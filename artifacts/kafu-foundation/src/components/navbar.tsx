@@ -11,6 +11,7 @@ const navItems = [
     children: [
       { name: "About KAFU", path: "/about" },
       { name: "Vision & Mission", path: "/about#vision" },
+      { name: "Staff Directory", path: "/staff" },
       { name: "Contact Us", path: "/contact" },
     ],
   },

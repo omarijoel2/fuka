@@ -10,6 +10,8 @@ import type {
   ContactInfo,
   AdmissionsData,
   ProgrammeDetail,
+  StaffMember,
+  StaffProfile,
 } from "./api-types";
 
 export function useStats() {
@@ -79,6 +81,28 @@ export function useAdmissions() {
   return useQuery({
     queryKey: ["admissions"],
     queryFn: () => fetchApi<AdmissionsData>("/admissions"),
+  });
+}
+
+export function useStaff(params?: { school?: string; search?: string; designation?: string }) {
+  return useQuery({
+    queryKey: ["staff", params],
+    queryFn: () => {
+      const p = new URLSearchParams();
+      if (params?.school) p.append("school", params.school);
+      if (params?.search) p.append("search", params.search);
+      if (params?.designation) p.append("designation", params.designation);
+      const q = p.toString() ? `?${p.toString()}` : "";
+      return fetchApi<StaffMember[]>(`/staff${q}`);
+    },
+  });
+}
+
+export function useStaffProfile(slug: string) {
+  return useQuery({
+    queryKey: ["staff", slug],
+    queryFn: () => fetchApi<StaffProfile>(`/staff/${slug}`),
+    enabled: !!slug,
   });
 }
 

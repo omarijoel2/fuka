@@ -91,6 +91,50 @@ export interface ContactInfo {
   social_media: SocialMedia[];
 }
 
+export interface StaffMember {
+  slug: string;
+  title: string;
+  name: string;
+  designation: string;
+  school: string | null;
+  department: string;
+  unit: string | null;
+  email: string;
+  specializations: string[];
+  photo: string | null;
+  bio: string;
+}
+
+export interface StaffQualification {
+  year: string;
+  qualification: string;
+  institution: string;
+}
+
+export interface StaffExperience {
+  start: string;
+  end: string;
+  position: string;
+  institution: string;
+}
+
+export interface StaffPublication {
+  citation: string;
+  url: string | null;
+}
+
+export interface StaffProfile extends StaffMember {
+  phone_visible: boolean;
+  biography: string;
+  qualifications: StaffQualification[];
+  research_interests: string[];
+  teaching_areas: string[];
+  experience: StaffExperience[];
+  publications: StaffPublication[];
+  awards: string[];
+  memberships: string[];
+}
+
 export interface ProgrammeDetail {
   school: string;
   code: string;
