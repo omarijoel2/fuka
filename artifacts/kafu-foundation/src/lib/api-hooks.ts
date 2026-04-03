@@ -1,11 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchApi } from "./api-types";
-import type { 
-  Stat, 
-  NewsArticle, 
-  School, 
-  Programme, 
-  Event, 
+import type {
+  Stat,
+  NewsArticle,
+  NewsArticleDetail,
+  School,
+  Programme,
+  Event,
+  Announcement,
+  AnnouncementDetail,
   Opportunity,
   OpportunityDetail,
   ContactInfo,
@@ -22,10 +25,24 @@ export function useStats() {
   });
 }
 
-export function useNews() {
+export function useNews(params?: { category?: string; search?: string }) {
   return useQuery({
-    queryKey: ["news"],
-    queryFn: () => fetchApi<NewsArticle[]>("/news"),
+    queryKey: ["news", params],
+    queryFn: () => {
+      const p = new URLSearchParams();
+      if (params?.category && params.category !== "All") p.append("category", params.category);
+      if (params?.search) p.append("search", params.search);
+      const q = p.toString() ? `?${p.toString()}` : "";
+      return fetchApi<NewsArticle[]>(`/news${q}`);
+    },
+  });
+}
+
+export function useNewsDetail(slug: string) {
+  return useQuery({
+    queryKey: ["news-detail", slug],
+    queryFn: () => fetchApi<NewsArticleDetail>(`/news/${slug}`),
+    enabled: !!slug,
   });
 }
 
@@ -57,10 +74,47 @@ export function useProgrammes(schoolCode?: string, level?: string) {
   });
 }
 
-export function useEvents() {
+export function useEvents(params?: { filter?: string; category?: string; search?: string }) {
   return useQuery({
-    queryKey: ["events"],
-    queryFn: () => fetchApi<Event[]>("/events"),
+    queryKey: ["events", params],
+    queryFn: () => {
+      const p = new URLSearchParams();
+      if (params?.filter) p.append("filter", params.filter);
+      if (params?.category && params.category !== "All") p.append("category", params.category);
+      if (params?.search) p.append("search", params.search);
+      const q = p.toString() ? `?${p.toString()}` : "";
+      return fetchApi<Event[]>(`/events${q}`);
+    },
+  });
+}
+
+export function useEventDetail(slug: string) {
+  return useQuery({
+    queryKey: ["event-detail", slug],
+    queryFn: () => fetchApi<Event>(`/events/${slug}`),
+    enabled: !!slug,
+  });
+}
+
+export function useAnnouncements(params?: { priority?: string; search?: string; status?: string }) {
+  return useQuery({
+    queryKey: ["announcements", params],
+    queryFn: () => {
+      const p = new URLSearchParams();
+      if (params?.priority && params.priority !== "all") p.append("priority", params.priority);
+      if (params?.search) p.append("search", params.search);
+      if (params?.status) p.append("status", params.status);
+      const q = p.toString() ? `?${p.toString()}` : "";
+      return fetchApi<Announcement[]>(`/announcements${q}`);
+    },
+  });
+}
+
+export function useAnnouncementDetail(slug: string) {
+  return useQuery({
+    queryKey: ["announcement-detail", slug],
+    queryFn: () => fetchApi<AnnouncementDetail>(`/announcements/${slug}`),
+    enabled: !!slug,
   });
 }
 

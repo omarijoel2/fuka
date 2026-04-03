@@ -48,7 +48,15 @@ const navItems = [
       { name: "E-Learning", path: "https://elearning.kafu.ac.ke", external: true },
     ],
   },
-  { name: "News", path: "/news" },
+  {
+    name: "News",
+    path: "/news",
+    children: [
+      { name: "Latest News", path: "/news" },
+      { name: "Events Calendar", path: "/events" },
+      { name: "Announcements", path: "/announcements" },
+    ],
+  },
   { name: "Opportunities", path: "/opportunities" },
   { name: "Contact", path: "/contact" },
 ];

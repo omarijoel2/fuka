@@ -11,14 +11,19 @@ export interface NewsArticle {
   id: number;
   slug: string;
   title: string;
-  excerpt: string;
-  summary?: string;
-  content?: string;
+  excerpt?: string;
+  summary: string;
   category: string;
+  author: string;
   date: string;
-  image?: string | null;
   imageUrl?: string | null;
+  tags: string[];
   featured: boolean;
+}
+
+export interface NewsArticleDetail extends NewsArticle {
+  content: string;
+  related: number[];
 }
 
 export interface ProgrammeCount {
@@ -49,11 +54,34 @@ export interface Programme {
 
 export interface Event {
   id: number;
+  slug: string;
   title: string;
   date: string;
+  end_date?: string | null;
   time: string;
   location: string;
   category: string;
+  description: string;
+  registration_link?: string | null;
+  tags: string[];
+  status: "upcoming" | "past" | "ongoing";
+}
+
+export interface Announcement {
+  id: number;
+  slug: string;
+  title: string;
+  department: string;
+  priority: "normal" | "urgent";
+  publish_date: string;
+  summary: string;
+  tags: string[];
+  status: "active" | "archived";
+}
+
+export interface AnnouncementDetail extends Announcement {
+  content: string;
+  attachments: { title: string; url: string; type: string }[];
 }
 
 export interface Opportunity {

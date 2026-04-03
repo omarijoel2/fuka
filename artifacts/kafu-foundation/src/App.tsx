@@ -17,7 +17,11 @@ import StaffProfilePage from "@/pages/staff-profile";
 import Admissions from "@/pages/admissions";
 import StudentServices from "@/pages/student-services";
 import News from "@/pages/news";
+import NewsDetail from "@/pages/news-detail";
 import Events from "@/pages/events";
+import EventDetail from "@/pages/event-detail";
+import Announcements from "@/pages/announcements";
+import AnnouncementDetail from "@/pages/announcement-detail";
 import Opportunities from "@/pages/opportunities";
 import OpportunityDetail from "@/pages/opportunity-detail";
 import Contact from "@/pages/contact";
@@ -49,7 +53,11 @@ function Router() {
           <Route path="/admissions" component={Admissions} />
           <Route path="/student-services" component={StudentServices} />
           <Route path="/news" component={News} />
+          <Route path="/news/:slug" component={NewsDetail} />
           <Route path="/events" component={Events} />
+          <Route path="/events/:slug" component={EventDetail} />
+          <Route path="/announcements" component={Announcements} />
+          <Route path="/announcements/:slug" component={AnnouncementDetail} />
           <Route path="/opportunities" component={Opportunities} />
           <Route path="/opportunities/:slug" component={OpportunityDetail} />
           <Route path="/contact" component={Contact} />
