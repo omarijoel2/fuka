@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useLocation } from "wouter";
 import { apiGet, apiPost, apiPut, apiDelete, CONTENT_TYPE_LABELS, CONTENT_TYPES, WORKFLOW_TRANSITIONS, STATUS_LABELS, formatDateTime, type WorkflowStatus } from "@/lib/api";
 import { StatusBadge } from "@/components/status-badge";
-import { Save, Trash2, Clock, ArrowLeft, RotateCcw, ChevronDown, ChevronUp } from "lucide-react";
+import { Save, Trash2, Clock, ArrowLeft, RotateCcw, ChevronDown, ChevronUp, Plus, X } from "lucide-react";
 
 interface ContentItem {
   id?: number;
@@ -24,6 +24,11 @@ interface ContentItem {
   published_at?: string | null;
   scheduled_at?: string | null;
   publish_date?: string | null;
+  structured_data?: Record<string, unknown> | null;
+  category?: string;
+  department?: string;
+  tags?: string[];
+  featured?: boolean;
 }
 
 interface Revision {
@@ -35,6 +40,18 @@ function slugify(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
+function sdField(sd: Record<string, unknown>, key: string): string {
+  return (sd[key] as string) ?? "";
+}
+
+function sdListField(sd: Record<string, unknown>, key: string): string[] {
+  return (sd[key] as string[]) ?? [];
+}
+
+function sdObjField(sd: Record<string, unknown>, key: string): Record<string, string> {
+  return (sd[key] as Record<string, string>) ?? {};
+}
+
 export default function ContentEditorPage({ id }: { id?: string }) {
   const isNew = !id || id === "new";
   const [, navigate] = useLocation();
@@ -42,7 +59,7 @@ export default function ContentEditorPage({ id }: { id?: string }) {
   const [form, setForm] = useState<ContentItem>({
     title: "", slug: "", type: "news", status: "draft",
     summary: "", body: "", meta_title: "", meta_description: "",
-    featured_image_url: "",
+    featured_image_url: "", structured_data: {}, category: "", department: "", tags: [], featured: false,
   });
   const [revisions, setRevisions] = useState<Revision[]>([]);
   const [showRevisions, setShowRevisions] = useState(false);
@@ -53,6 +70,7 @@ export default function ContentEditorPage({ id }: { id?: string }) {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [scheduleAt, setScheduleAt] = useState("");
+  const [requirementInput, setRequirementInput] = useState("");
 
   const load = useCallback(async () => {
     if (isNew) return;
@@ -68,6 +86,11 @@ export default function ContentEditorPage({ id }: { id?: string }) {
         featured_image_url: raw?.featured_image ?? "",
         summary: raw?.summary ?? "",
         body: raw?.body ?? "",
+        structured_data: raw?.structured_data ?? {},
+        category: raw?.category ?? "",
+        department: raw?.department ?? "",
+        tags: raw?.tags ?? [],
+        featured: raw?.featured ?? false,
       });
       const revData = await apiGet(`/content/${id}/revisions`);
       setRevisions(revData?.data ?? []);
@@ -80,13 +103,22 @@ export default function ContentEditorPage({ id }: { id?: string }) {
 
   useEffect(() => { load(); }, [load]);
 
-  const field = (key: keyof ContentItem, value: string) => {
+  const field = (key: keyof ContentItem, value: unknown) => {
     setForm((f) => ({
       ...f,
       [key]: value,
-      ...(key === "title" && isNew ? { slug: slugify(value), meta_title: value } : {}),
+      ...(key === "title" && isNew ? { slug: slugify(value as string), meta_title: value as string } : {}),
     }));
   };
+
+  const setSd = (key: string, value: unknown) => {
+    setForm((f) => ({
+      ...f,
+      structured_data: { ...(f.structured_data ?? {}), [key]: value },
+    }));
+  };
+
+  const sd = form.structured_data ?? {};
 
   const save = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -99,7 +131,12 @@ export default function ContentEditorPage({ id }: { id?: string }) {
         type: form.type,
         summary: form.summary,
         body: form.body,
+        category: form.category || null,
+        department: form.department || null,
+        tags: form.tags ?? [],
+        featured: form.featured ?? false,
         featured_image: form.featured_image_url || form.featured_image || "",
+        structured_data: form.structured_data ?? {},
         seo_meta: {
           title: form.meta_title || form.title,
           description: form.meta_description || form.summary,
@@ -208,6 +245,7 @@ export default function ContentEditorPage({ id }: { id?: string }) {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main form */}
         <div className="lg:col-span-2 space-y-5">
+          {/* Core fields */}
           <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">
             <div>
               <label className="block text-sm font-medium text-foreground mb-1.5" htmlFor="field-title">Title</label>
@@ -252,12 +290,279 @@ export default function ContentEditorPage({ id }: { id?: string }) {
                 rows={16}
                 value={form.body}
                 onChange={(e) => field("body", e.target.value)}
-                placeholder="Content body (HTML or Markdown accepted)..."
+                placeholder="Content body (HTML or plain text)..."
                 className="w-full px-3 py-2.5 rounded-lg border border-border text-sm font-mono resize-y focus:outline-none focus:ring-2 focus:ring-primary/30"
                 data-testid="input-body"
               />
             </div>
           </div>
+
+          {/* TYPE-SPECIFIC FIELDS — Event */}
+          {form.type === "event" && (
+            <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">
+              <h3 className="text-sm font-bold text-foreground">Event Details</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Start Date</label>
+                  <input
+                    type="date"
+                    value={sdField(sd, "date")}
+                    onChange={(e) => setSd("date", e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    data-testid="input-event-date"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">End Date</label>
+                  <input
+                    type="date"
+                    value={sdField(sd, "end_date")}
+                    onChange={(e) => setSd("end_date", e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    data-testid="input-event-end-date"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Time (e.g. 09:00 – 17:00)</label>
+                  <input
+                    type="text"
+                    value={sdField(sd, "time")}
+                    onChange={(e) => setSd("time", e.target.value)}
+                    placeholder="09:00 – 17:00"
+                    className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    data-testid="input-event-time"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Event Status</label>
+                  <select
+                    value={sdField(sd, "event_status") || "upcoming"}
+                    onChange={(e) => setSd("event_status", e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none"
+                    data-testid="select-event-status"
+                  >
+                    <option value="upcoming">Upcoming</option>
+                    <option value="ongoing">Ongoing</option>
+                    <option value="past">Past</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Location</label>
+                <input
+                  type="text"
+                  value={sdField(sd, "location")}
+                  onChange={(e) => setSd("location", e.target.value)}
+                  placeholder="e.g. Main Campus, Kaimosi"
+                  className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  data-testid="input-event-location"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Registration Link (optional)</label>
+                <input
+                  type="url"
+                  value={sdField(sd, "registration_link")}
+                  onChange={(e) => setSd("registration_link", e.target.value)}
+                  placeholder="https://portal.kafu.ac.ke"
+                  className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  data-testid="input-event-reg-link"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* TYPE-SPECIFIC FIELDS — Announcement */}
+          {form.type === "announcement" && (
+            <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">
+              <h3 className="text-sm font-bold text-foreground">Announcement Details</h3>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Priority</label>
+                <select
+                  value={sdField(sd, "priority") || "normal"}
+                  onChange={(e) => setSd("priority", e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none"
+                  data-testid="select-announcement-priority"
+                >
+                  <option value="normal">Normal</option>
+                  <option value="urgent">Urgent</option>
+                </select>
+              </div>
+            </div>
+          )}
+
+          {/* TYPE-SPECIFIC FIELDS — Opportunity */}
+          {form.type === "opportunity" && (
+            <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">
+              <h3 className="text-sm font-bold text-foreground">Opportunity Details</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Category</label>
+                  <select
+                    value={sdField(sd, "opportunity_category") || "notice"}
+                    onChange={(e) => {
+                      const cat = e.target.value;
+                      const typeLabels: Record<string, string> = {
+                        tender: "Tender", vacancy: "Job Vacancy", internship: "Internship",
+                        scholarship: "Scholarship", call: "Call for Applications", notice: "Notice",
+                      };
+                      setSd("opportunity_category", cat);
+                      setSd("opportunity_type", typeLabels[cat] ?? cat);
+                    }}
+                    className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none"
+                    data-testid="select-opportunity-category"
+                  >
+                    <option value="tender">Tender</option>
+                    <option value="vacancy">Job Vacancy</option>
+                    <option value="internship">Internship</option>
+                    <option value="scholarship">Scholarship/Bursary</option>
+                    <option value="call">Call for Applications</option>
+                    <option value="notice">Notice</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Status</label>
+                  <select
+                    value={sdField(sd, "opportunity_status") || "open"}
+                    onChange={(e) => setSd("opportunity_status", e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none"
+                    data-testid="select-opportunity-status"
+                  >
+                    <option value="open">Open</option>
+                    <option value="closing-soon">Closing Soon</option>
+                    <option value="closed">Closed</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Reference Number</label>
+                <input
+                  type="text"
+                  value={sdField(sd, "reference")}
+                  onChange={(e) => setSd("reference", e.target.value)}
+                  placeholder="e.g. KAFU/PROC/001/2026"
+                  className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  data-testid="input-opp-reference"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Deadline Date</label>
+                  <input
+                    type="date"
+                    value={sdField(sd, "deadline")}
+                    onChange={(e) => setSd("deadline", e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    data-testid="input-opp-deadline"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Deadline Time</label>
+                  <input
+                    type="text"
+                    value={sdField(sd, "deadline_time")}
+                    onChange={(e) => setSd("deadline_time", e.target.value)}
+                    placeholder="17:00"
+                    className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    data-testid="input-opp-deadline-time"
+                  />
+                </div>
+              </div>
+
+              {/* Requirements list */}
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Requirements</label>
+                <div className="space-y-1.5">
+                  {sdListField(sd, "requirements").map((req, i) => (
+                    <div key={i} className="flex items-center gap-2">
+                      <span className="flex-1 text-sm bg-muted rounded px-2 py-1">{req}</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const list = sdListField(sd, "requirements").filter((_, idx) => idx !== i);
+                          setSd("requirements", list);
+                        }}
+                        className="text-red-500 hover:text-red-700"
+                        data-testid={`btn-remove-req-${i}`}
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={requirementInput}
+                      onChange={(e) => setRequirementInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          if (requirementInput.trim()) {
+                            setSd("requirements", [...sdListField(sd, "requirements"), requirementInput.trim()]);
+                            setRequirementInput("");
+                          }
+                        }
+                      }}
+                      placeholder="Add requirement and press Enter"
+                      className="flex-1 px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      data-testid="input-opp-req"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (requirementInput.trim()) {
+                          setSd("requirements", [...sdListField(sd, "requirements"), requirementInput.trim()]);
+                          setRequirementInput("");
+                        }
+                      }}
+                      className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm"
+                      data-testid="btn-add-req"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Submission info */}
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Submission Instructions</label>
+                <textarea
+                  rows={3}
+                  value={sdField(sd, "submission_info")}
+                  onChange={(e) => setSd("submission_info", e.target.value)}
+                  placeholder="How to apply / submit..."
+                  className="w-full px-3 py-2 rounded-lg border border-border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  data-testid="input-opp-submission"
+                />
+              </div>
+
+              {/* Contact */}
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Contact Office</label>
+                <div className="grid grid-cols-2 gap-3">
+                  {[
+                    { k: "office", p: "Office name" },
+                    { k: "email", p: "Email address" },
+                    { k: "phone", p: "Phone number" },
+                    { k: "location", p: "Physical location" },
+                  ].map(({ k, p }) => (
+                    <input
+                      key={k}
+                      type="text"
+                      value={sdObjField(sd, "contact")[k] ?? ""}
+                      onChange={(e) => setSd("contact", { ...sdObjField(sd, "contact"), [k]: e.target.value })}
+                      placeholder={p}
+                      className="px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      data-testid={`input-opp-contact-${k}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* SEO */}
           <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">
@@ -305,6 +610,50 @@ export default function ContentEditorPage({ id }: { id?: string }) {
               </select>
             </div>
             <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Category</label>
+              <input
+                type="text"
+                value={form.category ?? ""}
+                onChange={(e) => field("category", e.target.value)}
+                placeholder="e.g. Research & Innovation"
+                className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                data-testid="input-category"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Department</label>
+              <input
+                type="text"
+                value={form.department ?? ""}
+                onChange={(e) => field("department", e.target.value)}
+                placeholder="e.g. Office of the Vice-Chancellor"
+                className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                data-testid="input-department"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Tags (comma-separated)</label>
+              <input
+                type="text"
+                value={(form.tags ?? []).join(", ")}
+                onChange={(e) => field("tags", e.target.value.split(",").map((t) => t.trim()).filter(Boolean))}
+                placeholder="e.g. Research, Innovation, SCIT"
+                className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                data-testid="input-tags"
+              />
+            </div>
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="chk-featured"
+                checked={form.featured ?? false}
+                onChange={(e) => field("featured", e.target.checked)}
+                className="w-4 h-4 rounded border-border accent-primary"
+                data-testid="chk-featured"
+              />
+              <label htmlFor="chk-featured" className="text-xs font-medium text-muted-foreground">Featured</label>
+            </div>
+            <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">Featured Image URL</label>
               <input
                 type="url"
@@ -321,10 +670,10 @@ export default function ContentEditorPage({ id }: { id?: string }) {
             {!isNew && (
               <div className="space-y-1 text-xs text-muted-foreground border-t border-border pt-3">
                 {form.author && (
-              <p>Author: <span className="font-medium text-foreground">
-                {typeof form.author === "object" ? form.author.name : form.author}
-              </span></p>
-            )}
+                  <p>Author: <span className="font-medium text-foreground">
+                    {typeof form.author === "object" ? (form.author as { name: string }).name : form.author}
+                  </span></p>
+                )}
                 {form.created_at && <p>Created: {formatDateTime(form.created_at)}</p>}
                 {form.updated_at && <p>Updated: {formatDateTime(form.updated_at)}</p>}
                 {form.published_at && <p>Published: {formatDateTime(form.published_at)}</p>}

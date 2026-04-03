@@ -2,12 +2,129 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Models\CmsContent;
+
+function mapCmsNews(CmsContent $item): array {
+    return [
+        'id'       => $item->id,
+        'slug'     => $item->slug,
+        'title'    => $item->title,
+        'excerpt'  => $item->summary,
+        'summary'  => $item->summary,
+        'category' => $item->category ?? 'General',
+        'author'   => $item->author?->name ?? 'KAFU Communications Office',
+        'date'     => $item->published_at?->format('Y-m-d') ?? $item->created_at->format('Y-m-d'),
+        'imageUrl' => $item->featured_image ?: null,
+        'tags'     => $item->tags ?? [],
+        'featured' => (bool)$item->featured,
+    ];
+}
+
+function mapCmsNewsDetail(CmsContent $item): array {
+    $base = mapCmsNews($item);
+    $base['content'] = $item->body ?? '<p>Content is being prepared. Please check back shortly.</p>';
+    $base['related'] = $item->related_ids ?? [];
+    return $base;
+}
+
+function mapCmsEvent(CmsContent $item): array {
+    $sd = $item->structured_data ?? [];
+    $status = $sd['event_status'] ?? 'upcoming';
+    $date   = $sd['date'] ?? $item->published_at?->format('Y-m-d') ?? $item->created_at->format('Y-m-d');
+    if (isset($sd['date']) && $sd['date'] < date('Y-m-d') && $status === 'upcoming') {
+        $status = 'past';
+    }
+    return [
+        'id'                => $item->id,
+        'slug'              => $item->slug,
+        'title'             => $item->title,
+        'date'              => $date,
+        'end_date'          => $sd['end_date'] ?? null,
+        'time'              => $sd['time'] ?? '',
+        'location'          => $sd['location'] ?? 'Kaimosi Campus',
+        'category'          => $item->category ?? 'General',
+        'description'       => $item->summary ?? $item->body ?? '',
+        'registration_link' => $sd['registration_link'] ?? null,
+        'tags'              => $item->tags ?? [],
+        'status'            => $status,
+    ];
+}
+
+function mapCmsEventDetail(CmsContent $item): array {
+    $base = mapCmsEvent($item);
+    $base['full_description'] = $item->body ?? $item->summary ?? '';
+    return $base;
+}
+
+function mapCmsAnnouncement(CmsContent $item): array {
+    $sd = $item->structured_data ?? [];
+    return [
+        'id'           => $item->id,
+        'slug'         => $item->slug,
+        'title'        => $item->title,
+        'department'   => $item->department ?? 'University Administration',
+        'priority'     => $sd['priority'] ?? 'normal',
+        'publish_date' => $item->published_at?->format('Y-m-d') ?? $item->created_at->format('Y-m-d'),
+        'summary'      => $item->summary ?? '',
+        'tags'         => $item->tags ?? [],
+        'status'       => 'active',
+    ];
+}
+
+function mapCmsAnnouncementDetail(CmsContent $item): array {
+    $base = mapCmsAnnouncement($item);
+    $sd = $item->structured_data ?? [];
+    $base['content']     = $item->body ?? '<p>Full content is being prepared.</p>';
+    $base['attachments'] = $sd['attachments'] ?? [];
+    return $base;
+}
+
+function mapCmsOpportunity(CmsContent $item): array {
+    $sd = $item->structured_data ?? [];
+    return [
+        'id'             => $item->id,
+        'slug'           => $item->slug,
+        'category'       => $sd['opportunity_category'] ?? $item->category ?? 'notice',
+        'type'           => $sd['opportunity_type'] ?? ucfirst($item->category ?? 'Notice'),
+        'title'          => $item->title,
+        'reference'      => $sd['reference'] ?? '',
+        'department'     => $item->department ?? '',
+        'summary'        => $item->summary ?? '',
+        'publish_date'   => $item->published_at?->format('Y-m-d') ?? $item->created_at->format('Y-m-d'),
+        'deadline'       => $sd['deadline'] ?? null,
+        'deadline_time'  => $sd['deadline_time'] ?? null,
+        'status'         => $sd['opportunity_status'] ?? 'open',
+        'featured'       => (bool)$item->featured,
+        'documents_count'=> count($sd['documents'] ?? []),
+    ];
+}
+
+function mapCmsOpportunityDetail(CmsContent $item): array {
+    $base = mapCmsOpportunity($item);
+    $sd = $item->structured_data ?? [];
+    $base['description']      = $item->body ?? $item->summary ?? '';
+    $base['requirements']     = $sd['requirements'] ?? [];
+    $base['submission_info']  = $sd['submission_info'] ?? '';
+    $base['contact']          = $sd['contact'] ?? ['office'=>'Registry','email'=>'info@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'Main Campus, Kaimosi'];
+    $base['documents']        = $sd['documents'] ?? [];
+    return $base;
+}
 
 Route::get('/healthz', function () {
     return response()->json(['status' => 'ok', 'service' => 'KAFU API']);
 });
 
 Route::get('/news', function (Request $request) {
+    $cmsItems = CmsContent::where('type', 'news')
+        ->where('status', 'published')
+        ->where('is_deleted', false)
+        ->with('author:id,name')
+        ->orderByDesc('published_at')
+        ->get()
+        ->map(fn($item) => mapCmsNews($item))
+        ->toArray();
+    $cmsSlugSet = array_flip(array_column($cmsItems, 'slug'));
+
     $articles = [
         [
             'id' => 1,
@@ -141,6 +258,10 @@ Route::get('/news', function (Request $request) {
         ],
     ];
 
+    // Remove static articles already managed in CMS (CMS version takes precedence)
+    $articles = array_values(array_filter($articles, fn($a) => !isset($cmsSlugSet[$a['slug']])));
+    $articles = array_merge($cmsItems, $articles);
+
     $category = $request->query('category');
     $search = $request->query('search');
 
@@ -159,6 +280,16 @@ Route::get('/news', function (Request $request) {
 });
 
 Route::get('/news/{slug}', function (string $slug) {
+    // Check CMS first
+    $cmsItem = CmsContent::where('type', 'news')
+        ->where('slug', $slug)
+        ->where('status', 'published')
+        ->where('is_deleted', false)
+        ->with('author:id,name')
+        ->first();
+    if ($cmsItem) {
+        return response()->json(['data' => mapCmsNewsDetail($cmsItem)]);
+    }
     $articles = [
         'innovators-develop-smart-digital-systems' => [
             'id' => 1,
@@ -240,6 +371,15 @@ Route::get('/news/{slug}', function (string $slug) {
 });
 
 Route::get('/events', function (Request $request) {
+    $cmsItems = CmsContent::where('type', 'event')
+        ->where('status', 'published')
+        ->where('is_deleted', false)
+        ->orderByDesc('published_at')
+        ->get()
+        ->map(fn($item) => mapCmsEvent($item))
+        ->toArray();
+    $cmsSlugSet = array_flip(array_column($cmsItems, 'slug'));
+
     $events = [
         [
             'id' => 1,
@@ -383,6 +523,10 @@ Route::get('/events', function (Request $request) {
         ],
     ];
 
+    // Merge: CMS events first, static events that aren't in CMS after
+    $events = array_values(array_filter($events, fn($e) => !isset($cmsSlugSet[$e['slug']])));
+    $events = array_merge($cmsItems, $events);
+
     $filter = $request->query('filter', 'upcoming');
     $category = $request->query('category');
     $search = $request->query('search');
@@ -407,6 +551,15 @@ Route::get('/events', function (Request $request) {
 });
 
 Route::get('/events/{slug}', function (string $slug) {
+    // Check CMS first
+    $cmsItem = CmsContent::where('type', 'event')
+        ->where('slug', $slug)
+        ->where('status', 'published')
+        ->where('is_deleted', false)
+        ->first();
+    if ($cmsItem) {
+        return response()->json(['data' => mapCmsEventDetail($cmsItem)]);
+    }
     $all = [
         'examination-processing-semester-2-2025-2026' => ['id'=>1,'end_date'=>'2026-04-10','time'=>'08:00 – 17:00','location'=>'Main Campus, Kaimosi','category'=>'Examinations','registration_link'=>'https://portal.kafu.ac.ke','tags'=>['Examinations','Academic Calendar','Students'],'status'=>'upcoming'],
         'kafu-open-day-2026' => ['id'=>2,'end_date'=>'2026-04-15','time'=>'09:00 – 16:00','location'=>'All Schools, Main Campus, Kaimosi','category'=>'Community Outreach','registration_link'=>'https://portal.kafu.ac.ke','tags'=>['Open Day','Prospective Students','Admissions'],'status'=>'upcoming'],
@@ -468,6 +621,15 @@ Route::get('/events/{slug}', function (string $slug) {
 });
 
 Route::get('/announcements', function (Request $request) {
+    $cmsItems = CmsContent::where('type', 'announcement')
+        ->where('status', 'published')
+        ->where('is_deleted', false)
+        ->orderByDesc('published_at')
+        ->get()
+        ->map(fn($item) => mapCmsAnnouncement($item))
+        ->toArray();
+    $cmsSlugSet = array_flip(array_column($cmsItems, 'slug'));
+
     $announcements = [
         [
             'id' => 1,
@@ -581,6 +743,10 @@ Route::get('/announcements', function (Request $request) {
         ],
     ];
 
+    // Merge: CMS announcements first, static ones not in CMS after
+    $announcements = array_values(array_filter($announcements, fn($a) => !isset($cmsSlugSet[$a['slug']])));
+    $announcements = array_merge($cmsItems, $announcements);
+
     $priority = $request->query('priority');
     $department = $request->query('department');
     $search = $request->query('search');
@@ -606,6 +772,15 @@ Route::get('/announcements', function (Request $request) {
 });
 
 Route::get('/announcements/{slug}', function (string $slug) {
+    // Check CMS first
+    $cmsItem = CmsContent::where('type', 'announcement')
+        ->where('slug', $slug)
+        ->where('status', 'published')
+        ->where('is_deleted', false)
+        ->first();
+    if ($cmsItem) {
+        return response()->json(['data' => mapCmsAnnouncementDetail($cmsItem)]);
+    }
     $content_map = [
         'academic-calendar-2025-2026' => "<p>The Academic Board of Kaimosi Friends University, at its meeting held on 28 July 2025, approved the official academic calendar for the 2025/2026 academic year. All students, staff, and other stakeholders are advised to familiarise themselves with the key dates and plan accordingly.</p><p>The academic calendar is available for download from the student portal and the university website. Physical copies are available at the Academic Registrar's office, the Dean of Students office, and all School offices.</p><p>Key dates include: Semester I commencing 8 September 2025; Semester I examinations 15–26 December 2025; Semester II commencing 12 January 2026; and Semester II examinations commencing 6 April 2026. The graduation ceremony is scheduled for 22 May 2026.</p>",
         'fee-structure-semester-2-2025-2026' => "<p>The Finance Office wishes to notify all students that the fee structure for the Second Semester 2025/2026 has been reviewed and updated in line with the university's approved budget. Students are required to note the following key updates:</p><ul><li>Tuition fees remain unchanged for continuing students.</li><li>Student welfare and medical fees have been adjusted upward by 5% following a review by the University Council.</li><li>All fee balances from Semester I must be cleared by 31 January 2026 to avoid a late payment penalty of 10% per month.</li></ul><p>Fee payment options include M-Pesa Paybill (Business Number: 123456, Account: Student Registration Number), bank deposit at Equity Bank (Account Number: 0290265940855), or direct payment at the Finance Office cashiers.</p>",
@@ -941,6 +1116,15 @@ Route::get('/contact', function () {
 });
 
 Route::get('/opportunities', function (Request $request) {
+    $cmsItems = CmsContent::where('type', 'opportunity')
+        ->where('status', 'published')
+        ->where('is_deleted', false)
+        ->orderByDesc('published_at')
+        ->get()
+        ->map(fn($item) => mapCmsOpportunity($item))
+        ->toArray();
+    $cmsSlugSet = array_flip(array_column($cmsItems, 'slug'));
+
     $all = [
         ['id'=>1,'slug'=>'supply-laboratory-equipment-kafu-proc-001-2026','category'=>'tender','type'=>'Tender','title'=>'Supply of Laboratory Equipment and Consumables','reference'=>'KAFU/PROC/001/2026','department'=>'Procurement & Supply Chain','summary'=>'KAFU invites sealed bids from qualified and registered suppliers for the supply and delivery of laboratory equipment and consumables for the Schools of Science and Health Sciences.','publish_date'=>'2026-03-17','deadline'=>'2026-04-30','deadline_time'=>'17:00','status'=>'open','featured'=>true,'documents_count'=>2],
         ['id'=>2,'slug'=>'provision-security-services-kafu-proc-002-2026','category'=>'tender','type'=>'Tender','title'=>'Provision of Security Guard Services','reference'=>'KAFU/PROC/002/2026','department'=>'Procurement & Supply Chain','summary'=>'KAFU invites tenders from licensed security firms for the provision of professional security guard services across all university campuses and facilities.','publish_date'=>'2026-03-20','deadline'=>'2026-04-08','deadline_time'=>'12:00','status'=>'closing-soon','featured'=>false,'documents_count'=>1],
@@ -961,6 +1145,10 @@ Route::get('/opportunities', function (Request $request) {
         ['id'=>17,'slug'=>'lecturer-business-admin-kafu-hr-005-2025','category'=>'vacancy','type'=>'Job Vacancy','title'=>'Lecturer — Business Administration','reference'=>'KAFU/HR/005/2025','department'=>'School of Business and Economics (SBE)','summary'=>'Applications for the position of Lecturer in Business Administration. Position has since been filled.','publish_date'=>'2026-01-10','deadline'=>'2026-02-28','deadline_time'=>'17:00','status'=>'closed','featured'=>false,'documents_count'=>1],
     ];
 
+    // Merge: CMS opportunities first, static ones not in CMS after
+    $all = array_values(array_filter($all, fn($o) => !isset($cmsSlugSet[$o['slug']])));
+    $all = array_merge($cmsItems, $all);
+
     $category = $request->query('category');
     $status = $request->query('status');
     $search = $request->query('search');
@@ -974,7 +1162,7 @@ Route::get('/opportunities', function (Request $request) {
     }
     if ($search) {
         $filtered = array_values(array_filter($filtered, function($o) use ($search) {
-            return stripos($o['title'], $search) !== false || stripos($o['summary'], $search) !== false || stripos($o['reference'], $search) !== false || stripos($o['department'], $search) !== false;
+            return stripos($o['title'], $search) !== false || stripos($o['summary'], $search) !== false || stripos($o['reference'] ?? '', $search) !== false || stripos($o['department'], $search) !== false;
         }));
     }
 
@@ -982,6 +1170,16 @@ Route::get('/opportunities', function (Request $request) {
 });
 
 Route::get('/opportunities/{slug}', function (string $slug) {
+    // Check CMS first
+    $cmsItem = CmsContent::where('type', 'opportunity')
+        ->where('slug', $slug)
+        ->where('status', 'published')
+        ->where('is_deleted', false)
+        ->first();
+    if ($cmsItem) {
+        return response()->json(['data' => mapCmsOpportunityDetail($cmsItem)]);
+    }
+
     $details = [
         'supply-laboratory-equipment-kafu-proc-001-2026' => ['id'=>1,'slug'=>'supply-laboratory-equipment-kafu-proc-001-2026','category'=>'tender','type'=>'Tender','title'=>'Supply of Laboratory Equipment and Consumables','reference'=>'KAFU/PROC/001/2026','department'=>'Procurement & Supply Chain','summary'=>'KAFU invites sealed bids from qualified and registered suppliers for the supply and delivery of laboratory equipment and consumables for the Schools of Science and Health Sciences.','description'=>"Kaimosi Friends University (KAFU) wishes to procure laboratory equipment and consumables for use in the Schools of Science (SOS) and Health Sciences (SHS). Items include general laboratory glassware, chemicals, microscopes, centrifuges, autoclaves, optometry instruments, and clinical diagnostic equipment. Suppliers must be registered with the AGPO and have a valid business permit. Interested bidders may collect tender documents from the Procurement Office at the Main Campus during business hours.",'requirements'=>['Valid business registration certificate','Tax compliance certificate from KRA','AGPO registration certificate (where applicable)','Certificate of Incorporation or business permit','Audited accounts for the last two financial years','Evidence of supply of similar equipment (at least 3 LPOs)','Filled tender document duly signed'],'submission_info'=>'Sealed tenders in plain envelopes marked "KAFU/PROC/001/2026 — Laboratory Equipment" must be deposited in the Tender Box at the Procurement Office, Main Administration Block, Kaimosi Campus, by the deadline date and time. Tenders received after the deadline will not be accepted.','contact'=>['office'=>'Procurement & Supply Chain Department','email'=>'procurement@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'Main Administration Block, Kaimosi Campus'],'publish_date'=>'2026-03-17','deadline'=>'2026-04-30','deadline_time'=>'17:00','status'=>'open','featured'=>true,'documents'=>[['title'=>'Tender Document — Supply of Lab Equipment (KAFU/PROC/001/2026)','type'=>'PDF','size'=>'1.2 MB','url'=>'#'],['title'=>'Schedule of Requirements — Lab Consumables','type'=>'PDF','size'=>'348 KB','url'=>'#']]],
         'provision-security-services-kafu-proc-002-2026' => ['id'=>2,'slug'=>'provision-security-services-kafu-proc-002-2026','category'=>'tender','type'=>'Tender','title'=>'Provision of Security Guard Services','reference'=>'KAFU/PROC/002/2026','department'=>'Procurement & Supply Chain','summary'=>'KAFU invites tenders from licensed security firms for the provision of professional security guard services across all university campuses and facilities.','description'=>'Kaimosi Friends University invites proposals from registered and licensed security companies to provide manned security guard services at the main campus and satellite facilities. Services required include day and night guarding, access control, patrol, and incident reporting. The contract period is one year, renewable subject to satisfactory performance.','requirements'=>['Private Security Regulatory Authority (PSRA) license — valid','Certificate of Registration of Company/Business','KRA Tax Compliance Certificate','Minimum 3 years of experience providing security to educational institutions','Evidence of at least two similar contracts in educational or institutional settings','Bonded and insured against third-party liability','NSSF and NHIF compliance certificates'],'submission_info'=>'Sealed bids in plain envelopes clearly marked "KAFU/PROC/002/2026 — Security Services" must be deposited in the Tender Box at the Procurement Office by 8 April 2026 at 12:00 noon. Late submissions will be disqualified.','contact'=>['office'=>'Procurement & Supply Chain Department','email'=>'procurement@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'Main Administration Block, Kaimosi Campus'],'publish_date'=>'2026-03-20','deadline'=>'2026-04-08','deadline_time'=>'12:00','status'=>'closing-soon','featured'=>false,'documents'=>[['title'=>'Tender Document — Security Services (KAFU/PROC/002/2026)','type'=>'PDF','size'=>'980 KB','url'=>'#']]],

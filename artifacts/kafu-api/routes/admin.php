@@ -163,20 +163,22 @@ Route::prefix('admin')->group(function () {
             $user = $request->user();
 
             $data = $request->validate([
-                'type'           => 'required|string',
-                'title'          => 'required|string|max:500',
-                'slug'           => 'required|string|unique:cms_content,slug',
-                'summary'        => 'nullable|string',
-                'body'           => 'nullable|string',
-                'category'       => 'nullable|string',
-                'department'     => 'nullable|string',
-                'school_code'    => 'nullable|string',
-                'featured_image' => 'nullable|string',
-                'featured'       => 'nullable|boolean',
-                'tags'           => 'nullable|array',
-                'publish_date'   => 'nullable|date',
-                'expiry_date'    => 'nullable|date',
-                'seo_meta'       => 'nullable|array',
+                'type'            => 'required|string',
+                'title'           => 'required|string|max:500',
+                'slug'            => 'required|string|unique:cms_content,slug',
+                'summary'         => 'nullable|string',
+                'body'            => 'nullable|string',
+                'category'        => 'nullable|string',
+                'department'      => 'nullable|string',
+                'school_code'     => 'nullable|string',
+                'featured_image'  => 'nullable|string',
+                'featured'        => 'nullable|boolean',
+                'tags'            => 'nullable|array',
+                'publish_date'    => 'nullable|date',
+                'expiry_date'     => 'nullable|date',
+                'seo_meta'        => 'nullable|array',
+                'structured_data' => 'nullable|array',
+                'related_ids'     => 'nullable|array',
             ]);
 
             $data['author_id'] = $user->id;
@@ -217,20 +219,21 @@ Route::prefix('admin')->group(function () {
             }
 
             $data = $request->validate([
-                'title'          => 'sometimes|string|max:500',
-                'slug'           => 'sometimes|string|unique:cms_content,slug,' . $id,
-                'summary'        => 'nullable|string',
-                'body'           => 'nullable|string',
-                'category'       => 'nullable|string',
-                'department'     => 'nullable|string',
-                'school_code'    => 'nullable|string',
-                'featured_image' => 'nullable|string',
-                'featured'       => 'nullable|boolean',
-                'tags'           => 'nullable|array',
-                'publish_date'   => 'nullable|date',
-                'expiry_date'    => 'nullable|date',
-                'seo_meta'       => 'nullable|array',
-                'related_ids'    => 'nullable|array',
+                'title'           => 'sometimes|string|max:500',
+                'slug'            => 'sometimes|string|unique:cms_content,slug,' . $id,
+                'summary'         => 'nullable|string',
+                'body'            => 'nullable|string',
+                'category'        => 'nullable|string',
+                'department'      => 'nullable|string',
+                'school_code'     => 'nullable|string',
+                'featured_image'  => 'nullable|string',
+                'featured'        => 'nullable|boolean',
+                'tags'            => 'nullable|array',
+                'publish_date'    => 'nullable|date',
+                'expiry_date'     => 'nullable|date',
+                'seo_meta'        => 'nullable|array',
+                'structured_data' => 'nullable|array',
+                'related_ids'     => 'nullable|array',
             ]);
 
             $before = $content->toArray();
@@ -347,7 +350,7 @@ Route::prefix('admin')->group(function () {
             $content->update(array_intersect_key($snapshot, array_flip([
                 'title', 'slug', 'summary', 'body', 'category', 'department',
                 'school_code', 'featured_image', 'featured', 'tags', 'seo_meta',
-                'publish_date', 'expiry_date',
+                'structured_data', 'related_ids', 'publish_date', 'expiry_date',
             ])));
             $content->update(['status' => 'draft']);
 
