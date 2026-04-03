@@ -28,7 +28,7 @@ export default function TaxonomyPage() {
     setLoading(true); setError("");
     try {
       const data = await apiGet("/taxonomy");
-      setTerms(data ?? []);
+      setTerms(data?.terms ?? data ?? []);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to load taxonomy.");
     } finally { setLoading(false); }
