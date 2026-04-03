@@ -104,6 +104,36 @@ Laravel 11 with PHP 8.2. All routes in `routes/api.php` (1300+ lines).
 - **E-Learning**: elearning.kafu.ac.ke
 - **Schools**: SESS (Education), SBE (Business), SCIT (Computing), SOS (Science), SHS (Health Sciences)
 
+## MP08 — CMS & Governance Engine (COMPLETE)
+
+### Backend (artifacts/kafu-api)
+- **Migrations**: users role fields, cms_content, cms_revisions, media_files, audit_logs, taxonomy_terms, content_taxonomy
+- **Models**: CmsContent (forRole scope, allowedTransitions), CmsRevision, MediaFile, AuditLog, TaxonomyTerm, User (HasApiTokens, roles)
+- **Admin API**: `routes/admin.php` — full CRUD, workflow transitions, revisions, review queue, media, users, taxonomy, audit logs, reports
+- **Seeder**: 8 users, 36 taxonomy terms, 5 sample content items
+- **Auth**: Sanctum tokens, 8-hour expiry, rate limiting on login
+
+### CMS Admin Frontend (artifacts/kafu-cms)
+- **URL**: /kafu-cms/ (port 24962)
+- **Auth**: Token stored in localStorage (kafu_cms_token, kafu_cms_user)
+- **Pages built**:
+  - Login — full sign-in with KAFU branding
+  - Dashboard — stats, content by type, review queue preview, recent activity feed
+  - Content Library — filterable table (type, status, search) with pagination
+  - Content Editor — full form with slug auto-gen, body, SEO, featured image, workflow transitions, revision history
+  - Review Queue — grouped by status, direct links to editor
+  - Media Library — grid with type detection, copy URL, file details panel
+  - User Management — table + add/edit modal with role assignment
+  - Taxonomy Manager — vocabulary sidebar + hierarchical term tree with add/edit/delete
+  - Audit Log — searchable/filterable log with action badges
+  - Settings — account info + change password
+- **Workflow states**: draft → submitted → under_review → approved → scheduled → published → unpublished → archived
+- **Role-based nav**: super_admin/ict_admin/communications_admin see Users, Taxonomy, Audit, Settings; reviewer sees Review Queue
+- **API proxy**: Vite dev server proxies /api → localhost:8080
+
+### Admin Credentials
+- Email: admin@kafu.ac.ke | Password: KafuAdmin@2026 | Role: super_admin
+
 ## Conventions
 
 - No emojis anywhere in UI
