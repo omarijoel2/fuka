@@ -11,6 +11,7 @@ import UsersPage from "@/pages/users";
 import TaxonomyPage from "@/pages/taxonomy";
 import AuditLogPage from "@/pages/audit-log";
 import SettingsPage from "@/pages/settings";
+import SiteSettingsPage from "@/pages/site-settings";
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -31,6 +32,7 @@ function AppRoutes() {
         <Route path="/users" component={UsersPage} />
         <Route path="/taxonomy" component={TaxonomyPage} />
         <Route path="/audit" component={AuditLogPage} />
+        <Route path="/site-settings" component={SiteSettingsPage} />
         <Route path="/settings" component={SettingsPage} />
         <Route>{() => <DashboardPage />}</Route>
       </Switch>

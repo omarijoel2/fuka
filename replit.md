@@ -10,6 +10,7 @@ Official website for Kaimosi Friends University (KAFU), a Quaker-founded public 
 |---|---|---|---|
 | Frontend | React 18 + Vite + TypeScript | `artifacts/kafu-foundation/` | dynamic ($PORT) |
 | Backend API | Laravel 11 (PHP 8.2) | `artifacts/kafu-api/` | 8080 |
+| CMS Admin | React 18 + Vite + TypeScript | `artifacts/kafu-cms/` | 24962 |
 | Monorepo | pnpm workspaces | `/` | — |
 
 ## Frontend (`artifacts/kafu-foundation/`)

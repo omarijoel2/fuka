@@ -649,5 +649,64 @@ Route::prefix('admin')->group(function () {
             ]);
         });
 
+        // -------------------------------------------------------------------------
+        // Site Settings (singleton pages: contact, stats, admissions, homepage)
+        // -------------------------------------------------------------------------
+        Route::prefix('site-settings')->group(function () {
+
+            Route::get('/{key}', function (string $key) {
+                $page = CmsContent::where('type', 'page')
+                    ->where('slug', $key)
+                    ->where('is_deleted', false)
+                    ->first();
+                if (!$page) {
+                    return response()->json(['data' => null, 'exists' => false]);
+                }
+                return response()->json([
+                    'data' => [
+                        'id'             => $page->id,
+                        'key'            => $key,
+                        'status'         => $page->status,
+                        'structured_data'=> $page->structured_data ?? [],
+                    ],
+                    'exists' => true,
+                ]);
+            });
+
+            Route::put('/{key}', function (Request $request, string $key) {
+                $validated = $request->validate(['structured_data' => 'required|array']);
+                $user = $request->user();
+
+                $page = CmsContent::where('type', 'page')
+                    ->where('slug', $key)
+                    ->where('is_deleted', false)
+                    ->first();
+
+                if ($page) {
+                    $page->update([
+                        'structured_data' => $validated['structured_data'],
+                        'status'          => 'published',
+                        'published_at'    => $page->published_at ?? now(),
+                        'updated_by'      => $user->id,
+                    ]);
+                } else {
+                    $page = CmsContent::create([
+                        'type'            => 'page',
+                        'slug'            => $key,
+                        'title'           => ucwords(str_replace('-', ' ', $key)) . ' Settings',
+                        'status'          => 'published',
+                        'structured_data' => $validated['structured_data'],
+                        'published_at'    => now(),
+                        'created_by'      => $user->id,
+                        'updated_by'      => $user->id,
+                        'is_deleted'      => false,
+                    ]);
+                }
+
+                return response()->json(['data' => ['id' => $page->id, 'key' => $key, 'status' => 'published']]);
+            });
+
+        });
+
     });
 });

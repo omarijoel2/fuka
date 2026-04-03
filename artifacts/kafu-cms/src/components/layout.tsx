@@ -4,7 +4,7 @@ import { useAuth } from "@/lib/auth";
 import {
   LayoutDashboard, FileText, Calendar, Bell, Briefcase, Users,
   Image, Tag, ClipboardList, Settings, LogOut, Menu, X,
-  ChevronDown, ChevronRight, BookOpen, UserCog, AlertTriangle, Newspaper
+  ChevronDown, ChevronRight, BookOpen, UserCog, AlertTriangle, Newspaper, SlidersHorizontal
 } from "lucide-react";
 
 interface NavItem {
@@ -40,6 +40,7 @@ const navItems: NavItem[] = [
   { label: "Users", icon: <UserCog className="w-4 h-4" />, href: "/users", roles: ADMIN_ROLES },
   { label: "Taxonomy", icon: <Tag className="w-4 h-4" />, href: "/taxonomy", roles: ADMIN_ROLES },
   { label: "Audit Log", icon: <ClipboardList className="w-4 h-4" />, href: "/audit", roles: ADMIN_ROLES },
+  { label: "Site Settings", icon: <SlidersHorizontal className="w-4 h-4" />, href: "/site-settings", roles: ADMIN_ROLES },
   { label: "Settings", icon: <Settings className="w-4 h-4" />, href: "/settings", roles: ADMIN_ROLES },
 ];
 

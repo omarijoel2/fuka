@@ -89,6 +89,7 @@ export const CONTENT_TYPE_LABELS: Record<string, string> = {
   opportunity: "Opportunity",
   programme: "Programme",
   staff_profile: "Staff Profile",
+  school: "School",
   document: "Document",
   research: "Research",
   partner: "Partner",
@@ -135,4 +136,15 @@ export function formatDate(d: string | null | undefined) {
 export function formatDateTime(d: string | null | undefined) {
   if (!d) return "—";
   return new Date(d).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+}
+
+export function apiGetSiteSettings(key: string) {
+  return apiFetch(`/site-settings/${key}`);
+}
+
+export function apiPutSiteSettings(key: string, structured_data: unknown) {
+  return apiFetch(`/site-settings/${key}`, {
+    method: "PUT",
+    body: JSON.stringify({ structured_data }),
+  });
 }

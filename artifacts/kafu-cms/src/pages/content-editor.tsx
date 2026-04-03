@@ -27,6 +27,7 @@ interface ContentItem {
   structured_data?: Record<string, unknown> | null;
   category?: string;
   department?: string;
+  school_code?: string;
   tags?: string[];
   featured?: boolean;
 }
@@ -59,7 +60,7 @@ export default function ContentEditorPage({ id }: { id?: string }) {
   const [form, setForm] = useState<ContentItem>({
     title: "", slug: "", type: "news", status: "draft",
     summary: "", body: "", meta_title: "", meta_description: "",
-    featured_image_url: "", structured_data: {}, category: "", department: "", tags: [], featured: false,
+    featured_image_url: "", structured_data: {}, category: "", department: "", school_code: "", tags: [], featured: false,
   });
   const [revisions, setRevisions] = useState<Revision[]>([]);
   const [showRevisions, setShowRevisions] = useState(false);
@@ -89,6 +90,7 @@ export default function ContentEditorPage({ id }: { id?: string }) {
         structured_data: raw?.structured_data ?? {},
         category: raw?.category ?? "",
         department: raw?.department ?? "",
+        school_code: raw?.school_code ?? "",
         tags: raw?.tags ?? [],
         featured: raw?.featured ?? false,
       });
@@ -133,6 +135,7 @@ export default function ContentEditorPage({ id }: { id?: string }) {
         body: form.body,
         category: form.category || null,
         department: form.department || null,
+        school_code: form.school_code ? form.school_code.toUpperCase() : null,
         tags: form.tags ?? [],
         featured: form.featured ?? false,
         featured_image: form.featured_image_url || form.featured_image || "",
@@ -564,6 +567,170 @@ export default function ContentEditorPage({ id }: { id?: string }) {
             </div>
           )}
 
+          {/* TYPE-SPECIFIC FIELDS — Staff Profile */}
+          {form.type === "staff_profile" && (
+            <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">
+              <h3 className="text-sm font-bold text-foreground">Staff Profile Details</h3>
+              <div className="grid grid-cols-4 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Title Prefix</label>
+                  <select value={sdField(sd, "title_prefix") || "Dr."} onChange={(e) => setSd("title_prefix", e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none" data-testid="select-staff-title">
+                    <option value="Prof.">Prof.</option>
+                    <option value="Dr.">Dr.</option>
+                    <option value="Mr.">Mr.</option>
+                    <option value="Mrs.">Mrs.</option>
+                    <option value="Ms.">Ms.</option>
+                    <option value="Eng.">Eng.</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">First Name</label>
+                  <input type="text" value={sdField(sd, "first_name")} onChange={(e) => setSd("first_name", e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" data-testid="input-staff-first-name" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Middle Name</label>
+                  <input type="text" value={sdField(sd, "middle_name")} onChange={(e) => setSd("middle_name", e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" data-testid="input-staff-middle-name" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Last Name</label>
+                  <input type="text" value={sdField(sd, "last_name")} onChange={(e) => setSd("last_name", e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" data-testid="input-staff-last-name" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Designation / Job Title</label>
+                <input type="text" value={sdField(sd, "designation")} onChange={(e) => setSd("designation", e.target.value)} placeholder="e.g. Dean, School of Business and Economics" className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" data-testid="input-staff-designation" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Unit / Office</label>
+                  <input type="text" value={sdField(sd, "unit")} onChange={(e) => setSd("unit", e.target.value)} placeholder="e.g. University Leadership" className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" data-testid="input-staff-unit" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Email Address</label>
+                  <input type="email" value={sdField(sd, "email")} onChange={(e) => setSd("email", e.target.value)} placeholder="name@kafu.ac.ke" className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" data-testid="input-staff-email" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Photo URL</label>
+                <input type="url" value={sdField(sd, "photo")} onChange={(e) => setSd("photo", e.target.value)} placeholder="https://..." className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" data-testid="input-staff-photo" />
+              </div>
+              {/* Specializations */}
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Specializations</label>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {sdListField(sd, "specializations").map((s, i) => (
+                    <span key={i} className="flex items-center gap-1 bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
+                      {s}
+                      <button type="button" onClick={() => setSd("specializations", sdListField(sd, "specializations").filter((_, idx) => idx !== i))} className="hover:text-red-500" data-testid={`btn-rm-spec-${i}`}><X className="w-3 h-3" /></button>
+                    </span>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input type="text" id="spec-input" placeholder="Add specialization and press Enter" className="flex-1 px-3 py-2 rounded-lg border border-border text-sm focus:outline-none"
+                    onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); const v = (e.target as HTMLInputElement).value.trim(); if (v) { setSd("specializations", [...sdListField(sd, "specializations"), v]); (e.target as HTMLInputElement).value = ""; } } }}
+                    data-testid="input-spec" />
+                  <button type="button" onClick={() => { const el = document.getElementById("spec-input") as HTMLInputElement; const v = el.value.trim(); if (v) { setSd("specializations", [...sdListField(sd, "specializations"), v]); el.value = ""; } }} className="px-3 py-2 rounded-lg bg-primary text-primary-foreground text-sm" data-testid="btn-add-spec"><Plus className="w-3.5 h-3.5" /></button>
+                </div>
+              </div>
+              {/* Qualifications JSON */}
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Qualifications (JSON array)</label>
+                <textarea rows={3} value={sd.qualifications ? JSON.stringify(sd.qualifications, null, 2) : "[]"} onChange={(e) => { try { setSd("qualifications", JSON.parse(e.target.value)); } catch {} }} className="w-full px-3 py-2 rounded-lg border border-border text-xs font-mono resize-none focus:outline-none" placeholder={'[{"year":"2010","qualification":"PhD","institution":"University of Nairobi"}]'} data-testid="input-staff-qualifications" />
+                <p className="text-[10px] text-muted-foreground mt-0.5">Array of objects: year, qualification, institution</p>
+              </div>
+              {/* Experience JSON */}
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Experience (JSON array)</label>
+                <textarea rows={3} value={sd.experience ? JSON.stringify(sd.experience, null, 2) : "[]"} onChange={(e) => { try { setSd("experience", JSON.parse(e.target.value)); } catch {} }} className="w-full px-3 py-2 rounded-lg border border-border text-xs font-mono resize-none focus:outline-none" placeholder={'[{"start":"2020","end":"Present","position":"Professor","institution":"KAFU"}]'} data-testid="input-staff-experience" />
+              </div>
+            </div>
+          )}
+
+          {/* TYPE-SPECIFIC FIELDS — School */}
+          {form.type === "school" && (
+            <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">
+              <h3 className="text-sm font-bold text-foreground">School Details</h3>
+              <p className="text-xs text-muted-foreground">Use the Slug field above to set the school code (e.g. SESS, SBE, SCIT). The Title is the full school name.</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Dean / Acting Dean</label>
+                  <input type="text" value={sdField(sd, "dean")} onChange={(e) => setSd("dean", e.target.value)} placeholder="Dr. Jane Doe" className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" data-testid="input-school-dean" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">School Colour (hex)</label>
+                  <div className="flex gap-2">
+                    <input type="color" value={sdField(sd, "colour") || "#1B3A6B"} onChange={(e) => setSd("colour", e.target.value)} className="w-12 h-9 rounded border border-border cursor-pointer" data-testid="input-school-colour-picker" />
+                    <input type="text" value={sdField(sd, "colour") || "#1B3A6B"} onChange={(e) => setSd("colour", e.target.value)} placeholder="#1B3A6B" className="flex-1 px-3 py-2 rounded-lg border border-border text-sm font-mono focus:outline-none" data-testid="input-school-colour" />
+                  </div>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Vision Statement</label>
+                <textarea rows={2} value={sdField(sd, "vision")} onChange={(e) => setSd("vision", e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30" data-testid="input-school-vision" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Mission Statement</label>
+                <textarea rows={2} value={sdField(sd, "mission")} onChange={(e) => setSd("mission", e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30" data-testid="input-school-mission" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Programme Counts</label>
+                <div className="grid grid-cols-3 gap-3">
+                  {(["undergraduate", "postgraduate", "doctoral"] as const).map((level) => (
+                    <div key={level}>
+                      <span className="text-[10px] text-muted-foreground capitalize">{level}</span>
+                      <input type="number" min={0} value={(sdObjField(sd, "programmes_count") as Record<string, number | string>)[level] ?? 0} onChange={(e) => setSd("programmes_count", { ...sdObjField(sd, "programmes_count"), [level]: Number(e.target.value) })} className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none mt-0.5" data-testid={`input-school-count-${level}`} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TYPE-SPECIFIC FIELDS — Programme */}
+          {form.type === "programme" && (
+            <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">
+              <h3 className="text-sm font-bold text-foreground">Programme Details</h3>
+              <p className="text-xs text-muted-foreground">Use the School field in the sidebar to associate this programme with a school.</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Level</label>
+                  <select value={sdField(sd, "level") || "undergraduate"} onChange={(e) => setSd("level", e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none" data-testid="select-programme-level">
+                    <option value="undergraduate">Undergraduate</option>
+                    <option value="postgraduate">Postgraduate</option>
+                    <option value="doctoral">Doctoral</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Programme Code</label>
+                  <input type="text" value={sdField(sd, "programme_code")} onChange={(e) => setSd("programme_code", e.target.value)} placeholder="e.g. BEd (Arts), BSc CS" className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" data-testid="input-programme-code" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Duration</label>
+                  <input type="text" value={sdField(sd, "duration")} onChange={(e) => setSd("duration", e.target.value)} placeholder="e.g. 4 years" className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" data-testid="input-programme-duration" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Mode of Delivery</label>
+                  <select value={sdField(sd, "mode") || "full_time"} onChange={(e) => setSd("mode", e.target.value)} className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none" data-testid="select-programme-mode">
+                    <option value="full_time">Full Time</option>
+                    <option value="part_time">Part Time</option>
+                    <option value="distance">Distance Learning (ODL)</option>
+                    <option value="blended">Blended</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Entry Requirements</label>
+                <textarea rows={3} value={sdField(sd, "entry_requirements")} onChange={(e) => setSd("entry_requirements", e.target.value)} placeholder="Minimum KCSE grade, specific subjects, etc." className="w-full px-3 py-2 rounded-lg border border-border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30" data-testid="input-programme-requirements" />
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Career Opportunities</label>
+                <textarea rows={2} value={sdField(sd, "career_opportunities")} onChange={(e) => setSd("career_opportunities", e.target.value)} placeholder="Graduates may pursue careers in..." className="w-full px-3 py-2 rounded-lg border border-border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30" data-testid="input-programme-career" />
+              </div>
+            </div>
+          )}
+
           {/* SEO */}
           <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">
             <h3 className="text-sm font-bold text-foreground">SEO</h3>
@@ -631,6 +798,22 @@ export default function ContentEditorPage({ id }: { id?: string }) {
                 data-testid="input-department"
               />
             </div>
+            {(form.type === "staff_profile" || form.type === "programme" || form.type === "school") && (
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">
+                  {form.type === "school" ? "School Code (Slug)" : "School Code"}
+                </label>
+                <input
+                  type="text"
+                  value={form.school_code ?? ""}
+                  onChange={(e) => field("school_code", e.target.value.toUpperCase())}
+                  placeholder="e.g. SESS, SBE, SCIT, SOS, SHS"
+                  className="w-full px-3 py-2 rounded-lg border border-border text-sm font-mono focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  data-testid="input-school-code"
+                />
+                <p className="text-[10px] text-muted-foreground mt-0.5">Used to link staff and programmes to a school.</p>
+              </div>
+            )}
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">Tags (comma-separated)</label>
               <input

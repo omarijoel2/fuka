@@ -99,6 +99,67 @@ function mapCmsOpportunity(CmsContent $item): array {
     ];
 }
 
+function mapCmsStaff(CmsContent $item): array {
+    $sd = $item->structured_data ?? [];
+    return [
+        'slug'            => $item->slug,
+        'title'           => $sd['title_prefix'] ?? 'Dr.',
+        'name'            => $item->title,
+        'first_name'      => $sd['first_name'] ?? '',
+        'middle_name'     => $sd['middle_name'] ?? '',
+        'last_name'       => $sd['last_name'] ?? '',
+        'designation'     => $sd['designation'] ?? ($item->category ?? ''),
+        'school'          => $item->school_code ?: null,
+        'department'      => $item->department ?? '',
+        'unit'            => $sd['unit'] ?? null,
+        'email'           => $sd['email'] ?? '',
+        'specializations' => $sd['specializations'] ?? [],
+        'photo'           => $item->featured_image ?: ($sd['photo'] ?? null),
+        'bio'             => $item->summary ?? '',
+    ];
+}
+
+function mapCmsStaffDetail(CmsContent $item): array {
+    $base = mapCmsStaff($item);
+    $sd = $item->structured_data ?? [];
+    $base['biography']         = $item->body ?? $item->summary ?? '';
+    $base['phone_visible']     = (bool)($sd['phone_visible'] ?? false);
+    $base['qualifications']    = $sd['qualifications'] ?? [];
+    $base['research_interests']= $sd['research_interests'] ?? [];
+    $base['teaching_areas']    = $sd['teaching_areas'] ?? [];
+    $base['experience']        = $sd['experience'] ?? [];
+    $base['publications']      = $sd['publications'] ?? [];
+    $base['awards']            = $sd['awards'] ?? [];
+    $base['memberships']       = $sd['memberships'] ?? [];
+    return $base;
+}
+
+function mapCmsSchool(CmsContent $item): array {
+    $sd = $item->structured_data ?? [];
+    return [
+        'code'             => strtoupper($item->slug),
+        'name'             => $item->title,
+        'dean'             => $sd['dean'] ?? null,
+        'description'      => $item->summary ?? '',
+        'vision'           => $sd['vision'] ?? '',
+        'mission'          => $sd['mission'] ?? '',
+        'programmes_count' => $sd['programmes_count'] ?? ['undergraduate' => 0, 'postgraduate' => 0, 'doctoral' => 0],
+        'colour'           => $sd['colour'] ?? '#1B3A6B',
+        'programmes'       => $sd['programmes'] ?? [],
+    ];
+}
+
+function mapCmsProgramme(CmsContent $item): array {
+    $sd = $item->structured_data ?? [];
+    return [
+        'school'   => $item->school_code ?? ($sd['school_code'] ?? ''),
+        'level'    => $sd['level'] ?? 'undergraduate',
+        'name'     => $item->title,
+        'code'     => $sd['programme_code'] ?? $item->category ?? $item->slug,
+        'duration' => $sd['duration'] ?? '4 years',
+    ];
+}
+
 function mapCmsOpportunityDetail(CmsContent $item): array {
     $base = mapCmsOpportunity($item);
     $sd = $item->structured_data ?? [];
@@ -886,6 +947,16 @@ Route::get('/announcements/{slug}', function (string $slug) {
 });
 
 Route::get('/schools', function () {
+    $cmsSchools = CmsContent::where('type', 'school')
+        ->where('status', 'published')
+        ->where('is_deleted', false)
+        ->orderBy('title')
+        ->get()
+        ->map(fn($item) => mapCmsSchool($item))
+        ->toArray();
+    if (!empty($cmsSchools)) {
+        return response()->json(['data' => $cmsSchools]);
+    }
     return response()->json([
         'data' => [
             [
@@ -933,6 +1004,28 @@ Route::get('/schools', function () {
 });
 
 Route::get('/schools/{code}', function (string $code) {
+    $cmsSchool = CmsContent::where('type', 'school')
+        ->whereRaw('UPPER(slug) = ?', [strtoupper($code)])
+        ->where('status', 'published')
+        ->where('is_deleted', false)
+        ->first();
+    if ($cmsSchool) {
+        $mapped = mapCmsSchool($cmsSchool);
+        // Also pull programmes of this school type from CMS
+        $cmsProgs = CmsContent::where('type', 'programme')
+            ->where('school_code', strtoupper($code))
+            ->where('status', 'published')
+            ->where('is_deleted', false)
+            ->orderBy('title')
+            ->get()
+            ->map(fn($p) => mapCmsProgramme($p))
+            ->toArray();
+        if (!empty($cmsProgs)) {
+            $mapped['programmes'] = $cmsProgs;
+        }
+        return response()->json(['data' => $mapped]);
+    }
+
     $schools = [
         'SESS' => [
             'code' => 'SESS',
@@ -1034,6 +1127,24 @@ Route::get('/schools/{code}', function (string $code) {
 });
 
 Route::get('/programmes', function (Request $request) {
+    $school = $request->query('school') ? strtoupper($request->query('school')) : null;
+    $level  = $request->query('level')  ? strtolower($request->query('level'))  : null;
+
+    $cmsQuery = CmsContent::where('type', 'programme')
+        ->where('status', 'published')
+        ->where('is_deleted', false);
+    if ($school) $cmsQuery->where('school_code', $school);
+    $cmsProgs = $cmsQuery->orderBy('title')->get();
+
+    if ($cmsProgs->isNotEmpty()) {
+        $mapped = $cmsProgs->map(fn($p) => mapCmsProgramme($p))->toArray();
+        if ($level) {
+            $mapped = array_values(array_filter($mapped, fn($p) => $p['level'] === $level));
+        }
+        return response()->json(['data' => $mapped, 'total' => count($mapped)]);
+    }
+
+    // Static fallback
     $all = [
         ['school' => 'SESS', 'level' => 'undergraduate', 'name' => 'Bachelor of Education (Arts)', 'code' => 'BEd (Arts)', 'duration' => '4 years'],
         ['school' => 'SESS', 'level' => 'undergraduate', 'name' => 'Bachelor of Education (French)', 'code' => 'BEd (French)', 'duration' => '4 years'],
@@ -1091,6 +1202,11 @@ Route::get('/programmes', function (Request $request) {
 });
 
 Route::get('/contact', function () {
+    $page = CmsContent::where('type', 'page')->where('slug', 'contact')
+        ->where('status', 'published')->where('is_deleted', false)->first();
+    if ($page && !empty($page->structured_data)) {
+        return response()->json(['data' => $page->structured_data]);
+    }
     return response()->json([
         'data' => [
             'institution' => 'Kaimosi Friends University',
@@ -1206,6 +1322,33 @@ Route::get('/opportunities/{slug}', function (string $slug) {
 });
 
 Route::get('/staff', function (Request $request) {
+    $school      = $request->query('school');
+    $designation = $request->query('designation');
+    $search      = $request->query('search');
+
+    $cmsQuery = CmsContent::where('type', 'staff_profile')
+        ->where('status', 'published')
+        ->where('is_deleted', false);
+    if ($school) $cmsQuery->where('school_code', strtoupper($school));
+    $cmsStaff = $cmsQuery->orderBy('title')->get();
+
+    if ($cmsStaff->isNotEmpty()) {
+        $mapped = $cmsStaff->map(fn($s) => mapCmsStaff($s))->toArray();
+        if ($designation) {
+            $mapped = array_values(array_filter($mapped, fn($s) => stripos($s['designation'], $designation) !== false));
+        }
+        if ($search) {
+            $mapped = array_values(array_filter($mapped, function ($s) use ($search) {
+                return stripos($s['name'], $search) !== false
+                    || stripos($s['designation'], $search) !== false
+                    || stripos($s['department'], $search) !== false
+                    || !empty(array_filter($s['specializations'] ?? [], fn($sp) => stripos($sp, $search) !== false));
+            }));
+        }
+        return response()->json(['data' => $mapped]);
+    }
+
+    // Static fallback
     $staff = [
         // University Leadership
         [
@@ -1630,6 +1773,15 @@ Route::get('/staff', function (Request $request) {
 });
 
 Route::get('/staff/{slug}', function (string $slug) {
+    $cmsProfile = CmsContent::where('type', 'staff_profile')
+        ->where('slug', $slug)
+        ->where('status', 'published')
+        ->where('is_deleted', false)
+        ->first();
+    if ($cmsProfile) {
+        return response()->json(['data' => mapCmsStaffDetail($cmsProfile)]);
+    }
+
     $profiles = [
         'prof-peter-n-mwita' => [
             'slug' => 'prof-peter-n-mwita',
@@ -1912,6 +2064,11 @@ Route::get('/programmes/{school}/{code}', function (string $school, string $code
 });
 
 Route::get('/admissions', function () {
+    $page = CmsContent::where('type', 'page')->where('slug', 'admissions')
+        ->where('status', 'published')->where('is_deleted', false)->first();
+    if ($page && !empty($page->structured_data)) {
+        return response()->json(['data' => $page->structured_data]);
+    }
     return response()->json([
         'data' => [
             'pathways' => [
@@ -2040,6 +2197,11 @@ Route::get('/admissions', function () {
 });
 
 Route::get('/stats', function () {
+    $page = CmsContent::where('type', 'page')->where('slug', 'stats')
+        ->where('status', 'published')->where('is_deleted', false)->first();
+    if ($page && !empty($page->structured_data)) {
+        return response()->json(['data' => $page->structured_data]);
+    }
     return response()->json([
         'data' => [
             ['label' => 'Schools', 'value' => 5],
