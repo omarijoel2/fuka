@@ -2,91 +2,102 @@ export interface ApiResponse<T> {
   data: T;
 }
 
-export interface HealthResponse {
-  status: string;
-}
-
 export interface Stat {
-  id: string;
   label: string;
-  value: string;
+  value: number;
 }
 
 export interface NewsArticle {
-  id: string;
+  id: number;
+  slug: string;
   title: string;
-  summary: string;
-  content: string;
+  excerpt: string;
+  summary?: string;
+  content?: string;
   category: string;
   date: string;
-  imageUrl?: string;
+  image?: string | null;
+  imageUrl?: string | null;
   featured: boolean;
 }
 
+export interface ProgrammeCount {
+  undergraduate: number;
+  postgraduate: number;
+  doctoral: number;
+}
+
 export interface School {
-  id: string;
   code: string;
   name: string;
+  dean: string | null;
   description: string;
-  dean: string;
-  vision: string;
-  mission: string;
-  programmeCount: number;
+  programmes_count: ProgrammeCount | number;
+  colour?: string;
+  vision?: string;
+  mission?: string;
+  programmes?: Programme[];
 }
 
 export interface Programme {
-  id: string;
-  code: string;
+  school: string;
+  level: string;
   name: string;
-  schoolCode: string;
-  level: "Undergraduate" | "Postgraduate" | "Doctoral" | "Diploma" | "Certificate";
+  code: string;
   duration: string;
-  description: string;
 }
 
 export interface Event {
-  id: string;
+  id: number;
   title: string;
   date: string;
   time: string;
   location: string;
-  description: string;
   category: string;
 }
 
 export interface Opportunity {
-  id: string;
+  id: number;
+  type: string;
   title: string;
-  type: "Tender" | "Job Vacancy" | "Scholarship";
+  reference?: string;
   deadline: string;
-  description: string;
-  link: string;
+  status: string;
+}
+
+export interface ContactEmail {
+  label: string;
+  address: string;
+}
+
+export interface Portal {
+  name: string;
+  url: string;
+}
+
+export interface SocialMedia {
+  platform: string;
+  url: string;
 }
 
 export interface ContactInfo {
+  institution: string;
+  abbreviation: string;
   address: string;
   phone: string;
-  email: string;
-  portals: {
-    student: string;
-    elearning: string;
-    staff: string;
-  };
-  socials: {
-    facebook: string;
-    twitter: string;
-    linkedin: string;
-    youtube: string;
-  };
+  emails: ContactEmail[];
+  website: string;
+  portals: Portal[];
+  social_media: SocialMedia[];
 }
 
 export async function fetchApi<T>(endpoint: string): Promise<T> {
   const res = await fetch(`/api${endpoint}`);
   if (!res.ok) {
-    throw new Error(`API error: ${res.statusText}`);
+    throw new Error(`API error: ${res.status} ${res.statusText}`);
   }
   const json = await res.json();
-  if ('data' in json) {
+  if ("data" in json) {
     return json.data as T;
   }
   return json as T;

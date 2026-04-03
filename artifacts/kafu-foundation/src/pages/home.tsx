@@ -1,223 +1,677 @@
+import React from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { useStats, useNews, useSchools, useEvents } from "@/lib/api-hooks";
-import { Calendar, MapPin, ArrowRight, BookOpen, ChevronRight, GraduationCap } from "lucide-react";
+import { useStats, useNews, useSchools, useEvents, useOpportunities, useProgrammes } from "@/lib/api-hooks";
+import {
+  Calendar,
+  MapPin,
+  ArrowRight,
+  BookOpen,
+  ChevronRight,
+  GraduationCap,
+  Search,
+  Monitor,
+  Library,
+  Mail,
+  Users,
+  Award,
+  Globe,
+  Leaf,
+  Clock,
+  FileText,
+  Briefcase,
+  BadgeCheck,
+} from "lucide-react";
 
 export default function Home() {
   const { data: stats, isLoading: statsLoading } = useStats();
   const { data: news, isLoading: newsLoading } = useNews();
   const { data: schools, isLoading: schoolsLoading } = useSchools();
   const { data: events, isLoading: eventsLoading } = useEvents();
+  const { data: opportunities } = useOpportunities();
+  const { data: programmes } = useProgrammes();
 
-  const featuredNews = news?.filter(n => n.featured).slice(0, 3) || [];
-  const upcomingEvents = events?.slice(0, 4) || [];
+  const [progSearch, setProgSearch] = React.useState("");
+  const [progLevel, setProgLevel] = React.useState("");
+  const [progSchool, setProgSchool] = React.useState("");
+
+  const featuredNews = news?.filter((n) => n.featured).slice(0, 3) ?? [];
+  const latestNews = news?.slice(0, 4) ?? [];
+  const upcomingEvents = events?.slice(0, 4) ?? [];
+  const openOpportunities = opportunities?.slice(0, 4) ?? [];
+
+  const filteredProgrammes = (programmes ?? [])
+    .filter((p) => {
+      const matchSearch = progSearch
+        ? p.name.toLowerCase().includes(progSearch.toLowerCase()) ||
+          p.code.toLowerCase().includes(progSearch.toLowerCase())
+        : true;
+      const matchLevel = progLevel ? p.level === progLevel : true;
+      const matchSchool = progSchool ? p.school === progSchool : true;
+      return matchSearch && matchLevel && matchSchool;
+    })
+    .slice(0, 6);
+
+  const whyKafu = [
+    {
+      icon: <BadgeCheck className="w-7 h-7" />,
+      title: "Accredited Quality",
+      body: "Fully accredited by the Commission for University Education (CUE) with programmes meeting national and international standards.",
+    },
+    {
+      icon: <Leaf className="w-7 h-7" />,
+      title: "Quaker Values",
+      body: "Founded on the Quaker principles of truth, integrity, and service to humanity — shaping leaders of character since 2014.",
+    },
+    {
+      icon: <Globe className="w-7 h-7" />,
+      title: "Community Impact",
+      body: "Deeply rooted in Western Kenya, KAFU actively engages 47 counties through research, outreach, and partnerships.",
+    },
+    {
+      icon: <Award className="w-7 h-7" />,
+      title: "Unique Programmes",
+      body: "Home to rare and high-demand offerings — including one of only two institutions in Kenya offering Optometry up to PhD level.",
+    },
+  ];
+
+  const admissionPathways = [
+    {
+      title: "Undergraduate",
+      subtitle: "KUCCPS & Direct Entry",
+      description: "Apply through Kenya Universities and Colleges Central Placement Service or directly with certified qualifications.",
+      href: "/admissions#undergraduate",
+      testid: "card-admissions-undergraduate",
+    },
+    {
+      title: "Postgraduate",
+      subtitle: "Masters & PhD",
+      description: "Advance your career with research-based or taught postgraduate programmes across all five schools.",
+      href: "/admissions#postgraduate",
+      testid: "card-admissions-postgraduate",
+    },
+    {
+      title: "International Students",
+      subtitle: "Open to All Nations",
+      description: "KAFU welcomes students from across Africa and beyond. Guidance on visa, recognition, and admission requirements.",
+      href: "/admissions#international",
+      testid: "card-admissions-international",
+    },
+    {
+      title: "Self-Sponsored",
+      subtitle: "Module II Programmes",
+      description: "Flexible Module II pathways for working professionals and those seeking alternative entry into university education.",
+      href: "/admissions#self-sponsored",
+      testid: "card-admissions-self-sponsored",
+    },
+  ];
+
+  const digitalServices = [
+    {
+      icon: <Monitor className="w-7 h-7" />,
+      label: "Student Portal",
+      desc: "Registration, results, fee statements and more",
+      href: "https://portal.kafu.ac.ke",
+      external: true,
+      testid: "service-student-portal",
+    },
+    {
+      icon: <BookOpen className="w-7 h-7" />,
+      label: "E-Learning",
+      desc: "Online classes, course materials and assignments",
+      href: "https://elearning.kafu.ac.ke",
+      external: true,
+      testid: "service-elearning",
+    },
+    {
+      icon: <Library className="w-7 h-7" />,
+      label: "Library",
+      desc: "Digital resources, research databases and journals",
+      href: "#",
+      external: false,
+      testid: "service-library",
+    },
+    {
+      icon: <Mail className="w-7 h-7" />,
+      label: "Institutional Email",
+      desc: "Official KAFU email for students and staff",
+      href: "mailto:info@kafu.ac.ke",
+      external: false,
+      testid: "service-email",
+    },
+    {
+      icon: <Users className="w-7 h-7" />,
+      label: "Staff Portal",
+      desc: "HR, payroll and administrative services for staff",
+      href: "#",
+      external: false,
+      testid: "service-staff-portal",
+    },
+    {
+      icon: <FileText className="w-7 h-7" />,
+      label: "Document Downloads",
+      desc: "Forms, joining instructions, fee structures",
+      href: "/admissions",
+      external: false,
+      testid: "service-documents",
+    },
+  ];
+
+  const levelLabels: Record<string, string> = {
+    undergraduate: "Undergraduate",
+    postgraduate: "Postgraduate",
+    doctoral: "Doctoral",
+  };
+
+  const schoolLabels: Record<string, string> = {
+    SESS: "SESS",
+    SBE: "SBE",
+    SCIT: "SCIT",
+    SOS: "SOS",
+    SHS: "SHS",
+  };
 
   return (
-    <div className="flex flex-col min-h-screen">
-      {/* Hero Section */}
-      <section className="relative h-[600px] md:h-[700px] flex items-center justify-center overflow-hidden bg-primary">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/70" />
-          <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(circle at 30% 50%, #D4A017 0%, transparent 60%), radial-gradient(circle at 80% 20%, #ffffff 0%, transparent 40%)'}} />
-        </div>
-        <div className="relative container mx-auto px-4 text-center text-white z-10">
-          <span className="inline-block py-1 px-3 rounded-full bg-accent/20 text-accent border border-accent/30 font-medium text-sm mb-6 animate-in slide-in-from-bottom-4 duration-500">
-            Est. 2014 • Quaker Heritage
+    <div className="flex flex-col">
+
+      {/* ─── HERO ─── */}
+      <section className="relative min-h-[620px] md:min-h-[700px] flex items-center justify-center overflow-hidden bg-primary">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-[#0d2347]" />
+        <div
+          className="absolute inset-0 opacity-20"
+          style={{
+            backgroundImage:
+              "radial-gradient(ellipse at 20% 60%, #D4A017 0%, transparent 55%), radial-gradient(ellipse at 80% 10%, rgba(255,255,255,0.15) 0%, transparent 45%)",
+          }}
+        />
+        <div className="relative container mx-auto px-4 py-20 text-center text-white z-10 max-w-5xl">
+          <span className="inline-block py-1 px-4 rounded-full bg-accent/20 text-accent border border-accent/40 font-medium text-sm mb-6">
+            Est. 2014 — Kaimosi, Western Kenya — Quaker Heritage
           </span>
-          <h1 className="text-4xl md:text-6xl lg:text-7xl font-serif font-bold mb-6 animate-in slide-in-from-bottom-6 duration-700 delay-100">
-            Spring of Knowledge
+          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 leading-tight">
+            Spring of <span className="text-accent">Knowledge</span>
           </h1>
-          <p className="text-lg md:text-xl lg:text-2xl mb-8 max-w-3xl mx-auto text-white/90 animate-in slide-in-from-bottom-8 duration-700 delay-200">
-            Welcome to Kaimosi Friends University. A premier institution in Western Kenya dedicated to truth, service, and academic excellence.
+          <p className="text-lg md:text-xl mb-10 max-w-3xl mx-auto text-white/85 leading-relaxed">
+            Kaimosi Friends University — a premier institution in Western Kenya dedicated to truth, service,
+            and academic excellence. Join over 5,000 students shaping Kenya's future.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center animate-in slide-in-from-bottom-10 duration-700 delay-300">
-            <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 text-lg px-8" asChild data-testid="hero-button-apply">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-14">
+            <Button
+              size="lg"
+              className="bg-accent text-accent-foreground hover:bg-accent/90 text-base px-8 h-12 font-semibold"
+              asChild
+              data-testid="hero-button-apply"
+            >
               <a href="https://portal.kafu.ac.ke" target="_blank" rel="noreferrer">
                 Apply for Admissions
               </a>
             </Button>
-            <Button size="lg" variant="outline" className="bg-transparent text-white border-white hover:bg-white/10 text-lg px-8" asChild data-testid="hero-button-programmes">
+            <Button
+              size="lg"
+              variant="outline"
+              className="bg-transparent text-white border-white/60 hover:bg-white/10 text-base px-8 h-12"
+              asChild
+              data-testid="hero-button-programmes"
+            >
               <Link href="/programmes">Explore Programmes</Link>
+            </Button>
+          </div>
+
+          {/* Stats overlay */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
+            {statsLoading
+              ? Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="bg-white/10 rounded-xl p-4 animate-pulse h-20" />
+                ))
+              : stats?.map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-3"
+                    data-testid={`hero-stat-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}
+                  >
+                    <div className="text-2xl md:text-3xl font-serif font-bold text-accent">{stat.value}+</div>
+                    <div className="text-xs text-white/75 mt-0.5 uppercase tracking-wide">{stat.label}</div>
+                  </div>
+                ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── PROGRAMME DISCOVERY ─── */}
+      <section className="py-20 bg-background" id="programmes">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary mb-4">Find Your Programme</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Search across 38+ programmes spanning Education, Business, Computing, Science, and Health Sciences.
+            </p>
+          </div>
+
+          {/* Search & Filters */}
+          <div className="flex flex-col md:flex-row gap-3 mb-8 max-w-4xl mx-auto">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                value={progSearch}
+                onChange={(e) => setProgSearch(e.target.value)}
+                placeholder="Search programmes or codes..."
+                className="w-full pl-10 pr-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                data-testid="input-programme-search"
+              />
+            </div>
+            <select
+              value={progLevel}
+              onChange={(e) => setProgLevel(e.target.value)}
+              className="px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white min-w-[160px]"
+              data-testid="select-programme-level"
+            >
+              <option value="">All Levels</option>
+              <option value="undergraduate">Undergraduate</option>
+              <option value="postgraduate">Postgraduate</option>
+              <option value="doctoral">Doctoral</option>
+            </select>
+            <select
+              value={progSchool}
+              onChange={(e) => setProgSchool(e.target.value)}
+              className="px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white min-w-[160px]"
+              data-testid="select-programme-school"
+            >
+              <option value="">All Schools</option>
+              <option value="SESS">SESS — Education</option>
+              <option value="SBE">SBE — Business</option>
+              <option value="SCIT">SCIT — Computing</option>
+              <option value="SOS">SOS — Science</option>
+              <option value="SHS">SHS — Health Sciences</option>
+            </select>
+          </div>
+
+          {/* Programme Cards */}
+          {filteredProgrammes.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto mb-8">
+              {filteredProgrammes.map((prog, i) => (
+                <Link
+                  key={i}
+                  href={`/programmes`}
+                  className="group flex items-start gap-4 p-5 rounded-xl border bg-card hover:border-primary hover:shadow-md transition-all"
+                  data-testid={`card-programme-${prog.code.replace(/\s+/g, "-")}`}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
+                    <GraduationCap className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+                      {prog.name}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      <span className="text-xs bg-primary/5 text-primary px-2 py-0.5 rounded font-medium">{prog.code}</span>
+                      <span className="text-xs text-muted-foreground capitalize">{levelLabels[prog.level] ?? prog.level}</span>
+                      <span className="text-xs text-muted-foreground">{prog.duration}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground max-w-sm mx-auto">
+              <Search className="w-10 h-10 mx-auto mb-3 opacity-30" />
+              <p className="font-medium">No programmes found</p>
+              <p className="text-sm mt-1">Try adjusting your search or filters</p>
+            </div>
+          )}
+
+          <div className="text-center">
+            <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white" asChild data-testid="link-view-all-programmes">
+              <Link href="/programmes">
+                View Full Programme Catalogue <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
             </Button>
           </div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="bg-secondary py-12 border-b">
+      {/* ─── ADMISSIONS PATHWAYS ─── */}
+      <section className="py-20 bg-primary/5 border-y" id="admissions-pathways">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {statsLoading ? (
-              Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="flex flex-col items-center justify-center p-4 animate-pulse">
-                  <div className="h-10 w-20 bg-muted rounded mb-2" />
-                  <div className="h-4 w-24 bg-muted rounded" />
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary mb-4">Admission Pathways</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Choose the pathway that fits your academic background and goals.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {admissionPathways.map((path) => (
+              <Link
+                key={path.testid}
+                href={path.href}
+                className="group flex flex-col bg-white rounded-xl border p-7 hover:border-accent hover:shadow-lg transition-all"
+                data-testid={path.testid}
+              >
+                <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center mb-5 group-hover:bg-accent transition-colors">
+                  <GraduationCap className="w-6 h-6 text-accent group-hover:text-white transition-colors" />
                 </div>
-              ))
-            ) : (
-              stats?.map((stat) => (
-                <div key={stat.id} className="flex flex-col items-center text-center p-4" data-testid={`stat-${stat.id}`}>
-                  <span className="text-4xl md:text-5xl font-bold text-primary mb-2 font-serif">{stat.value}</span>
-                  <span className="text-sm md:text-base font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</span>
-                </div>
-              ))
-            )}
+                <h3 className="font-serif text-lg font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
+                  {path.title}
+                </h3>
+                <p className="text-xs font-semibold text-accent uppercase tracking-wider mb-3">{path.subtitle}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed flex-1">{path.description}</p>
+                <span className="flex items-center gap-1 text-sm font-medium text-primary mt-5 group-hover:gap-2 transition-all">
+                  Learn more <ChevronRight className="w-4 h-4" />
+                </span>
+              </Link>
+            ))}
+          </div>
+          <div className="text-center mt-10">
+            <Button className="bg-accent text-accent-foreground hover:bg-accent/90 px-8" asChild data-testid="button-admissions-overview">
+              <Link href="/admissions">Full Admissions Guide</Link>
+            </Button>
           </div>
         </div>
       </section>
 
-      {/* Schools Section */}
+      {/* ─── SCHOOLS & FACULTIES ─── */}
       <section className="py-20 bg-background">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
             <div className="max-w-2xl">
-              <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary mb-4">Our Academic Schools</h2>
-              <p className="text-lg text-muted-foreground">
-                KAFU offers diverse academic programmes across five distinct schools, designed to equip students with knowledge and skills for the modern world.
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary mb-4">Schools & Faculties</h2>
+              <p className="text-muted-foreground text-lg">
+                Five distinct schools, each with a unique academic identity, world-class faculty, and programmes
+                aligned to national development priorities.
               </p>
             </div>
-            <Button variant="ghost" className="text-primary hover:text-primary/80 group" asChild data-testid="link-all-schools">
+            <Button
+              variant="ghost"
+              className="text-primary hover:text-primary/80 group shrink-0"
+              asChild
+              data-testid="link-all-schools"
+            >
               <Link href="/schools">
-                View all schools <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                All Schools <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
             </Button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {schoolsLoading ? (
-              Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="h-64 bg-muted rounded-xl animate-pulse" />
-              ))
-            ) : (
-              schools?.map((school) => (
-                <Link key={school.id} href={`/schools/${school.code}`} data-testid={`card-school-${school.code}`}>
-                  <div className="group h-full flex flex-col justify-between p-8 rounded-xl border bg-card hover:border-primary hover:shadow-lg transition-all duration-300">
-                    <div>
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all">
-                        <BookOpen className="w-6 h-6" />
+            {schoolsLoading
+              ? Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="h-64 bg-muted rounded-xl animate-pulse" />
+                ))
+              : schools?.map((school) => (
+                  <Link
+                    key={school.code}
+                    href={`/schools/${school.code}`}
+                    data-testid={`card-school-${school.code}`}
+                  >
+                    <div className="group h-full flex flex-col justify-between p-8 rounded-xl border bg-card hover:border-primary hover:shadow-lg transition-all duration-300">
+                      <div>
+                        <div className="flex items-center gap-3 mb-5">
+                          <div className="w-11 h-11 rounded-lg bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all">
+                            <BookOpen className="w-5 h-5" />
+                          </div>
+                          <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{school.code}</span>
+                        </div>
+                        <h3 className="text-lg font-bold text-foreground mb-3 font-serif line-clamp-2 group-hover:text-primary transition-colors">
+                          {school.name}
+                        </h3>
+                        <p className="text-muted-foreground text-sm line-clamp-3">{school.description}</p>
                       </div>
-                      <h3 className="text-xl font-bold text-foreground mb-3 font-serif line-clamp-2 group-hover:text-primary transition-colors">
-                        {school.name}
-                      </h3>
-                      <p className="text-muted-foreground text-sm line-clamp-3 mb-6">
-                        {school.description}
-                      </p>
+                      <div className="flex items-center justify-between mt-6 pt-4 border-t">
+                        <span className="text-xs font-medium text-primary">
+                          {typeof school.programmes_count === "object"
+                            ? Object.values(school.programmes_count as Record<string, number>).reduce((a, b) => a + b, 0)
+                            : school.programmes_count}{" "}
+                          Programmes
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                      </div>
                     </div>
-                    <div className="flex items-center justify-between mt-auto">
-                      <span className="text-sm font-medium text-primary bg-primary/5 px-3 py-1 rounded-full">
-                        {school.programmeCount} Programmes
-                      </span>
-                      <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                    </div>
+                  </Link>
+                ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── WHY KAFU ─── */}
+      <section className="py-20 bg-primary text-primary-foreground">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">Why Choose KAFU?</h2>
+            <p className="text-primary-foreground/80 max-w-xl mx-auto">
+              More than a university — a community of purpose, rooted in values and driven by impact.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {whyKafu.map((item, i) => (
+              <div key={i} className="flex flex-col items-start" data-testid={`why-kafu-${i}`}>
+                <div className="w-14 h-14 rounded-xl bg-accent/20 text-accent flex items-center justify-center mb-5">
+                  {item.icon}
+                </div>
+                <h3 className="font-serif text-xl font-bold mb-3">{item.title}</h3>
+                <p className="text-primary-foreground/75 text-sm leading-relaxed">{item.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ─── NEWS, EVENTS & ANNOUNCEMENTS ─── */}
+      <section className="py-20 bg-secondary/40 border-y">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+
+            {/* News — 2/3 width */}
+            <div className="lg:col-span-2">
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl md:text-3xl font-serif font-bold text-primary">University News</h2>
+                <Button variant="ghost" className="text-primary" asChild data-testid="link-all-news">
+                  <Link href="/news">
+                    All News <ArrowRight className="ml-1 w-4 h-4" />
+                  </Link>
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {newsLoading
+                  ? Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="h-56 bg-muted rounded-xl animate-pulse" />
+                    ))
+                  : latestNews.map((article) => (
+                      <Link key={article.id} href="/news" data-testid={`card-news-${article.id}`}>
+                        <div className="group rounded-xl overflow-hidden bg-card border hover:shadow-md hover:border-primary/30 transition-all h-full flex flex-col">
+                          <div className="p-5 flex flex-col flex-1">
+                            <div className="flex items-center gap-3 mb-3">
+                              <span className="text-xs font-semibold text-accent uppercase tracking-wider bg-accent/10 px-2 py-0.5 rounded">
+                                {article.category}
+                              </span>
+                              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {new Date(article.date).toLocaleDateString("en-GB", {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                })}
+                              </span>
+                            </div>
+                            <h3 className="text-base font-bold mb-2 font-serif group-hover:text-primary transition-colors line-clamp-3 flex-1">
+                              {article.title}
+                            </h3>
+                            <p className="text-xs text-muted-foreground line-clamp-2">{article.excerpt}</p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+              </div>
+            </div>
+
+            {/* Events — 1/3 width */}
+            <div>
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl md:text-3xl font-serif font-bold text-primary">Upcoming Events</h2>
+                <Button variant="ghost" className="text-primary" asChild data-testid="link-all-events">
+                  <Link href="/events">All</Link>
+                </Button>
+              </div>
+              <div className="space-y-4">
+                {eventsLoading
+                  ? Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="h-24 bg-muted rounded-xl animate-pulse" />
+                    ))
+                  : upcomingEvents.map((event) => (
+                      <div
+                        key={event.id}
+                        className="group p-4 rounded-xl border bg-card hover:border-primary/50 hover:shadow-sm transition-all flex gap-4"
+                        data-testid={`card-event-${event.id}`}
+                      >
+                        <div className="flex flex-col items-center justify-center min-w-[3rem] p-2 bg-primary/5 rounded-lg group-hover:bg-primary group-hover:text-white transition-colors text-primary">
+                          <span className="text-[10px] font-bold uppercase">
+                            {new Date(event.date).toLocaleDateString("en-US", { month: "short" })}
+                          </span>
+                          <span className="text-xl font-bold font-serif">{new Date(event.date).getDate()}</span>
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-semibold text-sm font-serif text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                            {event.title}
+                          </h4>
+                          <div className="flex flex-col gap-0.5 mt-1.5 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3 shrink-0" /> {event.time}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-3 h-3 shrink-0" /> {event.location}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── OPPORTUNITIES ─── */}
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary mb-3">Opportunities</h2>
+              <p className="text-muted-foreground">Tenders, vacancies, scholarships, and official notices.</p>
+            </div>
+            <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white shrink-0" asChild data-testid="link-all-opportunities">
+              <Link href="/opportunities">
+                View All Opportunities <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </Button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {openOpportunities.length === 0 ? (
+              <div className="col-span-2 text-center py-10 text-muted-foreground">No open opportunities at this time.</div>
+            ) : (
+              openOpportunities.map((opp) => (
+                <div
+                  key={opp.id}
+                  className="group flex items-start gap-4 p-5 rounded-xl border bg-card hover:border-primary hover:shadow-md transition-all"
+                  data-testid={`card-opportunity-${opp.id}`}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
+                    {opp.type === "Tender" ? (
+                      <FileText className="w-5 h-5" />
+                    ) : opp.type === "Job Vacancy" ? (
+                      <Briefcase className="w-5 h-5" />
+                    ) : (
+                      <Award className="w-5 h-5" />
+                    )}
                   </div>
-                </Link>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                      <span className="text-xs font-semibold text-accent uppercase tracking-wider">{opp.type}</span>
+                      <span className="text-xs text-muted-foreground">Closes: {new Date(opp.deadline).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>
+                    </div>
+                    <h4 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                      {opp.title}
+                    </h4>
+                    {opp.reference && (
+                      <p className="text-xs text-muted-foreground mt-1">{opp.reference}</p>
+                    )}
+                  </div>
+                  <span className="shrink-0 inline-block px-2.5 py-0.5 text-xs rounded-full bg-green-50 text-green-700 border border-green-200 font-medium">
+                    Open
+                  </span>
+                </div>
               ))
             )}
           </div>
         </div>
       </section>
 
-      {/* Featured News & Events */}
-      <section className="py-20 bg-secondary/50 border-y">
+      {/* ─── DIGITAL SERVICES HUB ─── */}
+      <section className="py-20 bg-primary/5 border-y">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-            
-            {/* News Column */}
-            <div className="lg:col-span-2">
-              <div className="flex justify-between items-center mb-8">
-                <h2 className="text-3xl font-serif font-bold text-primary">University News</h2>
-                <Button variant="ghost" asChild data-testid="link-all-news">
-                  <Link href="/news">All News</Link>
-                </Button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {newsLoading ? (
-                  Array.from({ length: 2 }).map((_, i) => (
-                    <div key={i} className="h-80 bg-muted rounded-xl animate-pulse" />
-                  ))
-                ) : (
-                  featuredNews.map((article) => (
-                    <Link key={article.id} href={`/news`} data-testid={`card-news-${article.id}`}>
-                      <div className="group rounded-xl overflow-hidden bg-card border hover:shadow-md transition-all">
-                        {article.imageUrl && (
-                          <div className="h-48 overflow-hidden bg-muted">
-                            <img 
-                              src={article.imageUrl} 
-                              alt={article.title} 
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                            />
-                          </div>
-                        )}
-                        <div className="p-6">
-                          <div className="flex items-center gap-3 mb-3">
-                            <span className="text-xs font-semibold text-accent uppercase tracking-wider">{article.category}</span>
-                            <span className="text-xs text-muted-foreground">{new Date(article.date).toLocaleDateString()}</span>
-                          </div>
-                          <h3 className="text-lg font-bold mb-2 font-serif group-hover:text-primary transition-colors line-clamp-2">{article.title}</h3>
-                          <p className="text-sm text-muted-foreground line-clamp-2">{article.summary}</p>
-                        </div>
-                      </div>
-                    </Link>
-                  ))
-                )}
-              </div>
-            </div>
-
-            {/* Events Column */}
-            <div>
-              <div className="flex justify-between items-center mb-8">
-                <h2 className="text-3xl font-serif font-bold text-primary">Upcoming Events</h2>
-                <Button variant="ghost" asChild data-testid="link-all-events">
-                  <Link href="/events">All Events</Link>
-                </Button>
-              </div>
-              
-              <div className="space-y-4">
-                {eventsLoading ? (
-                  Array.from({ length: 4 }).map((_, i) => (
-                    <div key={i} className="h-24 bg-muted rounded-xl animate-pulse" />
-                  ))
-                ) : (
-                  upcomingEvents.map((event) => (
-                    <div key={event.id} className="group p-5 rounded-xl border bg-card hover:border-primary/50 transition-colors flex gap-4" data-testid={`card-event-${event.id}`}>
-                      <div className="flex flex-col items-center justify-center min-w-[3.5rem] p-2 bg-primary/5 rounded-lg group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                        <span className="text-xs font-bold uppercase">{new Date(event.date).toLocaleDateString('en-US', { month: 'short' })}</span>
-                        <span className="text-xl font-bold font-serif">{new Date(event.date).getDate()}</span>
-                      </div>
-                      <div>
-                        <h4 className="font-bold mb-1 font-serif text-foreground group-hover:text-primary transition-colors">{event.title}</h4>
-                        <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-                          <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {event.time}</span>
-                          <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {event.location}</span>
-                        </div>
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary mb-4">Digital Services</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Access all your university services online — anytime, anywhere.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {digitalServices.map((svc) => {
+              const inner = (
+                <div
+                  className="group flex flex-col items-center text-center p-6 rounded-xl border bg-white hover:border-primary hover:shadow-md transition-all h-full"
+                  data-testid={svc.testid}
+                >
+                  <div className="w-14 h-14 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:bg-primary group-hover:text-white transition-colors">
+                    {svc.icon}
+                  </div>
+                  <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors mb-1">
+                    {svc.label}
+                  </h3>
+                  <p className="text-xs text-muted-foreground leading-tight">{svc.desc}</p>
+                </div>
+              );
+              return svc.external ? (
+                <a key={svc.label} href={svc.href} target="_blank" rel="noreferrer">
+                  {inner}
+                </a>
+              ) : (
+                <Link key={svc.label} href={svc.href}>
+                  {inner}
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-primary text-primary-foreground">
+      {/* ─── CTA ─── */}
+      <section className="py-20 bg-accent">
         <div className="container mx-auto px-4 text-center">
-          <GraduationCap className="w-16 h-16 mx-auto mb-6 text-accent" />
-          <h2 className="text-3xl md:text-5xl font-serif font-bold mb-6">Ready to Join KAFU?</h2>
-          <p className="text-lg md:text-xl text-primary-foreground/80 max-w-2xl mx-auto mb-10">
-            Take the next step in your academic journey. Explore our admission requirements and apply to become part of our vibrant community.
+          <h2 className="text-3xl md:text-4xl font-serif font-bold text-accent-foreground mb-4">
+            Ready to Begin Your Journey?
+          </h2>
+          <p className="text-accent-foreground/80 max-w-xl mx-auto mb-8">
+            Applications for the 2025/2026 academic year are open. Take the next step toward your future at
+            Kaimosi Friends University.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 px-8" asChild data-testid="cta-button-apply">
+            <Button
+              size="lg"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 h-12"
+              asChild
+              data-testid="cta-button-apply"
+            >
               <a href="https://portal.kafu.ac.ke" target="_blank" rel="noreferrer">
                 Start Application
               </a>
             </Button>
-            <Button size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 px-8" asChild data-testid="cta-button-admissions">
-              <Link href="/admissions">Admission Info</Link>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-primary text-primary bg-white hover:bg-primary/5 px-8 h-12"
+              asChild
+              data-testid="cta-button-admissions"
+            >
+              <Link href="/admissions">Admission Information</Link>
             </Button>
           </div>
         </div>
