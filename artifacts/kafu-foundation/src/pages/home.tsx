@@ -176,9 +176,16 @@ export default function Home() {
 
       {/* ─── HERO ─── */}
       <section className="relative min-h-[620px] md:min-h-[700px] flex items-center justify-center overflow-hidden bg-primary">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-[#0d2347]" />
+        <img
+          src="https://kafu.ac.ke/wp-content/uploads/2026/03/IMG_6424-scaled.jpg"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          style={{ filter: "brightness(0.45)" }}
+        />
+        <div className="absolute inset-0 bg-primary/60" />
         <div
-          className="absolute inset-0 opacity-20"
+          className="absolute inset-0 opacity-25"
           style={{
             backgroundImage:
               "radial-gradient(ellipse at 20% 60%, #D4A017 0%, transparent 55%), radial-gradient(ellipse at 80% 10%, rgba(255,255,255,0.15) 0%, transparent 45%)",
@@ -432,6 +439,30 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ─── CAMPUS LIFE PHOTO STRIP ─── */}
+      <section className="py-0 bg-background">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-0 h-56 md:h-72">
+          {[
+            { src: "https://kafu.ac.ke/wp-content/uploads/2025/10/undergraduate-fin.jpg", label: "Undergraduate Life" },
+            { src: "https://kafu.ac.ke/wp-content/uploads/2025/10/posgraduate.jpg", label: "Postgraduate Research" },
+            { src: "https://kafu.ac.ke/wp-content/uploads/2025/10/art-culture.jpg", label: "Arts & Culture" },
+            { src: "https://kafu.ac.ke/wp-content/uploads/2025/10/sports.jpg", label: "Sports & Recreation" },
+          ].map(({ src, label }, i) => (
+            <div key={i} className="relative overflow-hidden group">
+              <img
+                src={src}
+                alt={label}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-primary/50 group-hover:bg-primary/30 transition-colors" />
+              <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent">
+                <p className="text-white text-xs font-semibold">{label}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* ─── WHY KAFU ─── */}
       <section className="py-20 bg-primary text-primary-foreground">
         <div className="container mx-auto px-4">
@@ -644,19 +675,27 @@ export default function Home() {
       </section>
 
       {/* ─── CTA ─── */}
-      <section className="py-20 bg-accent">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-serif font-bold text-accent-foreground mb-4">
+      <section className="relative py-24 overflow-hidden">
+        <img
+          src="https://kafu.ac.ke/wp-content/uploads/2025/10/apply-now.jpg"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          style={{ filter: "brightness(0.35)" }}
+        />
+        <div className="absolute inset-0 bg-primary/75" />
+        <div className="relative container mx-auto px-4 text-center text-white z-10">
+          <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">
             Ready to Begin Your Journey?
           </h2>
-          <p className="text-accent-foreground/80 max-w-xl mx-auto mb-8">
+          <p className="text-white/80 max-w-xl mx-auto mb-8">
             Applications for the 2025/2026 academic year are open. Take the next step toward your future at
             Kaimosi Friends University.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button
               size="lg"
-              className="bg-primary text-primary-foreground hover:bg-primary/90 px-8 h-12"
+              className="bg-accent text-accent-foreground hover:bg-accent/90 px-8 h-12"
               asChild
               data-testid="cta-button-apply"
             >
@@ -667,7 +706,7 @@ export default function Home() {
             <Button
               size="lg"
               variant="outline"
-              className="border-primary text-primary bg-white hover:bg-primary/5 px-8 h-12"
+              className="border-white text-white bg-transparent hover:bg-white/10 px-8 h-12"
               asChild
               data-testid="cta-button-admissions"
             >

@@ -143,8 +143,16 @@ export default function Admissions() {
 
       {/* ─── HERO ─── */}
       <div className="bg-primary text-primary-foreground relative overflow-hidden">
+        <img
+          src="https://kafu.ac.ke/wp-content/uploads/2025/10/apply-now.jpg"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          style={{ filter: "brightness(0.3)" }}
+        />
+        <div className="absolute inset-0 bg-primary/75" />
         <div
-          className="absolute inset-0 opacity-10"
+          className="absolute inset-0 opacity-15"
           style={{ backgroundImage: "radial-gradient(ellipse at 80% 50%, #D4A017 0%, transparent 60%)" }}
         />
         <div className="container mx-auto px-4 py-16 md:py-20 relative z-10">
