@@ -58,11 +58,41 @@ export interface Event {
 
 export interface Opportunity {
   id: number;
+  slug: string;
+  category: string;
   type: string;
   title: string;
-  reference?: string;
-  deadline: string;
+  reference: string;
+  department: string;
+  summary: string;
+  publish_date: string;
+  deadline: string | null;
+  deadline_time: string | null;
   status: string;
+  featured: boolean;
+  documents_count: number;
+}
+
+export interface OpportunityDocument {
+  title: string;
+  type: string;
+  size: string;
+  url: string;
+}
+
+export interface OpportunityContact {
+  office: string;
+  email: string;
+  phone: string;
+  location: string;
+}
+
+export interface OpportunityDetail extends Opportunity {
+  description: string;
+  requirements: string[];
+  submission_info: string;
+  contact: OpportunityContact;
+  documents: OpportunityDocument[];
 }
 
 export interface ContactEmail {

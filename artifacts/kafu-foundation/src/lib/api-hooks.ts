@@ -6,7 +6,8 @@ import type {
   School, 
   Programme, 
   Event, 
-  Opportunity, 
+  Opportunity,
+  OpportunityDetail,
   ContactInfo,
   AdmissionsData,
   ProgrammeDetail,
@@ -63,10 +64,25 @@ export function useEvents() {
   });
 }
 
-export function useOpportunities() {
+export function useOpportunities(params?: { category?: string; status?: string; search?: string }) {
   return useQuery({
-    queryKey: ["opportunities"],
-    queryFn: () => fetchApi<Opportunity[]>("/opportunities"),
+    queryKey: ["opportunities", params],
+    queryFn: () => {
+      const p = new URLSearchParams();
+      if (params?.category) p.append("category", params.category);
+      if (params?.status) p.append("status", params.status);
+      if (params?.search) p.append("search", params.search);
+      const q = p.toString() ? `?${p.toString()}` : "";
+      return fetchApi<Opportunity[]>(`/opportunities${q}`);
+    },
+  });
+}
+
+export function useOpportunityDetail(slug: string) {
+  return useQuery({
+    queryKey: ["opportunity-detail", slug],
+    queryFn: () => fetchApi<OpportunityDetail>(`/opportunities/${slug}`),
+    enabled: !!slug,
   });
 }
 

@@ -21,7 +21,7 @@ Official website for Kaimosi Friends University (KAFU), a Quaker-founded public 
 - **Branding**: Deep Navy `#1B3A6B`, Gold `#D4A017`
 - **Logo**: `https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png`
 
-### Pages (11 total)
+### Pages (14 total)
 | Page | Path |
 |---|---|
 | Home | `/` |
@@ -29,11 +29,15 @@ Official website for Kaimosi Friends University (KAFU), a Quaker-founded public 
 | Schools | `/schools` |
 | School Detail | `/schools/:code` |
 | Programmes | `/programmes` |
+| Programme Detail | `/programmes/:school/:code` |
+| Staff Directory | `/staff` |
+| Staff Profile | `/staff/:slug` |
 | Admissions | `/admissions` |
 | Student Services | `/student-services` |
 | News | `/news` |
 | Events | `/events` |
 | Opportunities | `/opportunities` |
+| Opportunity Detail | `/opportunities/:slug` |
 | Contact | `/contact` |
 
 ### Key Source Files

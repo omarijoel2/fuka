@@ -19,6 +19,7 @@ import StudentServices from "@/pages/student-services";
 import News from "@/pages/news";
 import Events from "@/pages/events";
 import Opportunities from "@/pages/opportunities";
+import OpportunityDetail from "@/pages/opportunity-detail";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 
@@ -50,6 +51,7 @@ function Router() {
           <Route path="/news" component={News} />
           <Route path="/events" component={Events} />
           <Route path="/opportunities" component={Opportunities} />
+          <Route path="/opportunities/:slug" component={OpportunityDetail} />
           <Route path="/contact" component={Contact} />
           <Route component={NotFound} />
         </Switch>
