@@ -8,10 +8,25 @@ import { Footer } from "@/components/footer";
 
 import Home from "@/pages/home";
 import About from "@/pages/about";
+import Schools from "@/pages/schools";
+import SchoolDetails from "@/pages/school-details";
+import Programmes from "@/pages/programmes";
 import Admissions from "@/pages/admissions";
+import StudentServices from "@/pages/student-services";
+import News from "@/pages/news";
+import Events from "@/pages/events";
+import Opportunities from "@/pages/opportunities";
+import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: 5 * 60 * 1000,
+    },
+  },
+});
 
 function Router() {
   return (
@@ -21,7 +36,15 @@ function Router() {
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/about" component={About} />
+          <Route path="/schools" component={Schools} />
+          <Route path="/schools/:code" component={SchoolDetails} />
+          <Route path="/programmes" component={Programmes} />
           <Route path="/admissions" component={Admissions} />
+          <Route path="/student-services" component={StudentServices} />
+          <Route path="/news" component={News} />
+          <Route path="/events" component={Events} />
+          <Route path="/opportunities" component={Opportunities} />
+          <Route path="/contact" component={Contact} />
           <Route component={NotFound} />
         </Switch>
       </main>
