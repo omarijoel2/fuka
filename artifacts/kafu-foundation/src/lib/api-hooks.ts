@@ -9,6 +9,7 @@ import type {
   Opportunity, 
   ContactInfo,
   AdmissionsData,
+  ProgrammeDetail,
 } from "./api-types";
 
 export function useStats() {
@@ -78,5 +79,13 @@ export function useAdmissions() {
   return useQuery({
     queryKey: ["admissions"],
     queryFn: () => fetchApi<AdmissionsData>("/admissions"),
+  });
+}
+
+export function useProgrammeDetail(school: string, code: string) {
+  return useQuery({
+    queryKey: ["programme-detail", school, code],
+    queryFn: () => fetchApi<ProgrammeDetail>(`/programmes/${encodeURIComponent(school)}/${encodeURIComponent(code)}`),
+    enabled: !!school && !!code,
   });
 }

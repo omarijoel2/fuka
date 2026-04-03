@@ -91,6 +91,15 @@ export interface ContactInfo {
   social_media: SocialMedia[];
 }
 
+export interface ProgrammeDetail {
+  school: string;
+  code: string;
+  overview: string;
+  mode: string;
+  career_opportunities: string[];
+  entry_requirements: string[];
+}
+
 export interface AdmissionsStep {
   step: number;
   title: string;
