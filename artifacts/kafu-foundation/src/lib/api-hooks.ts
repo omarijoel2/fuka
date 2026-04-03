@@ -7,7 +7,8 @@ import type {
   Programme, 
   Event, 
   Opportunity, 
-  ContactInfo 
+  ContactInfo,
+  AdmissionsData,
 } from "./api-types";
 
 export function useStats() {
@@ -70,5 +71,12 @@ export function useContactInfo() {
   return useQuery({
     queryKey: ["contact"],
     queryFn: () => fetchApi<ContactInfo>("/contact"),
+  });
+}
+
+export function useAdmissions() {
+  return useQuery({
+    queryKey: ["admissions"],
+    queryFn: () => fetchApi<AdmissionsData>("/admissions"),
   });
 }

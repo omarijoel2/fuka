@@ -390,6 +390,134 @@ Route::get('/opportunities', function () {
     ]);
 });
 
+Route::get('/admissions', function () {
+    return response()->json([
+        'data' => [
+            'pathways' => [
+                [
+                    'id' => 'undergraduate',
+                    'title' => 'Undergraduate',
+                    'subtitle' => 'Government Sponsored (KUCCPS) & Direct Entry',
+                    'description' => 'Join one of KAFU\'s 22 undergraduate degree programmes via KUCCPS government placement or direct entry. Applications open each academic year.',
+                    'requirements' => [
+                        'Minimum KCSE mean grade of C+ (Plus) or its equivalent',
+                        'Specific subject cluster requirements depending on the programme',
+                        'Valid Kenya National Examinations Council (KNEC) certificate',
+                        'National Identity Card or Birth Certificate',
+                        'Two passport-size photographs',
+                    ],
+                    'steps' => [
+                        ['step' => 1, 'title' => 'Check Requirements', 'description' => 'Review the minimum entry requirements for your chosen programme.'],
+                        ['step' => 2, 'title' => 'Apply via KUCCPS', 'description' => 'Select Kaimosi Friends University on the KUCCPS portal during the application window.'],
+                        ['step' => 3, 'title' => 'Await Placement', 'description' => 'KUCCPS will notify you of your placement via SMS and the KUCCPS portal.'],
+                        ['step' => 4, 'title' => 'Accept Placement', 'description' => 'Log in to the KUCCPS portal and accept your placement to KAFU.'],
+                        ['step' => 5, 'title' => 'Report to KAFU', 'description' => 'Bring original documents, pay fees, and report on the stipulated joining date.'],
+                    ],
+                    'cta_label' => 'Apply via KUCCPS',
+                    'cta_url' => 'https://students.kuccps.net/',
+                    'cta_external' => true,
+                ],
+                [
+                    'id' => 'postgraduate',
+                    'title' => 'Postgraduate',
+                    'subtitle' => 'Masters & Doctoral Programmes',
+                    'description' => 'Advance your professional or academic career through KAFU\'s research-based and coursework Masters and PhD programmes across all five schools.',
+                    'requirements' => [
+                        'For Masters: A relevant Bachelor\'s degree (Second Class Honours or above) from a recognized university',
+                        'For PhD: A relevant Master\'s degree from a recognized university',
+                        'Official transcripts and certificates from all previous institutions',
+                        'Two academic referees\' letters of recommendation',
+                        'A research proposal (for research-based programmes)',
+                        'Curriculum Vitae (CV)',
+                    ],
+                    'steps' => [
+                        ['step' => 1, 'title' => 'Choose Your Programme', 'description' => 'Browse the postgraduate catalogue and identify a programme aligned to your goals.'],
+                        ['step' => 2, 'title' => 'Prepare Documents', 'description' => 'Gather official transcripts, certificates, CV, and reference letters.'],
+                        ['step' => 3, 'title' => 'Submit Application', 'description' => 'Apply directly through the KAFU Student Portal with all required documents.'],
+                        ['step' => 4, 'title' => 'Shortlisting & Interview', 'description' => 'Shortlisted candidates may be called for an interview or additional review.'],
+                        ['step' => 5, 'title' => 'Offer & Enrolment', 'description' => 'Upon acceptance, receive your admission letter and complete registration.'],
+                    ],
+                    'cta_label' => 'Apply via Student Portal',
+                    'cta_url' => 'https://portal.kafu.ac.ke',
+                    'cta_external' => true,
+                ],
+                [
+                    'id' => 'international',
+                    'title' => 'International Students',
+                    'subtitle' => 'Open to Students from All Nations',
+                    'description' => 'KAFU warmly welcomes students from across Africa and the world. We provide guidance on recognition of foreign qualifications, student visas, and accommodation.',
+                    'requirements' => [
+                        'Recognized secondary school leaving certificate equivalent to KCSE C+',
+                        'Certified copies of all academic certificates and transcripts',
+                        'Valid passport (copy of bio-data page)',
+                        'Student visa / study permit (upon admission)',
+                        'Evidence of English language proficiency (where applicable)',
+                        'Recognition of foreign qualifications from the Kenya National Qualifications Authority (KNQA)',
+                    ],
+                    'steps' => [
+                        ['step' => 1, 'title' => 'Equivalency Assessment', 'description' => 'Have your foreign qualifications recognized by KNQA or a recognized authority.'],
+                        ['step' => 2, 'title' => 'Submit Application', 'description' => 'Apply via the KAFU Student Portal with all certified documents.'],
+                        ['step' => 3, 'title' => 'Receive Offer Letter', 'description' => 'KAFU will issue a conditional or unconditional offer letter.'],
+                        ['step' => 4, 'title' => 'Apply for Student Visa', 'description' => 'Use your offer letter to apply for a Kenya student visa / study permit.'],
+                        ['step' => 5, 'title' => 'Arrive & Register', 'description' => 'Report to KAFU, present original documents, pay fees, and complete registration.'],
+                    ],
+                    'cta_label' => 'Apply via Student Portal',
+                    'cta_url' => 'https://portal.kafu.ac.ke',
+                    'cta_external' => true,
+                ],
+                [
+                    'id' => 'self-sponsored',
+                    'title' => 'Self-Sponsored',
+                    'subtitle' => 'Module II Programmes',
+                    'description' => 'KAFU\'s Module II (self-sponsored) pathway is designed for working professionals, school leavers who missed government placement, and those seeking flexible learning arrangements.',
+                    'requirements' => [
+                        'Minimum KCSE mean grade of C+ for degree programmes',
+                        'Minimum KCSE mean grade of C- for diploma programmes',
+                        'KAFU application form (available on the portal)',
+                        'Certified copies of academic certificates',
+                        'National ID or passport copy',
+                        'Two passport-size photos',
+                    ],
+                    'steps' => [
+                        ['step' => 1, 'title' => 'Download Application Form', 'description' => 'Download the Module II application form from the KAFU portal or admissions office.'],
+                        ['step' => 2, 'title' => 'Complete the Form', 'description' => 'Fill in all sections and attach certified copies of required documents.'],
+                        ['step' => 3, 'title' => 'Submit & Pay Application Fee', 'description' => 'Submit your form and pay the non-refundable application fee at the Finance Office or via M-Pesa.'],
+                        ['step' => 4, 'title' => 'Interview / Review', 'description' => 'Some programmes require a review panel or interview before admission.'],
+                        ['step' => 5, 'title' => 'Receive Admission Letter', 'description' => 'Collect or download your admission letter and report on the joining date.'],
+                    ],
+                    'cta_label' => 'Apply via Student Portal',
+                    'cta_url' => 'https://portal.kafu.ac.ke',
+                    'cta_external' => true,
+                ],
+            ],
+            'deadlines' => [
+                ['event' => 'KUCCPS Application Window', 'date' => '2026-05-30', 'description' => 'Deadline for selecting KAFU on the KUCCPS portal'],
+                ['event' => 'Module II Applications Close', 'date' => '2026-06-15', 'description' => 'Self-sponsored undergraduate and diploma applications'],
+                ['event' => 'Postgraduate Intake', 'date' => '2026-06-30', 'description' => 'Masters and PhD applications for September 2026 intake'],
+                ['event' => 'International Applications Close', 'date' => '2026-07-31', 'description' => 'All international student applications for September intake'],
+                ['event' => 'Reporting / Orientation', 'date' => '2026-09-08', 'description' => 'First-year student reporting and orientation week begins'],
+            ],
+            'documents' => [
+                ['id' => 1, 'title' => 'Undergraduate Application Form', 'category' => 'Application Forms', 'description' => 'Official direct-entry undergraduate application form', 'file_url' => '#', 'version' => '2026'],
+                ['id' => 2, 'title' => 'Postgraduate Application Form', 'category' => 'Application Forms', 'description' => 'Application form for Masters and PhD programmes', 'file_url' => '#', 'version' => '2026'],
+                ['id' => 3, 'title' => 'Module II Application Form', 'category' => 'Application Forms', 'description' => 'Self-sponsored programme application form', 'file_url' => '#', 'version' => '2026'],
+                ['id' => 4, 'title' => 'Government-Sponsored Fee Structure 2025/2026', 'category' => 'Fee Structures', 'description' => 'Fee schedules for KUCCPS-placed students per school', 'file_url' => '#', 'version' => '2025/2026'],
+                ['id' => 5, 'title' => 'Self-Sponsored Fee Structure 2025/2026', 'category' => 'Fee Structures', 'description' => 'Fee schedules for Module II and private students', 'file_url' => '#', 'version' => '2025/2026'],
+                ['id' => 6, 'title' => 'Postgraduate Fee Structure 2025/2026', 'category' => 'Fee Structures', 'description' => 'Fee schedules for all Masters and PhD programmes', 'file_url' => '#', 'version' => '2025/2026'],
+                ['id' => 7, 'title' => 'Joining Instructions 2025/2026', 'category' => 'Joining Instructions', 'description' => 'Official joining instructions and what to bring on reporting day', 'file_url' => '#', 'version' => '2025/2026'],
+                ['id' => 8, 'title' => 'KAFU Prospectus 2025/2026', 'category' => 'Brochures', 'description' => 'Full university prospectus including all programmes and fees', 'file_url' => '#', 'version' => '2025/2026'],
+            ],
+            'contact' => [
+                'office' => 'Admissions & Student Recruitment Office',
+                'email' => 'admissions@kafu.ac.ke',
+                'phone' => '+254 777 373 633',
+                'location' => 'Administration Block, Ground Floor, Main Campus, Kaimosi',
+                'hours' => 'Monday – Friday, 8:00 AM – 5:00 PM',
+            ],
+        ],
+    ]);
+});
+
 Route::get('/stats', function () {
     return response()->json([
         'data' => [

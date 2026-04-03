@@ -91,6 +91,54 @@ export interface ContactInfo {
   social_media: SocialMedia[];
 }
 
+export interface AdmissionsStep {
+  step: number;
+  title: string;
+  description: string;
+}
+
+export interface AdmissionsPathway {
+  id: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  requirements: string[];
+  steps: AdmissionsStep[];
+  cta_label: string;
+  cta_url: string;
+  cta_external: boolean;
+}
+
+export interface AdmissionsDeadline {
+  event: string;
+  date: string;
+  description: string;
+}
+
+export interface AdmissionsDocument {
+  id: number;
+  title: string;
+  category: string;
+  description: string;
+  file_url: string;
+  version: string;
+}
+
+export interface AdmissionsContact {
+  office: string;
+  email: string;
+  phone: string;
+  location: string;
+  hours: string;
+}
+
+export interface AdmissionsData {
+  pathways: AdmissionsPathway[];
+  deadlines: AdmissionsDeadline[];
+  documents: AdmissionsDocument[];
+  contact: AdmissionsContact;
+}
+
 export async function fetchApi<T>(endpoint: string): Promise<T> {
   const res = await fetch(`/api${endpoint}`);
   if (!res.ok) {
