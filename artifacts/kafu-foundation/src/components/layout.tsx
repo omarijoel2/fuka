@@ -34,14 +34,23 @@ export function Layout({ children }: { children: React.ReactNode }) {
       {/* Sidebar */}
       <aside className={`fixed inset-y-0 left-0 z-50 w-72 bg-card border-r border-border transform transition-transform duration-200 ease-in-out md:relative md:translate-x-0 print:hidden ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="p-6">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-10 h-10 bg-primary rounded flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">
-              K
+          <div className="mb-8">
+            <img
+              src="https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png"
+              alt="Kaimosi Friends University"
+              className="h-10 w-auto mb-3 object-contain"
+              onError={(e) => {
+                const target = e.currentTarget;
+                target.style.display = "none";
+                const fallback = target.nextElementSibling as HTMLElement | null;
+                if (fallback) fallback.style.display = "flex";
+              }}
+            />
+            <div className="hidden items-center gap-3" id="logo-fallback">
+              <div className="w-10 h-10 bg-primary rounded flex items-center justify-center text-primary-foreground font-serif font-bold text-xl">K</div>
+              <span className="font-serif font-bold text-lg text-card-foreground leading-tight">KAFU Digital</span>
             </div>
-            <div>
-              <h1 className="font-serif font-bold text-lg text-card-foreground leading-tight">KAFU Digital</h1>
-              <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Foundation Layer</p>
-            </div>
+            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider mt-1">Foundation Layer</p>
           </div>
           
           <nav className="space-y-1">

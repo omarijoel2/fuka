@@ -60,6 +60,70 @@ export default function Overview() {
         </div>
       </div>
 
+      <section className="space-y-6 pt-4">
+        <h2 className="text-2xl font-serif font-semibold border-b border-border pb-2">Institutional Profile</h2>
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="p-6 bg-card rounded-lg border border-border space-y-3">
+            <h3 className="font-bold text-base text-foreground">Schools & Faculties</h3>
+            <ul className="space-y-2 text-sm">
+              {[
+                { code: "SESS", name: "School of Education & Social Sciences" },
+                { code: "SBE",  name: "School of Business & Economics" },
+                { code: "SCIT", name: "School of Computing & Information Technology" },
+                { code: "SOS",  name: "School of Science" },
+                { code: "SHS",  name: "School of Health Sciences" },
+              ].map((s) => (
+                <li key={s.code} className="flex items-start gap-3">
+                  <span className="shrink-0 mt-0.5 font-mono text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded">{s.code}</span>
+                  <span className="text-muted-foreground">{s.name}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="p-6 bg-card rounded-lg border border-border space-y-4">
+            <h3 className="font-bold text-base text-foreground">Institution Details</h3>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <div><span className="font-medium text-foreground">Full Name: </span>Kaimosi Friends University</div>
+              <div><span className="font-medium text-foreground">Abbreviation: </span>KAFU</div>
+              <div><span className="font-medium text-foreground">Location: </span>Kaimosi, Vihiga County, Kenya</div>
+              <div><span className="font-medium text-foreground">Postal: </span>P.O BOX 385 – 50309, Kaimosi</div>
+              <div><span className="font-medium text-foreground">Phone: </span>+254 777 373 633</div>
+              <div><span className="font-medium text-foreground">VC Email: </span>vc@kafu.ac.ke</div>
+              <div><span className="font-medium text-foreground">General: </span>info@kafu.ac.ke</div>
+              <div><span className="font-medium text-foreground">Website: </span>
+                <a href="https://kafu.ac.ke" target="_blank" rel="noopener noreferrer" className="text-primary underline hover:no-underline">kafu.ac.ke</a>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 bg-card rounded-lg border border-border space-y-3">
+            <h3 className="font-bold text-base text-foreground">Student Digital Portals</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Student Portal</span>
+                <a href="https://portal.kafu.ac.ke" target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-primary underline">portal.kafu.ac.ke</a>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">E-Learning / ODL</span>
+                <a href="https://elearning.kafu.ac.ke" target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-primary underline">elearning.kafu.ac.ke</a>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-muted-foreground">Main Website</span>
+                <a href="https://kafu.ac.ke" target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-primary underline">kafu.ac.ke</a>
+              </div>
+            </div>
+          </div>
+          <div className="p-6 bg-card rounded-lg border border-border space-y-3">
+            <h3 className="font-bold text-base text-foreground">Programme Levels Offered</h3>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-primary inline-block"></span>Certificate &amp; Diploma</div>
+              <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-primary inline-block"></span>Undergraduate (Bachelor's Degree)</div>
+              <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-primary inline-block"></span>Postgraduate (Master's Degree)</div>
+              <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full bg-primary inline-block"></span>Doctoral (PhD)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="space-y-6 pt-6">
         <h2 className="text-2xl font-serif font-semibold border-b border-border pb-2">Implementation Order</h2>
         <div className="space-y-4">

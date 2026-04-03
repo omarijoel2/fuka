@@ -100,6 +100,60 @@ export default function CMSGovernance() {
       </section>
 
       <section className="space-y-6">
+        <h2 className="text-2xl font-serif font-semibold border-b border-border pb-2">Taxonomy Strategy</h2>
+        <p className="text-sm text-muted-foreground max-w-3xl">Controlled vocabulary used to classify and filter content across the platform. All taxonomies are managed centrally by the Corporate Communications Admin.</p>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="p-5 border border-border rounded-lg bg-card">
+            <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground mb-3">Schools (5 Schools)</h3>
+            <ul className="space-y-2 text-sm">
+              {[
+                ["SESS", "School of Education & Social Sciences"],
+                ["SBE",  "School of Business & Economics"],
+                ["SCIT", "School of Computing & Information Technology"],
+                ["SOS",  "School of Science"],
+                ["SHS",  "School of Health Sciences"],
+              ].map(([code, name]) => (
+                <li key={code} className="flex items-start gap-2">
+                  <span className="shrink-0 font-mono text-xs bg-primary/10 text-primary px-1.5 py-0.5 rounded mt-0.5">{code}</span>
+                  <span className="text-muted-foreground">{name}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="p-5 border border-border rounded-lg bg-card">
+            <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground mb-3">News Categories</h3>
+            <div className="flex flex-wrap gap-2">
+              {["In the News","Academic","Research","Student Life","Events","Partnerships","Administration","Tenders & Vacancies"].map((c) => (
+                <span key={c} className="text-xs px-2 py-1 bg-secondary rounded border border-border font-medium">{c}</span>
+              ))}
+            </div>
+            <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground mt-5 mb-3">Opportunity Types</h3>
+            <div className="flex flex-wrap gap-2">
+              {["Tender","Job Vacancy","Scholarship","Research Grant","Internship"].map((c) => (
+                <span key={c} className="text-xs px-2 py-1 bg-secondary rounded border border-border font-medium">{c}</span>
+              ))}
+            </div>
+          </div>
+          <div className="p-5 border border-border rounded-lg bg-card">
+            <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground mb-3">Programme Levels</h3>
+            <div className="flex flex-wrap gap-2">
+              {["Certificate","Diploma","Undergraduate","Postgraduate","PhD","Short Course","Professional"].map((c) => (
+                <span key={c} className="text-xs px-2 py-1 bg-secondary rounded border border-border font-medium">{c}</span>
+              ))}
+            </div>
+          </div>
+          <div className="p-5 border border-border rounded-lg bg-card">
+            <h3 className="font-bold text-sm uppercase tracking-wider text-muted-foreground mb-3">Staff Roles (For Directory)</h3>
+            <div className="flex flex-wrap gap-2">
+              {["Vice Chancellor","Deputy VC","Dean","Department Chair","Lecturer","Senior Lecturer","Associate Professor","Professor","Administrative Staff","Support Staff"].map((c) => (
+                <span key={c} className="text-xs px-2 py-1 bg-secondary rounded border border-border font-medium">{c}</span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="space-y-6">
         <h2 className="text-2xl font-serif font-semibold border-b border-border pb-2">Reusable Blocks</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           <div className="p-3 border border-border rounded bg-secondary/30 text-sm font-medium flex items-center justify-center text-center h-20">Hero Banner</div>

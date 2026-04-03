@@ -11,27 +11,37 @@ export default function SEO() {
 
       <section className="space-y-6">
         <h2 className="text-2xl font-serif font-semibold border-b border-border pb-2">URL Architecture</h2>
-        <div className="p-6 border border-border rounded-lg bg-card space-y-4">
-          <p className="text-sm text-muted-foreground mb-4">URLs must be semantic, lowercase, and use hyphens for separation. No trailing slashes.</p>
-          
-          <div className="grid gap-3">
-            <div className="flex flex-col md:flex-row md:items-center gap-2 p-3 bg-secondary/30 rounded border border-border">
-              <span className="font-semibold text-sm w-32">News</span>
-              <code className="text-sm text-primary font-mono bg-background px-2 py-1 rounded">/news/[year]/[month]/[slug]</code>
-            </div>
-            <div className="flex flex-col md:flex-row md:items-center gap-2 p-3 bg-secondary/30 rounded border border-border">
-              <span className="font-semibold text-sm w-32">Programmes</span>
-              <code className="text-sm text-primary font-mono bg-background px-2 py-1 rounded">/programmes/[faculty]/[slug]</code>
-            </div>
-            <div className="flex flex-col md:flex-row md:items-center gap-2 p-3 bg-secondary/30 rounded border border-border">
-              <span className="font-semibold text-sm w-32">Staff</span>
-              <code className="text-sm text-primary font-mono bg-background px-2 py-1 rounded">/staff/[department]/[slug]</code>
-            </div>
-            <div className="flex flex-col md:flex-row md:items-center gap-2 p-3 bg-secondary/30 rounded border border-border">
-              <span className="font-semibold text-sm w-32">Events</span>
-              <code className="text-sm text-primary font-mono bg-background px-2 py-1 rounded">/events/[year]/[slug]</code>
-            </div>
-          </div>
+        <p className="text-sm text-muted-foreground max-w-3xl">The current kafu.ac.ke site uses flat WordPress slugs (e.g. <code className="text-primary font-mono">/bachelor-of-commerce/</code>). The new platform will use a structured, hierarchical URL architecture for SEO and maintainability.</p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm border border-border rounded-lg overflow-hidden">
+            <thead>
+              <tr className="bg-secondary text-left">
+                <th className="px-4 py-3 font-semibold border-b border-border">Content Type</th>
+                <th className="px-4 py-3 font-semibold border-b border-border text-red-600">Current (kafu.ac.ke)</th>
+                <th className="px-4 py-3 font-semibold border-b border-border text-green-700">Recommended (New Platform)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                ["News / Blog", "/kafu-hosts-2nd-prayer-breakfast/", "/news/2026/03/kafu-hosts-2nd-prayer-breakfast"],
+                ["Academic Programme", "/bachelor-of-commerce/", "/academic-programmes/sbe/bachelor-of-commerce"],
+                ["School Page", "/school-of-education-social-sciences/", "/schools/sess"],
+                ["Events", "/events/examination-schedule-2025-2026/", "/events/2026/examination-schedule-semester-2"],
+                ["Staff Profile", "(Not available)", "/staff/sess/dr-nabeta-sangili"],
+                ["Opportunities / Tenders", "(Not structured)", "/opportunities/tenders/2026/ref-kafu-001"],
+                ["Vacancies", "(Not structured)", "/opportunities/vacancies/2026/lecturer-computer-science"],
+              ].map(([type, current, recommended]) => (
+                <tr key={type} className="border-b border-border last:border-0 hover:bg-secondary/20 transition-colors">
+                  <td className="px-4 py-3 font-medium">{type}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-red-500">{current}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-green-700">{recommended}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <div className="p-4 bg-secondary/40 border border-border rounded text-sm text-muted-foreground">
+          <strong>Redirect strategy:</strong> All existing kafu.ac.ke flat slugs must be 301-redirected to the new hierarchical URLs at go-live. A redirect map should be maintained in the CMS. No broken links are acceptable during migration.
         </div>
       </section>
 
