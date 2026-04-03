@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "gcwroWleWqOaCoRCyQgRc"
+uri = "file://artifacts/kafu-foundation/src/assets/images/hero-campus.png"
+type = "image"
+title = "KAFU university campus hero"

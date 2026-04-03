@@ -2,37 +2,31 @@ import { Switch, Route, Router as WouterRouter } from "wouter";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import NotFound from "@/pages/not-found";
-import { Layout } from "@/components/layout";
 
-import Overview from "@/pages/overview";
-import DesignSystem from "@/pages/design-system";
-import ComponentInventory from "@/pages/components";
-import CMSGovernance from "@/pages/cms-governance";
-import RolesPermissions from "@/pages/roles-permissions";
-import Security from "@/pages/security";
-import SEO from "@/pages/seo";
-import Accessibility from "@/pages/accessibility";
-import Analytics from "@/pages/analytics";
+import { Navbar } from "@/components/navbar";
+import { Footer } from "@/components/footer";
+
+import Home from "@/pages/home";
+import About from "@/pages/about";
+import Admissions from "@/pages/admissions";
+import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient();
 
 function Router() {
   return (
-    <Layout>
-      <Switch>
-        <Route path="/" component={Overview} />
-        <Route path="/design-system" component={DesignSystem} />
-        <Route path="/components" component={ComponentInventory} />
-        <Route path="/cms-governance" component={CMSGovernance} />
-        <Route path="/roles-permissions" component={RolesPermissions} />
-        <Route path="/security" component={Security} />
-        <Route path="/seo" component={SEO} />
-        <Route path="/accessibility" component={Accessibility} />
-        <Route path="/analytics" component={Analytics} />
-        <Route component={NotFound} />
-      </Switch>
-    </Layout>
+    <div className="min-h-[100dvh] flex flex-col">
+      <Navbar />
+      <main className="flex-1 flex flex-col">
+        <Switch>
+          <Route path="/" component={Home} />
+          <Route path="/about" component={About} />
+          <Route path="/admissions" component={Admissions} />
+          <Route component={NotFound} />
+        </Switch>
+      </main>
+      <Footer />
+    </div>
   );
 }
 
