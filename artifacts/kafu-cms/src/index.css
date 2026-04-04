@@ -39,32 +39,45 @@
 }
 
 :root {
-  --background: 220 14% 96%;
-  --foreground: 220 30% 12%;
-  --border: 220 13% 88%;
-  --input: 220 13% 88%;
-  --ring: 219 52% 28%;
+  /* KAFU Brand: Forest Green #1A5C38, White/Light Gray, Gold #C9A227 */
+  --background: 143 12% 96%;
+  --foreground: 143 40% 8%;
+  --border: 143 15% 87%;
+  --input: 143 15% 87%;
+  --ring: 143 55% 23%;
+
   --card: 0 0% 100%;
-  --card-foreground: 220 30% 12%;
+  --card-foreground: 143 40% 8%;
+
   --popover: 0 0% 100%;
-  --popover-foreground: 220 30% 12%;
-  --primary: 219 52% 28%;
+  --popover-foreground: 143 40% 8%;
+
+  /* Forest Green #1A5C38 → hsl(143, 55%, 23%) */
+  --primary: 143 55% 23%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 220 13% 92%;
-  --secondary-foreground: 220 30% 20%;
-  --muted: 220 13% 92%;
-  --muted-foreground: 220 14% 45%;
-  --accent: 43 74% 46%;
+
+  --secondary: 143 12% 91%;
+  --secondary-foreground: 143 40% 16%;
+
+  --muted: 143 10% 91%;
+  --muted-foreground: 143 12% 43%;
+
+  /* Gold #C9A227 → hsl(43, 68%, 47%) */
+  --accent: 43 68% 47%;
   --accent-foreground: 0 0% 100%;
+
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
-  --sidebar: 219 52% 18%;
-  --sidebar-foreground: 220 30% 85%;
-  --sidebar-primary: 43 74% 46%;
+
+  /* Sidebar: deep forest green */
+  --sidebar: 143 58% 14%;
+  --sidebar-foreground: 143 18% 86%;
+  --sidebar-primary: 43 68% 47%;
   --sidebar-primary-foreground: 0 0% 100%;
-  --sidebar-accent: 219 52% 25%;
+  --sidebar-accent: 143 55% 20%;
   --sidebar-accent-foreground: 0 0% 100%;
-  --sidebar-border: 219 52% 22%;
+  --sidebar-border: 143 55% 18%;
+
   --app-font-sans: 'Inter', system-ui, sans-serif;
   --app-font-mono: 'Menlo', monospace;
   --radius: 0.5rem;

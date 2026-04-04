@@ -72,7 +72,7 @@ export const STATUS_LABELS: Record<WorkflowStatus, string> = {
 
 export const STATUS_COLORS: Record<WorkflowStatus, string> = {
   draft: "bg-gray-100 text-gray-600",
-  submitted: "bg-blue-50 text-blue-700",
+  submitted: "bg-teal-50 text-teal-700",
   under_review: "bg-yellow-50 text-yellow-700",
   approved: "bg-green-50 text-green-700",
   scheduled: "bg-purple-50 text-purple-700",

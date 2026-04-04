@@ -119,8 +119,8 @@ export default function DashboardPage() {
         <StatCard
           label="Total Media"
           value={data?.stats.total_media ?? "—"}
-          icon={<Image className="w-5 h-5 text-blue-600" />}
-          color="bg-blue-50"
+          icon={<Image className="w-5 h-5 text-primary" />}
+          color="bg-primary/10"
           href="/media"
         />
       </div>
@@ -234,8 +234,8 @@ export default function DashboardPage() {
         <StatCard
           label="Total Media"
           value={data?.stats.total_media ?? "—"}
-          icon={<Image className="w-5 h-5 text-blue-600" />}
-          color="bg-blue-50"
+          icon={<Image className="w-5 h-5 text-primary" />}
+          color="bg-primary/10"
           href="/media"
         />
       </div>
