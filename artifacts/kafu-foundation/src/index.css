@@ -51,39 +51,39 @@
 }
 
 :root {
-  /* KAFU Colors: Deep Navy #1B3A6B and KAFU Gold #D4A017 */
+  /* KAFU Brand Colors: Forest Green #1A5C38, White #FFFFFF, Gold #C9A227 */
   --background: 0 0% 100%;
-  --foreground: 217 60% 10%;
-  --border: 217 30% 90%;
-  
-  --card: 0 0% 100%;
-  --card-foreground: 217 60% 10%;
-  --card-border: 217 30% 90%;
-  
-  --popover: 0 0% 100%;
-  --popover-foreground: 217 60% 10%;
-  --popover-border: 217 30% 90%;
+  --foreground: 143 55% 8%;
+  --border: 143 18% 88%;
 
-  /* Navy #1B3A6B is hsl(217, 60%, 26%) */
-  --primary: 217 60% 26%;
+  --card: 0 0% 100%;
+  --card-foreground: 143 55% 8%;
+  --card-border: 143 18% 88%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 143 55% 8%;
+  --popover-border: 143 18% 88%;
+
+  /* Forest Green #1A5C38 → hsl(143, 55%, 23%) */
+  --primary: 143 55% 23%;
   --primary-foreground: 0 0% 100%;
-  
-  /* Light blue tint for secondary */
-  --secondary: 217 30% 96%;
-  --secondary-foreground: 217 60% 20%;
-  
-  --muted: 217 20% 96%;
-  --muted-foreground: 217 10% 45%;
-  
-  /* Gold #D4A017 is hsl(43, 80%, 46%) */
-  --accent: 43 80% 46%;
-  --accent-foreground: 217 60% 10%;
-  
+
+  /* Light green tint for secondary elements */
+  --secondary: 143 25% 95%;
+  --secondary-foreground: 143 55% 18%;
+
+  --muted: 143 15% 96%;
+  --muted-foreground: 143 10% 44%;
+
+  /* Gold #C9A227 → hsl(43, 68%, 47%) */
+  --accent: 43 68% 47%;
+  --accent-foreground: 143 55% 8%;
+
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 100%;
-  
-  --input: 217 30% 90%;
-  --ring: 217 60% 26%;
+
+  --input: 143 18% 88%;
+  --ring: 143 55% 23%;
 
   --app-font-sans: 'Inter', sans-serif;
   --app-font-serif: 'Playfair Display', Georgia, serif;
@@ -92,35 +92,36 @@
 }
 
 .dark {
-  --background: 217 60% 5%;
-  --foreground: 217 20% 96%;
-  --border: 217 40% 15%;
-  
-  --card: 217 50% 8%;
-  --card-foreground: 217 20% 96%;
-  --card-border: 217 40% 15%;
-  
-  --popover: 217 50% 8%;
-  --popover-foreground: 217 20% 96%;
-  --popover-border: 217 40% 15%;
+  --background: 143 55% 5%;
+  --foreground: 143 20% 95%;
+  --border: 143 35% 15%;
 
-  --primary: 43 80% 46%; /* Gold in dark mode for pop */
-  --primary-foreground: 217 60% 10%;
-  
-  --secondary: 217 40% 15%;
-  --secondary-foreground: 217 20% 96%;
-  
-  --muted: 217 40% 12%;
-  --muted-foreground: 217 20% 70%;
-  
-  --accent: 43 80% 46%;
-  --accent-foreground: 217 60% 10%;
-  
+  --card: 143 45% 8%;
+  --card-foreground: 143 20% 95%;
+  --card-border: 143 35% 15%;
+
+  --popover: 143 45% 8%;
+  --popover-foreground: 143 20% 95%;
+  --popover-border: 143 35% 15%;
+
+  /* Gold as primary in dark mode for warmth and contrast */
+  --primary: 43 68% 47%;
+  --primary-foreground: 143 55% 8%;
+
+  --secondary: 143 35% 14%;
+  --secondary-foreground: 143 20% 95%;
+
+  --muted: 143 35% 11%;
+  --muted-foreground: 143 20% 68%;
+
+  --accent: 43 68% 47%;
+  --accent-foreground: 143 55% 8%;
+
   --destructive: 0 62% 30%;
-  --destructive-foreground: 217 20% 96%;
-  
-  --input: 217 40% 15%;
-  --ring: 43 80% 46%;
+  --destructive-foreground: 143 20% 95%;
+
+  --input: 143 35% 14%;
+  --ring: 43 68% 47%;
 }
 
 @layer base {

@@ -26,7 +26,7 @@ const SCHOOLS = [
 
 const SCHOOL_COLORS: Record<string, string> = {
   SESS: "bg-purple-100 text-purple-800 border-purple-200",
-  SBE: "bg-blue-100 text-blue-800 border-blue-200",
+  SBE: "bg-emerald-100 text-emerald-800 border-emerald-200",
   SCIT: "bg-teal-100 text-teal-800 border-teal-200",
   SOS: "bg-green-100 text-green-800 border-green-200",
   SHS: "bg-red-100 text-red-800 border-red-200",
@@ -45,7 +45,7 @@ function getInitials(name: string) {
 
 function getAvatarGradient(slug: string) {
   const gradients = [
-    "from-blue-700 to-blue-900",
+    "from-primary to-primary/80",
     "from-primary to-primary/70",
     "from-purple-700 to-purple-900",
     "from-teal-700 to-teal-900",
