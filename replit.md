@@ -123,7 +123,8 @@ Laravel 12 with PHP 8.2. Public routes in `routes/api.php`; admin routes in `rou
   - Content Library — filterable table (type, status, search) with pagination
   - Content Editor — full form with slug auto-gen, body, SEO, featured image, workflow transitions, revision history
   - Review Queue — grouped by status, direct links to editor
-  - Media Library — grid with type detection, file upload (multipart POST), delete, copy URL, file details panel; paginated (24/page); storage symlinked at public/storage
+  - Media Library — grid with folder sidebar (logos/campus/marketing/news/general), type filter (image/document), search, upload (multipart POST), delete, copy URL, URL preview in detail panel; paginated (24/page); storage symlinked at public/storage
+  - **11 assets migrated**: logos (×2), campus photos (×6 incl. hero), marketing CTA background, news/event photos (×3) — all registered via MediaMigrationSeeder
   - User Management — table + add/edit modal with role assignment
   - Taxonomy Manager — vocabulary sidebar + hierarchical term tree with add/edit/delete
   - Audit Log — searchable/filterable log with action badges
