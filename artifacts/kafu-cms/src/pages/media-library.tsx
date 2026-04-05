@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useRef } from "react";
 import { apiGet } from "@/lib/api";
 import { formatDateTime } from "@/lib/api";
-import { Image as ImageIcon, Upload, Search, Copy, Trash2, RefreshCw, ExternalLink } from "lucide-react";
+import { Image as ImageIcon, Upload, Search, Copy, Trash2, RefreshCw, ExternalLink, X } from "lucide-react";
+
+const TOKEN_KEY = "kafu_cms_token";
 
 interface MediaFile {
   id: number;
@@ -32,13 +34,20 @@ export default function MediaLibraryPage() {
   const [page, setPage] = useState(1);
   const [selected, setSelected] = useState<MediaFile | null>(null);
   const [copied, setCopied] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = async () => {
     setLoading(true); setError("");
     try {
       const data = await apiGet("/media", { search: search || undefined, page, per_page: 24 });
       setFiles(data?.data ?? []);
-      setMeta(data?.meta ?? null);
+      setMeta(data ? {
+        total: data.total ?? 0,
+        last_page: data.last_page ?? 1,
+        current_page: data.current_page ?? 1,
+      } : null);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to load media.");
     } finally { setLoading(false); }
@@ -46,10 +55,70 @@ export default function MediaLibraryPage() {
 
   useEffect(() => { load(); }, [page]);
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    setPage(1);
+    load();
+  };
+
   const copyUrl = (url: string) => {
     navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    setUploadError("");
+    try {
+      const token = localStorage.getItem(TOKEN_KEY);
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", "general");
+      const res = await fetch("/api/admin/media", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      });
+      if (res.status === 401) {
+        window.location.href = "/kafu-cms/login";
+        return;
+      }
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.message || `Upload failed (${res.status})`);
+      }
+      await load();
+    } catch (e: unknown) {
+      setUploadError(e instanceof Error ? e.message : "Upload failed.");
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleDelete = async (file: MediaFile) => {
+    if (!confirm(`Delete "${file.original_name}"? This cannot be undone.`)) return;
+    try {
+      const token = localStorage.getItem(TOKEN_KEY);
+      const res = await fetch(`/api/admin/media/${file.id}`, {
+        method: "DELETE",
+        headers: {
+          Accept: "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+      if (!res.ok) throw new Error("Delete failed.");
+      if (selected?.id === file.id) setSelected(null);
+      await load();
+    } catch (e: unknown) {
+      alert(e instanceof Error ? e.message : "Delete failed.");
+    }
   };
 
   const isImage = (type: string) => (type ?? "").startsWith("image/");
@@ -61,17 +130,44 @@ export default function MediaLibraryPage() {
           <h1 className="text-2xl font-bold text-foreground">Media Library</h1>
           <p className="text-sm text-muted-foreground mt-0.5">{meta?.total ?? 0} files</p>
         </div>
-        <button
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition"
-          data-testid="btn-upload-media"
-          onClick={() => alert("File upload requires a dedicated upload endpoint. Contact your ICT admin.")}
-        >
-          <Upload className="w-4 h-4" /> Upload File
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted transition"
+            data-testid="btn-refresh-media"
+            onClick={load}
+            title="Refresh"
+          >
+            <RefreshCw className="w-4 h-4" />
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            className="hidden"
+            data-testid="input-upload-file"
+            accept="image/*,application/pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip"
+            onChange={handleUpload}
+          />
+          <button
+            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-semibold hover:opacity-90 transition disabled:opacity-60"
+            data-testid="btn-upload-media"
+            disabled={uploading}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Upload className="w-4 h-4" />
+            {uploading ? "Uploading..." : "Upload File"}
+          </button>
+        </div>
       </div>
 
+      {uploadError && (
+        <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-destructive/10 text-destructive text-sm border border-destructive/20">
+          <X className="w-4 h-4 shrink-0" />
+          {uploadError}
+        </div>
+      )}
+
       {/* Search */}
-      <div className="flex gap-3">
+      <form onSubmit={handleSearch} className="flex gap-3">
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input
@@ -79,22 +175,25 @@ export default function MediaLibraryPage() {
             placeholder="Search files..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && (setPage(1), load())}
-            className="w-full pl-9 pr-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-full pl-9 pr-3 py-2 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
             data-testid="input-media-search"
           />
         </div>
-        <button
-          onClick={() => { setPage(1); load(); }}
-          disabled={loading}
-          className="px-3 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition"
-          data-testid="btn-media-search"
-        >
-          <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+        <button type="submit" className="px-4 py-2 rounded-lg border border-border text-sm font-medium hover:bg-muted transition" data-testid="btn-media-search">
+          Search
         </button>
-      </div>
+        {search && (
+          <button type="button" onClick={() => { setSearch(""); setPage(1); load(); }} className="px-3 py-2 rounded-lg border border-border text-sm hover:bg-muted transition" data-testid="btn-clear-search">
+            Clear
+          </button>
+        )}
+      </form>
 
-      {error && <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>}
+      {error && (
+        <div className="rounded-lg bg-destructive/10 text-destructive text-sm px-4 py-3 border border-destructive/20">
+          {error}
+        </div>
+      )}
 
       <div className="flex gap-6">
         {/* Grid */}
@@ -105,6 +204,7 @@ export default function MediaLibraryPage() {
             <div className="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
               <ImageIcon className="w-12 h-12 opacity-30" />
               <p className="text-sm">No media files found.</p>
+              <p className="text-xs opacity-70">Upload a file to get started.</p>
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-3">
@@ -195,6 +295,14 @@ export default function MediaLibraryPage() {
                   className="flex items-center justify-center w-8 rounded border border-border hover:bg-muted transition" data-testid="btn-open-media">
                   <ExternalLink className="w-3 h-3 text-muted-foreground" />
                 </a>
+                <button
+                  onClick={() => handleDelete(selected)}
+                  className="flex items-center justify-center w-8 rounded border border-destructive/30 text-destructive hover:bg-destructive/10 transition"
+                  title="Delete file"
+                  data-testid="btn-delete-media"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </button>
               </div>
             </div>
           </div>

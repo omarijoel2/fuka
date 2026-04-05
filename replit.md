@@ -19,7 +19,7 @@ Official website for Kaimosi Friends University (KAFU), a Quaker-founded public 
 - **State**: @tanstack/react-query
 - **Styling**: Tailwind CSS + shadcn/ui components
 - **Fonts**: Playfair Display (serif headings), Inter (body)
-- **Branding**: Deep Navy `#1B3A6B`, Gold `#D4A017`
+- **Branding**: Forest Green `#1A5C38` (hsl 143 55% 23%), Gold `#C9A227` (hsl 43 68% 47%), White background
 - **Logo**: `https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png`
 
 ### Pages (20 total — MP02–MP07 complete)
@@ -73,7 +73,7 @@ Official website for Kaimosi Friends University (KAFU), a Quaker-founded public 
 
 ## Backend API (`artifacts/kafu-api/`)
 
-Laravel 11 with PHP 8.2. All routes in `routes/api.php` (1300+ lines).
+Laravel 12 with PHP 8.2. Public routes in `routes/api.php`; admin routes in `routes/admin.php` (713 lines).
 
 ### Endpoints
 | Method | Endpoint | Notes |
@@ -123,7 +123,7 @@ Laravel 11 with PHP 8.2. All routes in `routes/api.php` (1300+ lines).
   - Content Library — filterable table (type, status, search) with pagination
   - Content Editor — full form with slug auto-gen, body, SEO, featured image, workflow transitions, revision history
   - Review Queue — grouped by status, direct links to editor
-  - Media Library — grid with type detection, copy URL, file details panel
+  - Media Library — grid with type detection, file upload (multipart POST), delete, copy URL, file details panel; paginated (24/page); storage symlinked at public/storage
   - User Management — table + add/edit modal with role assignment
   - Taxonomy Manager — vocabulary sidebar + hierarchical term tree with add/edit/delete
   - Audit Log — searchable/filterable log with action badges

@@ -385,10 +385,11 @@ Route::prefix('admin')->group(function () {
             $q = MediaFile::where('status', 'active');
             if ($request->folder) $q->where('folder', $request->folder);
             if ($request->type === 'image') $q->where('mime_type', 'like', 'image/%');
-            if ($request->type === 'document') $q->whereNotLike('mime_type', 'image/%');
+            if ($request->type === 'document') $q->where('mime_type', 'not like', 'image/%');
             if ($request->search) $q->where('original_name', 'like', '%' . $request->search . '%');
 
-            return response()->json($q->orderByDesc('created_at')->paginate(40));
+            $perPage = min(max((int)($request->per_page ?? 24), 1), 100);
+            return response()->json($q->orderByDesc('created_at')->paginate($perPage));
         });
 
         Route::post('/media', function (Request $request) {
