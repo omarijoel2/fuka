@@ -49,7 +49,12 @@ export default function ContentLibraryPage() {
         per_page: 20,
       });
       setItems(data.data ?? []);
-      setMeta(data.meta ?? null);
+      setMeta(data ? {
+        total: data.total ?? 0,
+        last_page: data.last_page ?? 1,
+        current_page: data.current_page ?? 1,
+        per_page: data.per_page ?? 20,
+      } : null);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Failed to load content.");
     } finally {

@@ -731,6 +731,78 @@ export default function ContentEditorPage({ id }: { id?: string }) {
             </div>
           )}
 
+          {form.type === "document" && (
+            <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">
+              <h3 className="text-sm font-bold text-foreground">Document Details</h3>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">Document URL (PDF or file link)</label>
+                <input
+                  type="url"
+                  value={sdField(sd, "document_url")}
+                  onChange={(e) => setSd("document_url", e.target.value)}
+                  placeholder="https://kafu.ac.ke/documents/handbook-2025.pdf"
+                  className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  data-testid="input-doc-url"
+                />
+                <p className="text-[10px] text-muted-foreground mt-0.5">Direct link to the document file (PDF, DOCX, etc.)</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Document Category</label>
+                  <select
+                    value={sdField(sd, "document_category") || "policy"}
+                    onChange={(e) => setSd("document_category", e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none"
+                    data-testid="select-doc-category"
+                  >
+                    <option value="policy">Policy</option>
+                    <option value="handbook">Handbook</option>
+                    <option value="regulation">Regulation</option>
+                    <option value="calendar">Academic Calendar</option>
+                    <option value="form">Form / Template</option>
+                    <option value="report">Report</option>
+                    <option value="circular">Circular / Notice</option>
+                    <option value="statute">Statute / Charter</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Version / Year</label>
+                  <input
+                    type="text"
+                    value={sdField(sd, "version")}
+                    onChange={(e) => setSd("version", e.target.value)}
+                    placeholder="e.g. 2025/2026"
+                    className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    data-testid="input-doc-version"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">Effective Date</label>
+                  <input
+                    type="date"
+                    value={sdField(sd, "effective_date")}
+                    onChange={(e) => setSd("effective_date", e.target.value)}
+                    className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none"
+                    data-testid="input-doc-effective-date"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">File Size</label>
+                  <input
+                    type="text"
+                    value={sdField(sd, "file_size")}
+                    onChange={(e) => setSd("file_size", e.target.value)}
+                    placeholder="e.g. 2.4 MB"
+                    className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                    data-testid="input-doc-size"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* SEO */}
           <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">
             <h3 className="text-sm font-bold text-foreground">SEO</h3>

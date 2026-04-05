@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(CmsSeeder::class);
         $this->call(MediaMigrationSeeder::class);
+        $this->call(DocumentsSeeder::class);
     }
 }
