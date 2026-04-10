@@ -4,7 +4,8 @@ import { useAuth } from "@/lib/auth";
 import {
   LayoutDashboard, FileText, Calendar, Bell, Briefcase, Users,
   Image, Tag, ClipboardList, Settings, LogOut, Menu, X,
-  ChevronDown, ChevronRight, BookOpen, UserCog, AlertTriangle, Newspaper, SlidersHorizontal
+  ChevronDown, ChevronRight, BookOpen, UserCog, AlertTriangle, Newspaper, SlidersHorizontal,
+  FlaskConical, Globe, Banknote, HeartHandshake
 } from "lucide-react";
 
 interface NavItem {
@@ -36,6 +37,18 @@ const navItems: NavItem[] = [
     ],
   },
   { label: "Review Queue", icon: <ClipboardList className="w-4 h-4" />, href: "/review-queue", roles: REVIEWER_ROLES },
+  {
+    label: "Research Office",
+    icon: <FlaskConical className="w-4 h-4" />,
+    roles: ADMIN_ROLES,
+    children: [
+      { label: "Themes", href: "/research/themes" },
+      { label: "Projects", href: "/research/projects" },
+      { label: "Publications", href: "/research/publications" },
+      { label: "Grants", href: "/research/grants" },
+      { label: "Partners", href: "/research/partners" },
+    ],
+  },
   { label: "Media Library", icon: <Image className="w-4 h-4" />, href: "/media" },
   { label: "Users", icon: <UserCog className="w-4 h-4" />, href: "/users", roles: ADMIN_ROLES },
   { label: "Taxonomy", icon: <Tag className="w-4 h-4" />, href: "/taxonomy", roles: ADMIN_ROLES },

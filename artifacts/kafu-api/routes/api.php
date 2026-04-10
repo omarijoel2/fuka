@@ -2211,3 +2211,316 @@ Route::get('/stats', function () {
         ],
     ]);
 });
+
+// ============================================================
+// Research & Innovation (RIMS-lite) — Public API
+// ============================================================
+
+use App\Models\ResearchTheme;
+use App\Models\ResearchProject;
+use App\Models\Publication;
+use App\Models\ResearchGrant;
+use App\Models\ResearchPartner;
+
+Route::get('/research/overview', function () {
+    $totalProjects    = ResearchProject::where('is_published', true)->count();
+    $activeProjects   = ResearchProject::where('is_published', true)->where('status', 'active')->count();
+    $totalPubs        = Publication::where('is_published', true)->count();
+    $totalGrants      = ResearchGrant::where('is_visible', true)->count();
+    $activeGrants     = ResearchGrant::where('is_visible', true)->where('status', 'active')->count();
+    $totalPartners    = ResearchPartner::where('is_active', true)->count();
+    $totalThemes      = ResearchTheme::where('is_active', true)->count();
+
+    $featured = ResearchProject::where('is_published', true)
+        ->where('is_featured', true)
+        ->with('theme')
+        ->orderByDesc('created_at')
+        ->limit(3)
+        ->get()
+        ->map(fn($p) => [
+            'id' => $p->id,
+            'slug' => $p->slug,
+            'title' => $p->title,
+            'abstract' => $p->abstract,
+            'department' => $p->department,
+            'lead_researcher' => $p->lead_researcher_name,
+            'status' => $p->status,
+            'theme' => $p->theme ? ['name' => $p->theme->name, 'colour' => $p->theme->colour] : null,
+            'sdg_goals' => $p->sdg_goals ?? [],
+            'featured_image_url' => $p->featured_image_url,
+        ]);
+
+    $featuredPubs = Publication::where('is_published', true)
+        ->where('is_featured', true)
+        ->orderByDesc('year')
+        ->limit(3)
+        ->get()
+        ->map(fn($p) => [
+            'id' => $p->id,
+            'slug' => $p->slug,
+            'title' => $p->title,
+            'authors' => $p->authors,
+            'year' => $p->year,
+            'journal' => $p->journal,
+            'type' => $p->type,
+            'doi' => $p->doi,
+            'indexed_in' => $p->indexed_in ?? [],
+        ]);
+
+    $themes = ResearchTheme::where('is_active', true)
+        ->orderBy('sort_order')
+        ->get()
+        ->map(fn($t) => [
+            'id' => $t->id,
+            'name' => $t->name,
+            'slug' => $t->slug,
+            'description' => $t->description,
+            'colour' => $t->colour,
+            'icon' => $t->icon,
+            'sdg_goals' => $t->sdg_goals ?? [],
+            'projects_count' => ResearchProject::where('theme_id', $t->id)->where('is_published', true)->count(),
+        ]);
+
+    return response()->json([
+        'stats' => [
+            ['label' => 'Research Projects', 'value' => $totalProjects],
+            ['label' => 'Active Projects', 'value' => $activeProjects],
+            ['label' => 'Publications', 'value' => $totalPubs],
+            ['label' => 'Active Grants', 'value' => $activeGrants],
+            ['label' => 'Partners & Collaborators', 'value' => $totalPartners],
+            ['label' => 'Research Themes', 'value' => $totalThemes],
+        ],
+        'featured_projects' => $featured,
+        'featured_publications' => $featuredPubs,
+        'themes' => $themes,
+    ]);
+});
+
+Route::get('/research/themes', function () {
+    $themes = ResearchTheme::where('is_active', true)
+        ->orderBy('sort_order')
+        ->get()
+        ->map(fn($t) => [
+            'id' => $t->id,
+            'name' => $t->name,
+            'slug' => $t->slug,
+            'description' => $t->description,
+            'colour' => $t->colour,
+            'icon' => $t->icon,
+            'sdg_goals' => $t->sdg_goals ?? [],
+            'projects_count' => ResearchProject::where('theme_id', $t->id)->where('is_published', true)->count(),
+            'publications_count' => Publication::whereHas('project', fn($q) => $q->where('theme_id', $t->id))->where('is_published', true)->count(),
+        ]);
+    return response()->json(['data' => $themes]);
+});
+
+Route::get('/research/projects', function (Request $request) {
+    $q = ResearchProject::where('is_published', true)->with('theme');
+
+    if ($request->theme) {
+        $theme = ResearchTheme::where('slug', $request->theme)->first();
+        if ($theme) $q->where('theme_id', $theme->id);
+    }
+    if ($request->status) {
+        $q->where('status', $request->status);
+    }
+    if ($request->department) {
+        $q->where('department', 'like', '%' . $request->department . '%');
+    }
+    if ($request->search) {
+        $q->where(function ($sq) use ($request) {
+            $sq->where('title', 'like', '%' . $request->search . '%')
+               ->orWhere('abstract', 'like', '%' . $request->search . '%')
+               ->orWhere('lead_researcher_name', 'like', '%' . $request->search . '%');
+        });
+    }
+
+    $perPage = min((int) ($request->per_page ?? 12), 50);
+    $paginator = $q->orderByDesc('is_featured')->orderByDesc('start_date')->paginate($perPage);
+
+    $items = collect($paginator->items())->map(fn($p) => [
+        'id' => $p->id,
+        'slug' => $p->slug,
+        'title' => $p->title,
+        'abstract' => $p->abstract,
+        'department' => $p->department,
+        'lead_researcher' => $p->lead_researcher_name,
+        'status' => $p->status,
+        'start_date' => $p->start_date?->format('Y-m-d'),
+        'end_date' => $p->end_date?->format('Y-m-d'),
+        'funding_source' => $p->funding_source,
+        'sdg_goals' => $p->sdg_goals ?? [],
+        'featured_image_url' => $p->featured_image_url,
+        'is_featured' => $p->is_featured,
+        'theme' => $p->theme ? ['name' => $p->theme->name, 'slug' => $p->theme->slug, 'colour' => $p->theme->colour] : null,
+    ]);
+
+    return response()->json([
+        'data' => $items,
+        'total' => $paginator->total(),
+        'last_page' => $paginator->lastPage(),
+        'current_page' => $paginator->currentPage(),
+        'per_page' => $paginator->perPage(),
+    ]);
+});
+
+Route::get('/research/projects/{slug}', function (string $slug) {
+    $project = ResearchProject::where('slug', $slug)->where('is_published', true)->with('theme', 'publications', 'grant')->firstOrFail();
+    return response()->json([
+        'id' => $project->id,
+        'slug' => $project->slug,
+        'title' => $project->title,
+        'abstract' => $project->abstract,
+        'department' => $project->department,
+        'lead_researcher' => $project->lead_researcher_name,
+        'lead_researcher_slug' => $project->lead_researcher_slug,
+        'co_researchers' => $project->co_researchers ?? [],
+        'status' => $project->status,
+        'start_date' => $project->start_date?->format('Y-m-d'),
+        'end_date' => $project->end_date?->format('Y-m-d'),
+        'funding_source' => $project->funding_source,
+        'grant_id' => $project->grant_id,
+        'budget' => $project->budget,
+        'currency' => $project->currency,
+        'sdg_goals' => $project->sdg_goals ?? [],
+        'featured_image_url' => $project->featured_image_url,
+        'outputs' => $project->outputs ?? [],
+        'is_featured' => $project->is_featured,
+        'theme' => $project->theme ? [
+            'name' => $project->theme->name,
+            'slug' => $project->theme->slug,
+            'colour' => $project->theme->colour,
+            'description' => $project->theme->description,
+        ] : null,
+        'publications' => $project->publications->where('is_published', true)->map(fn($p) => [
+            'id' => $p->id, 'slug' => $p->slug, 'title' => $p->title,
+            'authors' => $p->authors, 'year' => $p->year, 'journal' => $p->journal,
+            'doi' => $p->doi, 'type' => $p->type, 'indexed_in' => $p->indexed_in ?? [],
+        ])->values(),
+        'grant' => $project->grant ? [
+            'name' => $project->grant->name,
+            'funder' => $project->grant->funder,
+            'amount' => $project->grant->amount,
+            'currency' => $project->grant->currency,
+            'status' => $project->grant->status,
+        ] : null,
+    ]);
+});
+
+Route::get('/research/publications', function (Request $request) {
+    $q = Publication::where('is_published', true);
+
+    if ($request->type) $q->where('type', $request->type);
+    if ($request->year) $q->where('year', (int) $request->year);
+    if ($request->search) {
+        $q->where(function ($sq) use ($request) {
+            $sq->where('title', 'like', '%' . $request->search . '%')
+               ->orWhere('abstract', 'like', '%' . $request->search . '%')
+               ->orWhere('journal', 'like', '%' . $request->search . '%');
+        });
+    }
+
+    $perPage = min((int) ($request->per_page ?? 12), 50);
+    $paginator = $q->orderByDesc('is_featured')->orderByDesc('year')->orderByDesc('created_at')->paginate($perPage);
+
+    $items = collect($paginator->items())->map(fn($p) => [
+        'id' => $p->id,
+        'slug' => $p->slug,
+        'title' => $p->title,
+        'authors' => $p->authors,
+        'year' => $p->year,
+        'journal' => $p->journal,
+        'publisher' => $p->publisher,
+        'doi' => $p->doi,
+        'url' => $p->url,
+        'type' => $p->type,
+        'abstract' => $p->abstract,
+        'indexed_in' => $p->indexed_in ?? [],
+        'volume' => $p->volume,
+        'issue' => $p->issue,
+        'pages' => $p->pages,
+        'is_featured' => $p->is_featured,
+        'citation' => $p->citation,
+    ]);
+
+    return response()->json([
+        'data' => $items,
+        'total' => $paginator->total(),
+        'last_page' => $paginator->lastPage(),
+        'current_page' => $paginator->currentPage(),
+        'per_page' => $paginator->perPage(),
+    ]);
+});
+
+Route::get('/research/publications/{slug}', function (string $slug) {
+    $p = Publication::where('slug', $slug)->where('is_published', true)->with('project.theme')->firstOrFail();
+    return response()->json([
+        'id' => $p->id,
+        'slug' => $p->slug,
+        'title' => $p->title,
+        'authors' => $p->authors,
+        'year' => $p->year,
+        'journal' => $p->journal,
+        'publisher' => $p->publisher,
+        'doi' => $p->doi,
+        'url' => $p->url,
+        'type' => $p->type,
+        'abstract' => $p->abstract,
+        'indexed_in' => $p->indexed_in ?? [],
+        'volume' => $p->volume,
+        'issue' => $p->issue,
+        'pages' => $p->pages,
+        'is_featured' => $p->is_featured,
+        'citation' => $p->citation,
+        'project' => $p->project ? [
+            'id' => $p->project->id, 'slug' => $p->project->slug,
+            'title' => $p->project->title,
+            'theme' => $p->project->theme ? ['name' => $p->project->theme->name, 'colour' => $p->project->theme->colour] : null,
+        ] : null,
+    ]);
+});
+
+Route::get('/research/grants', function (Request $request) {
+    $q = ResearchGrant::where('is_visible', true)->with('project');
+    if ($request->status) $q->where('status', $request->status);
+    $grants = $q->orderByRaw("CASE status WHEN 'active' THEN 0 ELSE 1 END")->orderByDesc('start_date')->get();
+
+    return response()->json([
+        'data' => $grants->map(fn($g) => [
+            'id' => $g->id,
+            'name' => $g->name,
+            'funder' => $g->funder,
+            'funder_type' => $g->funder_type,
+            'funder_country' => $g->funder_country,
+            'amount' => $g->amount,
+            'currency' => $g->currency,
+            'start_date' => $g->start_date?->format('Y-m-d'),
+            'end_date' => $g->end_date?->format('Y-m-d'),
+            'status' => $g->status,
+            'description' => $g->description,
+            'grant_number' => $g->grant_number,
+            'project' => $g->project ? ['slug' => $g->project->slug, 'title' => $g->project->title] : null,
+        ]),
+    ]);
+});
+
+Route::get('/research/partners', function (Request $request) {
+    $q = ResearchPartner::where('is_active', true);
+    if ($request->type) $q->where('type', $request->type);
+    $partners = $q->orderByDesc('is_featured')->orderBy('name')->get();
+
+    return response()->json([
+        'data' => $partners->map(fn($p) => [
+            'id' => $p->id,
+            'name' => $p->name,
+            'slug' => $p->slug,
+            'type' => $p->type,
+            'country' => $p->country,
+            'description' => $p->description,
+            'logo_url' => $p->logo_url,
+            'website_url' => $p->website_url,
+            'collaboration_areas' => $p->collaboration_areas ?? [],
+            'is_featured' => $p->is_featured,
+        ]),
+    ]);
+});

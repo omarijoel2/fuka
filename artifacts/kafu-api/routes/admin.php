@@ -707,6 +707,331 @@ Route::prefix('admin')->group(function () {
                 return response()->json(['data' => ['id' => $page->id, 'key' => $key, 'status' => 'published']]);
             });
 
+        }); // close site-settings prefix group
+
+        // ============================================================
+        // Research & Innovation Admin Routes (RIMS-lite)
+        // ============================================================
+
+        // --- Research Themes ---
+        Route::get('/research/themes', function (Request $request) {
+            $themes = \App\Models\ResearchTheme::orderBy('sort_order')->get();
+            return response()->json(['data' => $themes]);
+        });
+
+        Route::post('/research/themes', function (Request $request) {
+            $data = $request->validate([
+                'name' => 'required|string|max:200',
+                'slug' => 'required|string|unique:research_themes,slug',
+                'description' => 'nullable|string',
+                'sdg_goals' => 'nullable|array',
+                'colour' => 'nullable|string|max:20',
+                'icon' => 'nullable|string|max:50',
+                'sort_order' => 'nullable|integer',
+                'is_active' => 'nullable|boolean',
+            ]);
+            $theme = \App\Models\ResearchTheme::create($data);
+            return response()->json(['data' => $theme], 201);
+        });
+
+        Route::put('/research/themes/{id}', function (Request $request, $id) {
+            $theme = \App\Models\ResearchTheme::findOrFail($id);
+            $data = $request->validate([
+                'name' => 'sometimes|string|max:200',
+                'description' => 'nullable|string',
+                'sdg_goals' => 'nullable|array',
+                'colour' => 'nullable|string|max:20',
+                'icon' => 'nullable|string|max:50',
+                'sort_order' => 'nullable|integer',
+                'is_active' => 'nullable|boolean',
+            ]);
+            $theme->update($data);
+            return response()->json(['data' => $theme->fresh()]);
+        });
+
+        Route::delete('/research/themes/{id}', function (Request $request, $id) {
+            $theme = \App\Models\ResearchTheme::findOrFail($id);
+            $theme->delete();
+            return response()->json(['message' => 'Theme deleted.']);
+        });
+
+        // --- Research Projects ---
+        Route::get('/research/projects', function (Request $request) {
+            $q = \App\Models\ResearchProject::with('theme');
+            if ($request->status) $q->where('status', $request->status);
+            if ($request->theme_id) $q->where('theme_id', $request->theme_id);
+            if ($request->search) {
+                $q->where(function ($sq) use ($request) {
+                    $sq->where('title', 'like', '%' . $request->search . '%')
+                       ->orWhere('lead_researcher_name', 'like', '%' . $request->search . '%');
+                });
+            }
+            $perPage = min((int) ($request->per_page ?? 20), 50);
+            $p = $q->orderByDesc('updated_at')->paginate($perPage);
+            return response()->json([
+                'data' => $p->items(), 'total' => $p->total(),
+                'last_page' => $p->lastPage(), 'current_page' => $p->currentPage(),
+            ]);
+        });
+
+        Route::post('/research/projects', function (Request $request) {
+            $data = $request->validate([
+                'title' => 'required|string|max:500',
+                'slug' => 'required|string|unique:research_projects,slug',
+                'abstract' => 'required|string',
+                'department' => 'nullable|string',
+                'lead_researcher_name' => 'nullable|string',
+                'lead_researcher_slug' => 'nullable|string',
+                'co_researchers' => 'nullable|array',
+                'theme_id' => 'nullable|integer|exists:research_themes,id',
+                'status' => 'nullable|in:planned,active,completed,suspended',
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date',
+                'funding_source' => 'nullable|string',
+                'grant_id' => 'nullable|string',
+                'budget' => 'nullable|numeric',
+                'currency' => 'nullable|string|max:3',
+                'sdg_goals' => 'nullable|array',
+                'featured_image_url' => 'nullable|url',
+                'is_published' => 'nullable|boolean',
+                'is_featured' => 'nullable|boolean',
+            ]);
+            $project = \App\Models\ResearchProject::create($data);
+            \App\Models\AuditLog::record($request->user(), 'research.project.create', 'research_project', $project->id, $project->title);
+            return response()->json(['data' => $project], 201);
+        });
+
+        Route::get('/research/projects/{id}', function (Request $request, $id) {
+            $p = \App\Models\ResearchProject::with('theme', 'publications', 'grant')->findOrFail($id);
+            return response()->json(['data' => $p]);
+        });
+
+        Route::put('/research/projects/{id}', function (Request $request, $id) {
+            $project = \App\Models\ResearchProject::findOrFail($id);
+            $data = $request->validate([
+                'title' => 'sometimes|string|max:500',
+                'abstract' => 'sometimes|string',
+                'department' => 'nullable|string',
+                'lead_researcher_name' => 'nullable|string',
+                'lead_researcher_slug' => 'nullable|string',
+                'co_researchers' => 'nullable|array',
+                'theme_id' => 'nullable|integer|exists:research_themes,id',
+                'status' => 'nullable|in:planned,active,completed,suspended',
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date',
+                'funding_source' => 'nullable|string',
+                'grant_id' => 'nullable|string',
+                'budget' => 'nullable|numeric',
+                'currency' => 'nullable|string|max:3',
+                'sdg_goals' => 'nullable|array',
+                'featured_image_url' => 'nullable|url',
+                'is_published' => 'nullable|boolean',
+                'is_featured' => 'nullable|boolean',
+            ]);
+            $project->update($data);
+            \App\Models\AuditLog::record($request->user(), 'research.project.update', 'research_project', $project->id, $project->title);
+            return response()->json(['data' => $project->fresh()->load('theme')]);
+        });
+
+        Route::delete('/research/projects/{id}', function (Request $request, $id) {
+            $project = \App\Models\ResearchProject::findOrFail($id);
+            \App\Models\AuditLog::record($request->user(), 'research.project.delete', 'research_project', $project->id, $project->title);
+            $project->delete();
+            return response()->json(['message' => 'Project deleted.']);
+        });
+
+        // --- Publications ---
+        Route::get('/research/publications', function (Request $request) {
+            $q = \App\Models\Publication::with('project');
+            if ($request->type) $q->where('type', $request->type);
+            if ($request->year) $q->where('year', (int) $request->year);
+            if ($request->search) {
+                $q->where(function ($sq) use ($request) {
+                    $sq->where('title', 'like', '%' . $request->search . '%')
+                       ->orWhere('journal', 'like', '%' . $request->search . '%');
+                });
+            }
+            $perPage = min((int) ($request->per_page ?? 20), 50);
+            $p = $q->orderByDesc('year')->orderByDesc('created_at')->paginate($perPage);
+            return response()->json([
+                'data' => $p->items(), 'total' => $p->total(),
+                'last_page' => $p->lastPage(), 'current_page' => $p->currentPage(),
+            ]);
+        });
+
+        Route::post('/research/publications', function (Request $request) {
+            $data = $request->validate([
+                'title' => 'required|string|max:500',
+                'slug' => 'required|string|unique:publications,slug',
+                'authors' => 'required|array',
+                'year' => 'required|integer|min:1900|max:2100',
+                'journal' => 'nullable|string',
+                'publisher' => 'nullable|string',
+                'doi' => 'nullable|string|unique:publications,doi',
+                'url' => 'nullable|url',
+                'type' => 'nullable|in:journal,conference,book_chapter,thesis,report,book,preprint',
+                'abstract' => 'nullable|string',
+                'indexed_in' => 'nullable|array',
+                'volume' => 'nullable|string',
+                'issue' => 'nullable|string',
+                'pages' => 'nullable|string',
+                'project_id' => 'nullable|integer|exists:research_projects,id',
+                'is_published' => 'nullable|boolean',
+                'is_featured' => 'nullable|boolean',
+            ]);
+            $pub = \App\Models\Publication::create($data);
+            \App\Models\AuditLog::record($request->user(), 'research.pub.create', 'publication', $pub->id, $pub->title);
+            return response()->json(['data' => $pub], 201);
+        });
+
+        Route::get('/research/publications/{id}', function (Request $request, $id) {
+            $p = \App\Models\Publication::with('project')->findOrFail($id);
+            return response()->json(['data' => $p]);
+        });
+
+        Route::put('/research/publications/{id}', function (Request $request, $id) {
+            $pub = \App\Models\Publication::findOrFail($id);
+            $data = $request->validate([
+                'title' => 'sometimes|string|max:500',
+                'authors' => 'sometimes|array',
+                'year' => 'sometimes|integer',
+                'journal' => 'nullable|string',
+                'publisher' => 'nullable|string',
+                'doi' => 'nullable|string',
+                'url' => 'nullable|url',
+                'type' => 'nullable|in:journal,conference,book_chapter,thesis,report,book,preprint',
+                'abstract' => 'nullable|string',
+                'indexed_in' => 'nullable|array',
+                'volume' => 'nullable|string',
+                'issue' => 'nullable|string',
+                'pages' => 'nullable|string',
+                'project_id' => 'nullable|integer|exists:research_projects,id',
+                'is_published' => 'nullable|boolean',
+                'is_featured' => 'nullable|boolean',
+            ]);
+            $pub->update($data);
+            \App\Models\AuditLog::record($request->user(), 'research.pub.update', 'publication', $pub->id, $pub->title);
+            return response()->json(['data' => $pub->fresh()]);
+        });
+
+        Route::delete('/research/publications/{id}', function (Request $request, $id) {
+            $pub = \App\Models\Publication::findOrFail($id);
+            \App\Models\AuditLog::record($request->user(), 'research.pub.delete', 'publication', $pub->id, $pub->title);
+            $pub->delete();
+            return response()->json(['message' => 'Publication deleted.']);
+        });
+
+        // --- Grants ---
+        Route::get('/research/grants', function (Request $request) {
+            $q = \App\Models\ResearchGrant::with('project');
+            if ($request->status) $q->where('status', $request->status);
+            $perPage = min((int) ($request->per_page ?? 20), 50);
+            $p = $q->orderByDesc('start_date')->paginate($perPage);
+            return response()->json([
+                'data' => $p->items(), 'total' => $p->total(),
+                'last_page' => $p->lastPage(), 'current_page' => $p->currentPage(),
+            ]);
+        });
+
+        Route::post('/research/grants', function (Request $request) {
+            $data = $request->validate([
+                'name' => 'required|string',
+                'funder' => 'required|string',
+                'funder_type' => 'nullable|string',
+                'funder_country' => 'nullable|string',
+                'amount' => 'nullable|numeric',
+                'currency' => 'nullable|string|max:3',
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date',
+                'description' => 'nullable|string',
+                'status' => 'nullable|in:active,completed,pending',
+                'project_id' => 'nullable|integer|exists:research_projects,id',
+                'grant_number' => 'nullable|string',
+                'is_visible' => 'nullable|boolean',
+            ]);
+            $grant = \App\Models\ResearchGrant::create($data);
+            return response()->json(['data' => $grant], 201);
+        });
+
+        Route::put('/research/grants/{id}', function (Request $request, $id) {
+            $grant = \App\Models\ResearchGrant::findOrFail($id);
+            $data = $request->validate([
+                'name' => 'sometimes|string',
+                'funder' => 'sometimes|string',
+                'funder_type' => 'nullable|string',
+                'funder_country' => 'nullable|string',
+                'amount' => 'nullable|numeric',
+                'currency' => 'nullable|string|max:3',
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date',
+                'description' => 'nullable|string',
+                'status' => 'nullable|in:active,completed,pending',
+                'project_id' => 'nullable|integer|exists:research_projects,id',
+                'grant_number' => 'nullable|string',
+                'is_visible' => 'nullable|boolean',
+            ]);
+            $grant->update($data);
+            return response()->json(['data' => $grant->fresh()]);
+        });
+
+        Route::delete('/research/grants/{id}', function (Request $request, $id) {
+            $grant = \App\Models\ResearchGrant::findOrFail($id);
+            $grant->delete();
+            return response()->json(['message' => 'Grant deleted.']);
+        });
+
+        // --- Partners ---
+        Route::get('/research/partners', function (Request $request) {
+            $q = \App\Models\ResearchPartner::query();
+            if ($request->type) $q->where('type', $request->type);
+            $perPage = min((int) ($request->per_page ?? 20), 50);
+            $p = $q->orderByDesc('is_featured')->orderBy('name')->paginate($perPage);
+            return response()->json([
+                'data' => $p->items(), 'total' => $p->total(),
+                'last_page' => $p->lastPage(), 'current_page' => $p->currentPage(),
+            ]);
+        });
+
+        Route::post('/research/partners', function (Request $request) {
+            $data = $request->validate([
+                'name' => 'required|string',
+                'slug' => 'required|string|unique:research_partners,slug',
+                'type' => 'nullable|in:academic,government,ngo,donor,industry,international',
+                'country' => 'nullable|string',
+                'country_code' => 'nullable|string|max:3',
+                'description' => 'nullable|string',
+                'logo_url' => 'nullable|url',
+                'website_url' => 'nullable|url',
+                'collaboration_areas' => 'nullable|array',
+                'is_active' => 'nullable|boolean',
+                'is_featured' => 'nullable|boolean',
+            ]);
+            $partner = \App\Models\ResearchPartner::create($data);
+            return response()->json(['data' => $partner], 201);
+        });
+
+        Route::put('/research/partners/{id}', function (Request $request, $id) {
+            $partner = \App\Models\ResearchPartner::findOrFail($id);
+            $data = $request->validate([
+                'name' => 'sometimes|string',
+                'type' => 'nullable|in:academic,government,ngo,donor,industry,international',
+                'country' => 'nullable|string',
+                'country_code' => 'nullable|string|max:3',
+                'description' => 'nullable|string',
+                'logo_url' => 'nullable|url',
+                'website_url' => 'nullable|url',
+                'collaboration_areas' => 'nullable|array',
+                'is_active' => 'nullable|boolean',
+                'is_featured' => 'nullable|boolean',
+            ]);
+            $partner->update($data);
+            return response()->json(['data' => $partner->fresh()]);
+        });
+
+        Route::delete('/research/partners/{id}', function (Request $request, $id) {
+            $partner = \App\Models\ResearchPartner::findOrFail($id);
+            $partner->delete();
+            return response()->json(['message' => 'Partner deleted.']);
         });
 
     });

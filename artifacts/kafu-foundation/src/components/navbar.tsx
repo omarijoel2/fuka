@@ -57,6 +57,16 @@ const navItems = [
       { name: "Announcements", path: "/announcements" },
     ],
   },
+  {
+    name: "Research",
+    path: "/research",
+    children: [
+      { name: "Research Overview", path: "/research" },
+      { name: "Research Projects", path: "/research/projects" },
+      { name: "Publications", path: "/research/publications" },
+      { name: "Partnerships & Grants", path: "/research/partnerships" },
+    ],
+  },
   { name: "Opportunities", path: "/opportunities" },
   { name: "Contact", path: "/contact" },
 ];

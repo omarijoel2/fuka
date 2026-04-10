@@ -261,3 +261,105 @@ export async function fetchApi<T>(endpoint: string): Promise<T> {
   }
   return json as T;
 }
+
+// ============================================================
+// Research & Innovation (RIMS-lite) Types
+// ============================================================
+
+export interface ResearchTheme {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  colour: string;
+  icon: string;
+  sdg_goals: number[];
+  projects_count?: number;
+  publications_count?: number;
+}
+
+export interface ResearchProject {
+  id: number;
+  slug: string;
+  title: string;
+  abstract: string;
+  department: string;
+  lead_researcher: string;
+  lead_researcher_slug?: string;
+  co_researchers?: { name: string; slug?: string }[];
+  status: "planned" | "active" | "completed" | "suspended";
+  start_date?: string;
+  end_date?: string;
+  funding_source?: string;
+  sdg_goals: number[];
+  featured_image_url?: string;
+  is_featured: boolean;
+  theme?: { name: string; slug: string; colour: string };
+  publications?: ResearchPublication[];
+  grant?: { name: string; funder: string; amount: number; currency: string; status: string };
+}
+
+export interface ResearchPublication {
+  id: number;
+  slug: string;
+  title: string;
+  authors: { name: string; first_initial?: string; last_name?: string; affiliation?: string }[];
+  year: number;
+  journal?: string;
+  publisher?: string;
+  doi?: string;
+  url?: string;
+  type: "journal" | "conference" | "book_chapter" | "thesis" | "report" | "book" | "preprint";
+  abstract?: string;
+  indexed_in: string[];
+  volume?: string;
+  issue?: string;
+  pages?: string;
+  is_featured: boolean;
+  citation: string;
+  project?: { id: number; slug: string; title: string; theme?: { name: string; colour: string } };
+}
+
+export interface ResearchGrant {
+  id: number;
+  name: string;
+  funder: string;
+  funder_type?: string;
+  funder_country?: string;
+  amount?: number;
+  currency: string;
+  start_date?: string;
+  end_date?: string;
+  status: "active" | "completed" | "pending";
+  description?: string;
+  grant_number?: string;
+  project?: { slug: string; title: string };
+}
+
+export interface ResearchPartner {
+  id: number;
+  name: string;
+  slug: string;
+  type: "academic" | "government" | "ngo" | "donor" | "industry" | "international";
+  country?: string;
+  description?: string;
+  logo_url?: string;
+  website_url?: string;
+  collaboration_areas: string[];
+  is_featured: boolean;
+}
+
+export interface ResearchOverview {
+  stats: { label: string; value: number }[];
+  featured_projects: ResearchProject[];
+  featured_publications: ResearchPublication[];
+  themes: ResearchTheme[];
+}
+
+export interface PaginatedResearch<T> {
+  data: T[];
+  total: number;
+  last_page: number;
+  current_page: number;
+  per_page: number;
+}

@@ -25,6 +25,12 @@ import AnnouncementDetail from "@/pages/announcement-detail";
 import Opportunities from "@/pages/opportunities";
 import OpportunityDetail from "@/pages/opportunity-detail";
 import Contact from "@/pages/contact";
+import Research from "@/pages/research";
+import ResearchProjects from "@/pages/research-projects";
+import ResearchProjectDetail from "@/pages/research-project-detail";
+import ResearchPublications from "@/pages/research-publications";
+import ResearchPublicationDetail from "@/pages/research-publication-detail";
+import ResearchPartnerships from "@/pages/research-partnerships";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -61,6 +67,16 @@ function Router() {
           <Route path="/opportunities" component={Opportunities} />
           <Route path="/opportunities/:slug" component={OpportunityDetail} />
           <Route path="/contact" component={Contact} />
+          <Route path="/research" component={Research} />
+          <Route path="/research/projects" component={ResearchProjects} />
+          <Route path="/research/projects/:slug">
+            {(params) => <ResearchProjectDetail slug={params.slug ?? ""} />}
+          </Route>
+          <Route path="/research/publications" component={ResearchPublications} />
+          <Route path="/research/publications/:slug">
+            {(params) => <ResearchPublicationDetail slug={params.slug ?? ""} />}
+          </Route>
+          <Route path="/research/partnerships" component={ResearchPartnerships} />
           <Route component={NotFound} />
         </Switch>
       </main>

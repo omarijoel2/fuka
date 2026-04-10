@@ -148,3 +148,32 @@ export function apiPutSiteSettings(key: string, structured_data: unknown) {
     body: JSON.stringify({ structured_data }),
   });
 }
+
+// ============================================================
+// Research & Innovation (RIMS-lite) API helpers
+// ============================================================
+
+export function apiGetResearchThemes() { return apiGet("/research/themes"); }
+export function apiPostResearchTheme(body: unknown) { return apiPost("/research/themes", body); }
+export function apiPutResearchTheme(id: number, body: unknown) { return apiPut(`/research/themes/${id}`, body); }
+export function apiDeleteResearchTheme(id: number) { return apiDelete(`/research/themes/${id}`); }
+
+export function apiGetResearchProjects(params?: Record<string, string | number | undefined>) { return apiGet("/research/projects", params); }
+export function apiPostResearchProject(body: unknown) { return apiPost("/research/projects", body); }
+export function apiPutResearchProject(id: number, body: unknown) { return apiPut(`/research/projects/${id}`, body); }
+export function apiDeleteResearchProject(id: number) { return apiDelete(`/research/projects/${id}`); }
+
+export function apiGetPublications(params?: Record<string, string | number | undefined>) { return apiGet("/research/publications", params); }
+export function apiPostPublication(body: unknown) { return apiPost("/research/publications", body); }
+export function apiPutPublication(id: number, body: unknown) { return apiPut(`/research/publications/${id}`, body); }
+export function apiDeletePublication(id: number) { return apiDelete(`/research/publications/${id}`); }
+
+export function apiGetResearchGrants(params?: Record<string, string | number | undefined>) { return apiGet("/research/grants", params); }
+export function apiPostResearchGrant(body: unknown) { return apiPost("/research/grants", body); }
+export function apiPutResearchGrant(id: number, body: unknown) { return apiPut(`/research/grants/${id}`, body); }
+export function apiDeleteResearchGrant(id: number) { return apiDelete(`/research/grants/${id}`); }
+
+export function apiGetResearchPartners(params?: Record<string, string | number | undefined>) { return apiGet("/research/partners", params); }
+export function apiPostResearchPartner(body: unknown) { return apiPost("/research/partners", body); }
+export function apiPutResearchPartner(id: number, body: unknown) { return apiPut(`/research/partners/${id}`, body); }
+export function apiDeleteResearchPartner(id: number) { return apiDelete(`/research/partners/${id}`); }

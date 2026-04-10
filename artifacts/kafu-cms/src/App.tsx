@@ -12,6 +12,11 @@ import TaxonomyPage from "@/pages/taxonomy";
 import AuditLogPage from "@/pages/audit-log";
 import SettingsPage from "@/pages/settings";
 import SiteSettingsPage from "@/pages/site-settings";
+import ResearchThemesPage from "@/pages/research-themes";
+import ResearchProjectsCmsPage from "@/pages/research-projects-cms";
+import ResearchPublicationsCmsPage from "@/pages/research-publications-cms";
+import ResearchGrantsCmsPage from "@/pages/research-grants-cms";
+import ResearchPartnersCmsPage from "@/pages/research-partners-cms";
 
 function AppRoutes() {
   const { user } = useAuth();

@@ -183,3 +183,93 @@ export function useProgrammeDetail(school: string, code: string) {
     enabled: !!school && !!code,
   });
 }
+
+// Research & Innovation Hooks
+import type { ResearchOverview, ResearchProject, ResearchPublication, ResearchGrant, ResearchPartner, PaginatedResearch } from "./api-types";
+
+export function useResearchOverview() {
+  return useQuery<ResearchOverview>({
+    queryKey: ["research-overview"],
+    queryFn: () => fetchApi<ResearchOverview>("/research/overview"),
+  });
+}
+
+export function useResearchProjects(params?: { theme?: string; status?: string; search?: string; page?: number; per_page?: number }) {
+  const p = params ?? {};
+  return useQuery<PaginatedResearch<ResearchProject>>({
+    queryKey: ["research-projects", p],
+    queryFn: async () => {
+      const q = new URLSearchParams();
+      if (p.theme) q.set("theme", p.theme);
+      if (p.status) q.set("status", p.status);
+      if (p.search) q.set("search", p.search);
+      if (p.page) q.set("page", String(p.page));
+      if (p.per_page) q.set("per_page", String(p.per_page));
+      const qs = q.toString();
+      const res = await fetch(`/api/research/projects${qs ? "?" + qs : ""}`);
+      return res.json();
+    },
+  });
+}
+
+export function useResearchProject(slug: string) {
+  return useQuery<ResearchProject>({
+    queryKey: ["research-project", slug],
+    queryFn: () => fetchApi<ResearchProject>(`/research/projects/${slug}`),
+    enabled: !!slug,
+  });
+}
+
+export function useResearchPublications(params?: { type?: string; year?: number; search?: string; page?: number; per_page?: number }) {
+  const p = params ?? {};
+  return useQuery<PaginatedResearch<ResearchPublication>>({
+    queryKey: ["research-publications", p],
+    queryFn: async () => {
+      const q = new URLSearchParams();
+      if (p.type) q.set("type", p.type);
+      if (p.year) q.set("year", String(p.year));
+      if (p.search) q.set("search", p.search);
+      if (p.page) q.set("page", String(p.page));
+      if (p.per_page) q.set("per_page", String(p.per_page));
+      const qs = q.toString();
+      const res = await fetch(`/api/research/publications${qs ? "?" + qs : ""}`);
+      return res.json();
+    },
+  });
+}
+
+export function useResearchPublication(slug: string) {
+  return useQuery<ResearchPublication>({
+    queryKey: ["research-publication", slug],
+    queryFn: () => fetchApi<ResearchPublication>(`/research/publications/${slug}`),
+    enabled: !!slug,
+  });
+}
+
+export function useResearchGrants(params?: { status?: string }) {
+  const p = params ?? {};
+  return useQuery<{ data: ResearchGrant[] }>({
+    queryKey: ["research-grants", p],
+    queryFn: async () => {
+      const q = new URLSearchParams();
+      if (p.status) q.set("status", p.status);
+      const qs = q.toString();
+      const res = await fetch(`/api/research/grants${qs ? "?" + qs : ""}`);
+      return res.json();
+    },
+  });
+}
+
+export function useResearchPartners(params?: { type?: string }) {
+  const p = params ?? {};
+  return useQuery<{ data: ResearchPartner[] }>({
+    queryKey: ["research-partners", p],
+    queryFn: async () => {
+      const q = new URLSearchParams();
+      if (p.type) q.set("type", p.type);
+      const qs = q.toString();
+      const res = await fetch(`/api/research/partners${qs ? "?" + qs : ""}`);
+      return res.json();
+    },
+  });
+}
