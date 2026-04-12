@@ -181,16 +181,62 @@ export interface StaffPublication {
   url: string | null;
 }
 
+export interface StaffCourse {
+  code: string;
+  name: string;
+  programme?: string;
+  level?: string;
+}
+
+export interface StaffGrant {
+  title: string;
+  funder: string;
+  amount?: string;
+  start?: string;
+  end?: string;
+  role?: string;
+  status?: string;
+}
+
+export interface StaffSupervision {
+  masters_count: number;
+  phd_count: number;
+  current_students?: { name: string; topic: string; level: string; year?: string }[];
+}
+
+export interface StaffRepoPublication {
+  id: number;
+  slug: string;
+  title: string;
+  type: string;
+  year: number;
+  journal_name?: string;
+  doi?: string;
+  citation_count: number;
+  access: string;
+}
+
 export interface StaffProfile extends StaffMember {
+  rank?: string;
   phone_visible: boolean;
   biography: string;
+  orcid_id?: string;
+  google_scholar_url?: string;
+  scopus_id?: string;
+  linkedin_url?: string;
+  cv_url?: string;
   qualifications: StaffQualification[];
   research_interests: string[];
   teaching_areas: string[];
+  courses_taught: StaffCourse[];
   experience: StaffExperience[];
   publications: StaffPublication[];
+  repo_publications: StaffRepoPublication[];
+  grants: StaffGrant[];
+  supervision: StaffSupervision;
   awards: string[];
   memberships: string[];
+  profile_completeness?: number;
 }
 
 export interface ProgrammeDetail {

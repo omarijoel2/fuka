@@ -164,7 +164,7 @@ export function useAdmissions() {
   });
 }
 
-export function useStaff(params?: { school?: string; search?: string; designation?: string }) {
+export function useStaff(params?: { school?: string; search?: string; designation?: string; rank?: string }) {
   return useQuery({
     queryKey: ["staff", params],
     queryFn: () => {
@@ -172,6 +172,7 @@ export function useStaff(params?: { school?: string; search?: string; designatio
       if (params?.school) p.append("school", params.school);
       if (params?.search) p.append("search", params.search);
       if (params?.designation) p.append("designation", params.designation);
+      if (params?.rank) p.append("rank", params.rank);
       const q = p.toString() ? `?${p.toString()}` : "";
       return fetchApi<StaffMember[]>(`/staff${q}`);
     },

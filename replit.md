@@ -22,7 +22,7 @@ Official website for Kaimosi Friends University (KAFU), a Quaker-founded public 
 - **Branding**: Forest Green `#1A5C38` (hsl 143 55% 23%), Gold `#C9A227` (hsl 43 68% 47%), White background
 - **Logo**: `https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png`
 
-### Pages (34 total — MP02–MP07 + RIMS-lite + International + IR complete)
+### Pages (34 total — MP02–MP07 + RIMS-lite + International + IR + MP13 complete)
 | Page | Path | Module |
 |---|---|---|
 | Home | `/` | MP02 |
@@ -104,8 +104,8 @@ Laravel 12 with PHP 8.2. Public routes in `routes/api.php`; admin routes in `rou
 | GET | `/api/programmes` | Flat array; `?school=&level=` filters |
 | GET | `/api/opportunities` | 17 items; `?category=&status=&search=` |
 | GET | `/api/opportunities/:slug` | Full opportunity with requirements/documents |
-| GET | `/api/staff` | Staff list; `?school=&search=&designation=` |
-| GET | `/api/staff/:slug` | Full staff profile |
+| GET | `/api/staff` | Staff list; `?school=&search=&designation=&rank=` filters (MP13: rank filter added) |
+| GET | `/api/staff/:slug` | Full academic profile: ORCID, Scholar, Scopus, grants, supervision, courses_taught, repo_publications (auto-linked), profile_completeness (MP13) |
 | GET | `/api/admissions` | Pathways, deadlines, documents, contact |
 | GET | `/api/contact` | Institution contact info |
 | GET | `/api/research/overview` | Stats, featured projects, featured publications, themes |

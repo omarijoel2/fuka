@@ -20,6 +20,7 @@ import ResearchPartnersCmsPage from "@/pages/research-partners-cms";
 import InternationalPartnershipsCmsPage from "@/pages/international-partnerships-cms";
 import ExchangeProgrammesCmsPage from "@/pages/exchange-programmes-cms";
 import RepositoryCmsPage from "@/pages/repository-cms";
+import StaffProfilesCmsPage from "@/pages/staff-profiles-cms";
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -50,6 +51,7 @@ function AppRoutes() {
         <Route path="/international/partnerships" component={InternationalPartnershipsCmsPage} />
         <Route path="/international/exchange" component={ExchangeProgrammesCmsPage} />
         <Route path="/repository" component={RepositoryCmsPage} />
+        <Route path="/staff-profiles" component={StaffProfilesCmsPage} />
         <Route>{() => <DashboardPage />}</Route>
       </Switch>
     </CmsLayout>

@@ -1,3 +1,4 @@
+import React, { useEffect, useRef, useState } from "react";
 import { useRoute, Link } from "wouter";
 import { useStaffProfile } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,16 @@ import {
   CheckCircle2,
   ExternalLink,
   AlertCircle,
+  Download,
+  Globe,
+  Microscope,
+  Banknote,
+  ArrowUpRight,
+  Library,
+  BookMarked,
+  UserCheck,
+  TrendingUp,
+  Quote,
 } from "lucide-react";
 
 const SCHOOL_NAMES: Record<string, string> = {
@@ -34,13 +45,32 @@ const SCHOOL_COLORS: Record<string, string> = {
 };
 
 const GRADIENTS = [
-  "from-primary to-primary/80",
   "from-[#1a5c38] to-[#0d3320]",
+  "from-primary to-primary/80",
   "from-purple-700 to-purple-900",
   "from-teal-700 to-teal-900",
   "from-green-700 to-green-900",
   "from-red-700 to-red-900",
   "from-indigo-700 to-indigo-900",
+];
+
+const REPO_TYPE_LABELS: Record<string, string> = {
+  thesis: "Thesis",
+  dissertation: "Dissertation",
+  journal_article: "Journal Article",
+  conference_paper: "Conference Paper",
+  book_chapter: "Book Chapter",
+  research_report: "Research Report",
+  working_paper: "Working Paper",
+  dataset: "Dataset",
+};
+
+const NAV_TABS = [
+  { id: "overview", label: "Overview" },
+  { id: "teaching", label: "Teaching" },
+  { id: "research", label: "Research" },
+  { id: "supervision", label: "Supervision" },
+  { id: "service", label: "Service" },
 ];
 
 function getInitials(name: string) {
@@ -54,9 +84,9 @@ function getGradient(slug: string) {
   return GRADIENTS[hash % GRADIENTS.length];
 }
 
-function Section({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
+function Section({ id, icon, title, children }: { id?: string; icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
-    <section className="mb-10">
+    <section id={id} className="mb-10 scroll-mt-32">
       <h2 className="text-xl font-serif font-bold text-primary mb-5 flex items-center gap-2.5 pb-3 border-b">
         <span className="text-primary/70">{icon}</span>
         {title}
@@ -66,10 +96,49 @@ function Section({ icon, title, children }: { icon: React.ReactNode; title: stri
   );
 }
 
+function CompletenessBar({ score }: { score: number }) {
+  const color = score >= 80 ? "bg-emerald-500" : score >= 50 ? "bg-amber-500" : "bg-red-400";
+  return (
+    <div className="bg-card border rounded-xl p-4" data-testid="profile-completeness-bar">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Profile Completeness</span>
+        <span className="text-sm font-bold text-foreground">{score}%</span>
+      </div>
+      <div className="h-2 bg-muted rounded-full overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all ${color}`}
+          style={{ width: `${score}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
 export default function StaffProfilePage() {
   const [, params] = useRoute("/staff/:slug");
   const slug = params?.slug ?? "";
   const { data: profile, isLoading, isError } = useStaffProfile(slug);
+  const [activeTab, setActiveTab] = useState("overview");
+  const observerRef = useRef<IntersectionObserver | null>(null);
+
+  useEffect(() => {
+    const sections = NAV_TABS.map((t) => document.getElementById(t.id)).filter(Boolean) as HTMLElement[];
+    if (!sections.length) return;
+    observerRef.current?.disconnect();
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting) {
+            setActiveTab(entry.target.id);
+            break;
+          }
+        }
+      },
+      { rootMargin: "-80px 0px -60% 0px", threshold: 0 }
+    );
+    sections.forEach((s) => observerRef.current!.observe(s));
+    return () => observerRef.current?.disconnect();
+  }, [isLoading]);
 
   if (isError) {
     return (
@@ -92,14 +161,16 @@ export default function StaffProfilePage() {
 
   const gradient = getGradient(slug);
   const schoolColor = profile?.school ? SCHOOL_COLORS[profile.school] : null;
+  const supervision = profile?.supervision ?? { masters_count: 0, phd_count: 0 };
+  const totalSupervised = (supervision.masters_count ?? 0) + (supervision.phd_count ?? 0);
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Hero / Header */}
+      {/* Hero */}
       <div className="bg-primary text-primary-foreground relative overflow-hidden">
         <div
           className="absolute inset-0 opacity-10"
-          style={{ backgroundImage: "radial-gradient(ellipse at 75% 40%, #D4A017 0%, transparent 50%)" }}
+          style={{ backgroundImage: "radial-gradient(ellipse at 75% 40%, #C9A227 0%, transparent 50%)" }}
         />
         <div className="container mx-auto px-4 py-10 relative z-10">
           {/* Breadcrumb */}
@@ -141,6 +212,11 @@ export default function StaffProfilePage() {
                         {profile.school}
                       </span>
                     )}
+                    {profile?.rank && (
+                      <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-accent/20 text-accent border border-accent/30">
+                        {profile.rank}
+                      </span>
+                    )}
                     {profile?.unit && (
                       <span className="px-2.5 py-1 rounded-full text-xs font-medium bg-white/10 text-white border border-white/20">
                         {profile.unit}
@@ -151,23 +227,114 @@ export default function StaffProfilePage() {
                     {profile?.name}
                   </h1>
                   <p className="text-accent font-semibold text-base mb-1.5">{profile?.designation}</p>
-                  <p className="text-primary-foreground/75 text-sm">
+                  <p className="text-primary-foreground/75 text-sm mb-4">
                     {profile?.department}
                     {profile?.school && ` · ${SCHOOL_NAMES[profile.school] ?? profile.school}`}
                   </p>
-                  {profile?.email && (
-                    <a
-                      href={`mailto:${profile.email}`}
-                      className="inline-flex items-center gap-1.5 mt-3 text-sm text-primary-foreground/80 hover:text-white transition-colors"
-                      data-testid="profile-email-link"
-                    >
-                      <Mail className="w-4 h-4" />
-                      {profile.email}
-                    </a>
-                  )}
+
+                  {/* Academic identity badges */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {profile?.orcid_id && (
+                      <a
+                        href={`https://orcid.org/${profile.orcid_id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#A6CE39] text-white text-xs font-bold rounded-lg hover:opacity-90 transition-opacity"
+                        data-testid="badge-orcid"
+                      >
+                        <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-current"><path d="M12 0C5.372 0 0 5.372 0 12s5.372 12 12 12 12-5.372 12-12S18.628 0 12 0zM7.369 4.378c.525 0 .947.431.947.947s-.422.947-.947.947a.95.95 0 0 1-.947-.947c0-.516.422-.947.947-.947zm-.722 3.038h1.444v10.041H6.647V7.416zm3.562 0h3.9c3.712 0 5.344 2.653 5.344 5.025 0 2.578-2.016 5.016-5.325 5.016h-3.919V7.416zm1.444 1.303v7.444h2.297c2.359 0 3.869-1.559 3.869-3.722 0-2.016-1.369-3.722-3.916-3.722h-2.25z"/></svg>
+                        ORCID {profile.orcid_id}
+                      </a>
+                    )}
+                    {profile?.google_scholar_url && (
+                      <a
+                        href={profile.google_scholar_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 text-white text-xs font-semibold rounded-lg hover:bg-white/25 transition-colors border border-white/20"
+                        data-testid="badge-scholar"
+                      >
+                        <TrendingUp className="w-3.5 h-3.5" /> Google Scholar
+                      </a>
+                    )}
+                    {profile?.scopus_id && (
+                      <a
+                        href={`https://www.scopus.com/authid/detail.uri?authorId=${profile.scopus_id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/15 text-white text-xs font-semibold rounded-lg hover:bg-white/25 transition-colors border border-white/20"
+                        data-testid="badge-scopus"
+                      >
+                        <Globe className="w-3.5 h-3.5" /> Scopus
+                      </a>
+                    )}
+                    {profile?.linkedin_url && (
+                      <a
+                        href={profile.linkedin_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0077B5]/80 text-white text-xs font-semibold rounded-lg hover:opacity-90 transition-opacity"
+                        data-testid="badge-linkedin"
+                      >
+                        <Globe className="w-3.5 h-3.5" /> LinkedIn
+                      </a>
+                    )}
+                  </div>
+
+                  {/* Contact + CV row */}
+                  <div className="flex flex-wrap gap-3 items-center">
+                    {profile?.email && (
+                      <a
+                        href={`mailto:${profile.email}`}
+                        className="inline-flex items-center gap-1.5 text-sm text-primary-foreground/80 hover:text-white transition-colors"
+                        data-testid="profile-email-link"
+                      >
+                        <Mail className="w-4 h-4" />
+                        {profile.email}
+                      </a>
+                    )}
+                    {profile?.cv_url && (
+                      <a
+                        href={profile.cv_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-accent text-accent-foreground text-xs font-bold rounded-lg hover:bg-accent/90 transition-colors"
+                        data-testid="btn-download-cv"
+                      >
+                        <Download className="w-3.5 h-3.5" /> Download CV
+                      </a>
+                    )}
+                  </div>
                 </>
               )}
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Sticky Tab Navigation */}
+      <div className="border-b bg-background sticky top-[70px] z-30 shadow-sm">
+        <div className="container mx-auto px-4">
+          <div className="flex gap-0 overflow-x-auto scrollbar-none" role="tablist" data-testid="profile-tab-nav">
+            {NAV_TABS.map((tab) => (
+              <button
+                key={tab.id}
+                role="tab"
+                aria-selected={activeTab === tab.id}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  document.getElementById(tab.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+                className={`px-5 py-3.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? "border-primary text-primary"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+                data-testid={`tab-${tab.id}`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -179,8 +346,8 @@ export default function StaffProfilePage() {
           {/* Main column */}
           <div className="lg:col-span-2">
 
-            {/* Biography */}
-            <Section icon={<BookOpen className="w-5 h-5" />} title="Biography">
+            {/* OVERVIEW */}
+            <Section id="overview" icon={<BookOpen className="w-5 h-5" />} title="Biography">
               {isLoading ? (
                 <div className="space-y-2">
                   {Array.from({ length: 5 }).map((_, i) => (
@@ -244,26 +411,6 @@ export default function StaffProfilePage() {
               </Section>
             )}
 
-            {/* Research Interests */}
-            {(isLoading || (profile?.research_interests && profile.research_interests.length > 0)) && (
-              <Section icon={<FlaskConical className="w-5 h-5" />} title="Research Interests">
-                {isLoading ? (
-                  <div className="space-y-2">
-                    {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-8 bg-muted rounded-lg animate-pulse" />)}
-                  </div>
-                ) : (
-                  <ul className="space-y-2">
-                    {profile!.research_interests.map((r, i) => (
-                      <li key={i} className="flex items-center gap-3 p-3 bg-secondary rounded-lg text-sm" data-testid={`research-${i}`}>
-                        <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
-                        {r}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </Section>
-            )}
-
             {/* Professional Experience */}
             {(isLoading || (profile?.experience && profile.experience.length > 0)) && (
               <Section icon={<Briefcase className="w-5 h-5" />} title="Professional Experience">
@@ -295,79 +442,411 @@ export default function StaffProfilePage() {
               </Section>
             )}
 
-            {/* Publications */}
-            {!isLoading && profile?.publications && profile.publications.length > 0 && (
-              <Section icon={<FileText className="w-5 h-5" />} title="Selected Publications">
-                <div className="space-y-3">
-                  {profile.publications.map((pub, i) => (
-                    <div key={i} className="p-4 bg-card border rounded-lg" data-testid={`pub-${i}`}>
-                      <p className="text-sm text-foreground leading-relaxed">{pub.citation}</p>
-                      {pub.url && (
-                        <a
-                          href={pub.url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center gap-1 mt-2 text-xs text-primary hover:underline"
-                        >
-                          <ExternalLink className="w-3 h-3" /> View Publication
-                        </a>
-                      )}
-                    </div>
-                  ))}
+            {/* TEACHING */}
+            <Section id="teaching" icon={<Presentation className="w-5 h-5" />} title="Teaching">
+              {/* Teaching Areas */}
+              {!isLoading && profile?.teaching_areas && profile.teaching_areas.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Teaching Areas</h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {profile.teaching_areas.map((t, i) => (
+                      <div key={i} className="flex items-center gap-3 p-3 bg-secondary border rounded-lg text-sm" data-testid={`teach-${i}`}>
+                        <BookOpen className="w-4 h-4 text-primary shrink-0" />
+                        {t}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </Section>
-            )}
+              )}
 
-            {/* Teaching Areas */}
-            {!isLoading && profile?.teaching_areas && profile.teaching_areas.length > 0 && (
-              <Section icon={<Presentation className="w-5 h-5" />} title="Teaching Areas">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {profile.teaching_areas.map((t, i) => (
-                    <div key={i} className="flex items-center gap-3 p-3 bg-secondary border rounded-lg text-sm" data-testid={`teach-${i}`}>
-                      <BookOpen className="w-4 h-4 text-primary shrink-0" />
-                      {t}
-                    </div>
-                  ))}
+              {/* Courses Taught */}
+              {!isLoading && profile?.courses_taught && profile.courses_taught.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Courses Currently Taught</h3>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm" data-testid="courses-table">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-muted-foreground">Code</th>
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-muted-foreground">Course</th>
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-muted-foreground">Programme</th>
+                          <th className="text-left py-2 px-3 text-xs font-semibold text-muted-foreground">Level</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {profile.courses_taught.map((c, i) => (
+                          <tr key={i} className="border-b last:border-0 hover:bg-muted/50" data-testid={`course-${i}`}>
+                            <td className="py-2.5 px-3">
+                              <span className="font-mono text-xs bg-muted px-2 py-0.5 rounded font-semibold">{c.code}</span>
+                            </td>
+                            <td className="py-2.5 px-3 font-medium text-foreground">{c.name}</td>
+                            <td className="py-2.5 px-3 text-muted-foreground text-xs">{c.programme ?? "—"}</td>
+                            <td className="py-2.5 px-3">
+                              {c.level && (
+                                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                                  c.level === "postgraduate"
+                                    ? "bg-purple-100 text-purple-700"
+                                    : "bg-blue-100 text-blue-700"
+                                }`}>
+                                  {c.level === "postgraduate" ? "PG" : "UG"}
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </Section>
-            )}
+              )}
+
+              {!isLoading && (!profile?.teaching_areas?.length) && (!profile?.courses_taught?.length) && (
+                <p className="text-muted-foreground text-sm">Teaching information not yet available.</p>
+              )}
+            </Section>
+
+            {/* RESEARCH */}
+            <Section id="research" icon={<Microscope className="w-5 h-5" />} title="Research">
+              {/* Research Interests */}
+              {!isLoading && profile?.research_interests && profile.research_interests.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Research Interests</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {profile.research_interests.map((r, i) => (
+                      <span
+                        key={i}
+                        className="px-3 py-1.5 bg-primary/5 text-primary border border-primary/20 rounded-full text-sm"
+                        data-testid={`research-${i}`}
+                      >
+                        {r}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Selected Publications (manual) */}
+              {!isLoading && profile?.publications && profile.publications.length > 0 && (
+                <div className="mb-8">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Selected Publications</h3>
+                  <div className="space-y-3">
+                    {profile.publications.map((pub, i) => (
+                      <div key={i} className="p-4 bg-card border rounded-lg" data-testid={`pub-${i}`}>
+                        <div className="flex gap-3">
+                          <Quote className="w-4 h-4 text-muted-foreground/50 shrink-0 mt-0.5" />
+                          <div>
+                            <p className="text-sm text-foreground leading-relaxed">{pub.citation}</p>
+                            {pub.url && (
+                              <a
+                                href={pub.url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="inline-flex items-center gap-1 mt-2 text-xs text-primary hover:underline"
+                              >
+                                <ExternalLink className="w-3 h-3" /> View Publication
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Repository Publications (auto-linked) */}
+              {!isLoading && profile?.repo_publications && profile.repo_publications.length > 0 && (
+                <div className="mb-8">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                      Repository Publications
+                      <span className="ml-2 text-xs px-1.5 py-0.5 bg-primary/10 text-primary rounded font-normal normal-case">
+                        {profile.repo_publications.length} found
+                      </span>
+                    </h3>
+                    <Link href="/repository" className="text-xs text-primary hover:underline flex items-center gap-1">
+                      <Library className="w-3 h-3" /> Browse Repository
+                    </Link>
+                  </div>
+                  <div className="space-y-3">
+                    {profile.repo_publications.map((pub, i) => (
+                      <Link
+                        key={i}
+                        href={`/repository/item/${pub.slug}`}
+                        className="block p-4 bg-card border rounded-lg hover:border-primary hover:shadow-sm transition-all group"
+                        data-testid={`repo-pub-${i}`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1.5">
+                              <span className="text-xs px-2 py-0.5 bg-muted text-muted-foreground rounded-full font-medium">
+                                {REPO_TYPE_LABELS[pub.type] ?? pub.type}
+                              </span>
+                              <span className="text-xs text-muted-foreground">{pub.year}</span>
+                              {pub.access === "open" && (
+                                <span className="text-xs px-1.5 py-0.5 bg-emerald-100 text-emerald-700 rounded font-medium">Open Access</span>
+                              )}
+                            </div>
+                            <p className="font-medium text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                              {pub.title}
+                            </p>
+                            {pub.journal_name && (
+                              <p className="text-xs text-muted-foreground mt-0.5 italic">{pub.journal_name}</p>
+                            )}
+                          </div>
+                          <div className="shrink-0 text-right">
+                            {pub.citation_count > 0 && (
+                              <div className="text-center">
+                                <p className="text-lg font-bold text-primary">{pub.citation_count}</p>
+                                <p className="text-[10px] text-muted-foreground">citations</p>
+                              </div>
+                            )}
+                            <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-primary mt-1 ml-auto transition-colors" />
+                          </div>
+                        </div>
+                        {pub.doi && (
+                          <p className="text-xs text-muted-foreground mt-2 font-mono truncate">DOI: {pub.doi}</p>
+                        )}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Grants & Funding */}
+              {!isLoading && profile?.grants && profile.grants.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Grants &amp; Funding</h3>
+                  <div className="space-y-3">
+                    {profile.grants.map((g, i) => (
+                      <div key={i} className="p-4 bg-card border rounded-lg" data-testid={`grant-${i}`}>
+                        <div className="flex items-start justify-between gap-3 mb-2">
+                          <p className="font-semibold text-sm text-foreground flex-1">{g.title}</p>
+                          {g.status && (
+                            <span className={`text-xs px-2 py-0.5 rounded-full font-medium shrink-0 ${
+                              g.status === "active"
+                                ? "bg-emerald-100 text-emerald-700"
+                                : "bg-muted text-muted-foreground"
+                            }`}>
+                              {g.status === "active" ? "Active" : "Completed"}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Banknote className="w-3.5 h-3.5" /> {g.funder}
+                          </span>
+                          {g.amount && <span className="font-semibold text-foreground">{g.amount}</span>}
+                          {g.role && <span>{g.role}</span>}
+                          {g.start && <span>{g.start}{g.end ? ` – ${g.end}` : ""}</span>}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {!isLoading &&
+                !profile?.research_interests?.length &&
+                !profile?.publications?.length &&
+                !profile?.repo_publications?.length &&
+                !profile?.grants?.length && (
+                  <p className="text-muted-foreground text-sm">Research information not yet available.</p>
+              )}
+            </Section>
+
+            {/* SUPERVISION */}
+            <Section id="supervision" icon={<UserCheck className="w-5 h-5" />} title="Supervision">
+              {!isLoading && (
+                <>
+                  {/* Stats */}
+                  {totalSupervised > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
+                      <div className="p-4 bg-primary/5 border border-primary/10 rounded-xl text-center" data-testid="supervision-masters">
+                        <p className="text-3xl font-bold text-primary">{supervision.masters_count}</p>
+                        <p className="text-xs text-muted-foreground mt-1">Masters Supervised</p>
+                      </div>
+                      <div className="p-4 bg-primary/5 border border-primary/10 rounded-xl text-center" data-testid="supervision-phd">
+                        <p className="text-3xl font-bold text-primary">{supervision.phd_count}</p>
+                        <p className="text-xs text-muted-foreground mt-1">PhD Supervised</p>
+                      </div>
+                      <div className="p-4 bg-accent/10 border border-accent/20 rounded-xl text-center col-span-2 sm:col-span-1">
+                        <p className="text-3xl font-bold text-accent">{totalSupervised}</p>
+                        <p className="text-xs text-muted-foreground mt-1">Total Postgraduates</p>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Current students */}
+                  {supervision.current_students && supervision.current_students.length > 0 && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Current Supervisees</h3>
+                      <div className="space-y-3">
+                        {supervision.current_students.map((s, i) => (
+                          <div key={i} className="p-4 bg-card border rounded-lg" data-testid={`supervisee-${i}`}>
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="flex-1">
+                                <p className="font-semibold text-sm text-foreground">{s.name}</p>
+                                <p className="text-sm text-muted-foreground mt-0.5 leading-relaxed">{s.topic}</p>
+                              </div>
+                              <div className="shrink-0 text-right">
+                                <span className={`text-xs px-2 py-1 rounded-full font-bold ${
+                                  s.level === "PhD"
+                                    ? "bg-purple-100 text-purple-700"
+                                    : "bg-blue-100 text-blue-700"
+                                }`}>
+                                  {s.level}
+                                </span>
+                                {s.year && <p className="text-xs text-muted-foreground mt-1">{s.year}</p>}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {totalSupervised === 0 && (!supervision.current_students?.length) && (
+                    <p className="text-muted-foreground text-sm">Supervision data not available.</p>
+                  )}
+                </>
+              )}
+              {isLoading && (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-3 gap-4">
+                    {Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-20 bg-muted rounded-xl animate-pulse" />)}
+                  </div>
+                </div>
+              )}
+            </Section>
+
+            {/* SERVICE */}
+            <Section id="service" icon={<Award className="w-5 h-5" />} title="Service &amp; Memberships">
+              {/* Awards */}
+              {!isLoading && profile?.awards && profile.awards.length > 0 && (
+                <div className="mb-6">
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Awards &amp; Recognition</h3>
+                  <div className="space-y-2">
+                    {profile.awards.map((a, i) => (
+                      <div key={i} className="flex items-start gap-3 p-3 bg-accent/5 border border-accent/20 rounded-lg" data-testid={`award-${i}`}>
+                        <Award className="w-4 h-4 text-accent shrink-0 mt-0.5" />
+                        <p className="text-sm text-foreground">{a}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Memberships */}
+              {!isLoading && profile?.memberships && profile.memberships.length > 0 && (
+                <div>
+                  <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Professional Memberships</h3>
+                  <div className="space-y-2">
+                    {profile.memberships.map((m, i) => (
+                      <div key={i} className="flex items-start gap-3 p-3 bg-card border rounded-lg" data-testid={`membership-${i}`}>
+                        <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />
+                        <p className="text-sm text-foreground">{m}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {!isLoading && !profile?.awards?.length && !profile?.memberships?.length && (
+                <p className="text-muted-foreground text-sm">Service information not yet available.</p>
+              )}
+            </Section>
           </div>
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
             <div className="sticky top-24 space-y-4">
 
-              {/* Awards */}
-              {!isLoading && profile?.awards && profile.awards.length > 0 && (
+              {/* Profile completeness */}
+              {!isLoading && profile?.profile_completeness !== undefined && (
+                <CompletenessBar score={profile.profile_completeness} />
+              )}
+
+              {/* Academic identity */}
+              {!isLoading && (profile?.orcid_id || profile?.google_scholar_url || profile?.scopus_id) && (
                 <div className="bg-card border rounded-xl p-5">
-                  <h3 className="font-bold text-sm uppercase tracking-wider text-foreground mb-4 flex items-center gap-2">
-                    <Award className="w-4 h-4 text-accent" /> Awards & Recognition
-                  </h3>
-                  <ul className="space-y-2">
-                    {profile.awards.map((a, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground" data-testid={`award-${i}`}>
-                        <Award className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" />
-                        {a}
-                      </li>
-                    ))}
-                  </ul>
+                  <h3 className="font-bold text-xs uppercase tracking-wider text-muted-foreground mb-3">Academic Identity</h3>
+                  <div className="space-y-2">
+                    {profile?.orcid_id && (
+                      <a
+                        href={`https://orcid.org/${profile.orcid_id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-2 text-xs text-foreground hover:text-primary transition-colors"
+                        data-testid="sidebar-orcid"
+                      >
+                        <span className="w-5 h-5 rounded bg-[#A6CE39] flex items-center justify-center text-white text-[9px] font-bold shrink-0">iD</span>
+                        <span className="font-mono">{profile.orcid_id}</span>
+                        <ExternalLink className="w-3 h-3 text-muted-foreground ml-auto" />
+                      </a>
+                    )}
+                    {profile?.google_scholar_url && (
+                      <a
+                        href={profile.google_scholar_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-2 text-xs text-foreground hover:text-primary transition-colors"
+                        data-testid="sidebar-scholar"
+                      >
+                        <TrendingUp className="w-4 h-4 text-muted-foreground shrink-0" />
+                        <span>Google Scholar</span>
+                        <ExternalLink className="w-3 h-3 text-muted-foreground ml-auto" />
+                      </a>
+                    )}
+                    {profile?.scopus_id && (
+                      <a
+                        href={`https://www.scopus.com/authid/detail.uri?authorId=${profile.scopus_id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-2 text-xs text-foreground hover:text-primary transition-colors"
+                        data-testid="sidebar-scopus"
+                      >
+                        <Globe className="w-4 h-4 text-muted-foreground shrink-0" />
+                        <span>Scopus ID: {profile.scopus_id}</span>
+                        <ExternalLink className="w-3 h-3 text-muted-foreground ml-auto" />
+                      </a>
+                    )}
+                  </div>
                 </div>
               )}
 
-              {/* Memberships */}
-              {!isLoading && profile?.memberships && profile.memberships.length > 0 && (
+              {/* Research stats */}
+              {!isLoading && (
                 <div className="bg-card border rounded-xl p-5">
-                  <h3 className="font-bold text-sm uppercase tracking-wider text-foreground mb-4 flex items-center gap-2">
-                    <Users className="w-4 h-4 text-primary" /> Professional Memberships
-                  </h3>
-                  <ul className="space-y-2">
-                    {profile.memberships.map((m, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground" data-testid={`membership-${i}`}>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
-                        {m}
-                      </li>
-                    ))}
-                  </ul>
+                  <h3 className="font-bold text-xs uppercase tracking-wider text-muted-foreground mb-3">Research Output</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5" /> Publications
+                      </span>
+                      <span className="font-bold text-foreground">
+                        {(profile?.publications?.length ?? 0) + (profile?.repo_publications?.length ?? 0)}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <BookMarked className="w-3.5 h-3.5" /> Repository Items
+                      </span>
+                      <span className="font-bold text-foreground">{profile?.repo_publications?.length ?? 0}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <Banknote className="w-3.5 h-3.5" /> Grants
+                      </span>
+                      <span className="font-bold text-foreground">{profile?.grants?.length ?? 0}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground flex items-center gap-1.5">
+                        <UserCheck className="w-3.5 h-3.5" /> Postgrads Supervised
+                      </span>
+                      <span className="font-bold text-foreground">{totalSupervised}</span>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -387,6 +866,11 @@ export default function StaffProfilePage() {
                   </Button>
                 )}
                 <Button variant="outline" className="w-full text-sm justify-start" asChild>
+                  <Link href="/repository">
+                    <Library className="w-4 h-4 mr-2" /> Repository
+                  </Link>
+                </Button>
+                <Button variant="outline" className="w-full text-sm justify-start" asChild>
                   <Link href="/programmes">
                     <GraduationCap className="w-4 h-4 mr-2" /> Programmes
                   </Link>
@@ -395,6 +879,13 @@ export default function StaffProfilePage() {
                   <Button className="w-full text-sm bg-primary text-white justify-start" asChild>
                     <a href={`mailto:${profile.email}`}>
                       <Mail className="w-4 h-4 mr-2" /> Send Email
+                    </a>
+                  </Button>
+                )}
+                {profile?.cv_url && (
+                  <Button variant="outline" className="w-full text-sm justify-start border-accent text-accent hover:bg-accent/10" asChild>
+                    <a href={profile.cv_url} target="_blank" rel="noreferrer">
+                      <Download className="w-4 h-4 mr-2" /> Download CV
                     </a>
                   </Button>
                 )}

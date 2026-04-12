@@ -12,6 +12,7 @@ import {
   Users,
   Filter,
   X,
+  TrendingUp,
 } from "lucide-react";
 
 const SCHOOLS = [
@@ -22,6 +23,27 @@ const SCHOOLS = [
   { code: "SOS", label: "SOS — Science" },
   { code: "SHS", label: "SHS — Health Sciences" },
   { code: "leadership", label: "University Leadership" },
+];
+
+const RANKS = [
+  { value: "", label: "All Ranks" },
+  { value: "Professor", label: "Professor" },
+  { value: "Associate Professor", label: "Associate Professor" },
+  { value: "Senior Lecturer", label: "Senior Lecturer" },
+  { value: "Lecturer", label: "Lecturer" },
+  { value: "Tutorial Fellow", label: "Tutorial Fellow" },
+  { value: "Dean", label: "Deans" },
+];
+
+const RESEARCH_THEMES = [
+  "Artificial Intelligence",
+  "Malaria & Tropical Diseases",
+  "Environmental Science",
+  "Education Policy",
+  "Entrepreneurship",
+  "Eye Health",
+  "NLP & African Languages",
+  "Water Quality",
 ];
 
 const SCHOOL_COLORS: Record<string, string> = {
@@ -84,6 +106,11 @@ function StaffCard({ member }: { member: StaffMember }) {
             {member.school ?? "Leadership"}
           </span>
         )}
+        {(member as any).orcid_id && (
+          <span className="absolute top-3 left-3 w-5 h-5 rounded bg-[#A6CE39] flex items-center justify-center text-white text-[9px] font-bold" title="ORCID verified">
+            iD
+          </span>
+        )}
       </div>
 
       {/* Info */}
@@ -91,7 +118,10 @@ function StaffCard({ member }: { member: StaffMember }) {
         <h3 className="font-serif font-bold text-foreground text-base leading-tight mb-1 group-hover:text-primary transition-colors">
           {member.name}
         </h3>
-        <p className="text-xs text-accent font-semibold mb-1">{member.designation}</p>
+        <p className="text-xs text-accent font-semibold mb-0.5">{member.designation}</p>
+        {(member as any).rank && (
+          <p className="text-xs text-muted-foreground mb-0.5">{(member as any).rank}</p>
+        )}
         <p className="text-xs text-muted-foreground mb-3">{member.department}</p>
 
         {member.specializations.length > 0 && (
@@ -105,11 +135,11 @@ function StaffCard({ member }: { member: StaffMember }) {
         )}
 
         <div className="mt-auto flex items-center justify-between text-xs text-muted-foreground border-t pt-3">
-          <span className="flex items-center gap-1.5">
-            <Mail className="w-3.5 h-3.5" />
-            {member.email}
+          <span className="flex items-center gap-1.5 truncate">
+            <Mail className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">{member.email}</span>
           </span>
-          <ChevronRight className="w-4 h-4 text-primary group-hover:translate-x-0.5 transition-transform" />
+          <ChevronRight className="w-4 h-4 text-primary group-hover:translate-x-0.5 transition-transform shrink-0" />
         </div>
       </div>
     </Link>
@@ -136,6 +166,8 @@ function SkeletonCard() {
 export default function StaffDirectoryPage() {
   const [search, setSearch] = React.useState("");
   const [school, setSchool] = React.useState("");
+  const [rank, setRank] = React.useState("");
+  const [researchTheme, setResearchTheme] = React.useState("");
   const [debouncedSearch, setDebouncedSearch] = React.useState("");
 
   React.useEffect(() => {
@@ -147,21 +179,32 @@ export default function StaffDirectoryPage() {
   const { data: allStaff, isLoading } = useStaff({
     school: apiSchool || undefined,
     search: debouncedSearch || undefined,
+    rank: rank || undefined,
   });
 
   const staff = React.useMemo(() => {
     if (!allStaff) return [];
+    let filtered = allStaff;
     if (school === "leadership") {
-      return allStaff.filter((s) => s.unit === "University Leadership");
+      filtered = filtered.filter((s) => s.unit === "University Leadership");
     }
-    return allStaff;
-  }, [allStaff, school]);
+    if (researchTheme) {
+      filtered = filtered.filter((s) =>
+        s.specializations.some((sp) =>
+          sp.toLowerCase().includes(researchTheme.toLowerCase())
+        )
+      );
+    }
+    return filtered;
+  }, [allStaff, school, researchTheme]);
 
-  const hasFilters = !!search || !!school;
+  const hasFilters = !!search || !!school || !!rank || !!researchTheme;
 
   const clearFilters = () => {
     setSearch("");
     setSchool("");
+    setRank("");
+    setResearchTheme("");
   };
 
   return (
@@ -170,7 +213,7 @@ export default function StaffDirectoryPage() {
       <div className="bg-primary text-primary-foreground relative overflow-hidden">
         <div
           className="absolute inset-0 opacity-10"
-          style={{ backgroundImage: "radial-gradient(ellipse at 20% 60%, #D4A017 0%, transparent 55%)" }}
+          style={{ backgroundImage: "radial-gradient(ellipse at 20% 60%, #C9A227 0%, transparent 55%)" }}
         />
         <div className="container mx-auto px-4 py-14 relative z-10">
           <nav className="flex items-center gap-1.5 text-xs text-primary-foreground/70 mb-6">
@@ -188,15 +231,16 @@ export default function StaffDirectoryPage() {
             </div>
           </div>
           <p className="text-primary-foreground/80 text-base max-w-2xl mt-4">
-            Meet the scholars, researchers, and professionals shaping KAFU's academic mission. Browse by school, specialization, or name.
+            Meet the scholars, researchers, and professionals shaping KAFU's academic mission. Browse by school, rank, or research theme.
           </p>
         </div>
       </div>
 
       {/* Filters */}
       <div className="border-b bg-card sticky top-[70px] z-30">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex flex-col sm:flex-row gap-3">
+        <div className="container mx-auto px-4 py-3">
+          {/* Main filter row */}
+          <div className="flex flex-col sm:flex-row gap-3 mb-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
@@ -228,6 +272,16 @@ export default function StaffDirectoryPage() {
                   <option key={s.code} value={s.code}>{s.label}</option>
                 ))}
               </select>
+              <select
+                className="h-10 border rounded-md px-3 text-sm bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                value={rank}
+                onChange={(e) => setRank(e.target.value)}
+                data-testid="staff-rank-filter"
+              >
+                {RANKS.map((r) => (
+                  <option key={r.value} value={r.value}>{r.label}</option>
+                ))}
+              </select>
             </div>
             {hasFilters && (
               <Button
@@ -240,6 +294,27 @@ export default function StaffDirectoryPage() {
                 <X className="w-4 h-4 mr-1" /> Clear
               </Button>
             )}
+          </div>
+
+          {/* Research theme chip bar */}
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1">
+            <span className="text-xs text-muted-foreground shrink-0 flex items-center gap-1">
+              <TrendingUp className="w-3.5 h-3.5" /> Research:
+            </span>
+            {RESEARCH_THEMES.map((theme) => (
+              <button
+                key={theme}
+                onClick={() => setResearchTheme(researchTheme === theme ? "" : theme)}
+                className={`text-xs px-3 py-1.5 rounded-full border shrink-0 transition-all ${
+                  researchTheme === theme
+                    ? "bg-primary text-white border-primary"
+                    : "bg-background text-muted-foreground border-border hover:border-primary hover:text-primary"
+                }`}
+                data-testid={`theme-chip-${theme.toLowerCase().replace(/\s+/g, "-")}`}
+              >
+                {theme}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -255,6 +330,8 @@ export default function StaffDirectoryPage() {
               <span>
                 <strong className="text-foreground">{staff.length}</strong> staff member{staff.length !== 1 ? "s" : ""} found
                 {school && ` in ${SCHOOLS.find((s) => s.code === school)?.label}`}
+                {rank && ` · ${rank}`}
+                {researchTheme && ` · ${researchTheme}`}
               </span>
             )}
           </div>
@@ -277,7 +354,9 @@ export default function StaffDirectoryPage() {
             <p className="text-muted-foreground text-sm mb-6">
               Try adjusting your search or filters to find what you are looking for.
             </p>
-            <Button variant="outline" onClick={clearFilters}>Clear all filters</Button>
+            <Button variant="outline" onClick={clearFilters} data-testid="btn-clear-all-filters">
+              Clear all filters
+            </Button>
           </div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">

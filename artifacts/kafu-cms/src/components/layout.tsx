@@ -67,6 +67,15 @@ const navItems: NavItem[] = [
       { label: "Pending Review", href: "/repository?status=under_review" },
     ],
   },
+  {
+    label: "Academic Profiles",
+    icon: <UserCog className="w-4 h-4" />,
+    roles: ADMIN_ROLES,
+    children: [
+      { label: "Staff Profiles", href: "/staff-profiles" },
+      { label: "Staff Content", href: "/content?type=staff_profile" },
+    ],
+  },
   { label: "Media Library", icon: <Image className="w-4 h-4" />, href: "/media" },
   { label: "Users", icon: <UserCog className="w-4 h-4" />, href: "/users", roles: ADMIN_ROLES },
   { label: "Taxonomy", icon: <Tag className="w-4 h-4" />, href: "/taxonomy", roles: ADMIN_ROLES },
