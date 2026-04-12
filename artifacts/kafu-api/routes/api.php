@@ -2690,3 +2690,197 @@ Route::delete('/admin/international/exchange/{id}', function (int $id) {
     \App\Models\ExchangeProgramme::findOrFail($id)->delete();
     return response()->json(['success' => true]);
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INSTITUTIONAL REPOSITORY (MP12)
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Overview: stats + featured items */
+Route::get('/repository/overview', function () {
+    $base = \App\Models\RepositoryItem::published();
+    $stats = [
+        'total'       => $base->count(),
+        'theses'      => (clone $base)->whereIn('type', ['thesis','dissertation'])->count(),
+        'articles'    => (clone $base)->where('type', 'journal_article')->count(),
+        'open_access' => (clone $base)->where('access', 'open')->count(),
+        'downloads'   => (clone $base)->sum('downloads'),
+        'departments' => (clone $base)->distinct('department')->whereNotNull('department')->count('department'),
+    ];
+    $featured = \App\Models\RepositoryItem::published()
+        ->where('access', 'open')
+        ->orderBy('citation_count', 'desc')
+        ->take(6)
+        ->get(['id','slug','title','type','year','department','authors','citation_count','downloads','doi']);
+    $recent = \App\Models\RepositoryItem::published()
+        ->orderBy('created_at', 'desc')
+        ->take(5)
+        ->get(['id','slug','title','type','year','department','authors']);
+    return response()->json(compact('stats', 'featured', 'recent'));
+});
+
+/** Browse — paginated with filters */
+Route::get('/repository/items', function (\Illuminate\Http\Request $request) {
+    $q = \App\Models\RepositoryItem::published();
+    if ($request->type)       $q->where('type', $request->type);
+    if ($request->department) $q->where('department', $request->department);
+    if ($request->year)       $q->where('year', $request->year);
+    if ($request->access)     $q->where('access', $request->access);
+    if ($request->search) {
+        $s = '%' . $request->search . '%';
+        $q->where(fn($w) => $w
+            ->where('title', 'like', $s)
+            ->orWhere('abstract', 'like', $s)
+            ->orWhere('department', 'like', $s)
+        );
+    }
+    $sort = match($request->sort ?? 'recent') {
+        'citations' => ['citation_count', 'desc'],
+        'downloads' => ['downloads', 'desc'],
+        'year_asc'  => ['year', 'asc'],
+        'year_desc' => ['year', 'desc'],
+        default     => ['created_at', 'desc'],
+    };
+    $q->orderBy(...$sort);
+    $perPage = min((int)($request->per_page ?? 12), 50);
+    $result  = $q->paginate($perPage, ['id','slug','title','type','abstract','year','department','authors','keywords','citation_count','downloads','access','license','doi']);
+    return response()->json([
+        'data'         => $result->items(),
+        'current_page' => $result->currentPage(),
+        'last_page'    => $result->lastPage(),
+        'total'        => $result->total(),
+        'per_page'     => $result->perPage(),
+    ]);
+});
+
+/** Aggregated browse facets (years, departments, counts) */
+Route::get('/repository/facets', function () {
+    $base = \App\Models\RepositoryItem::published();
+    $years       = (clone $base)->selectRaw('year, count(*) as count')->groupBy('year')->orderBy('year','desc')->get();
+    $departments = (clone $base)->selectRaw('department, count(*) as count')->whereNotNull('department')->groupBy('department')->orderBy('count','desc')->get();
+    $types       = (clone $base)->selectRaw('type, count(*) as count')->groupBy('type')->orderBy('count','desc')->get();
+    return response()->json(compact('years','departments','types'));
+});
+
+/** Single item detail */
+Route::get('/repository/items/{slug}', function (string $slug) {
+    $item = \App\Models\RepositoryItem::published()->where('slug', $slug)->firstOrFail();
+    $item->increment('views');
+    $related = \App\Models\RepositoryItem::published()
+        ->where('id', '!=', $item->id)
+        ->where(fn($w) => $w->where('department', $item->department)->orWhere('research_theme', $item->research_theme))
+        ->inRandomOrder()->take(4)
+        ->get(['id','slug','title','type','year','authors']);
+    return response()->json(array_merge($item->toArray(), ['related' => $related]));
+});
+
+/** Download — increment counter + redirect */
+Route::get('/repository/items/{slug}/download', function (string $slug) {
+    $item = \App\Models\RepositoryItem::published()->where('slug', $slug)->firstOrFail();
+    if ($item->access !== 'open' || !$item->file_url) {
+        abort(403, 'File not publicly available.');
+    }
+    $item->increment('downloads');
+    return response()->json(['url' => $item->file_url]);
+});
+
+// ── ADMIN ROUTES ──────────────────────────────────────────────────────────
+
+Route::get('/admin/repository', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $q = \App\Models\RepositoryItem::query();
+    if ($request->status) $q->where('status', $request->status);
+    if ($request->type)   $q->where('type', $request->type);
+    if ($request->search) {
+        $s = '%'.$request->search.'%';
+        $q->where(fn($w) => $w->where('title','like',$s)->orWhere('department','like',$s));
+    }
+    $result = $q->orderBy('created_at','desc')->paginate(20);
+    return response()->json([
+        'data'         => $result->items(),
+        'current_page' => $result->currentPage(),
+        'last_page'    => $result->lastPage(),
+        'total'        => $result->total(),
+        'per_page'     => $result->perPage(),
+    ]);
+});
+
+Route::post('/admin/repository', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $data = $request->validate([
+        'slug'            => 'required|string|unique:repository_items,slug',
+        'title'           => 'required|string',
+        'type'            => 'required|in:thesis,dissertation,journal_article,conference_paper,book_chapter,research_report,working_paper,dataset',
+        'abstract'        => 'required|string',
+        'authors'         => 'required|array',
+        'keywords'        => 'required|array',
+        'department'      => 'nullable|string',
+        'research_theme'  => 'nullable|string',
+        'year'            => 'required|integer|min:1990|max:2030',
+        'publisher'       => 'nullable|string',
+        'journal_name'    => 'nullable|string',
+        'volume'          => 'nullable|string',
+        'issue'           => 'nullable|string',
+        'pages'           => 'nullable|string',
+        'doi'             => 'nullable|string',
+        'isbn_issn'       => 'nullable|string',
+        'file_url'        => 'nullable|string',
+        'file_size_kb'    => 'nullable|integer',
+        'language'        => 'nullable|string',
+        'license'         => 'nullable|in:cc_by,cc_by_nc,cc_by_sa,all_rights_reserved,open_access',
+        'access'          => 'nullable|in:open,restricted,embargo',
+        'embargo_until'   => 'nullable|date',
+        'funded_by'       => 'nullable|string',
+        'student_name'    => 'nullable|string',
+        'supervisor'      => 'nullable|string',
+        'degree'          => 'nullable|string',
+        'status'          => 'nullable|in:draft,under_review,approved,published,withdrawn',
+    ]);
+    $item = \App\Models\RepositoryItem::create($data);
+    return response()->json($item, 201);
+});
+
+Route::get('/admin/repository/{id}', function (int $id) {
+    return response()->json(\App\Models\RepositoryItem::findOrFail($id));
+});
+
+Route::put('/admin/repository/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $item = \App\Models\RepositoryItem::findOrFail($id);
+    $data = $request->validate([
+        'slug'            => 'sometimes|string|unique:repository_items,slug,'.$id,
+        'title'           => 'sometimes|string',
+        'type'            => 'sometimes|in:thesis,dissertation,journal_article,conference_paper,book_chapter,research_report,working_paper,dataset',
+        'abstract'        => 'sometimes|string',
+        'authors'         => 'sometimes|array',
+        'keywords'        => 'sometimes|array',
+        'department'      => 'nullable|string',
+        'research_theme'  => 'nullable|string',
+        'year'            => 'sometimes|integer|min:1990|max:2030',
+        'publisher'       => 'nullable|string',
+        'journal_name'    => 'nullable|string',
+        'volume'          => 'nullable|string',
+        'issue'           => 'nullable|string',
+        'pages'           => 'nullable|string',
+        'doi'             => 'nullable|string',
+        'isbn_issn'       => 'nullable|string',
+        'file_url'        => 'nullable|string',
+        'file_size_kb'    => 'nullable|integer',
+        'license'         => 'nullable|in:cc_by,cc_by_nc,cc_by_sa,all_rights_reserved,open_access',
+        'access'          => 'nullable|in:open,restricted,embargo',
+        'embargo_until'   => 'nullable|date',
+        'funded_by'       => 'nullable|string',
+        'student_name'    => 'nullable|string',
+        'supervisor'      => 'nullable|string',
+        'degree'          => 'nullable|string',
+        'status'          => 'nullable|in:draft,under_review,approved,published,withdrawn',
+    ]);
+    $item->update($data);
+    return response()->json($item);
+});
+
+Route::delete('/admin/repository/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    \App\Models\RepositoryItem::findOrFail($id)->delete();
+    return response()->json(['success' => true]);
+});
+

@@ -346,3 +346,52 @@ export function useExchangeProgrammeDetail(slug: string) {
     enabled: !!slug,
   });
 }
+
+// ── INSTITUTIONAL REPOSITORY (MP12) ──────────────────────────────────────
+import type {
+  RepositoryOverview, RepositoryPage, RepositoryFacets, RepositoryItem,
+} from "./api-types";
+
+export function useRepositoryOverview() {
+  return useQuery<RepositoryOverview>({
+    queryKey: ["repository-overview"],
+    queryFn: () => fetch("/api/repository/overview").then(r => r.json()),
+  });
+}
+
+export function useRepositoryItems(params: {
+  type?: string; department?: string; year?: string;
+  access?: string; search?: string; sort?: string;
+  page?: number; per_page?: number;
+}) {
+  return useQuery<RepositoryPage>({
+    queryKey: ["repository-items", params],
+    queryFn: async () => {
+      const q = new URLSearchParams();
+      if (params.type)       q.set("type", params.type);
+      if (params.department) q.set("department", params.department);
+      if (params.year)       q.set("year", params.year);
+      if (params.access)     q.set("access", params.access);
+      if (params.search)     q.set("search", params.search);
+      if (params.sort)       q.set("sort", params.sort);
+      if (params.page)       q.set("page", String(params.page));
+      if (params.per_page)   q.set("per_page", String(params.per_page));
+      return fetch(`/api/repository/items?${q}`).then(r => r.json());
+    },
+  });
+}
+
+export function useRepositoryFacets() {
+  return useQuery<RepositoryFacets>({
+    queryKey: ["repository-facets"],
+    queryFn: () => fetch("/api/repository/facets").then(r => r.json()),
+  });
+}
+
+export function useRepositoryItemDetail(slug: string) {
+  return useQuery<RepositoryItem>({
+    queryKey: ["repository-item", slug],
+    queryFn: () => fetch(`/api/repository/items/${slug}`).then(r => r.json()),
+    enabled: !!slug,
+  });
+}

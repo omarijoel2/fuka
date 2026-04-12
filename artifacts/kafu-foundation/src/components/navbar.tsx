@@ -65,6 +65,7 @@ const navItems = [
       { name: "Research Projects", path: "/research/projects" },
       { name: "Publications", path: "/research/publications" },
       { name: "Partnerships & Grants", path: "/research/partnerships" },
+      { name: "Institutional Repository", path: "/repository" },
     ],
   },
   {

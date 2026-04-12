@@ -19,5 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call(MediaMigrationSeeder::class);
         $this->call(DocumentsSeeder::class);
         $this->call(ResearchSeeder::class);
+        $this->call(InternationalSeeder::class);
+        $this->call(RepositorySeeder::class);
     }
 }

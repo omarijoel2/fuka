@@ -439,3 +439,77 @@ export interface InternationalOverview {
   featured_partnerships: InternationalPartnership[];
   featured_programmes: ExchangeProgramme[];
 }
+
+// ── INSTITUTIONAL REPOSITORY (MP12) ──────────────────────────────────────
+
+export type RepoItemType =
+  | 'thesis' | 'dissertation' | 'journal_article' | 'conference_paper'
+  | 'book_chapter' | 'research_report' | 'working_paper' | 'dataset';
+
+export type RepoAccess  = 'open' | 'restricted' | 'embargo';
+export type RepoLicense = 'cc_by' | 'cc_by_nc' | 'cc_by_sa' | 'all_rights_reserved' | 'open_access';
+export type RepoStatus  = 'draft' | 'under_review' | 'approved' | 'published' | 'withdrawn';
+
+export interface RepoAuthor {
+  name: string;
+  staff_slug?: string;
+  role?: string;
+}
+
+export interface RepositoryItem {
+  id: number;
+  slug: string;
+  title: string;
+  type: RepoItemType;
+  abstract: string;
+  authors: RepoAuthor[];
+  keywords: string[];
+  department?: string;
+  research_theme?: string;
+  year: number;
+  publisher?: string;
+  journal_name?: string;
+  volume?: string;
+  issue?: string;
+  pages?: string;
+  doi?: string;
+  isbn_issn?: string;
+  file_url?: string;
+  file_size_kb: number;
+  language: string;
+  license: RepoLicense;
+  access: RepoAccess;
+  embargo_until?: string;
+  funded_by?: string;
+  student_name?: string;
+  supervisor?: string;
+  degree?: string;
+  citation_count: number;
+  downloads: number;
+  views: number;
+  status: RepoStatus;
+  related?: Pick<RepositoryItem, 'id' | 'slug' | 'title' | 'type' | 'year' | 'authors'>[];
+}
+
+export interface RepositoryOverview {
+  stats: {
+    total: number; theses: number; articles: number;
+    open_access: number; downloads: number; departments: number;
+  };
+  featured: RepositoryItem[];
+  recent: RepositoryItem[];
+}
+
+export interface RepositoryPage {
+  data: RepositoryItem[];
+  current_page: number;
+  last_page: number;
+  total: number;
+  per_page: number;
+}
+
+export interface RepositoryFacets {
+  years:       { year: number; count: number }[];
+  departments: { department: string; count: number }[];
+  types:       { type: RepoItemType; count: number }[];
+}

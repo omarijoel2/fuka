@@ -22,7 +22,7 @@ Official website for Kaimosi Friends University (KAFU), a Quaker-founded public 
 - **Branding**: Forest Green `#1A5C38` (hsl 143 55% 23%), Gold `#C9A227` (hsl 43 68% 47%), White background
 - **Logo**: `https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png`
 
-### Pages (31 total — MP02–MP07 + RIMS-lite + International complete)
+### Pages (34 total — MP02–MP07 + RIMS-lite + International + IR complete)
 | Page | Path | Module |
 |---|---|---|
 | Home | `/` | MP02 |
@@ -55,6 +55,9 @@ Official website for Kaimosi Friends University (KAFU), a Quaker-founded public 
 | **Visa & Immigration** | `/international/visa` | MP11 |
 | **Exchange Programmes** | `/international/exchange` | MP11 |
 | **International Partnerships** | `/international/partnerships` | MP11 |
+| **IR Landing** | `/repository` | MP12/IR |
+| **IR Browse** | `/repository/browse` | MP12/IR |
+| **IR Item Detail** | `/repository/items/:slug` | MP12/IR |
 | Not Found | `*` | — |
 
 ### Key Source Files

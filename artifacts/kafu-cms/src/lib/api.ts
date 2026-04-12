@@ -5,7 +5,7 @@ function getToken() {
   return localStorage.getItem(TOKEN_KEY);
 }
 
-async function apiFetch(path: string, options: RequestInit = {}) {
+export async function apiFetch(path: string, options: RequestInit = {}) {
   const token = getToken();
   const res = await fetch(`${API_BASE}${path}`, {
     ...options,
