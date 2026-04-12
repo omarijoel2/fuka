@@ -27,6 +27,10 @@ import AnnouncementDetail from "@/pages/announcement-detail";
 import Opportunities from "@/pages/opportunities";
 import OpportunityDetail from "@/pages/opportunity-detail";
 import Contact from "@/pages/contact";
+import Campuses from "@/pages/campuses";
+import CampusDetail from "@/pages/campus-detail";
+import Offices from "@/pages/offices";
+import OfficeDetail from "@/pages/office-detail";
 import Research from "@/pages/research";
 import ResearchProjects from "@/pages/research-projects";
 import ResearchProjectDetail from "@/pages/research-project-detail";
@@ -78,6 +82,10 @@ function Router() {
           <Route path="/opportunities" component={Opportunities} />
           <Route path="/opportunities/:slug" component={OpportunityDetail} />
           <Route path="/contact" component={Contact} />
+          <Route path="/campuses" component={Campuses} />
+          <Route path="/campuses/:slug" component={CampusDetail} />
+          <Route path="/offices" component={Offices} />
+          <Route path="/offices/:slug" component={OfficeDetail} />
           <Route path="/research" component={Research} />
           <Route path="/research/projects" component={ResearchProjects} />
           <Route path="/research/projects/:slug">

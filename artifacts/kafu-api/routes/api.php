@@ -3265,3 +3265,49 @@ Route::delete('/admin/research/publications/{id}', function (\Illuminate\Http\Re
     return response()->json(['success' => true]);
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+// CAMPUSES & SERVICE POINTS — Public Routes (MP15)
+// ─────────────────────────────────────────────────────────────────────────────
+
+Route::get('/campuses', function (Request $request) {
+    $campuses = \App\Models\Campus::active()
+        ->orderBy('sort_order')
+        ->orderBy('name')
+        ->get();
+    return response()->json($campuses);
+});
+
+Route::get('/campuses/{slug}', function (string $slug) {
+    $campus = \App\Models\Campus::where('slug', $slug)->where('status', 'active')->firstOrFail();
+    $offices = \App\Models\ServicePoint::where('campus_id', $campus->id)
+        ->where('status', 'active')
+        ->orderBy('sort_order')
+        ->get();
+    return response()->json(array_merge($campus->toArray(), ['offices' => $offices]));
+});
+
+Route::get('/service-points', function (Request $request) {
+    $q = \App\Models\ServicePoint::active()
+        ->with('campus:id,name,slug')
+        ->orderBy('sort_order')
+        ->orderBy('name');
+    if ($request->query('category')) {
+        $q->where('category', $request->query('category'));
+    }
+    if ($request->query('campus_id')) {
+        $q->where('campus_id', $request->query('campus_id'));
+    }
+    if ($request->query('search')) {
+        $term = '%' . $request->query('search') . '%';
+        $q->where(fn($w) => $w->where('name', 'like', $term)->orWhere('summary', 'like', $term)->orWhere('category', 'like', $term));
+    }
+    return response()->json($q->get());
+});
+
+Route::get('/service-points/{slug}', function (string $slug) {
+    $sp = \App\Models\ServicePoint::where('slug', $slug)->where('status', 'active')
+        ->with('campus:id,name,slug,address,latitude,longitude')
+        ->firstOrFail();
+    return response()->json($sp);
+});
+

@@ -26,6 +26,8 @@ import type {
   InternationalPartnership,
   InternationalPartnershipDetail,
   ExchangeProgramme,
+  Campus,
+  ServicePoint,
 } from "./api-types";
 
 export function useStats() {
@@ -393,6 +395,45 @@ export function useRepositoryItemDetail(slug: string) {
   return useQuery<RepositoryItem>({
     queryKey: ["repository-item", slug],
     queryFn: () => fetch(`/api/repository/items/${slug}`).then(r => r.json()),
+    enabled: !!slug,
+  });
+}
+
+// ── MP15 — Campus & Service Points ──────────────────────────────────────────
+
+export function useCampuses() {
+  return useQuery<Campus[]>({
+    queryKey: ["campuses"],
+    queryFn: () => fetch("/api/campuses").then(r => r.json()),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useCampusDetail(slug: string) {
+  return useQuery<Campus>({
+    queryKey: ["campus", slug],
+    queryFn: () => fetch(`/api/campuses/${slug}`).then(r => r.json()),
+    enabled: !!slug,
+  });
+}
+
+export function useServicePoints(params?: { category?: string; campus_id?: number; search?: string }) {
+  const q = new URLSearchParams();
+  if (params?.category) q.set("category", params.category);
+  if (params?.campus_id) q.set("campus_id", String(params.campus_id));
+  if (params?.search)    q.set("search", params.search);
+  const qs = q.toString();
+  return useQuery<ServicePoint[]>({
+    queryKey: ["service-points", params],
+    queryFn: () => fetch(`/api/service-points${qs ? "?" + qs : ""}`).then(r => r.json()),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useServicePointDetail(slug: string) {
+  return useQuery<ServicePoint>({
+    queryKey: ["service-point", slug],
+    queryFn: () => fetch(`/api/service-points/${slug}`).then(r => r.json()),
     enabled: !!slug,
   });
 }

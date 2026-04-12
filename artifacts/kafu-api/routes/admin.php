@@ -1034,5 +1034,136 @@ Route::prefix('admin')->group(function () {
             return response()->json(['message' => 'Partner deleted.']);
         });
 
+        // ── Campus CRUD ─────────────────────────────────────────────────────────
+        Route::get('/campuses', function (Request $request) {
+            $q = \App\Models\Campus::orderBy('sort_order')->orderBy('name');
+            if ($request->query('status')) $q->where('status', $request->query('status'));
+            return response()->json(['data' => $q->get()]);
+        });
+
+        Route::post('/campuses', function (Request $request) {
+            $data = $request->validate([
+                'name'            => 'required|string|max:255',
+                'slug'            => 'required|string|unique:campuses,slug',
+                'summary'         => 'nullable|string',
+                'description'     => 'nullable|string',
+                'address'         => 'nullable|string',
+                'county'          => 'nullable|string',
+                'region'          => 'nullable|string',
+                'latitude'        => 'nullable|numeric|between:-90,90',
+                'longitude'       => 'nullable|numeric|between:-180,180',
+                'hero_image'      => 'nullable|string',
+                'gallery_images'  => 'nullable|array',
+                'contact_email'   => 'nullable|email',
+                'contact_phone'   => 'nullable|string',
+                'visitor_notes'   => 'nullable|string',
+                'transport_notes' => 'nullable|string',
+                'sort_order'      => 'nullable|integer',
+                'status'          => 'nullable|in:active,inactive',
+            ]);
+            $campus = \App\Models\Campus::create($data);
+            return response()->json(['data' => $campus], 201);
+        });
+
+        Route::put('/campuses/{id}', function (Request $request, $id) {
+            $campus = \App\Models\Campus::findOrFail($id);
+            $data = $request->validate([
+                'name'            => 'sometimes|string|max:255',
+                'slug'            => "sometimes|string|unique:campuses,slug,{$id}",
+                'summary'         => 'nullable|string',
+                'description'     => 'nullable|string',
+                'address'         => 'nullable|string',
+                'county'          => 'nullable|string',
+                'region'          => 'nullable|string',
+                'latitude'        => 'nullable|numeric|between:-90,90',
+                'longitude'       => 'nullable|numeric|between:-180,180',
+                'hero_image'      => 'nullable|string',
+                'gallery_images'  => 'nullable|array',
+                'contact_email'   => 'nullable|email',
+                'contact_phone'   => 'nullable|string',
+                'visitor_notes'   => 'nullable|string',
+                'transport_notes' => 'nullable|string',
+                'sort_order'      => 'nullable|integer',
+                'status'          => 'nullable|in:active,inactive',
+            ]);
+            $campus->update($data);
+            return response()->json(['data' => $campus->fresh()]);
+        });
+
+        Route::delete('/campuses/{id}', function (Request $request, $id) {
+            \App\Models\Campus::findOrFail($id)->delete();
+            return response()->json(['message' => 'Campus deleted.']);
+        });
+
+        // ── Service Points CRUD ─────────────────────────────────────────────────
+        Route::get('/service-points', function (Request $request) {
+            $q = \App\Models\ServicePoint::with('campus:id,name,slug')
+                ->orderBy('sort_order')->orderBy('name');
+            if ($request->query('campus_id')) $q->where('campus_id', $request->query('campus_id'));
+            if ($request->query('category')) $q->where('category', $request->query('category'));
+            if ($request->query('status')) $q->where('status', $request->query('status'));
+            return response()->json(['data' => $q->get()]);
+        });
+
+        Route::post('/service-points', function (Request $request) {
+            $data = $request->validate([
+                'name'              => 'required|string|max:255',
+                'slug'              => 'required|string|unique:service_points,slug',
+                'category'          => 'required|string',
+                'campus_id'         => 'nullable|exists:campuses,id',
+                'building'          => 'nullable|string',
+                'contact_person'    => 'nullable|string',
+                'public_phone'      => 'nullable|string',
+                'public_email'      => 'nullable|email',
+                'whatsapp'          => 'nullable|string',
+                'physical_location' => 'nullable|string',
+                'latitude'          => 'nullable|numeric|between:-90,90',
+                'longitude'         => 'nullable|numeric|between:-180,180',
+                'operating_hours'   => 'nullable|array',
+                'summary'           => 'nullable|string',
+                'support_scope'     => 'nullable|string',
+                'related_links'     => 'nullable|array',
+                'hero_image'        => 'nullable|string',
+                'sort_order'        => 'nullable|integer',
+                'status'            => 'nullable|in:active,inactive',
+                'seo_meta'          => 'nullable|array',
+            ]);
+            $sp = \App\Models\ServicePoint::create($data);
+            return response()->json(['data' => $sp->load('campus:id,name,slug')], 201);
+        });
+
+        Route::put('/service-points/{id}', function (Request $request, $id) {
+            $sp = \App\Models\ServicePoint::findOrFail($id);
+            $data = $request->validate([
+                'name'              => 'sometimes|string|max:255',
+                'slug'              => "sometimes|string|unique:service_points,slug,{$id}",
+                'category'          => 'sometimes|string',
+                'campus_id'         => 'nullable|exists:campuses,id',
+                'building'          => 'nullable|string',
+                'contact_person'    => 'nullable|string',
+                'public_phone'      => 'nullable|string',
+                'public_email'      => 'nullable|email',
+                'whatsapp'          => 'nullable|string',
+                'physical_location' => 'nullable|string',
+                'latitude'          => 'nullable|numeric|between:-90,90',
+                'longitude'         => 'nullable|numeric|between:-180,180',
+                'operating_hours'   => 'nullable|array',
+                'summary'           => 'nullable|string',
+                'support_scope'     => 'nullable|string',
+                'related_links'     => 'nullable|array',
+                'hero_image'        => 'nullable|string',
+                'sort_order'        => 'nullable|integer',
+                'status'            => 'nullable|in:active,inactive',
+                'seo_meta'          => 'nullable|array',
+            ]);
+            $sp->update($data);
+            return response()->json(['data' => $sp->fresh()->load('campus:id,name,slug')]);
+        });
+
+        Route::delete('/service-points/{id}', function (Request $request, $id) {
+            \App\Models\ServicePoint::findOrFail($id)->delete();
+            return response()->json(['message' => 'Service point deleted.']);
+        });
+
     });
 });

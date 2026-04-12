@@ -562,3 +562,54 @@ export interface RepositoryFacets {
   departments: { department: string; count: number }[];
   types:       { type: RepoItemType; count: number }[];
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// MP15 — Campuses & Service Points
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface Campus {
+  id: number;
+  name: string;
+  slug: string;
+  summary?: string;
+  description?: string;
+  address?: string;
+  county?: string;
+  region?: string;
+  latitude?: number;
+  longitude?: number;
+  hero_image?: string;
+  gallery_images?: string[];
+  contact_email?: string;
+  contact_phone?: string;
+  visitor_notes?: string;
+  transport_notes?: string;
+  sort_order: number;
+  status: 'active' | 'inactive';
+  offices?: ServicePoint[];
+}
+
+export interface ServicePoint {
+  id: number;
+  name: string;
+  slug: string;
+  category: string;
+  campus_id?: number;
+  campus?: { id: number; name: string; slug: string; address?: string; latitude?: number; longitude?: number };
+  building?: string;
+  contact_person?: string;
+  public_phone?: string;
+  public_email?: string;
+  whatsapp?: string;
+  physical_location?: string;
+  latitude?: number;
+  longitude?: number;
+  operating_hours?: { mon_fri?: string; sat?: string; sun?: string };
+  summary?: string;
+  support_scope?: string;
+  related_links?: { label: string; url: string }[];
+  hero_image?: string;
+  sort_order: number;
+  status: 'active' | 'inactive';
+  seo_meta?: { title?: string; description?: string } | null;
+}

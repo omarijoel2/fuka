@@ -5,7 +5,7 @@ import {
   LayoutDashboard, FileText, Calendar, Bell, Briefcase, Users,
   Image, Tag, ClipboardList, Settings, LogOut, Menu, X,
   ChevronDown, ChevronRight, BookOpen, UserCog, AlertTriangle, Newspaper, SlidersHorizontal,
-  FlaskConical, Globe, Banknote, HeartHandshake
+  FlaskConical, Globe, Banknote, HeartHandshake, MapPin, Building2
 } from "lucide-react";
 
 interface NavItem {
@@ -74,6 +74,15 @@ const navItems: NavItem[] = [
     children: [
       { label: "Staff Profiles", href: "/staff-profiles" },
       { label: "Staff Content", href: "/content?type=staff_profile" },
+    ],
+  },
+  {
+    label: "Contact & Campus",
+    icon: <MapPin className="w-4 h-4" />,
+    roles: ADMIN_ROLES,
+    children: [
+      { label: "Campuses", href: "/campuses" },
+      { label: "Offices & Services", href: "/offices" },
     ],
   },
   { label: "Media Library", icon: <Image className="w-4 h-4" />, href: "/media" },

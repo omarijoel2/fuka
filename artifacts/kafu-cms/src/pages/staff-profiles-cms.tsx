@@ -288,7 +288,7 @@ export default function StaffProfilesCmsPage() {
   const fetchStaff = React.useCallback(async () => {
     setLoading(true);
     try {
-      const res = await apiGet("/cms/content", { type: "staff_profile", per_page: 100 });
+      const res = await apiGet("/content", { type: "staff_profile", per_page: 100 });
       setStaffList(res.data ?? []);
     } catch {
       showToast("error", "Failed to load staff profiles.");
@@ -329,10 +329,10 @@ export default function StaffProfilesCmsPage() {
     try {
       const payload = formToPayload(editing);
       if (isNew) {
-        await apiPost("/cms/content", payload);
+        await apiPost("/content", payload);
         showToast("success", "Staff profile created successfully.");
       } else {
-        await apiPut(`/cms/content/${editing.id}`, payload);
+        await apiPut(`/content/${editing.id}`, payload);
         showToast("success", "Staff profile updated successfully.");
       }
       setEditing(null);
@@ -348,7 +348,7 @@ export default function StaffProfilesCmsPage() {
   const handleDelete = async () => {
     if (!deleteTarget) return;
     try {
-      await apiDelete(`/cms/content/${deleteTarget.id}`);
+      await apiDelete(`/content/${deleteTarget.id}`);
       showToast("success", "Profile deleted.");
       setDeleteTarget(null);
       await fetchStaff();
