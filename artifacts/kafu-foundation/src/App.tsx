@@ -31,6 +31,11 @@ import ResearchProjectDetail from "@/pages/research-project-detail";
 import ResearchPublications from "@/pages/research-publications";
 import ResearchPublicationDetail from "@/pages/research-publication-detail";
 import ResearchPartnerships from "@/pages/research-partnerships";
+import InternationalPage from "@/pages/international";
+import InternationalStudy from "@/pages/international-study";
+import InternationalVisa from "@/pages/international-visa";
+import InternationalPartnerships from "@/pages/international-partnerships";
+import InternationalExchange from "@/pages/international-exchange";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -77,6 +82,11 @@ function Router() {
             {(params) => <ResearchPublicationDetail slug={params.slug ?? ""} />}
           </Route>
           <Route path="/research/partnerships" component={ResearchPartnerships} />
+          <Route path="/international" component={InternationalPage} />
+          <Route path="/international/study" component={InternationalStudy} />
+          <Route path="/international/visa" component={InternationalVisa} />
+          <Route path="/international/partnerships" component={InternationalPartnerships} />
+          <Route path="/international/exchange" component={InternationalExchange} />
           <Route component={NotFound} />
         </Switch>
       </main>

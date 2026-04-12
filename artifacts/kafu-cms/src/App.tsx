@@ -17,6 +17,8 @@ import ResearchProjectsCmsPage from "@/pages/research-projects-cms";
 import ResearchPublicationsCmsPage from "@/pages/research-publications-cms";
 import ResearchGrantsCmsPage from "@/pages/research-grants-cms";
 import ResearchPartnersCmsPage from "@/pages/research-partners-cms";
+import InternationalPartnershipsCmsPage from "@/pages/international-partnerships-cms";
+import ExchangeProgrammesCmsPage from "@/pages/exchange-programmes-cms";
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -44,6 +46,8 @@ function AppRoutes() {
         <Route path="/research/publications" component={ResearchPublicationsCmsPage} />
         <Route path="/research/grants" component={ResearchGrantsCmsPage} />
         <Route path="/research/partners" component={ResearchPartnersCmsPage} />
+        <Route path="/international/partnerships" component={InternationalPartnershipsCmsPage} />
+        <Route path="/international/exchange" component={ExchangeProgrammesCmsPage} />
         <Route>{() => <DashboardPage />}</Route>
       </Switch>
     </CmsLayout>

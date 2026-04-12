@@ -22,7 +22,7 @@ Official website for Kaimosi Friends University (KAFU), a Quaker-founded public 
 - **Branding**: Forest Green `#1A5C38` (hsl 143 55% 23%), Gold `#C9A227` (hsl 43 68% 47%), White background
 - **Logo**: `https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png`
 
-### Pages (26 total — MP02–MP07 + RIMS-lite complete)
+### Pages (31 total — MP02–MP07 + RIMS-lite + International complete)
 | Page | Path | Module |
 |---|---|---|
 | Home | `/` | MP02 |
@@ -50,6 +50,11 @@ Official website for Kaimosi Friends University (KAFU), a Quaker-founded public 
 | **Research Publications** | `/research/publications` | RIMS-lite |
 | **Research Publication Detail** | `/research/publications/:slug` | RIMS-lite |
 | **Research Partnerships & Grants** | `/research/partnerships` | RIMS-lite |
+| **International Landing** | `/international` | MP11 |
+| **Study at KAFU** | `/international/study` | MP11 |
+| **Visa & Immigration** | `/international/visa` | MP11 |
+| **Exchange Programmes** | `/international/exchange` | MP11 |
+| **International Partnerships** | `/international/partnerships` | MP11 |
 | Not Found | `*` | — |
 
 ### Key Source Files
@@ -108,9 +113,18 @@ Laravel 12 with PHP 8.2. Public routes in `routes/api.php`; admin routes in `rou
 | GET | `/api/research/publications/:slug` | Publication detail with citation, authors, linked project |
 | GET | `/api/research/grants` | All grants; `?status=active|completed|pending` |
 | GET | `/api/research/partners` | All partners; `?type=academic|government|ngo|donor|industry|international` |
+| GET | `/api/international/overview` | 5 stats, 6 featured partnerships, 3 featured programmes |
+| GET | `/api/international/partnerships` | All partnerships; `?type=&country=` filters |
+| GET | `/api/international/partnerships/:slug` | Partnership detail with linked exchange programmes |
+| GET | `/api/international/exchange` | All exchange programmes; `?type=&status=` filters |
+| GET | `/api/international/exchange/:slug` | Exchange programme detail |
 
 ### Research (RIMS-lite) Admin Endpoints (`/api/admin/research/*`)
 Full CRUD for: themes, projects, publications, grants, partners. Each supports GET (list), POST (create), GET /:id, PUT /:id, DELETE /:id.
+
+### International Admin Endpoints (`/api/admin/international/*`)
+- POST/PUT/DELETE `/api/admin/international/partnerships/:id` — manage institutional partnerships
+- POST/PUT/DELETE `/api/admin/international/exchange/:id` — manage exchange programmes
 
 ## KAFU Real Data
 
@@ -148,7 +162,8 @@ Full CRUD for: themes, projects, publications, grants, partners. Each supports G
   - Settings — account info + change password
 - **Workflow states**: draft → submitted → under_review → approved → scheduled → published → unpublished → archived
 - **Research Office section** (admin-only sidebar): Themes, Projects, Publications, Grants, Partners — each page has full CRUD with modal forms and real-time filtering
-- **Role-based nav**: super_admin/ict_admin/communications_admin see Users, Taxonomy, Audit, Settings, Research Office; reviewer sees Review Queue
+- **International Office section** (admin-only sidebar): Partnerships (10 seeded: Earlham, Woodbrooke, Makerere, UoN, Ghana, IITA, USAID, FWCC, AfDB, Guilford), Exchange Programmes (6 seeded) — each with full CRUD modal
+- **Role-based nav**: super_admin/ict_admin/communications_admin see Users, Taxonomy, Audit, Settings, Research Office, International Office; reviewer sees Review Queue
 - **API proxy**: Vite dev server proxies /api → localhost:8080
 
 ### Admin Credentials

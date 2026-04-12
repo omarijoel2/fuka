@@ -67,6 +67,17 @@ const navItems = [
       { name: "Partnerships & Grants", path: "/research/partnerships" },
     ],
   },
+  {
+    name: "International",
+    path: "/international",
+    children: [
+      { name: "Global Overview", path: "/international" },
+      { name: "Study at KAFU", path: "/international/study" },
+      { name: "Visa & Immigration", path: "/international/visa" },
+      { name: "Exchange Programmes", path: "/international/exchange" },
+      { name: "Our Partners", path: "/international/partnerships" },
+    ],
+  },
   { name: "Opportunities", path: "/opportunities" },
   { name: "Contact", path: "/contact" },
 ];

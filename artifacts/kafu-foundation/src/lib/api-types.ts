@@ -363,3 +363,79 @@ export interface PaginatedResearch<T> {
   current_page: number;
   per_page: number;
 }
+
+// ── International & Partnerships ─────────────────────────────
+
+export type PartnerType =
+  | "university"
+  | "research_institute"
+  | "government"
+  | "ngo"
+  | "development_agency"
+  | "quaker"
+  | "professional_body";
+
+export type PartnerStatus = "active" | "inactive" | "pending";
+
+export interface InternationalPartnership {
+  id: number;
+  slug: string;
+  name: string;
+  short_name?: string;
+  country: string;
+  country_code?: string;
+  type: PartnerType;
+  status: PartnerStatus;
+  description?: string;
+  logo_url?: string;
+  website_url?: string;
+  mou_date?: string;
+  mou_expiry?: string;
+  collaboration_areas: string[];
+  is_featured: boolean;
+  sort_order: number;
+}
+
+export interface InternationalPartnershipDetail extends InternationalPartnership {
+  exchange_programmes: ExchangeProgramme[];
+}
+
+export type ExchangeType =
+  | "student_exchange"
+  | "staff_exchange"
+  | "joint_degree"
+  | "summer_school"
+  | "research_fellowship"
+  | "internship";
+
+export type ExchangeStatus = "open" | "closed" | "upcoming" | "suspended";
+
+export interface ExchangeProgramme {
+  id: number;
+  slug: string;
+  title: string;
+  type: ExchangeType;
+  partnership_id?: number;
+  partner_name?: string;
+  partner_country?: string;
+  description: string;
+  duration_weeks?: number;
+  duration_label?: string;
+  application_deadline?: string;
+  next_intake?: string;
+  slots_available?: number;
+  stipend_amount?: number;
+  stipend_currency: string;
+  eligibility: string[];
+  benefits: string[];
+  required_documents: string[];
+  status: ExchangeStatus;
+  is_featured: boolean;
+  partnership?: { id: number; name: string; country: string; logo_url?: string; slug: string };
+}
+
+export interface InternationalOverview {
+  stats: { label: string; value: number | string }[];
+  featured_partnerships: InternationalPartnership[];
+  featured_programmes: ExchangeProgramme[];
+}

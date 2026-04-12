@@ -33,6 +33,19 @@ async function apiFetch(path: string, options: RequestInit = {}) {
   return res.json();
 }
 
+export async function apiRequest(url: string, options: RequestInit = {}): Promise<Response> {
+  const token = getToken();
+  return fetch(url, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      "Accept": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+      ...(options.headers || {}),
+    },
+  });
+}
+
 export function apiGet(path: string, params?: Record<string, string | number | undefined>) {
   const q = params
     ? "?" + Object.entries(params)

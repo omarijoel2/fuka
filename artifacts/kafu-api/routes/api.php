@@ -2524,3 +2524,169 @@ Route::get('/research/partners', function (Request $request) {
         ]),
     ]);
 });
+
+// ============================================================
+// International & Partnerships Module
+// ============================================================
+
+Route::get('/international/overview', function () {
+    $partnerships = \App\Models\InternationalPartnership::where('status', 'active')->count();
+    $programmes   = \App\Models\ExchangeProgramme::where('status', 'open')->count();
+    $countries    = \App\Models\InternationalPartnership::where('status', 'active')->distinct('country')->count('country');
+    $featured     = \App\Models\InternationalPartnership::where('is_featured', true)->where('status', 'active')
+        ->orderBy('sort_order')->limit(6)->get();
+    $featuredProgrammes = \App\Models\ExchangeProgramme::where('is_featured', true)->where('status', 'open')
+        ->with('partnership:id,name,country,logo_url')->limit(3)->get();
+    return response()->json([
+        'stats' => [
+            ['label' => 'Partner Countries',       'value' => $countries],
+            ['label' => 'Active Partnerships',     'value' => $partnerships],
+            ['label' => 'Exchange Programmes',     'value' => $programmes],
+            ['label' => 'Students Exchanged',      'value' => 38],
+            ['label' => 'Grants Received (USD M)', 'value' => 2.3],
+        ],
+        'featured_partnerships' => $featured,
+        'featured_programmes'   => $featuredProgrammes,
+    ]);
+});
+
+Route::get('/international/partnerships', function (\Illuminate\Http\Request $request) {
+    $query = \App\Models\InternationalPartnership::query();
+    if ($request->type)   $query->where('type', $request->type);
+    if ($request->status) $query->where('status', $request->status);
+    else                  $query->where('status', 'active');
+    if ($request->country) $query->where('country', 'like', "%{$request->country}%");
+    $query->orderBy('sort_order')->orderBy('name');
+    return response()->json(['data' => $query->get()]);
+});
+
+Route::get('/international/partnerships/{slug}', function (string $slug) {
+    $partner = \App\Models\InternationalPartnership::where('slug', $slug)->firstOrFail();
+    $partner->load(['exchangeProgrammes' => function($q) { $q->where('status', 'open'); }]);
+    return response()->json($partner);
+});
+
+Route::get('/international/exchange', function (\Illuminate\Http\Request $request) {
+    $query = \App\Models\ExchangeProgramme::with('partnership:id,name,country,logo_url,slug');
+    if ($request->type)   $query->where('type', $request->type);
+    if ($request->status) $query->where('status', $request->status);
+    $query->orderByRaw("CASE status WHEN 'open' THEN 1 WHEN 'upcoming' THEN 2 WHEN 'closed' THEN 3 ELSE 4 END")->orderBy('application_deadline');
+    return response()->json(['data' => $query->get()]);
+});
+
+Route::get('/international/exchange/{slug}', function (string $slug) {
+    $prog = \App\Models\ExchangeProgramme::with('partnership')->where('slug', $slug)->firstOrFail();
+    return response()->json($prog);
+});
+
+// ============================================================
+// Admin: International & Partnerships CRUD
+// ============================================================
+
+Route::post('/admin/international/partnerships', function (\Illuminate\Http\Request $request) {
+    $data = $request->validate([
+        'slug' => 'required|string|unique:international_partnerships,slug',
+        'name' => 'required|string',
+        'short_name' => 'nullable|string',
+        'country' => 'required|string',
+        'country_code' => 'nullable|string|max:3',
+        'type' => 'required|in:university,research_institute,government,ngo,development_agency,quaker,professional_body',
+        'status' => 'required|in:active,inactive,pending',
+        'description' => 'nullable|string',
+        'logo_url' => 'nullable|string',
+        'website_url' => 'nullable|string',
+        'mou_date' => 'nullable|date',
+        'mou_expiry' => 'nullable|date',
+        'collaboration_areas' => 'nullable|array',
+        'is_featured' => 'nullable|boolean',
+        'sort_order' => 'nullable|integer',
+    ]);
+    $partner = \App\Models\InternationalPartnership::create($data);
+    return response()->json($partner, 201);
+});
+
+Route::put('/admin/international/partnerships/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    $partner = \App\Models\InternationalPartnership::findOrFail($id);
+    $data = $request->validate([
+        'slug' => "required|string|unique:international_partnerships,slug,{$id}",
+        'name' => 'required|string',
+        'short_name' => 'nullable|string',
+        'country' => 'required|string',
+        'country_code' => 'nullable|string|max:3',
+        'type' => 'required|in:university,research_institute,government,ngo,development_agency,quaker,professional_body',
+        'status' => 'required|in:active,inactive,pending',
+        'description' => 'nullable|string',
+        'logo_url' => 'nullable|string',
+        'website_url' => 'nullable|string',
+        'mou_date' => 'nullable|date',
+        'mou_expiry' => 'nullable|date',
+        'collaboration_areas' => 'nullable|array',
+        'is_featured' => 'nullable|boolean',
+        'sort_order' => 'nullable|integer',
+    ]);
+    $partner->update($data);
+    return response()->json($partner);
+});
+
+Route::delete('/admin/international/partnerships/{id}', function (int $id) {
+    \App\Models\InternationalPartnership::findOrFail($id)->delete();
+    return response()->json(['success' => true]);
+});
+
+Route::post('/admin/international/exchange', function (\Illuminate\Http\Request $request) {
+    $data = $request->validate([
+        'slug' => 'required|string|unique:exchange_programmes,slug',
+        'title' => 'required|string',
+        'type' => 'required|in:student_exchange,staff_exchange,joint_degree,summer_school,research_fellowship,internship',
+        'partnership_id' => 'nullable|integer|exists:international_partnerships,id',
+        'partner_name' => 'nullable|string',
+        'partner_country' => 'nullable|string',
+        'description' => 'required|string',
+        'duration_weeks' => 'nullable|integer',
+        'duration_label' => 'nullable|string',
+        'application_deadline' => 'nullable|date',
+        'next_intake' => 'nullable|string',
+        'slots_available' => 'nullable|integer',
+        'stipend_amount' => 'nullable|numeric',
+        'stipend_currency' => 'nullable|string|max:3',
+        'eligibility' => 'nullable|array',
+        'benefits' => 'nullable|array',
+        'required_documents' => 'nullable|array',
+        'status' => 'required|in:open,closed,upcoming,suspended',
+        'is_featured' => 'nullable|boolean',
+    ]);
+    $prog = \App\Models\ExchangeProgramme::create($data);
+    return response()->json($prog, 201);
+});
+
+Route::put('/admin/international/exchange/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    $prog = \App\Models\ExchangeProgramme::findOrFail($id);
+    $data = $request->validate([
+        'slug' => "required|string|unique:exchange_programmes,slug,{$id}",
+        'title' => 'required|string',
+        'type' => 'required|in:student_exchange,staff_exchange,joint_degree,summer_school,research_fellowship,internship',
+        'partnership_id' => 'nullable|integer|exists:international_partnerships,id',
+        'partner_name' => 'nullable|string',
+        'partner_country' => 'nullable|string',
+        'description' => 'required|string',
+        'duration_weeks' => 'nullable|integer',
+        'duration_label' => 'nullable|string',
+        'application_deadline' => 'nullable|date',
+        'next_intake' => 'nullable|string',
+        'slots_available' => 'nullable|integer',
+        'stipend_amount' => 'nullable|numeric',
+        'stipend_currency' => 'nullable|string|max:3',
+        'eligibility' => 'nullable|array',
+        'benefits' => 'nullable|array',
+        'required_documents' => 'nullable|array',
+        'status' => 'required|in:open,closed,upcoming,suspended',
+        'is_featured' => 'nullable|boolean',
+    ]);
+    $prog->update($data);
+    return response()->json($prog);
+});
+
+Route::delete('/admin/international/exchange/{id}', function (int $id) {
+    \App\Models\ExchangeProgramme::findOrFail($id)->delete();
+    return response()->json(['success' => true]);
+});

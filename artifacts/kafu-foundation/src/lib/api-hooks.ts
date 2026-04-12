@@ -22,6 +22,10 @@ import type {
   ResearchGrant,
   ResearchPartner,
   PaginatedResearch,
+  InternationalOverview,
+  InternationalPartnership,
+  InternationalPartnershipDetail,
+  ExchangeProgramme,
 } from "./api-types";
 
 export function useStats() {
@@ -276,5 +280,69 @@ export function useResearchPartners(params?: { type?: string }) {
       const res = await fetch(`/api/research/partners${qs ? "?" + qs : ""}`);
       return res.json();
     },
+  });
+}
+
+// ── International & Partnerships hooks ──────────────────────
+
+export function useInternationalOverview() {
+  return useQuery<InternationalOverview>({
+    queryKey: ["international-overview"],
+    queryFn: async () => {
+      const res = await fetch("/api/international/overview");
+      return res.json();
+    },
+  });
+}
+
+export function useInternationalPartnerships(params?: { type?: string; country?: string }) {
+  const p = params ?? {};
+  return useQuery<{ data: InternationalPartnership[] }>({
+    queryKey: ["international-partnerships", p],
+    queryFn: async () => {
+      const q = new URLSearchParams();
+      if (p.type) q.set("type", p.type);
+      if (p.country) q.set("country", p.country);
+      const qs = q.toString();
+      const res = await fetch(`/api/international/partnerships${qs ? "?" + qs : ""}`);
+      return res.json();
+    },
+  });
+}
+
+export function useInternationalPartnershipDetail(slug: string) {
+  return useQuery<InternationalPartnershipDetail>({
+    queryKey: ["international-partnership-detail", slug],
+    queryFn: async () => {
+      const res = await fetch(`/api/international/partnerships/${slug}`);
+      return res.json();
+    },
+    enabled: !!slug,
+  });
+}
+
+export function useExchangeProgrammes(params?: { type?: string; status?: string }) {
+  const p = params ?? {};
+  return useQuery<{ data: ExchangeProgramme[] }>({
+    queryKey: ["exchange-programmes", p],
+    queryFn: async () => {
+      const q = new URLSearchParams();
+      if (p.type) q.set("type", p.type);
+      if (p.status) q.set("status", p.status);
+      const qs = q.toString();
+      const res = await fetch(`/api/international/exchange${qs ? "?" + qs : ""}`);
+      return res.json();
+    },
+  });
+}
+
+export function useExchangeProgrammeDetail(slug: string) {
+  return useQuery<ExchangeProgramme>({
+    queryKey: ["exchange-programme-detail", slug],
+    queryFn: async () => {
+      const res = await fetch(`/api/international/exchange/${slug}`);
+      return res.json();
+    },
+    enabled: !!slug,
   });
 }

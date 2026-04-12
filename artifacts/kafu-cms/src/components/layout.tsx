@@ -49,6 +49,15 @@ const navItems: NavItem[] = [
       { label: "Partners", href: "/research/partners" },
     ],
   },
+  {
+    label: "International Office",
+    icon: <Globe className="w-4 h-4" />,
+    roles: ADMIN_ROLES,
+    children: [
+      { label: "Partnerships", href: "/international/partnerships" },
+      { label: "Exchange Programmes", href: "/international/exchange" },
+    ],
+  },
   { label: "Media Library", icon: <Image className="w-4 h-4" />, href: "/media" },
   { label: "Users", icon: <UserCog className="w-4 h-4" />, href: "/users", roles: ADMIN_ROLES },
   { label: "Taxonomy", icon: <Tag className="w-4 h-4" />, href: "/taxonomy", roles: ADMIN_ROLES },
