@@ -16,6 +16,12 @@ import type {
   ProgrammeDetail,
   StaffMember,
   StaffProfile,
+  ResearchOverview,
+  ResearchProject,
+  ResearchPublication,
+  ResearchGrant,
+  ResearchPartner,
+  PaginatedResearch,
 } from "./api-types";
 
 export function useStats() {
@@ -185,7 +191,6 @@ export function useProgrammeDetail(school: string, code: string) {
 }
 
 // Research & Innovation Hooks
-import type { ResearchOverview, ResearchProject, ResearchPublication, ResearchGrant, ResearchPartner, PaginatedResearch } from "./api-types";
 
 export function useResearchOverview() {
   return useQuery<ResearchOverview>({

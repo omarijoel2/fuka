@@ -22,7 +22,7 @@ Official website for Kaimosi Friends University (KAFU), a Quaker-founded public 
 - **Branding**: Forest Green `#1A5C38` (hsl 143 55% 23%), Gold `#C9A227` (hsl 43 68% 47%), White background
 - **Logo**: `https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png`
 
-### Pages (20 total — MP02–MP07 complete)
+### Pages (26 total — MP02–MP07 + RIMS-lite complete)
 | Page | Path | Module |
 |---|---|---|
 | Home | `/` | MP02 |
@@ -44,6 +44,12 @@ Official website for Kaimosi Friends University (KAFU), a Quaker-founded public 
 | Opportunities | `/opportunities` | MP06 |
 | Opportunity Detail | `/opportunities/:slug` | MP06 |
 | Contact | `/contact` | — |
+| **Research Overview** | `/research` | RIMS-lite |
+| **Research Projects** | `/research/projects` | RIMS-lite |
+| **Research Project Detail** | `/research/projects/:slug` | RIMS-lite |
+| **Research Publications** | `/research/publications` | RIMS-lite |
+| **Research Publication Detail** | `/research/publications/:slug` | RIMS-lite |
+| **Research Partnerships & Grants** | `/research/partnerships` | RIMS-lite |
 | Not Found | `*` | — |
 
 ### Key Source Files
@@ -94,6 +100,17 @@ Laravel 12 with PHP 8.2. Public routes in `routes/api.php`; admin routes in `rou
 | GET | `/api/staff/:slug` | Full staff profile |
 | GET | `/api/admissions` | Pathways, deadlines, documents, contact |
 | GET | `/api/contact` | Institution contact info |
+| GET | `/api/research/overview` | Stats, featured projects, featured publications, themes |
+| GET | `/api/research/themes` | All 6 research themes with project/publication counts |
+| GET | `/api/research/projects` | Paginated; `?theme=&status=&search=&page=&per_page=` |
+| GET | `/api/research/projects/:slug` | Project detail with publications, grant, team |
+| GET | `/api/research/publications` | Paginated; `?type=&year=&search=&page=&per_page=` |
+| GET | `/api/research/publications/:slug` | Publication detail with citation, authors, linked project |
+| GET | `/api/research/grants` | All grants; `?status=active|completed|pending` |
+| GET | `/api/research/partners` | All partners; `?type=academic|government|ngo|donor|industry|international` |
+
+### Research (RIMS-lite) Admin Endpoints (`/api/admin/research/*`)
+Full CRUD for: themes, projects, publications, grants, partners. Each supports GET (list), POST (create), GET /:id, PUT /:id, DELETE /:id.
 
 ## KAFU Real Data
 
@@ -130,7 +147,8 @@ Laravel 12 with PHP 8.2. Public routes in `routes/api.php`; admin routes in `rou
   - Audit Log — searchable/filterable log with action badges
   - Settings — account info + change password
 - **Workflow states**: draft → submitted → under_review → approved → scheduled → published → unpublished → archived
-- **Role-based nav**: super_admin/ict_admin/communications_admin see Users, Taxonomy, Audit, Settings; reviewer sees Review Queue
+- **Research Office section** (admin-only sidebar): Themes, Projects, Publications, Grants, Partners — each page has full CRUD with modal forms and real-time filtering
+- **Role-based nav**: super_admin/ict_admin/communications_admin see Users, Taxonomy, Audit, Settings, Research Office; reviewer sees Review Queue
 - **API proxy**: Vite dev server proxies /api → localhost:8080
 
 ### Admin Credentials

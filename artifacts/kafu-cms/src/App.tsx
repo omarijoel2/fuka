@@ -39,6 +39,11 @@ function AppRoutes() {
         <Route path="/audit" component={AuditLogPage} />
         <Route path="/site-settings" component={SiteSettingsPage} />
         <Route path="/settings" component={SettingsPage} />
+        <Route path="/research/themes" component={ResearchThemesPage} />
+        <Route path="/research/projects" component={ResearchProjectsCmsPage} />
+        <Route path="/research/publications" component={ResearchPublicationsCmsPage} />
+        <Route path="/research/grants" component={ResearchGrantsCmsPage} />
+        <Route path="/research/partners" component={ResearchPartnersCmsPage} />
         <Route>{() => <DashboardPage />}</Route>
       </Switch>
     </CmsLayout>
