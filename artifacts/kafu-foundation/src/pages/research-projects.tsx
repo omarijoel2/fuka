@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "wouter";
 import { useResearchProjects, useResearchOverview } from "@/lib/api-hooks";
 import { ChevronRight, Search, FlaskConical, Filter, ArrowRight } from "lucide-react";
+import { SeoHead } from "@/components/seo-head";
 
 const STATUS_LABELS: Record<string, string> = {
   active: "Active", completed: "Completed", planned: "Planned", suspended: "Suspended",
@@ -43,6 +44,12 @@ export default function ResearchProjects() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title="Research Projects — Kaimosi Friends University"
+        description="Explore active and completed research projects at KAFU — funded studies across AI, public health, environmental science, agriculture, education, and social development."
+        path="/research/projects"
+        breadcrumbs={[{ name: "Research", path: "/research" }, { name: "Projects", path: "/research/projects" }]}
+      />
       {/* Header */}
       <div className="relative bg-primary text-primary-foreground py-16 md:py-20 overflow-hidden">
         <img src="https://kafu.ac.ke/wp-content/uploads/2025/10/campus-1-scaled.jpg" alt="" aria-hidden="true"

@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Link } from "wouter";
 import { useOpportunities } from "@/lib/api-hooks";
 import type { Opportunity } from "@/lib/api-types";
+import { SeoHead } from "@/components/seo-head";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -226,6 +227,12 @@ export default function Opportunities() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
+      <SeoHead
+        title="Opportunities — Kaimosi Friends University"
+        description="Explore academic, research, and career opportunities at KAFU — fellowships, scholarships, teaching vacancies, staff positions, and student internships."
+        path="/opportunities"
+        breadcrumbs={[{ name: "Opportunities", path: "/opportunities" }]}
+      />
       <div className="bg-primary text-primary-foreground py-14">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">

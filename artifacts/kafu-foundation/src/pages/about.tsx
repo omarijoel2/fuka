@@ -1,6 +1,7 @@
 import { BookOpen, Users, MapPin, Globe, GraduationCap, FlaskConical } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { SeoHead } from "@/components/seo-head";
 
 const CAMPUS_IMG = "https://kafu.ac.ke/wp-content/uploads/IMG_8696.jpg";
 const CAMPUS_IMG2 = "https://kafu.ac.ke/wp-content/uploads/PIC1.jpg";
@@ -9,6 +10,12 @@ const VC_IMG = "https://kafu.ac.ke/wp-content/uploads/Vice-Chancellor-Prof.-Pete
 export default function About() {
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title="About KAFU — Our Mission, Vision & History"
+        description="Learn about Kaimosi Friends University — our Quaker heritage, academic mission, leadership, and commitment to transformative education in Western Kenya since 2013."
+        path="/about"
+        breadcrumbs={[{ name: "About", path: "/about" }]}
+      />
       {/* Page Header with real campus photo */}
       <div className="relative bg-primary text-primary-foreground py-20 md:py-28 overflow-hidden">
         <img

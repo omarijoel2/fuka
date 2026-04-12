@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "wouter";
 import { useResearchPublications } from "@/lib/api-hooks";
 import { ChevronRight, Search, BookOpen, ExternalLink } from "lucide-react";
+import { SeoHead } from "@/components/seo-head";
 
 const TYPE_LABELS: Record<string, string> = {
   journal: "Journal Article", conference: "Conference Paper", book_chapter: "Book Chapter",
@@ -36,6 +37,12 @@ export default function ResearchPublications() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title="Research Publications — Kaimosi Friends University"
+        description="Browse peer-reviewed publications, journal articles, and conference papers by KAFU researchers. Advancing knowledge in science, education, health, and technology."
+        path="/research/publications"
+        breadcrumbs={[{ name: "Research", path: "/research" }, { name: "Publications", path: "/research/publications" }]}
+      />
       {/* Header */}
       <div className="relative bg-primary text-primary-foreground py-16 md:py-20 overflow-hidden">
         <img src="https://kafu.ac.ke/wp-content/uploads/2025/10/campus-1-scaled.jpg" alt="" aria-hidden="true"

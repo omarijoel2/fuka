@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { useRepositoryOverview } from "../lib/api-hooks";
 import type { RepositoryItem, RepoItemType } from "../lib/api-types";
+import { SeoHead } from "../components/seo-head";
 
 const TYPE_LABELS: Record<RepoItemType, string> = {
   thesis:           "Thesis",
@@ -117,6 +118,12 @@ export default function RepositoryPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <SeoHead
+        title="Institutional Repository — Kaimosi Friends University"
+        description="KAFU's open-access institutional repository — theses, dissertations, journal articles, conference papers, and working papers from KAFU researchers and graduates."
+        path="/repository"
+        breadcrumbs={[{ name: "Repository", path: "/repository" }]}
+      />
       {/* Hero */}
       <section
         className="relative text-white overflow-hidden py-20"

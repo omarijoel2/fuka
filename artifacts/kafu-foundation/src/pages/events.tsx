@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { useEvents } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Clock, Search, ExternalLink, ChevronRight, Tag, ArrowRight } from "lucide-react";
+import { SeoHead } from "@/components/seo-head";
 import type { Event } from "@/lib/api-types";
 
 const CATEGORIES = ["All", "Examinations", "Academic", "Administration", "Graduation", "Special Events", "Community Outreach", "Student Life"];
@@ -92,6 +93,12 @@ export default function Events() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title="Events — Kaimosi Friends University"
+        description="Upcoming and past events at Kaimosi Friends University — academic calendar, graduation ceremonies, conferences, public lectures, and community outreach events."
+        path="/events"
+        breadcrumbs={[{ name: "Events", path: "/events" }]}
+      />
       {/* Header */}
       <div className="relative bg-primary text-primary-foreground py-16 md:py-20 overflow-hidden">
         <img

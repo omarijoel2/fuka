@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useParams } from "wouter";
 import { useRepositoryItemDetail } from "../lib/api-hooks";
 import type { RepositoryItem, RepoItemType } from "../lib/api-types";
+import { SeoHead, ORG_JSONLD } from "../components/seo-head";
 
 const TYPE_LABELS: Record<RepoItemType, string> = {
   thesis:           "Thesis",
@@ -120,8 +121,34 @@ export default function RepositoryItemPage() {
 
   const isThesis = item.type === "thesis" || item.type === "dissertation";
 
+  const repoJsonLd = {
+    "@context": "https://schema.org",
+    "@type": isThesis ? "Thesis" : "ScholarlyArticle",
+    headline: item.title,
+    abstract: item.abstract ?? undefined,
+    author: item.authors.map((a) => ({ "@type": "Person", name: a.name })),
+    datePublished: String(item.year),
+    publisher: ORG_JSONLD,
+    ...(item.doi ? { identifier: `https://doi.org/${item.doi}`, sameAs: `https://doi.org/${item.doi}` } : {}),
+    url: `https://kafu.ac.ke/repository/items/${item.slug}`,
+    inLanguage: "en",
+    educationalUse: "research",
+    ...(item.journal_name ? { isPartOf: { "@type": "Periodical", name: item.journal_name } } : {}),
+  };
+
   return (
     <div className="min-h-screen bg-white">
+      <SeoHead
+        title={item.seo_meta?.title ?? `${item.title} | KAFU Repository`}
+        description={item.seo_meta?.description ?? item.abstract?.slice(0, 160) ?? `${TYPE_LABELS[item.type]} by ${item.authors.map((a) => a.name).join(", ")} — ${item.year}. KAFU Institutional Repository.`}
+        path={`/repository/items/${item.slug}`}
+        breadcrumbs={[
+          { name: "Repository", path: "/repository" },
+          { name: "Browse", path: "/repository/browse" },
+          { name: item.title },
+        ]}
+        jsonLd={repoJsonLd}
+      />
       {/* Header */}
       <section className="text-white py-12" style={{ backgroundColor: "#1A5C38" }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">

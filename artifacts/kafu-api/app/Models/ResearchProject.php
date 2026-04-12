@@ -11,12 +11,14 @@ class ResearchProject extends Model
         'lead_researcher_name', 'co_researchers', 'theme_id', 'status',
         'start_date', 'end_date', 'funding_source', 'grant_id', 'budget', 'currency',
         'sdg_goals', 'featured_image_url', 'outputs', 'is_published', 'is_featured',
+        'seo_meta',
     ];
 
     protected $casts = [
         'co_researchers' => 'array',
         'sdg_goals' => 'array',
         'outputs' => 'array',
+        'seo_meta' => 'array',
         'is_published' => 'boolean',
         'is_featured' => 'boolean',
         'start_date' => 'date',

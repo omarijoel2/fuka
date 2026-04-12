@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
+import { SeoHead } from "@/components/seo-head";
 import { useAdmissions, useProgrammes } from "@/lib/api-hooks";
 import type { AdmissionsPathway } from "@/lib/api-types";
 import {
@@ -140,6 +141,12 @@ export default function Admissions() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title="Admissions — Apply to Kaimosi Friends University"
+        description="Join KAFU's vibrant academic community. Explore undergraduate (KUCCPS), postgraduate, doctoral, international, and self-sponsored admission pathways. Apply now."
+        path="/admissions"
+        breadcrumbs={[{ name: "Admissions", path: "/admissions" }]}
+      />
 
       {/* ─── HERO ─── */}
       <div className="bg-primary text-primary-foreground relative overflow-hidden">

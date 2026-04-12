@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { useAnnouncements } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
 import { Search, AlertTriangle, Bell, ChevronRight, ArrowRight, Calendar, Tag } from "lucide-react";
+import { SeoHead } from "@/components/seo-head";
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -28,6 +29,12 @@ export default function Announcements() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title="Announcements — Kaimosi Friends University"
+        description="Official announcements from Kaimosi Friends University — academic notices, examination schedules, registration deadlines, and institutional updates."
+        path="/announcements"
+        breadcrumbs={[{ name: "Announcements", path: "/announcements" }]}
+      />
       {/* Header */}
       <div className="relative bg-primary text-primary-foreground py-16 md:py-20 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary to-[#0d2347]" />

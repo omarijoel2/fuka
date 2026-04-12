@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "wouter";
 import { useResearchProject } from "@/lib/api-hooks";
 import { ChevronRight, Calendar, User, Building2, Banknote, FlaskConical, ExternalLink, Tag } from "lucide-react";
+import { SeoHead } from "@/components/seo-head";
 
 const STATUS_LABELS: Record<string, string> = {
   active: "Active", completed: "Completed", planned: "Planned", suspended: "Suspended",
@@ -58,6 +59,12 @@ export default function ResearchProjectDetail({ slug }: { slug: string }) {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title={project.seo_meta?.title ?? `${project.title} — KAFU Research`}
+        description={project.seo_meta?.description ?? project.abstract?.slice(0, 155) ?? `Research project at Kaimosi Friends University: ${project.title}`}
+        path={`/research/projects/${project.slug}`}
+        breadcrumbs={[{ name: "Research", path: "/research" }, { name: "Projects", path: "/research/projects" }, { name: project.title, path: `/research/projects/${project.slug}` }]}
+      />
       {/* Header */}
       <div className="relative bg-primary text-primary-foreground py-16 overflow-hidden">
         {project.featured_image_url ? (

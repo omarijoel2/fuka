@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRoute, Link } from "wouter";
 import { useStaffProfile } from "@/lib/api-hooks";
+import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import { Button } from "@/components/ui/button";
 import {
   Mail,
@@ -164,8 +165,41 @@ export default function StaffProfilePage() {
   const supervision = profile?.supervision ?? { masters_count: 0, phd_count: 0 };
   const totalSupervised = (supervision.masters_count ?? 0) + (supervision.phd_count ?? 0);
 
+  const personJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": `https://kafu.ac.ke/staff/${slug}`,
+    name: profile.name,
+    jobTitle: profile.title,
+    description: profile.biography ?? undefined,
+    email: profile.email ?? undefined,
+    affiliation: { "@id": "https://kafu.ac.ke/#organization" },
+    worksFor: { "@id": "https://kafu.ac.ke/#organization" },
+    url: `https://kafu.ac.ke/staff/${slug}`,
+    sameAs: [
+      ...(profile.orcid_id ? [`https://orcid.org/${profile.orcid_id}`] : []),
+      ...(profile.google_scholar_url ? [profile.google_scholar_url] : []),
+      ...(profile.scopus_url ? [profile.scopus_url] : []),
+      ...(profile.linkedin_url ? [profile.linkedin_url] : []),
+    ],
+    ...(profile.research_interests?.length
+      ? { knowsAbout: profile.research_interests }
+      : {}),
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title={`${profile.name} — ${profile.title} | KAFU`}
+        description={profile.biography ? profile.biography.slice(0, 160) : `${profile.name} is ${profile.title} at the ${SCHOOL_NAMES[profile.school] ?? profile.school}, Kaimosi Friends University.`}
+        path={`/staff/${slug}`}
+        type="profile"
+        breadcrumbs={[
+          { name: "Staff Directory", path: "/staff" },
+          { name: profile.name },
+        ]}
+        jsonLd={personJsonLd}
+      />
       {/* Hero */}
       <div className="bg-primary text-primary-foreground relative overflow-hidden">
         <div

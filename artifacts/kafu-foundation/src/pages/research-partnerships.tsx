@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "wouter";
 import { useResearchGrants, useResearchPartners } from "@/lib/api-hooks";
 import { ChevronRight, Globe, Banknote, ExternalLink, Building2, Users, HeartHandshake } from "lucide-react";
+import { SeoHead } from "@/components/seo-head";
 
 const PARTNER_TYPE_LABELS: Record<string, string> = {
   academic: "Academic", government: "Government", ngo: "NGO", donor: "Donor",
@@ -36,6 +37,12 @@ export default function ResearchPartnerships() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title="Research Partnerships — Kaimosi Friends University"
+        description="KAFU's national and international research partnerships — collaborating with universities, NGOs, government agencies, and industry to drive impactful research."
+        path="/research/partnerships"
+        breadcrumbs={[{ name: "Research", path: "/research" }, { name: "Partnerships", path: "/research/partnerships" }]}
+      />
       {/* Header */}
       <div className="relative bg-primary text-primary-foreground py-16 md:py-20 overflow-hidden">
         <img src="https://kafu.ac.ke/wp-content/uploads/2025/10/campus-1-scaled.jpg" alt="" aria-hidden="true"

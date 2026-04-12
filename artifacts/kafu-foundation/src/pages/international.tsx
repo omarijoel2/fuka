@@ -1,6 +1,7 @@
 import type { ReactElement } from "react";
 import { Link } from "wouter";
 import { useInternationalOverview } from "../lib/api-hooks";
+import { SeoHead } from "../components/seo-head";
 
 const TYPE_LABELS: Record<string, string> = {
   university: "University",
@@ -81,6 +82,12 @@ export default function InternationalPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <SeoHead
+        title="International Office — Kaimosi Friends University"
+        description="KAFU's International Office welcomes students and scholars from around the world. Explore exchange programmes, scholarships, visa guidance, and global partnerships."
+        path="/international"
+        breadcrumbs={[{ name: "International", path: "/international" }]}
+      />
       {/* Hero */}
       <section
         className="relative text-white overflow-hidden"

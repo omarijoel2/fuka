@@ -1,6 +1,7 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useSchools } from "@/lib/api-hooks";
+import { SeoHead } from "@/components/seo-head";
 import { BookOpen, GraduationCap, ChevronRight, User } from "lucide-react";
 
 function progTotal(count: Record<string, number> | number): number {
@@ -13,6 +14,12 @@ export default function Schools() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title="Schools & Faculties — Kaimosi Friends University"
+        description="Explore the five schools at KAFU: School of Education & Social Sciences, Business & Economics, Computing & IT, Science, and Health Sciences. Find your programme today."
+        path="/schools"
+        breadcrumbs={[{ name: "Schools", path: "/schools" }]}
+      />
       <div className="bg-primary text-primary-foreground relative overflow-hidden">
         <div
           className="absolute inset-0 opacity-10"

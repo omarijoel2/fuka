@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { useResearchOverview } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, BookOpen, FlaskConical, Users, Banknote, ArrowRight, ExternalLink, Globe } from "lucide-react";
+import { SeoHead } from "@/components/seo-head";
 
 const SDG_LABELS: Record<number, string> = {
   1: "No Poverty", 2: "Zero Hunger", 3: "Good Health", 4: "Quality Education",
@@ -38,6 +39,12 @@ export default function Research() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title="Research — Kaimosi Friends University"
+        description="Explore KAFU's research excellence — AI, malaria, environmental science, education policy, and more. Discover our projects, publications, grants, and research partnerships."
+        path="/research"
+        breadcrumbs={[{ name: "Research", path: "/research" }]}
+      />
       {/* Hero */}
       <div className="relative bg-primary text-primary-foreground py-20 md:py-28 overflow-hidden">
         <img

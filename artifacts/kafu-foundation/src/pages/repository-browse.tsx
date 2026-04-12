@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { useRepositoryItems, useRepositoryFacets } from "../lib/api-hooks";
 import type { RepoItemType } from "../lib/api-types";
+import { SeoHead } from "../components/seo-head";
 
 const TYPE_LABELS: Record<RepoItemType, string> = {
   thesis:           "Thesis",
@@ -89,6 +90,12 @@ export default function RepositoryBrowsePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <SeoHead
+        title="Browse Repository — Kaimosi Friends University"
+        description="Browse KAFU's institutional repository by type, department, year, or keyword. Access theses, dissertations, articles, conference papers, and working papers."
+        path="/repository/browse"
+        breadcrumbs={[{ name: "Repository", path: "/repository" }, { name: "Browse", path: "/repository/browse" }]}
+      />
       {/* Header */}
       <section className="text-white py-10" style={{ backgroundColor: "#1A5C38" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

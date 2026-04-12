@@ -3,6 +3,7 @@ import { useParams } from "wouter";
 import { useOpportunityDetail } from "@/lib/api-hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import { Badge } from "@/components/ui/badge";
 import {
   ChevronLeft,
@@ -106,8 +107,37 @@ export default function OpportunityDetail() {
   const daysLeft = getDaysLeft(opp.deadline);
   const isClosed = opp.status === "closed";
 
+  const oppJsonLd = opp.category === "vacancy"
+    ? {
+        "@context": "https://schema.org",
+        "@type": "JobPosting",
+        title: opp.title,
+        description: opp.description,
+        hiringOrganization: ORG_JSONLD,
+        jobLocation: {
+          "@type": "Place",
+          name: "Kaimosi Friends University",
+          address: { "@type": "PostalAddress", addressLocality: "Kaimosi", addressCountry: "KE" },
+        },
+        validThrough: opp.deadline,
+        datePosted: opp.publish_date,
+        employmentType: "FULL_TIME",
+        url: `https://kafu.ac.ke/opportunities/${slug}`,
+      }
+    : undefined;
+
   return (
     <div className="min-h-screen bg-background">
+      <SeoHead
+        title={opp.title}
+        description={opp.description?.slice(0, 160)}
+        path={`/opportunities/${slug}`}
+        breadcrumbs={[
+          { name: "Opportunities", path: "/opportunities" },
+          { name: opp.title },
+        ]}
+        jsonLd={oppJsonLd}
+      />
       <div className={`${isClosed ? "bg-muted" : "bg-primary"} ${isClosed ? "text-foreground" : "text-primary-foreground"} py-12`}>
         <div className="container mx-auto px-4 max-w-5xl">
           <nav className="flex items-center gap-2 text-sm mb-6 opacity-80" aria-label="Breadcrumb">

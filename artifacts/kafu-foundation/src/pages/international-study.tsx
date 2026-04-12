@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { Link } from "wouter";
+import { SeoHead } from "../components/seo-head";
 
 const WHY_KAFU: { icon: ReactElement; title: string; desc: string }[] = [
   {
@@ -89,6 +90,12 @@ const STEPS = [
 export default function InternationalStudyPage() {
   return (
     <div className="min-h-screen bg-white">
+      <SeoHead
+        title="Study at KAFU as an International Student — Kaimosi Friends University"
+        description="Apply to KAFU from anywhere in the world. Accredited degree programmes, affordable tuition, rich campus life in Western Kenya. English-medium instruction."
+        path="/international/study"
+        breadcrumbs={[{ name: "International", path: "/international" }, { name: "Study at KAFU", path: "/international/study" }]}
+      />
       {/* Header */}
       <section
         className="text-white py-16"

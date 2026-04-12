@@ -2,6 +2,7 @@ import { Link, useParams } from "wouter";
 import { useAnnouncementDetail } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
 import { Calendar, Building2, Tag, ChevronRight, ArrowLeft, AlertTriangle, Bell, Download, ArrowRight } from "lucide-react";
+import { SeoHead } from "@/components/seo-head";
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -41,6 +42,12 @@ export default function AnnouncementDetail() {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
+      <SeoHead
+        title={`${announcement.title} — KAFU Announcements`}
+        description={announcement.content?.slice(0, 155) ?? "Official announcement from Kaimosi Friends University."}
+        path={`/announcements/${announcement.slug}`}
+        breadcrumbs={[{ name: "Announcements", path: "/announcements" }, { name: announcement.title, path: `/announcements/${announcement.slug}` }]}
+      />
       {/* Breadcrumb */}
       <div className="border-b bg-secondary/30">
         <div className="container mx-auto px-4 py-3 flex items-center gap-2 text-sm text-muted-foreground">

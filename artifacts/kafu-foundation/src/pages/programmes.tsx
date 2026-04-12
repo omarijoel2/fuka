@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { useProgrammes, useSchools } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
+import { SeoHead } from "@/components/seo-head";
 import {
   Search,
   BookOpen,
@@ -54,6 +55,12 @@ export default function Programmes() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title="Academic Programmes — Kaimosi Friends University"
+        description="Browse KAFU's academic programmes — undergraduate, postgraduate, and doctoral degrees in Business, Education, Computing, Science, and Health Sciences."
+        path="/programmes"
+        breadcrumbs={[{ name: "Programmes", path: "/programmes" }]}
+      />
       {/* Hero */}
       <div className="bg-primary text-primary-foreground relative overflow-hidden">
         <div

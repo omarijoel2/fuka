@@ -343,6 +343,7 @@ export interface ResearchProject {
   theme?: { name: string; slug: string; colour: string };
   publications?: ResearchPublication[];
   grant?: { name: string; funder: string; amount: number; currency: string; status: string };
+  seo_meta?: { title?: string; description?: string } | null;
 }
 
 export interface ResearchPublication {
@@ -364,6 +365,7 @@ export interface ResearchPublication {
   is_featured: boolean;
   citation: string;
   project?: { id: number; slug: string; title: string; theme?: { name: string; colour: string } };
+  seo_meta?: { title?: string; description?: string } | null;
 }
 
 export interface ResearchGrant {
@@ -534,6 +536,7 @@ export interface RepositoryItem {
   downloads: number;
   views: number;
   status: RepoStatus;
+  seo_meta?: { title?: string; description?: string } | null;
   related?: Pick<RepositoryItem, 'id' | 'slug' | 'title' | 'type' | 'year' | 'authors'>[];
 }
 

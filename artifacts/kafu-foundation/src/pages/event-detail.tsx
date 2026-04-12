@@ -2,6 +2,7 @@ import { Link, useParams } from "wouter";
 import { useEventDetail } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Clock, Tag, ChevronRight, ArrowLeft, ExternalLink } from "lucide-react";
+import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -48,8 +49,35 @@ export default function EventDetail() {
   const isMultiDay = event.end_date && event.end_date !== event.date;
   const isPast = event.status === "past";
 
+  const eventJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: event.title,
+    description: event.description,
+    startDate: event.date,
+    endDate: event.end_date ?? event.date,
+    location: {
+      "@type": "Place",
+      name: event.venue ?? "Kaimosi Friends University",
+      address: { "@type": "PostalAddress", addressLocality: "Kaimosi", addressCountry: "KE" },
+    },
+    organizer: ORG_JSONLD,
+    eventStatus: isPast
+      ? "https://schema.org/EventPostponed"
+      : "https://schema.org/EventScheduled",
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    url: `https://kafu.ac.ke/events/${slug}`,
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
+      <SeoHead
+        title={event.title}
+        description={event.description}
+        path={`/events/${slug}`}
+        breadcrumbs={[{ name: "Events", path: "/events" }, { name: event.title }]}
+        jsonLd={eventJsonLd}
+      />
       {/* Breadcrumb */}
       <div className="border-b bg-secondary/30">
         <div className="container mx-auto px-4 py-3 flex items-center gap-2 text-sm text-muted-foreground">

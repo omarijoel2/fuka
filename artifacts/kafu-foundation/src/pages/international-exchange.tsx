@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { useExchangeProgrammes } from "../lib/api-hooks";
 import type { ExchangeType, ExchangeStatus } from "../lib/api-types";
+import { SeoHead } from "../components/seo-head";
 
 const TYPE_LABELS: Record<ExchangeType, string> = {
   student_exchange: "Student Exchange",
@@ -56,6 +57,12 @@ export default function InternationalExchangePage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <SeoHead
+        title="Student Exchange Programmes — Kaimosi Friends University"
+        description="Study abroad, attend KAFU as an exchange student, or apply for a KAFU fellowship. Explore our Erasmus+, bilateral exchange, and short-programme options."
+        path="/international/exchange"
+        breadcrumbs={[{ name: "International", path: "/international" }, { name: "Exchange Programmes", path: "/international/exchange" }]}
+      />
       {/* Header */}
       <section className="text-white py-16" style={{ backgroundColor: "#1A5C38" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

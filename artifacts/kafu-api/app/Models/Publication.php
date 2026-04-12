@@ -10,11 +10,13 @@ class Publication extends Model
         'title', 'slug', 'authors', 'year', 'journal', 'publisher', 'doi', 'url',
         'type', 'abstract', 'indexed_in', 'volume', 'issue', 'pages',
         'citation_key', 'project_id', 'is_published', 'is_featured',
+        'seo_meta',
     ];
 
     protected $casts = [
         'authors' => 'array',
         'indexed_in' => 'array',
+        'seo_meta' => 'array',
         'is_published' => 'boolean',
         'is_featured' => 'boolean',
         'year' => 'integer',

@@ -172,14 +172,14 @@ export function apiPutResearchTheme(id: number, body: unknown) { return apiPut(`
 export function apiDeleteResearchTheme(id: number) { return apiDelete(`/research/themes/${id}`); }
 
 export function apiGetResearchProjects(params?: Record<string, string | number | undefined>) { return apiGet("/research/projects", params); }
-export function apiPostResearchProject(body: unknown) { return apiPost("/research/projects", body); }
-export function apiPutResearchProject(id: number, body: unknown) { return apiPut(`/research/projects/${id}`, body); }
-export function apiDeleteResearchProject(id: number) { return apiDelete(`/research/projects/${id}`); }
+export function apiPostResearchProject(body: unknown) { return apiPost("/admin/research/projects", body); }
+export function apiPutResearchProject(id: number, body: unknown) { return apiPut(`/admin/research/projects/${id}`, body); }
+export function apiDeleteResearchProject(id: number) { return apiDelete(`/admin/research/projects/${id}`); }
 
 export function apiGetPublications(params?: Record<string, string | number | undefined>) { return apiGet("/research/publications", params); }
-export function apiPostPublication(body: unknown) { return apiPost("/research/publications", body); }
-export function apiPutPublication(id: number, body: unknown) { return apiPut(`/research/publications/${id}`, body); }
-export function apiDeletePublication(id: number) { return apiDelete(`/research/publications/${id}`); }
+export function apiPostPublication(body: unknown) { return apiPost("/admin/research/publications", body); }
+export function apiPutPublication(id: number, body: unknown) { return apiPut(`/admin/research/publications/${id}`, body); }
+export function apiDeletePublication(id: number) { return apiDelete(`/admin/research/publications/${id}`); }
 
 export function apiGetResearchGrants(params?: Record<string, string | number | undefined>) { return apiGet("/research/grants", params); }
 export function apiPostResearchGrant(body: unknown) { return apiPost("/research/grants", body); }

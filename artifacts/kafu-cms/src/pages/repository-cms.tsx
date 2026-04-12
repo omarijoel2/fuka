@@ -34,6 +34,7 @@ interface RepositoryItem {
   download_count: number;
   is_featured: boolean;
   sort_order: number;
+  seo_meta?: { title?: string; description?: string } | null;
 }
 
 const TYPE_LABELS: Record<string, string> = {
@@ -83,6 +84,8 @@ const DEPARTMENTS: Record<string, string[]> = {
 const EMPTY_FORM = {
   title: "",
   slug: "",
+  meta_title: "",
+  meta_description: "",
   abstract: "",
   type: "thesis",
   department: "",
@@ -192,6 +195,8 @@ export default function RepositoryCmsPage() {
       download_count: item.download_count,
       is_featured: item.is_featured,
       sort_order: item.sort_order,
+      meta_title: item.seo_meta?.title || "",
+      meta_description: item.seo_meta?.description || "",
     });
     setShowModal(true);
   }
@@ -215,6 +220,9 @@ export default function RepositoryCmsPage() {
         authors: form.authors_raw.split(";").map((s) => s.trim()).filter(Boolean),
         supervisors: form.supervisors_raw.split(";").map((s) => s.trim()).filter(Boolean),
         keywords: form.keywords_raw.split(",").map((s) => s.trim()).filter(Boolean),
+        seo_meta: (form.meta_title || form.meta_description)
+          ? { title: form.meta_title || form.title, description: form.meta_description || form.abstract?.slice(0, 155) }
+          : null,
       };
       if (editingItem) {
         await apiFetch(`/repository/${editingItem.id}`, {
@@ -730,6 +738,35 @@ export default function RepositoryCmsPage() {
                   <div>
                     <label className="block text-xs font-medium text-gray-600 mb-1">Sort Order</label>
                     <input data-testid="input-repo-sort" type="number" value={form.sort_order} onChange={(e) => setField("sort_order", parseInt(e.target.value) || 0)} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                  </div>
+                </div>
+              </section>
+
+              {/* SEO Overrides */}
+              <section className="space-y-4">
+                <h3 className="text-sm font-semibold text-gray-800 border-b pb-2">SEO Overrides <span className="font-normal text-gray-500">(optional — defaults to title/abstract)</span></h3>
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Meta Title</label>
+                    <input
+                      type="text"
+                      value={form.meta_title}
+                      onChange={(e) => setField("meta_title", e.target.value)}
+                      placeholder={form.title || "Auto-generated from title"}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      data-testid="input-meta-title"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Meta Description</label>
+                    <textarea
+                      rows={2}
+                      value={form.meta_description}
+                      onChange={(e) => setField("meta_description", e.target.value)}
+                      placeholder="Auto-generated from abstract"
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      data-testid="input-meta-desc"
+                    />
                   </div>
                 </div>
               </section>

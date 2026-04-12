@@ -12,12 +12,13 @@ class RepositoryItem extends Model
         'volume', 'issue', 'pages', 'doi', 'isbn_issn', 'file_url',
         'file_size_kb', 'language', 'license', 'access', 'embargo_until',
         'funded_by', 'student_name', 'supervisor', 'degree',
-        'citation_count', 'downloads', 'views', 'status',
+        'citation_count', 'downloads', 'views', 'status', 'seo_meta',
     ];
 
     protected $casts = [
         'authors'  => 'array',
         'keywords' => 'array',
+        'seo_meta' => 'array',
         'embargo_until' => 'date',
     ];
 

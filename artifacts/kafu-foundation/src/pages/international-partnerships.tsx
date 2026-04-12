@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "wouter";
 import { useInternationalPartnerships } from "../lib/api-hooks";
 import type { PartnerType } from "../lib/api-types";
+import { SeoHead } from "../components/seo-head";
 
 const TYPE_LABELS: Record<string, string> = {
   university: "University",
@@ -81,6 +82,12 @@ export default function InternationalPartnershipsPage() {
 
   return (
     <div className="min-h-screen bg-white">
+      <SeoHead
+        title="International Partnerships — Kaimosi Friends University"
+        description="KAFU's growing network of international academic partnerships — joint research, faculty exchange, curriculum development, and global student mobility programmes."
+        path="/international/partnerships"
+        breadcrumbs={[{ name: "International", path: "/international" }, { name: "Partnerships", path: "/international/partnerships" }]}
+      />
       {/* Header */}
       <section className="text-white py-16" style={{ backgroundColor: "#1A5C38" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

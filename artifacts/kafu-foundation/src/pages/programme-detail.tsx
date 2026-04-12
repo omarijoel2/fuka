@@ -1,6 +1,7 @@
 import { useRoute, Link } from "wouter";
 import { useSchool, useProgrammeDetail } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
+import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import {
   ArrowLeft,
   BookOpen,
@@ -58,8 +59,35 @@ export default function ProgrammeDetailPage() {
   const duration = baseProgramme?.duration ?? "Refer to school";
   const level = baseProgramme?.level ?? "";
 
+  const courseJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Course",
+    name: baseProgramme?.name ?? code,
+    description: detail?.description ?? baseProgramme?.description ?? `Study ${baseProgramme?.name ?? code} at Kaimosi Friends University.`,
+    provider: ORG_JSONLD,
+    courseCode: code,
+    educationalLevel: LEVEL_LABELS[level] ?? level,
+    url: `https://kafu.ac.ke/programmes/${school.toLowerCase()}/${code}`,
+    hasCourseInstance: {
+      "@type": "CourseInstance",
+      courseMode: "Blended",
+      duration,
+    },
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title={`${baseProgramme?.name ?? code} — ${SCHOOL_NAMES[school] ?? school} | KAFU`}
+        description={detail?.description ?? baseProgramme?.description ?? `Study ${baseProgramme?.name ?? code} at Kaimosi Friends University. ${LEVEL_LABELS[level] ?? ""} programme offered by the ${SCHOOL_NAMES[school] ?? school}.`}
+        path={`/programmes/${school.toLowerCase()}/${code}`}
+        breadcrumbs={[
+          { name: "Programmes", path: "/programmes" },
+          { name: SCHOOL_NAMES[school] ?? school, path: `/schools/${school.toLowerCase()}` },
+          { name: baseProgramme?.name ?? code },
+        ]}
+        jsonLd={courseJsonLd}
+      />
       {/* Hero */}
       <div className="bg-primary text-primary-foreground relative overflow-hidden">
         <div

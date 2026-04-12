@@ -6,8 +6,9 @@ import {
 import { FlaskConical, Plus, Edit2, Trash2, X, RefreshCw, Search } from "lucide-react";
 
 interface Theme { id: number; name: string; colour: string; }
+interface SeoMeta { title?: string; description?: string; }
 interface Project {
-  id: number; slug: string; title: string; abstract: string;
+  id: number; slug: string; title: string; abstract: string; seo_meta?: SeoMeta;
   department: string; lead_researcher: string; status: string;
   start_date?: string; end_date?: string; funding_source?: string;
   is_featured: boolean; theme_id?: number; sdg_goals: number[];
@@ -36,6 +37,8 @@ function ProjectModal({ project, themes, onClose, onSaved }: {
     theme_id: project?.theme_id ?? project?.theme?.id ?? "",
     is_featured: project?.is_featured ?? false,
     sdg_goals: project?.sdg_goals ?? [] as number[],
+    meta_title: project?.seo_meta?.title ?? "",
+    meta_description: project?.seo_meta?.description ?? "",
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -47,7 +50,13 @@ function ProjectModal({ project, themes, onClose, onSaved }: {
   const save = async (e: React.FormEvent) => {
     e.preventDefault(); setSaving(true); setError("");
     try {
-      const payload = { ...form, theme_id: form.theme_id || null };
+      const payload = {
+        ...form,
+        theme_id: form.theme_id || null,
+        seo_meta: (form.meta_title || form.meta_description)
+          ? { title: form.meta_title || form.title, description: form.meta_description || form.abstract?.slice(0, 155) }
+          : null,
+      };
       if (isNew) await apiPostResearchProject(payload);
       else await apiPutResearchProject(project!.id!, payload);
       onSaved(); onClose();
@@ -141,6 +150,23 @@ function ProjectModal({ project, themes, onClose, onSaved }: {
               onChange={(e) => setForm((f) => ({ ...f, is_featured: e.target.checked }))}
               className="rounded" data-testid="checkbox-featured" />
             <label htmlFor="is_featured" className="text-sm">Feature on Research Overview page</label>
+          </div>
+          <div className="border-t pt-4 space-y-3">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">SEO Overrides <span className="font-normal normal-case">(optional — defaults to title/abstract)</span></p>
+            <div>
+              <label className="block text-sm font-medium mb-1">Meta Title</label>
+              <input value={form.meta_title} onChange={(e) => setForm((f) => ({ ...f, meta_title: e.target.value }))}
+                placeholder={form.title || "Auto-generated from title"}
+                className="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                data-testid="input-meta-title" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Meta Description</label>
+              <textarea rows={2} value={form.meta_description} onChange={(e) => setForm((f) => ({ ...f, meta_description: e.target.value }))}
+                placeholder="Auto-generated from abstract"
+                className="w-full px-3 py-2 rounded-lg border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+                data-testid="input-meta-desc" />
+            </div>
           </div>
           <div className="flex gap-3 pt-2">
             <button type="submit" disabled={saving}

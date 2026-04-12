@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useStats, useNews, useSchools, useEvents, useOpportunities, useProgrammes } from "@/lib/api-hooks";
+import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import {
   Calendar,
   MapPin,
@@ -171,8 +172,29 @@ export default function Home() {
     SHS: "SHS",
   };
 
+  const websiteJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https://kafu.ac.ke/#website",
+    url: "https://kafu.ac.ke",
+    name: "Kaimosi Friends University",
+    description: "Spring of Knowledge — A Quaker-founded public university in Western Kenya",
+    publisher: { "@id": "https://kafu.ac.ke/#organization" },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: { "@type": "EntryPoint", urlTemplate: "https://kafu.ac.ke/programmes?search={search_term_string}" },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
   return (
     <div className="flex flex-col">
+      <SeoHead
+        title="Kaimosi Friends University — Spring of Knowledge"
+        description="Kaimosi Friends University (KAFU) — Spring of Knowledge. A Quaker-founded public university in Kaimosi, Western Kenya offering undergraduate, postgraduate, and doctoral programmes in Sciences, Technology, Business, Education, and Health."
+        path="/"
+        jsonLd={[ORG_JSONLD, websiteJsonLd]}
+      />
 
       {/* ─── HERO ─── */}
       <section className="relative min-h-[620px] md:min-h-[700px] flex items-center justify-center overflow-hidden bg-primary">

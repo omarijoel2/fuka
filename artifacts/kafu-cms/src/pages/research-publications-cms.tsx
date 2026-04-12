@@ -4,10 +4,11 @@ import { BookOpen, Plus, Edit2, Trash2, X, RefreshCw, Search, ExternalLink } fro
 
 interface Project { id: number; title: string; }
 interface Author { name: string; affiliation?: string; }
+interface SeoMeta { title?: string; description?: string; }
 interface Publication {
   id: number; slug: string; title: string; year: number; journal?: string; publisher?: string;
   doi?: string; url?: string; type: string; abstract?: string; indexed_in: string[];
-  volume?: string; issue?: string; pages?: string; is_featured: boolean;
+  volume?: string; issue?: string; pages?: string; is_featured: boolean; seo_meta?: SeoMeta;
   authors: Author[]; citation: string; research_project_id?: number;
   project?: { title: string };
 }
@@ -39,6 +40,8 @@ function PubModal({ pub, projects, onClose, onSaved }: {
     authors_raw: pub?.authors?.map((a) => a.name).join("; ") ?? "",
     is_featured: pub?.is_featured ?? false,
     research_project_id: pub?.research_project_id ?? "",
+    meta_title: pub?.seo_meta?.title ?? "",
+    meta_description: pub?.seo_meta?.description ?? "",
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -51,7 +54,14 @@ function PubModal({ pub, projects, onClose, onSaved }: {
     e.preventDefault(); setSaving(true); setError("");
     try {
       const authors = form.authors_raw.split(";").map((n) => ({ name: n.trim() })).filter((a) => a.name);
-      const payload = { ...form, authors, research_project_id: form.research_project_id || null };
+      const payload = {
+        ...form,
+        authors,
+        research_project_id: form.research_project_id || null,
+        seo_meta: (form.meta_title || form.meta_description)
+          ? { title: form.meta_title || form.title, description: form.meta_description || form.abstract?.slice(0, 155) }
+          : null,
+      };
       if (isNew) await apiPostPublication(payload);
       else await apiPutPublication(pub!.id!, payload);
       onSaved(); onClose();
@@ -171,6 +181,23 @@ function PubModal({ pub, projects, onClose, onSaved }: {
               onChange={(e) => setForm((f) => ({ ...f, is_featured: e.target.checked }))}
               className="rounded" data-testid="checkbox-featured" />
             <label htmlFor="is_featured" className="text-sm">Feature on Research Overview page</label>
+          </div>
+          <div className="border-t pt-4 space-y-3">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">SEO Overrides <span className="font-normal normal-case">(optional — defaults to title/abstract)</span></p>
+            <div>
+              <label className="block text-sm font-medium mb-1">Meta Title</label>
+              <input value={form.meta_title} onChange={(e) => setForm((f) => ({ ...f, meta_title: e.target.value }))}
+                placeholder={form.title || "Auto-generated from title"}
+                className="w-full px-3 py-2 rounded-lg border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                data-testid="input-meta-title" />
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Meta Description</label>
+              <textarea rows={2} value={form.meta_description} onChange={(e) => setForm((f) => ({ ...f, meta_description: e.target.value }))}
+                placeholder="Auto-generated from abstract"
+                className="w-full px-3 py-2 rounded-lg border text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary/30"
+                data-testid="input-meta-desc" />
+            </div>
           </div>
           <div className="flex gap-3 pt-2">
             <button type="submit" disabled={saving}

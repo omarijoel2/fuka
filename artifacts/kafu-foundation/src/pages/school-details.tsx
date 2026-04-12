@@ -2,6 +2,7 @@ import { useRoute, Link } from "wouter";
 import { useSchool, useProgrammes } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { SeoHead } from "@/components/seo-head";
 import { ArrowLeft, BookOpen, User, GraduationCap, ChevronRight, Clock, ExternalLink } from "lucide-react";
 
 function progSlug(code: string): string {
@@ -41,6 +42,12 @@ export default function SchoolDetails() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title={school ? `${school.name} — Kaimosi Friends University` : "School — Kaimosi Friends University"}
+        description={school?.description?.slice(0, 155) ?? "School at Kaimosi Friends University — programmes, staff, research, and more."}
+        path={`/schools/${code}`}
+        breadcrumbs={[{ name: "Schools", path: "/schools" }, { name: school?.name ?? code, path: `/schools/${code}` }]}
+      />
       {/* Hero */}
       {schoolLoading ? (
         <div className="h-64 bg-muted animate-pulse" />

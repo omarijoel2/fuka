@@ -1,9 +1,16 @@
 import { Users, Library, Activity, HeartHandshake, ShieldCheck, Laptop } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SeoHead } from "@/components/seo-head";
 
 export default function StudentServices() {
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title="Student Services — Kaimosi Friends University"
+        description="KAFU student support services — academic registry, library, health services, counselling, accommodation, career services, and digital learning tools."
+        path="/student-services"
+        breadcrumbs={[{ name: "Student Services", path: "/student-services" }]}
+      />
       <div className="bg-primary text-primary-foreground py-16 md:py-24">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-4">Student Life & Services</h1>

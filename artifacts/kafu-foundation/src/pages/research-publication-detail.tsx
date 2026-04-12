@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "wouter";
 import { useResearchPublication } from "@/lib/api-hooks";
 import { ChevronRight, ExternalLink, BookOpen, Copy, Check } from "lucide-react";
+import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
 
 const TYPE_LABELS: Record<string, string> = {
   journal: "Journal Article", conference: "Conference Paper", book_chapter: "Book Chapter",
@@ -32,8 +33,33 @@ export default function ResearchPublicationDetail({ slug }: { slug: string }) {
     );
   }
 
+  const pubJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "ScholarlyArticle",
+    headline: pub.title,
+    abstract: pub.abstract ?? undefined,
+    author: pub.authors?.map((a: string) => ({ "@type": "Person", name: a })),
+    datePublished: String(pub.year),
+    publisher: ORG_JSONLD,
+    ...(pub.doi ? { identifier: `https://doi.org/${pub.doi}`, sameAs: `https://doi.org/${pub.doi}` } : {}),
+    url: `https://kafu.ac.ke/research/publications/${pub.id}`,
+    inLanguage: "en",
+    isPartOf: pub.journal ? { "@type": "Periodical", name: pub.journal } : undefined,
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title={pub.seo_meta?.title ?? `${pub.title} | KAFU Research`}
+        description={pub.seo_meta?.description ?? pub.abstract?.slice(0, 160) ?? `${TYPE_LABELS[pub.type] ?? pub.type} published by Kaimosi Friends University researchers in ${pub.year}.`}
+        path={`/research/publications/${pub.id}`}
+        breadcrumbs={[
+          { name: "Research", path: "/research" },
+          { name: "Publications", path: "/research/publications" },
+          { name: pub.title },
+        ]}
+        jsonLd={pubJsonLd}
+      />
       {/* Header */}
       <div className="relative bg-primary text-primary-foreground py-16 overflow-hidden">
         <div className="absolute inset-0 bg-primary/90" />

@@ -1,5 +1,6 @@
 import type { ReactElement } from "react";
 import { Link } from "wouter";
+import { SeoHead } from "../components/seo-head";
 
 const VISA_CATEGORIES = [
   {
@@ -118,6 +119,12 @@ const SUPPORT_SERVICES = [
 export default function InternationalVisaPage() {
   return (
     <div className="min-h-screen bg-white">
+      <SeoHead
+        title="Visa & Immigration — Kaimosi Friends University"
+        description="Step-by-step visa and immigration guidance for international students at KAFU. Kenya student pass, Class G permit, required documents, and student support contacts."
+        path="/international/visa"
+        breadcrumbs={[{ name: "International", path: "/international" }, { name: "Visa & Immigration", path: "/international/visa" }]}
+      />
       {/* Header */}
       <section className="text-white py-16" style={{ backgroundColor: "#1A5C38" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

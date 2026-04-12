@@ -1,6 +1,7 @@
 import { useContactInfo } from "@/lib/api-hooks";
 import { MapPin, Phone, Mail, Send, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SeoHead } from "@/components/seo-head";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -29,6 +30,12 @@ export default function Contact() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title="Contact KAFU — Kaimosi Friends University"
+        description="Get in touch with Kaimosi Friends University. P.O Box 385, Kaimosi, Western Kenya. Tel: +254 777 373 633 | info@kafu.ac.ke"
+        path="/contact"
+        breadcrumbs={[{ name: "Contact", path: "/contact" }]}
+      />
       <div className="bg-primary text-primary-foreground py-16">
         <div className="container mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">Contact Us</h1>

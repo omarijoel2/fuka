@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "wouter";
 import { useStaff } from "@/lib/api-hooks";
 import type { StaffMember } from "@/lib/api-types";
+import { SeoHead } from "@/components/seo-head";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -209,6 +210,12 @@ export default function StaffDirectoryPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title="Staff Directory — Kaimosi Friends University"
+        description="Meet KAFU's academic and administrative staff — professors, senior lecturers, researchers, and professional staff across all five schools."
+        path="/staff"
+        breadcrumbs={[{ name: "Staff Directory", path: "/staff" }]}
+      />
       {/* Hero */}
       <div className="bg-primary text-primary-foreground relative overflow-hidden">
         <div

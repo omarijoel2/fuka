@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { useNews } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
 import { Calendar, Search, Tag, ArrowRight, User, ChevronRight } from "lucide-react";
+import { SeoHead } from "@/components/seo-head";
 
 const CATEGORIES = ["All", "Research & Innovation", "Institutional", "Academic", "Outreach", "Partnerships", "Leadership", "Events"];
 
@@ -30,6 +31,12 @@ export default function News() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <SeoHead
+        title="News — Kaimosi Friends University"
+        description="Latest news from Kaimosi Friends University — research breakthroughs, institutional milestones, academic achievements, and community impact stories."
+        path="/news"
+        breadcrumbs={[{ name: "News", path: "/news" }]}
+      />
       {/* Header */}
       <div className="relative bg-primary text-primary-foreground py-16 md:py-20 overflow-hidden">
         <img

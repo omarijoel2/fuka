@@ -2,6 +2,7 @@ import { Link, useParams } from "wouter";
 import { useNewsDetail, useNews } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
 import { Calendar, User, Tag, ChevronRight, ArrowLeft, ArrowRight, Share2 } from "lucide-react";
+import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -40,8 +41,32 @@ export default function NewsDetail() {
 
   const related = allNews?.filter((a) => a.id !== article.id && article.related?.includes(a.id)).slice(0, 3) ?? [];
 
+  const newsJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: article.title,
+    description: article.excerpt,
+    image: article.imageUrl ? [article.imageUrl] : undefined,
+    author: { "@type": "Person", name: article.author },
+    publisher: ORG_JSONLD,
+    datePublished: article.date,
+    dateModified: article.date,
+    url: `https://kafu.ac.ke/news/${slug}`,
+    keywords: article.tags?.join(", "),
+    articleSection: article.category,
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
+      <SeoHead
+        title={article.title}
+        description={article.excerpt}
+        image={article.imageUrl ?? undefined}
+        path={`/news/${slug}`}
+        type="article"
+        breadcrumbs={[{ name: "News", path: "/news" }, { name: article.title }]}
+        jsonLd={newsJsonLd}
+      />
       {/* Breadcrumb */}
       <div className="border-b bg-secondary/30">
         <div className="container mx-auto px-4 py-3 flex items-center gap-2 text-sm text-muted-foreground">

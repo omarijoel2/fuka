@@ -2605,6 +2605,7 @@ Route::get('/research/projects/{slug}', function (string $slug) {
             'currency' => $project->grant->currency,
             'status' => $project->grant->status,
         ] : null,
+        'seo_meta' => $project->seo_meta,
     ]);
 });
 
@@ -2678,6 +2679,7 @@ Route::get('/research/publications/{slug}', function (string $slug) {
             'title' => $p->project->title,
             'theme' => $p->project->theme ? ['name' => $p->project->theme->name, 'colour' => $p->project->theme->colour] : null,
         ] : null,
+        'seo_meta' => $p->seo_meta,
     ]);
 });
 
@@ -3035,6 +3037,9 @@ Route::post('/admin/repository', function (\Illuminate\Http\Request $request) {
         'supervisor'      => 'nullable|string',
         'degree'          => 'nullable|string',
         'status'          => 'nullable|in:draft,under_review,approved,published,withdrawn',
+        'seo_meta'        => 'nullable|array',
+        'seo_meta.title'  => 'nullable|string|max:255',
+        'seo_meta.description' => 'nullable|string|max:500',
     ]);
     $item = \App\Models\RepositoryItem::create($data);
     return response()->json($item, 201);
@@ -3074,6 +3079,9 @@ Route::put('/admin/repository/{id}', function (\Illuminate\Http\Request $request
         'supervisor'      => 'nullable|string',
         'degree'          => 'nullable|string',
         'status'          => 'nullable|in:draft,under_review,approved,published,withdrawn',
+        'seo_meta'        => 'nullable|array',
+        'seo_meta.title'  => 'nullable|string|max:255',
+        'seo_meta.description' => 'nullable|string|max:500',
     ]);
     $item->update($data);
     return response()->json($item);
@@ -3082,6 +3090,178 @@ Route::put('/admin/repository/{id}', function (\Illuminate\Http\Request $request
 Route::delete('/admin/repository/{id}', function (\Illuminate\Http\Request $request, int $id) {
     \App\Http\Middleware\AdminAuth::check($request);
     \App\Models\RepositoryItem::findOrFail($id)->delete();
+    return response()->json(['success' => true]);
+});
+
+// ─── Admin: Research Projects ─────────────────────────────────────────────────
+
+Route::post('/admin/research/projects', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $data = $request->validate([
+        'title'              => 'required|string|max:500',
+        'slug'               => 'nullable|string|max:500',
+        'abstract'           => 'required|string',
+        'department'         => 'nullable|string|max:200',
+        'lead_researcher'    => 'nullable|string|max:300',
+        'theme_id'           => 'nullable|integer|exists:research_themes,id',
+        'status'             => 'required|in:planned,active,completed,suspended',
+        'start_date'         => 'nullable|date',
+        'end_date'           => 'nullable|date',
+        'funding_source'     => 'nullable|string|max:300',
+        'sdg_goals'          => 'nullable|array',
+        'sdg_goals.*'        => 'integer|min:1|max:17',
+        'is_featured'        => 'nullable|boolean',
+        'seo_meta'           => 'nullable|array',
+        'seo_meta.title'     => 'nullable|string|max:255',
+        'seo_meta.description' => 'nullable|string|max:500',
+    ]);
+    $slug = $data['slug'] ?? \Illuminate\Support\Str::slug($data['title']);
+    $base = $slug;
+    $i = 2;
+    while (\App\Models\ResearchProject::where('slug', $slug)->exists()) {
+        $slug = $base . '-' . $i++;
+    }
+    $project = \App\Models\ResearchProject::create([
+        'title'               => $data['title'],
+        'slug'                => $slug,
+        'abstract'            => $data['abstract'],
+        'department'          => $data['department'] ?? null,
+        'lead_researcher_name' => $data['lead_researcher'] ?? null,
+        'theme_id'            => $data['theme_id'] ?? null,
+        'status'              => $data['status'],
+        'start_date'          => $data['start_date'] ?? null,
+        'end_date'            => $data['end_date'] ?? null,
+        'funding_source'      => $data['funding_source'] ?? null,
+        'sdg_goals'           => $data['sdg_goals'] ?? [],
+        'is_featured'         => $data['is_featured'] ?? false,
+        'is_published'        => true,
+        'seo_meta'            => $data['seo_meta'] ?? null,
+    ]);
+    return response()->json($project->load('theme'), 201);
+});
+
+Route::put('/admin/research/projects/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $project = \App\Models\ResearchProject::findOrFail($id);
+    $data = $request->validate([
+        'title'              => 'sometimes|string|max:500',
+        'abstract'           => 'sometimes|string',
+        'department'         => 'nullable|string|max:200',
+        'lead_researcher'    => 'nullable|string|max:300',
+        'theme_id'           => 'nullable|integer',
+        'status'             => 'sometimes|in:planned,active,completed,suspended',
+        'start_date'         => 'nullable|date',
+        'end_date'           => 'nullable|date',
+        'funding_source'     => 'nullable|string|max:300',
+        'sdg_goals'          => 'nullable|array',
+        'sdg_goals.*'        => 'integer|min:1|max:17',
+        'is_featured'        => 'nullable|boolean',
+        'seo_meta'           => 'nullable|array',
+        'seo_meta.title'     => 'nullable|string|max:255',
+        'seo_meta.description' => 'nullable|string|max:500',
+    ]);
+    if (isset($data['lead_researcher'])) {
+        $data['lead_researcher_name'] = $data['lead_researcher'];
+        unset($data['lead_researcher']);
+    }
+    $project->update($data);
+    return response()->json($project->load('theme'));
+});
+
+Route::delete('/admin/research/projects/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    \App\Models\ResearchProject::findOrFail($id)->delete();
+    return response()->json(['success' => true]);
+});
+
+// ─── Admin: Research Publications ─────────────────────────────────────────────
+
+Route::post('/admin/research/publications', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $data = $request->validate([
+        'title'               => 'required|string|max:500',
+        'slug'                => 'nullable|string|max:500',
+        'authors'             => 'required|array',
+        'year'                => 'required|integer|min:1980|max:2030',
+        'type'                => 'required|in:journal,conference,book_chapter,thesis,report,book,preprint',
+        'journal'             => 'nullable|string|max:300',
+        'publisher'           => 'nullable|string|max:300',
+        'doi'                 => 'nullable|string|max:200',
+        'url'                 => 'nullable|string|max:500',
+        'abstract'            => 'nullable|string',
+        'volume'              => 'nullable|string|max:50',
+        'issue'               => 'nullable|string|max:50',
+        'pages'               => 'nullable|string|max:50',
+        'indexed_in'          => 'nullable|array',
+        'research_project_id' => 'nullable|integer|exists:research_projects,id',
+        'is_featured'         => 'nullable|boolean',
+        'seo_meta'            => 'nullable|array',
+        'seo_meta.title'      => 'nullable|string|max:255',
+        'seo_meta.description' => 'nullable|string|max:500',
+    ]);
+    $slug = $data['slug'] ?? \Illuminate\Support\Str::slug($data['title']);
+    $base = $slug;
+    $i = 2;
+    while (\App\Models\Publication::where('slug', $slug)->exists()) {
+        $slug = $base . '-' . $i++;
+    }
+    $pub = \App\Models\Publication::create([
+        'title'       => $data['title'],
+        'slug'        => $slug,
+        'authors'     => $data['authors'],
+        'year'        => $data['year'],
+        'type'        => $data['type'],
+        'journal'     => $data['journal'] ?? null,
+        'publisher'   => $data['publisher'] ?? null,
+        'doi'         => $data['doi'] ?? null,
+        'url'         => $data['url'] ?? null,
+        'abstract'    => $data['abstract'] ?? null,
+        'volume'      => $data['volume'] ?? null,
+        'issue'       => $data['issue'] ?? null,
+        'pages'       => $data['pages'] ?? null,
+        'indexed_in'  => $data['indexed_in'] ?? [],
+        'project_id'  => $data['research_project_id'] ?? null,
+        'is_featured' => $data['is_featured'] ?? false,
+        'is_published' => true,
+        'seo_meta'    => $data['seo_meta'] ?? null,
+    ]);
+    return response()->json($pub, 201);
+});
+
+Route::put('/admin/research/publications/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $pub = \App\Models\Publication::findOrFail($id);
+    $data = $request->validate([
+        'title'               => 'sometimes|string|max:500',
+        'authors'             => 'sometimes|array',
+        'year'                => 'sometimes|integer|min:1980|max:2030',
+        'type'                => 'sometimes|in:journal,conference,book_chapter,thesis,report,book,preprint',
+        'journal'             => 'nullable|string|max:300',
+        'publisher'           => 'nullable|string|max:300',
+        'doi'                 => 'nullable|string|max:200',
+        'url'                 => 'nullable|string|max:500',
+        'abstract'            => 'nullable|string',
+        'volume'              => 'nullable|string|max:50',
+        'issue'               => 'nullable|string|max:50',
+        'pages'               => 'nullable|string|max:50',
+        'indexed_in'          => 'nullable|array',
+        'research_project_id' => 'nullable|integer',
+        'is_featured'         => 'nullable|boolean',
+        'seo_meta'            => 'nullable|array',
+        'seo_meta.title'      => 'nullable|string|max:255',
+        'seo_meta.description' => 'nullable|string|max:500',
+    ]);
+    if (array_key_exists('research_project_id', $data)) {
+        $data['project_id'] = $data['research_project_id'];
+        unset($data['research_project_id']);
+    }
+    $pub->update($data);
+    return response()->json($pub);
+});
+
+Route::delete('/admin/research/publications/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    \App\Models\Publication::findOrFail($id)->delete();
     return response()->json(['success' => true]);
 });
 
