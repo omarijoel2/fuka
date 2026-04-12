@@ -1166,4 +1166,35 @@ Route::prefix('admin')->group(function () {
         });
 
     });
+
+    // -------------------------------------------------------------------------
+    // Site Config
+    // -------------------------------------------------------------------------
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/site-config', [\App\Http\Controllers\Admin\SiteConfigController::class, 'all']);
+        Route::get('/site-config/{group}', [\App\Http\Controllers\Admin\SiteConfigController::class, 'getGroup']);
+        Route::put('/site-config/{group}', [\App\Http\Controllers\Admin\SiteConfigController::class, 'updateGroup']);
+
+        // -------------------------------------------------------------------------
+        // Redirects
+        // -------------------------------------------------------------------------
+        Route::get('/redirects', [\App\Http\Controllers\Admin\RedirectController::class, 'index']);
+        Route::post('/redirects', [\App\Http\Controllers\Admin\RedirectController::class, 'store']);
+        Route::get('/redirects/{id}', [\App\Http\Controllers\Admin\RedirectController::class, 'show']);
+        Route::put('/redirects/{id}', [\App\Http\Controllers\Admin\RedirectController::class, 'update']);
+        Route::delete('/redirects/{id}', [\App\Http\Controllers\Admin\RedirectController::class, 'destroy']);
+        Route::post('/redirects/bulk-toggle', [\App\Http\Controllers\Admin\RedirectController::class, 'bulkToggle']);
+
+        // -------------------------------------------------------------------------
+        // Content Health
+        // -------------------------------------------------------------------------
+        Route::get('/content-health', [\App\Http\Controllers\Admin\ContentHealthController::class, 'index']);
+
+        // -------------------------------------------------------------------------
+        // Workflow Queue
+        // -------------------------------------------------------------------------
+        Route::get('/workflow-queue', [\App\Http\Controllers\Admin\WorkflowQueueController::class, 'index']);
+        Route::post('/workflow-queue/{id}/assign', [\App\Http\Controllers\Admin\WorkflowQueueController::class, 'assign']);
+    });
+
 });

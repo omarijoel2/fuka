@@ -25,6 +25,12 @@ import CampusesCmsPage from "@/pages/campuses-cms";
 import OfficesCmsPage from "@/pages/offices-cms";
 import StaffReviewCmsPage from "@/pages/staff-review-cms";
 import StaffAccountsCmsPage from "@/pages/staff-accounts-cms";
+import HomepageManagerPage from "@/pages/homepage-manager";
+import NavigationManagerPage from "@/pages/navigation-manager";
+import SiteControlsPage from "@/pages/site-controls";
+import RedirectsCmsPage from "@/pages/redirects-cms";
+import ContentHealthPage from "@/pages/content-health";
+import WorkflowConsolePage from "@/pages/workflow-console";
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -60,6 +66,12 @@ function AppRoutes() {
         <Route path="/offices" component={OfficesCmsPage} />
         <Route path="/staff-review" component={StaffReviewCmsPage} />
         <Route path="/staff-accounts" component={StaffAccountsCmsPage} />
+        <Route path="/homepage" component={HomepageManagerPage} />
+        <Route path="/navigation" component={NavigationManagerPage} />
+        <Route path="/site-controls" component={SiteControlsPage} />
+        <Route path="/redirects" component={RedirectsCmsPage} />
+        <Route path="/content-health" component={ContentHealthPage} />
+        <Route path="/workflow" component={WorkflowConsolePage} />
         <Route>{() => <DashboardPage />}</Route>
       </Switch>
     </CmsLayout>
