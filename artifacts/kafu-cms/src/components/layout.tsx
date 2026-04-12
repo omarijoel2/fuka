@@ -74,6 +74,8 @@ const navItems: NavItem[] = [
     children: [
       { label: "Staff Profiles", href: "/staff-profiles" },
       { label: "Staff Content", href: "/content?type=staff_profile" },
+      { label: "Submission Review", href: "/staff-review" },
+      { label: "Staff Accounts", href: "/staff-accounts" },
     ],
   },
   {

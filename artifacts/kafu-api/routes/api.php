@@ -1817,6 +1817,49 @@ Route::get('/staff', function (Request $request) {
     return response()->json(['data' => $staff]);
 });
 
+// ── Staff Portal API routes ────────────────────────────────────────
+// Registered here (before the /staff/{slug} wildcard) so the specific
+// portal paths (/staff/login, /staff/me, etc.) are matched first.
+Route::prefix('staff')->group(function () {
+    Route::post('/login',   [\App\Http\Controllers\StaffAuthController::class,    'login']);
+    Route::post('/password/reset-request', [\App\Http\Controllers\StaffAuthController::class, 'resetRequest']);
+    Route::post('/password/reset',         [\App\Http\Controllers\StaffAuthController::class, 'resetConfirm']);
+});
+Route::prefix('staff')->middleware(['auth:sanctum'])->group(function () {
+    Route::get('/me',                         [\App\Http\Controllers\StaffAuthController::class,    'me']);
+    Route::post('/logout',                    [\App\Http\Controllers\StaffAuthController::class,    'logout']);
+    Route::post('/password/change',           [\App\Http\Controllers\StaffAuthController::class,    'changePassword']);
+    Route::get('/profile',                    [\App\Http\Controllers\StaffProfileController::class, 'getProfile']);
+    Route::put('/profile/section/{section}',  [\App\Http\Controllers\StaffProfileController::class, 'updateSection']);
+    Route::post('/profile/submit',            [\App\Http\Controllers\StaffProfileController::class, 'submit']);
+    Route::post('/profile/withdraw',          [\App\Http\Controllers\StaffProfileController::class, 'withdraw']);
+    Route::get('/profile/submissions',        [\App\Http\Controllers\StaffProfileController::class, 'getSubmissions']);
+    Route::post('/upload-photo',              [\App\Http\Controllers\StaffProfileController::class, 'uploadPhoto']);
+    Route::post('/upload-cv',                 [\App\Http\Controllers\StaffProfileController::class, 'uploadCv']);
+    Route::post('/consent/accept',            [\App\Http\Controllers\StaffProfileController::class, 'acceptConsent']);
+});
+Route::prefix('reviewer')->middleware(['auth:sanctum'])->group(function () {
+    Route::get('/queue',                                [\App\Http\Controllers\ReviewerController::class,    'queue']);
+    Route::get('/submissions/{id}',                     [\App\Http\Controllers\ReviewerController::class,    'show']);
+    Route::post('/submissions/{id}/review',             [\App\Http\Controllers\ReviewerController::class,    'review']);
+    Route::post('/submissions/{id}/approve',            [\App\Http\Controllers\ReviewerController::class,    'approve']);
+    Route::post('/submissions/{id}/request-revision',   [\App\Http\Controllers\ReviewerController::class,    'requestRevision']);
+    Route::post('/submissions/{id}/reject',             [\App\Http\Controllers\ReviewerController::class,    'reject']);
+    Route::post('/submissions/{id}/comments',           [\App\Http\Controllers\ReviewerController::class,    'addComment']);
+});
+Route::prefix('admin/staff-accounts')->middleware(['auth:sanctum'])->group(function () {
+    Route::get('/',                     [\App\Http\Controllers\AdminStaffController::class, 'index']);
+    Route::post('/',                    [\App\Http\Controllers\AdminStaffController::class, 'provision']);
+    Route::get('/security-events',      [\App\Http\Controllers\AdminStaffController::class, 'securityEvents']);
+    Route::get('/{id}',                 [\App\Http\Controllers\AdminStaffController::class, 'show']);
+    Route::put('/{id}',                 [\App\Http\Controllers\AdminStaffController::class, 'update']);
+    Route::post('/{id}/lock',           [\App\Http\Controllers\AdminStaffController::class, 'lock']);
+    Route::post('/{id}/unlock',         [\App\Http\Controllers\AdminStaffController::class, 'unlock']);
+    Route::post('/{id}/deactivate',     [\App\Http\Controllers\AdminStaffController::class, 'deactivate']);
+    Route::post('/{id}/reset-password', [\App\Http\Controllers\AdminStaffController::class, 'resetPassword']);
+});
+// ──────────────────────────────────────────────────────────────────
+
 Route::get('/staff/{slug}', function (string $slug) {
     $cmsProfile = CmsContent::where('type', 'staff_profile')
         ->where('slug', $slug)

@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/kafu-staff/"
+title = "KAFU Staff Portal"
+version = "1.0.0"
+id = "artifacts/kafu-staff"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/kafu-staff/" ]
+localPort = 24967
+
+[services.development]
+run = "pnpm --filter @workspace/kafu-staff run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/kafu-staff", "run", "build" ]
+publicDir = "artifacts/kafu-staff/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24967"
+BASE_PATH = "/kafu-staff/"

@@ -23,6 +23,8 @@ class User extends Authenticatable
         'name', 'email', 'password',
         'role', 'department', 'school_code',
         'status', 'last_login_at', 'avatar_url',
+        'payroll_number', 'staff_number', 'title', 'job_title',
+        'first_login_completed', 'failed_login_count', 'locked_at', 'mfa_ready', 'phone',
     ];
 
     /**
@@ -46,7 +48,41 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'last_login_at' => 'datetime',
+            'locked_at' => 'datetime',
+            'first_login_completed' => 'boolean',
+            'mfa_ready' => 'boolean',
+            'failed_login_count' => 'integer',
         ];
+    }
+
+    public function isLocked(): bool
+    {
+        return $this->status === 'locked' || $this->locked_at !== null;
+    }
+
+    public function isActiveStaff(): bool
+    {
+        return $this->status === 'active' && !$this->isLocked();
+    }
+
+    public function consentRecords(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\StaffConsentRecord::class);
+    }
+
+    public function profileSubmissions(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\ProfileSubmission::class);
+    }
+
+    public function latestSubmission(): ?\App\Models\ProfileSubmission
+    {
+        return $this->profileSubmissions()->orderByDesc('version_number')->first();
+    }
+
+    public function hasAcceptedConsent(string $type = 'profile_publication'): bool
+    {
+        return $this->consentRecords()->where('consent_type', $type)->where('is_current', true)->exists();
     }
 
     public function hasRole(string|array $roles): bool

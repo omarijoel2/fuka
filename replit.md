@@ -172,6 +172,37 @@ Full CRUD for: themes, projects, publications, grants, partners. Each supports G
 ### Admin Credentials
 - Email: admin@kafu.ac.ke | Password: KafuAdmin@2026 | Role: super_admin
 
+## MP16 — Staff Account Updater Portal (COMPLETE)
+
+### Staff Portal Frontend (`artifacts/kafu-staff/`)
+- **URL**: /kafu-staff/ (port 24967)
+- **Auth**: Token stored in localStorage (kafu_staff_token, kafu_staff_user)
+- **Pages**: Login, Onboarding (PW change + consent), Dashboard, Profile Editor, Submission History, Review Queue (reviewer+), Account Management (super_admin/ict_admin)
+- **Routing**: wouter with base = import.meta.env.BASE_URL; auth guards in App.tsx
+- **Onboarding flow**: first_login_completed=false → password change; has_consent=false → publication consent acceptance
+- **Profile sections**: personal, bio, qualifications, teaching, research, contact, uploads
+- **Submission workflow**: draft → submitted → under_review → revision_requested/approved; min 40% completeness + consent required to submit
+
+### Backend DB & API (artifacts/kafu-api)
+- **Migrations**: extend_users (staff fields), staff_consent_records, profile_submissions (+ comments), staff_security_events + password_resets
+- **Staff API**: `routes/staff.php` inlined in api.php BEFORE the `/staff/{slug}` wildcard to avoid route shadowing
+  - Public: POST /api/staff/login, /api/staff/password/reset-request, /api/staff/password/reset
+  - Auth: GET /api/staff/me, POST /api/staff/logout, /api/staff/password/change, GET /api/staff/profile, PUT /api/staff/profile/section/{section}, POST /api/staff/profile/submit|withdraw, GET /api/staff/profile/submissions, POST /api/staff/upload-photo|upload-cv, POST /api/staff/consent/accept
+  - Reviewer: GET /api/reviewer/queue, POST /api/reviewer/submissions/{id}/review|approve|request-revision|reject
+  - Admin: GET/POST /api/admin/staff-accounts, POST /api/admin/staff-accounts/{id}/lock|unlock|deactivate|reset-password
+
+### CMS Integration
+- **Submission Review** page added to CMS at `/staff-review` (Academic Profiles sidebar group)
+- **Staff Accounts** management page added to CMS at `/staff-accounts`
+- Both use direct `/api/reviewer` and `/api/admin/staff-accounts` paths (bypass /api/admin prefix)
+
+### Test Credentials (Staff Portal)
+- `dr.jane.oduya@kafu.ac.ke` / `Staff@2026!` — needs onboarding (first_login_completed=false)
+- `prof.john.mutua@kafu.ac.ke` / `Staff@2026!` — fully set up (goes to dashboard directly)
+
+### Route Fix
+The `/api/staff/{slug}` wildcard in api.php shadowed all staff portal routes. Fixed by inlining staff portal routes in api.php before the wildcard, and also fixing staffFetch to only redirect on 401 when a token already existed (not during login itself).
+
 ## Conventions
 
 - No emojis anywhere in UI
