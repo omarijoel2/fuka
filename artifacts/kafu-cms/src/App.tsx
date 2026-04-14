@@ -31,6 +31,7 @@ import SiteControlsPage from "@/pages/site-controls";
 import RedirectsCmsPage from "@/pages/redirects-cms";
 import ContentHealthPage from "@/pages/content-health";
 import WorkflowConsolePage from "@/pages/workflow-console";
+import AdmissionsCmsPage from "@/pages/admissions-cms";
 
 function AppRoutes() {
   const { user } = useAuth();
@@ -71,6 +72,7 @@ function AppRoutes() {
         <Route path="/site-controls" component={SiteControlsPage} />
         <Route path="/redirects" component={RedirectsCmsPage} />
         <Route path="/content-health" component={ContentHealthPage} />
+        <Route path="/admissions" component={AdmissionsCmsPage} />
         <Route path="/workflow" component={WorkflowConsolePage} />
         <Route>{() => <DashboardPage />}</Route>
       </Switch>

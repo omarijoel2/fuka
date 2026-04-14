@@ -3655,17 +3655,30 @@ Route::post('/admissions/documents/upload', function (Request $request) {
     $file = $request->file('certificate');
     $docType = $request->input('document_type', 'certificate');
     $ext = $file->getClientOriginalExtension();
-    $safeName = \Illuminate\Support\Str::uuid() . '.' . $ext;
+    $refId = (string) \Illuminate\Support\Str::uuid();
+    $safeName = $refId . '.' . $ext;
     $stored = $file->storeAs('admissions-uploads', $safeName);
+
+    $sizeKb = round($file->getSize() / 1024, 1);
+
+    \Illuminate\Support\Facades\DB::table('admissions_uploads')->insert([
+        'reference_id'  => $refId,
+        'file_name'     => $file->getClientOriginalName(),
+        'stored_path'   => $stored,
+        'document_type' => $docType,
+        'size_kb'       => $sizeKb,
+        'status'        => 'pending',
+        'created_at'    => now(),
+        'updated_at'    => now(),
+    ]);
 
     return response()->json([
         'data' => [
-            'reference_id' => \Illuminate\Support\Str::uuid(),
-            'file_name'    => $file->getClientOriginalName(),
-            'document_type'=> $docType,
-            'size_kb'      => round($file->getSize() / 1024, 1),
-            'stored_path'  => $stored,
-            'message'      => 'Document uploaded successfully. It will be verified by the Admissions Office when you submit your formal application.',
+            'reference_id'  => $refId,
+            'file_name'     => $file->getClientOriginalName(),
+            'document_type' => $docType,
+            'size_kb'       => $sizeKb,
+            'message'       => 'Document uploaded successfully. It will be verified by the Admissions Office when you submit your formal application.',
         ]
     ]);
 });
@@ -4088,3 +4101,181 @@ Route::get('/admissions/fees', function () {
     ]);
 });
 
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ADMISSIONS ADMIN ROUTES
+// ─────────────────────────────────────────────────────────────────────────────
+Route::middleware(['auth:sanctum'])->prefix('admin/admissions')->group(function () {
+
+    // ── Document Uploads ────────────────────────────────────────────────────
+    Route::get('/uploads', function (Illuminate\Http\Request $request) {
+        $q = \Illuminate\Support\Facades\DB::table('admissions_uploads');
+        if ($s = $request->query('status')) $q->where('status', $s);
+        if ($t = $request->query('type'))   $q->where('document_type', $t);
+        if ($k = $request->query('search')) $q->where('file_name', 'like', "%$k%");
+        $total   = $q->count();
+        $perPage = (int) ($request->query('per_page', 20));
+        $page    = (int) ($request->query('page', 1));
+        $items   = $q->orderByDesc('created_at')->skip(($page - 1) * $perPage)->take($perPage)->get();
+        return response()->json([
+            'data'         => $items,
+            'total'        => $total,
+            'current_page' => $page,
+            'last_page'    => max(1, (int) ceil($total / $perPage)),
+        ]);
+    });
+
+    Route::get('/uploads/{ref}', function (string $ref) {
+        $item = \Illuminate\Support\Facades\DB::table('admissions_uploads')->where('reference_id', $ref)->first();
+        abort_if(!$item, 404, 'Upload not found');
+        return response()->json(['data' => $item]);
+    });
+
+    Route::patch('/uploads/{ref}/status', function (Illuminate\Http\Request $request, string $ref) {
+        $request->validate(['status' => 'required|in:pending,verified,rejected', 'notes' => 'nullable|string|max:500']);
+        $reviewer = optional(auth()->user())->name ?? 'Admin';
+        $updated = \Illuminate\Support\Facades\DB::table('admissions_uploads')
+            ->where('reference_id', $ref)
+            ->update([
+                'status'         => $request->input('status'),
+                'reviewed_by'    => $reviewer,
+                'reviewer_notes' => $request->input('notes'),
+                'reviewed_at'    => now(),
+                'updated_at'     => now(),
+            ]);
+        abort_if(!$updated, 404, 'Upload not found');
+        return response()->json(['data' => ['message' => 'Status updated.']]);
+    });
+
+    Route::delete('/uploads/{ref}', function (string $ref) {
+        \Illuminate\Support\Facades\DB::table('admissions_uploads')->where('reference_id', $ref)->delete();
+        return response()->json(null, 204);
+    });
+
+    // ── Postgraduate Programmes ─────────────────────────────────────────────
+    Route::get('/pg-programmes', function () {
+        $rows = \Illuminate\Support\Facades\DB::table('admissions_pg_programmes')
+            ->orderBy('level')->orderBy('sort_order')->orderBy('name')->get();
+        return response()->json(['data' => $rows]);
+    });
+
+    Route::post('/pg-programmes', function (Illuminate\Http\Request $request) {
+        $data = $request->validate([
+            'code'        => 'required|string|max:30|unique:admissions_pg_programmes,code',
+            'name'        => 'required|string|max:120',
+            'level'       => 'required|in:masters,doctoral',
+            'school'      => 'required|in:SESS,SBE,SCIT,SOS,SHS',
+            'duration'    => 'required|string|max:30',
+            'min_qual'    => 'required|string|max:255',
+            'min_class'   => 'required|in:pass,third,lower_second,upper_second,first,masters',
+            'career_hint' => 'nullable|string|max:120',
+            'is_active'   => 'boolean',
+            'sort_order'  => 'integer',
+        ]);
+        $data['is_active']  = $data['is_active'] ?? true;
+        $data['sort_order'] = $data['sort_order'] ?? 0;
+        $data['created_at'] = now();
+        $data['updated_at'] = now();
+        $id = \Illuminate\Support\Facades\DB::table('admissions_pg_programmes')->insertGetId($data);
+        return response()->json(['data' => \Illuminate\Support\Facades\DB::table('admissions_pg_programmes')->find($id)], 201);
+    });
+
+    Route::put('/pg-programmes/{id}', function (Illuminate\Http\Request $request, int $id) {
+        $row = \Illuminate\Support\Facades\DB::table('admissions_pg_programmes')->find($id);
+        abort_if(!$row, 404, 'Programme not found');
+        $data = $request->validate([
+            'code'        => "required|string|max:30|unique:admissions_pg_programmes,code,$id",
+            'name'        => 'required|string|max:120',
+            'level'       => 'required|in:masters,doctoral',
+            'school'      => 'required|in:SESS,SBE,SCIT,SOS,SHS',
+            'duration'    => 'required|string|max:30',
+            'min_qual'    => 'required|string|max:255',
+            'min_class'   => 'required|in:pass,third,lower_second,upper_second,first,masters',
+            'career_hint' => 'nullable|string|max:120',
+            'is_active'   => 'boolean',
+            'sort_order'  => 'integer',
+        ]);
+        $data['updated_at'] = now();
+        \Illuminate\Support\Facades\DB::table('admissions_pg_programmes')->where('id', $id)->update($data);
+        return response()->json(['data' => \Illuminate\Support\Facades\DB::table('admissions_pg_programmes')->find($id)]);
+    });
+
+    Route::delete('/pg-programmes/{id}', function (int $id) {
+        \Illuminate\Support\Facades\DB::table('admissions_pg_programmes')->where('id', $id)->delete();
+        return response()->json(null, 204);
+    });
+
+    // Seed from hardcoded API list (one-time operation)
+    Route::post('/pg-programmes/seed', function () {
+        $exists = \Illuminate\Support\Facades\DB::table('admissions_pg_programmes')->count();
+        if ($exists > 0) return response()->json(['data' => ['message' => 'Already seeded. Clear existing records first.', 'count' => $exists]]);
+        $seed = [
+            ['code'=>'MA Religion','name'=>'MA Religion','level'=>'masters','school'=>'SESS','duration'=>'2 years','min_qual'=>"Bachelor's degree, 2nd Class Honours or above",'min_class'=>'lower_second','career_hint'=>'Theology, Academia, Development','sort_order'=>1],
+            ['code'=>'MA English','name'=>'MA English Language','level'=>'masters','school'=>'SESS','duration'=>'2 years','min_qual'=>"Bachelor's in English, Linguistics or related",'min_class'=>'lower_second','career_hint'=>'Language Studies, Research, Teaching','sort_order'=>2],
+            ['code'=>'MA Kiswahili','name'=>'MA Kiswahili','level'=>'masters','school'=>'SESS','duration'=>'2 years','min_qual'=>"Bachelor's in Kiswahili or related (2nd Class or above)",'min_class'=>'lower_second','career_hint'=>'Language, Research, Teaching','sort_order'=>3],
+            ['code'=>'MEd Ed. Psych.','name'=>'MEd Educational Psychology','level'=>'masters','school'=>'SESS','duration'=>'2 years','min_qual'=>"Bachelor's in Education or Psychology (2nd Class or above)",'min_class'=>'lower_second','career_hint'=>'Educational Psychology, Counselling','sort_order'=>4],
+            ['code'=>'MBA','name'=>'MBA','level'=>'masters','school'=>'SBE','duration'=>'2 years','min_qual'=>"Bachelor's degree + 2 years relevant work experience",'min_class'=>'pass','career_hint'=>'Management, Entrepreneurship, Leadership','sort_order'=>5],
+            ['code'=>'MSc Economics','name'=>'MSc Economics','level'=>'masters','school'=>'SBE','duration'=>'2 years','min_qual'=>"Bachelor's in Economics, Mathematics or Statistics (2nd Class or above)",'min_class'=>'lower_second','career_hint'=>'Economic Policy, Research, Development','sort_order'=>6],
+            ['code'=>'MSc IT','name'=>'MSc IT','level'=>'masters','school'=>'SCIT','duration'=>'2 years','min_qual'=>"Bachelor's in CS, IT or related (2nd Class or above)",'min_class'=>'lower_second','career_hint'=>'Technology Leadership, Research','sort_order'=>7],
+            ['code'=>'MSc CS','name'=>'MSc Computer Science','level'=>'masters','school'=>'SCIT','duration'=>'2 years','min_qual'=>"Bachelor's in Computer Science or related (2nd Class or above)",'min_class'=>'lower_second','career_hint'=>'AI, Software Engineering, Data Science','sort_order'=>8],
+            ['code'=>'MSc Biology','name'=>'MSc Biology','level'=>'masters','school'=>'SOS','duration'=>'2 years','min_qual'=>"Bachelor's in Biology or related Life Sciences (2nd Class or above)",'min_class'=>'lower_second','career_hint'=>'Research, Healthcare, Environmental Science','sort_order'=>9],
+            ['code'=>'MSc Chemistry','name'=>'MSc Chemistry','level'=>'masters','school'=>'SOS','duration'=>'2 years','min_qual'=>"Bachelor's in Chemistry or related (2nd Class or above)",'min_class'=>'lower_second','career_hint'=>'Pharmaceutical, Research, Lab Science','sort_order'=>10],
+            ['code'=>'PhD Bus. Admin.','name'=>'PhD Business Administration','level'=>'doctoral','school'=>'SBE','duration'=>'3–4 years','min_qual'=>"Master's degree in Business or related field from a recognized university",'min_class'=>'masters','career_hint'=>'Academia, Executive Leadership, Research','sort_order'=>11],
+            ['code'=>'PhD CS','name'=>'PhD Computer Science','level'=>'doctoral','school'=>'SCIT','duration'=>'3–4 years','min_qual'=>"Master's degree in CS, IT or related field",'min_class'=>'masters','career_hint'=>'AI Research, Academia, Tech Innovation','sort_order'=>12],
+            ['code'=>'PhD Education','name'=>'PhD Education','level'=>'doctoral','school'=>'SESS','duration'=>'3–4 years','min_qual'=>"Master's degree in Education or related field",'min_class'=>'masters','career_hint'=>'Educational Leadership, Academia, Policy','sort_order'=>13],
+            ['code'=>'PhD Biology','name'=>'PhD Biology','level'=>'doctoral','school'=>'SOS','duration'=>'3–4 years','min_qual'=>"Master's degree in Biology or Life Sciences",'min_class'=>'masters','career_hint'=>'Life Sciences Research, Conservation, Academia','sort_order'=>14],
+        ];
+        $now = now();
+        foreach ($seed as &$row) { $row['is_active'] = true; $row['created_at'] = $now; $row['updated_at'] = $now; }
+        \Illuminate\Support\Facades\DB::table('admissions_pg_programmes')->insert($seed);
+        return response()->json(['data' => ['message' => 'Seeded '.count($seed).' programmes.', 'count' => count($seed)]]);
+    });
+
+    // ── Admissions Settings ──────────────────────────────────────────────────
+    Route::get('/settings', function () {
+        $rows = \Illuminate\Support\Facades\DB::table('admissions_settings')->get()->keyBy('key');
+        $defaults = [
+            ['key'=>'ug_intake_open','label'=>'Undergraduate Intake Open','type'=>'boolean','value'=>'1'],
+            ['key'=>'pg_intake_open','label'=>'Postgraduate Intake Open','type'=>'boolean','value'=>'1'],
+            ['key'=>'ug_deadline','label'=>'Undergraduate Application Deadline','type'=>'date','value'=>'2026-07-15'],
+            ['key'=>'pg_deadline','label'=>'Postgraduate Application Deadline','type'=>'date','value'=>'2026-06-30'],
+            ['key'=>'kuccps_cutoff','label'=>'KUCCPS Minimum Mean Grade','type'=>'text','value'=>'C+'],
+            ['key'=>'module2_cutoff','label'=>'Module II (Self-Sponsored) Minimum Grade','type'=>'text','value'=>'C'],
+            ['key'=>'pg_masters_cutoff','label'=>'Masters Minimum Degree Class','type'=>'text','value'=>'lower_second'],
+            ['key'=>'ug_intake_note','label'=>'Undergraduate Intake Notice (shown on website)','type'=>'text','value'=>'Applications for the 2026/2027 academic year are now open via KUCCPS.'],
+            ['key'=>'pg_intake_note','label'=>'Postgraduate Intake Notice','type'=>'text','value'=>'Masters and PhD applications for January 2027 intake are now open. Apply via the Student Portal.'],
+            ['key'=>'admissions_contact_email','label'=>'Admissions Office Email','type'=>'text','value'=>'admissions@kafu.ac.ke'],
+            ['key'=>'admissions_contact_phone','label'=>'Admissions Office Phone','type'=>'text','value'=>'+254 777 373 633'],
+        ];
+        $result = [];
+        foreach ($defaults as $d) {
+            $existing = $rows[$d['key']] ?? null;
+            $result[] = $existing
+                ? ['key'=>$d['key'],'label'=>$d['label'],'type'=>$d['type'],'value'=>$existing->value]
+                : $d;
+        }
+        return response()->json(['data' => $result]);
+    });
+
+    Route::put('/settings', function (Illuminate\Http\Request $request) {
+        $settings = $request->validate(['settings' => 'required|array', 'settings.*.key' => 'required|string', 'settings.*.value' => 'nullable|string']);
+        $now = now();
+        foreach ($settings['settings'] as $s) {
+            \Illuminate\Support\Facades\DB::table('admissions_settings')->updateOrInsert(
+                ['key' => $s['key']],
+                ['value' => $s['value'] ?? '', 'updated_at' => $now, 'created_at' => $now]
+            );
+        }
+        return response()->json(['data' => ['message' => 'Settings saved.']]);
+    });
+
+    // ── Upload stats for dashboard ──────────────────────────────────────────
+    Route::get('/stats', function () {
+        $total   = \Illuminate\Support\Facades\DB::table('admissions_uploads')->count();
+        $pending  = \Illuminate\Support\Facades\DB::table('admissions_uploads')->where('status','pending')->count();
+        $verified = \Illuminate\Support\Facades\DB::table('admissions_uploads')->where('status','verified')->count();
+        $rejected = \Illuminate\Support\Facades\DB::table('admissions_uploads')->where('status','rejected')->count();
+        $programmes = \Illuminate\Support\Facades\DB::table('admissions_pg_programmes')->count();
+        return response()->json(['data' => compact('total','pending','verified','rejected','programmes')]);
+    });
+});

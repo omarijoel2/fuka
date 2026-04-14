@@ -6,7 +6,7 @@ import {
   Image, Tag, ClipboardList, Settings, LogOut, Menu, X,
   ChevronDown, ChevronRight, BookOpen, UserCog, AlertTriangle, Newspaper, SlidersHorizontal,
   FlaskConical, Globe, Banknote, HeartHandshake, MapPin, Building2,
-  Home, Navigation, ToggleRight, ArrowRightLeft, Activity, GitBranch, Search
+  Home, Navigation, ToggleRight, ArrowRightLeft, Activity, GitBranch, Search, GraduationCap
 } from "lucide-react";
 
 interface NavItem {
@@ -77,6 +77,16 @@ const navItems: NavItem[] = [
       { label: "Staff Content", href: "/content?type=staff_profile" },
       { label: "Submission Review", href: "/staff-review" },
       { label: "Staff Accounts", href: "/staff-accounts" },
+    ],
+  },
+  {
+    label: "Admissions",
+    icon: <GraduationCap className="w-4 h-4" />,
+    roles: ADMIN_ROLES,
+    children: [
+      { label: "Document Uploads", href: "/admissions?tab=uploads" },
+      { label: "Postgraduate Programmes", href: "/admissions?tab=programmes" },
+      { label: "Eligibility Settings", href: "/admissions?tab=settings" },
     ],
   },
   {
