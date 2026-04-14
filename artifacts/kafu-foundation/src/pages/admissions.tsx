@@ -21,6 +21,12 @@ import {
   ChevronRight,
   AlertCircle,
   ExternalLink,
+  Banknote,
+  ClipboardCheck,
+  MessageCircle,
+  Award,
+  TrendingUp,
+  Layers,
 } from "lucide-react";
 
 const PATHWAY_ICONS: Record<string, React.ReactNode> = {
@@ -246,6 +252,102 @@ export default function Admissions() {
           {/* ── LEFT: Pathway Nav + Sections ── */}
           <div className="lg:col-span-3 space-y-16">
 
+              {/* ── WHY KAFU — Value Proposition ── */}
+            <div id="why-kafu" className="scroll-mt-24">
+              <h2 className="text-2xl md:text-3xl font-serif font-bold text-primary mb-2">Why Choose KAFU?</h2>
+              <p className="text-muted-foreground mb-8">A Quaker-founded public university rooted in integrity, scholarship, and service to community.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                {[
+                  {
+                    icon: <Award className="w-6 h-6" />,
+                    title: "Government Chartered",
+                    body: "Fully chartered by the Commission for University Education (CUE), Kenya. Your degree is recognised nationwide and internationally.",
+                  },
+                  {
+                    icon: <TrendingUp className="w-6 h-6" />,
+                    title: "Strong Graduate Outcomes",
+                    body: "Over 85% of our graduates secure employment or pursue further studies within one year of completing their programme.",
+                  },
+                  {
+                    icon: <Layers className="w-6 h-6" />,
+                    title: "38+ Accredited Programmes",
+                    body: "Choose from undergraduate, postgraduate, and doctoral degrees across Business, Education, Science, Health Sciences, and Computing.",
+                  },
+                  {
+                    icon: <Users className="w-6 h-6" />,
+                    title: "Inclusive Community",
+                    body: "We welcome students from all backgrounds. Scholarships, bursaries, and flexible payment plans make quality education accessible.",
+                  },
+                  {
+                    icon: <GraduationCap className="w-6 h-6" />,
+                    title: "Expert Faculty",
+                    body: "Our teaching staff includes internationally trained PhDs, professional practitioners, and respected researchers in their fields.",
+                  },
+                  {
+                    icon: <Globe className="w-6 h-6" />,
+                    title: "International Linkages",
+                    body: "Partnership agreements with universities across Africa, Europe, and North America open doors to exchange and collaborative research.",
+                  },
+                ].map((item, i) => (
+                  <div key={i} className="flex gap-4 p-5 bg-card border rounded-xl hover:border-primary hover:shadow-sm transition-all" data-testid={`why-kafu-${i}`}>
+                    <div className="w-11 h-11 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">{item.icon}</div>
+                    <div>
+                      <h3 className="font-semibold text-sm text-foreground mb-1">{item.title}</h3>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{item.body}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── ENTRY REQUIREMENTS AT A GLANCE — KCSE Grade Map ── */}
+            <div id="kcse-grades" className="scroll-mt-24">
+              <h2 className="text-2xl md:text-3xl font-serif font-bold text-primary mb-2">Entry Requirements at a Glance</h2>
+              <p className="text-muted-foreground mb-6">Minimum KCSE mean grades by programme level. Actual requirements depend on the specific programme and available slots.</p>
+              <div className="overflow-x-auto rounded-xl border">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-primary text-primary-foreground">
+                      <th className="text-left px-5 py-3 font-semibold">Programme Level</th>
+                      <th className="text-left px-5 py-3 font-semibold">Pathway</th>
+                      <th className="text-left px-5 py-3 font-semibold">Minimum KCSE Mean Grade</th>
+                      <th className="text-left px-5 py-3 font-semibold">Other Requirements</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      { level: "Undergraduate", pathway: "Government-Sponsored (KUCCPS)", grade: "C+ (Plus)", other: "KUCCPS placement + programme cluster subjects" },
+                      { level: "Undergraduate", pathway: "Self-Sponsored (Module II)", grade: "C (Plain)", other: "Programme cluster subjects; direct application" },
+                      { level: "Undergraduate", pathway: "Diploma Holders", grade: "C (Plain)", other: "Relevant diploma + interview (select programmes)" },
+                      { level: "Postgraduate (Masters)", pathway: "All Pathways", grade: "Relevant First Degree", other: "2nd Class Honours (Upper) or equivalent" },
+                      { level: "Doctoral (PhD)", pathway: "All Pathways", grade: "Masters Degree", other: "Research proposal + panel interview" },
+                    ].map((row, i) => (
+                      <tr key={i} className={`border-b ${i % 2 === 0 ? "bg-secondary/30" : "bg-card"}`} data-testid={`grade-row-${i}`}>
+                        <td className="px-5 py-3 font-semibold text-foreground text-xs">{row.level}</td>
+                        <td className="px-5 py-3 text-muted-foreground text-xs">{row.pathway}</td>
+                        <td className="px-5 py-3">
+                          <span className="px-2 py-0.5 bg-primary text-white rounded-full text-xs font-bold">{row.grade}</span>
+                        </td>
+                        <td className="px-5 py-3 text-muted-foreground text-xs">{row.other}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="mt-4 flex flex-wrap gap-3">
+                <Button className="bg-primary text-white" asChild data-testid="btn-eligibility-from-grade-table">
+                  <Link href="/admissions/eligibility">
+                    <ClipboardCheck className="w-4 h-4 mr-2" /> Check Your Eligibility
+                  </Link>
+                </Button>
+                <Button variant="outline" className="border-primary text-primary" asChild data-testid="btn-fees-from-grade-table">
+                  <Link href="/admissions/fees">
+                    <Banknote className="w-4 h-4 mr-2" /> View Fee Structures
+                  </Link>
+                </Button>
+              </div>
+            </div>
+
             {/* Pathway Cards / Selector */}
             <div>
               <h2 className="text-2xl md:text-3xl font-serif font-bold text-primary mb-6">Choose Your Pathway</h2>
@@ -435,11 +537,41 @@ export default function Admissions() {
                 </Button>
               </div>
 
+              {/* Eligibility Checker CTA */}
+              <div className="bg-primary/5 border border-primary/20 rounded-xl p-5" data-testid="sidebar-eligibility-card">
+                <div className="flex items-center gap-2 mb-2">
+                  <ClipboardCheck className="w-5 h-5 text-primary" />
+                  <h3 className="font-bold text-sm text-foreground">Not Sure You Qualify?</h3>
+                </div>
+                <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+                  Enter your KCSE grade and we'll show you exactly which programmes you are eligible for.
+                </p>
+                <Button className="w-full bg-primary text-white hover:bg-primary/90 font-semibold text-sm" asChild data-testid="sidebar-btn-eligibility">
+                  <Link href="/admissions/eligibility">Check Your Eligibility</Link>
+                </Button>
+              </div>
+
+              {/* Fees CTA */}
+              <div className="bg-accent/5 border border-accent/20 rounded-xl p-5" data-testid="sidebar-fees-card">
+                <div className="flex items-center gap-2 mb-2">
+                  <Banknote className="w-5 h-5 text-accent" />
+                  <h3 className="font-bold text-sm text-foreground">Fee Structures</h3>
+                </div>
+                <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+                  Detailed breakdown of tuition, accommodation, and other costs — with scholarship options.
+                </p>
+                <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90 font-semibold text-sm" asChild data-testid="sidebar-btn-fees">
+                  <Link href="/admissions/fees">View Fee Guide</Link>
+                </Button>
+              </div>
+
               {/* Quick Links */}
               <div className="bg-card border rounded-xl p-5">
-                <h3 className="font-bold text-sm text-foreground uppercase tracking-wider mb-4">Quick Links</h3>
+                <h3 className="font-bold text-sm text-foreground uppercase tracking-wider mb-4">On This Page</h3>
                 <nav className="space-y-2">
                   {[
+                    { label: "Why KAFU", href: "#why-kafu" },
+                    { label: "Entry Requirements at a Glance", href: "#kcse-grades" },
                     { label: "Undergraduate Admissions", href: "#undergraduate" },
                     { label: "Postgraduate Admissions", href: "#postgraduate" },
                     { label: "International Students", href: "#international" },
@@ -507,6 +639,18 @@ export default function Admissions() {
                   </div>
                 )}
               </div>
+
+              {/* WhatsApp Enquiry */}
+              <a
+                href="https://wa.me/254777373633?text=Hello%20KAFU%20Admissions%2C%20I%20would%20like%20to%20enquire%20about%20admission%20to%20Kaimosi%20Friends%20University."
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-3 w-full p-4 bg-[#25D366] text-white rounded-xl font-semibold text-sm hover:bg-[#1da851] transition-colors"
+                data-testid="sidebar-btn-whatsapp"
+              >
+                <MessageCircle className="w-5 h-5" />
+                WhatsApp Admissions Office
+              </a>
 
               {/* Programmes Link */}
               <div className="bg-secondary border rounded-xl p-5 text-center">

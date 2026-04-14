@@ -17,6 +17,9 @@ import ProgrammeDetail from "@/pages/programme-detail";
 import StaffDirectory from "@/pages/staff-directory";
 import StaffProfilePage from "@/pages/staff-profile";
 import Admissions from "@/pages/admissions";
+import AdmissionsEligibility from "@/pages/admissions-eligibility";
+import AdmissionsFees from "@/pages/admissions-fees";
+import ProgrammeCompare from "@/pages/programme-compare";
 import StudentServices from "@/pages/student-services";
 import News from "@/pages/news";
 import NewsDetail from "@/pages/news-detail";
@@ -68,10 +71,13 @@ function Router() {
           <Route path="/schools" component={Schools} />
           <Route path="/schools/:code" component={SchoolDetails} />
           <Route path="/programmes" component={Programmes} />
+          <Route path="/programmes/compare" component={ProgrammeCompare} />
           <Route path="/programmes/:school/:code" component={ProgrammeDetail} />
           <Route path="/staff" component={StaffDirectory} />
           <Route path="/staff/:slug" component={StaffProfilePage} />
           <Route path="/admissions" component={Admissions} />
+          <Route path="/admissions/eligibility" component={AdmissionsEligibility} />
+          <Route path="/admissions/fees" component={AdmissionsFees} />
           <Route path="/student-services" component={StudentServices} />
           <Route path="/news" component={News} />
           <Route path="/news/:slug" component={NewsDetail} />

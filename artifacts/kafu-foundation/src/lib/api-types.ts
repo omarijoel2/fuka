@@ -239,6 +239,32 @@ export interface StaffProfile extends StaffMember {
   profile_completeness?: number;
 }
 
+export interface CourseStructureYear {
+  year: string;
+  units: string[];
+}
+
+export interface Accreditation {
+  body: string;
+  status: string;
+  year: number;
+}
+
+export interface EmployabilityData {
+  job_roles: string[];
+  industry_sectors: string[];
+  employment_rate: number;
+}
+
+export interface FeeStructure {
+  tuition_kes_per_year: number;
+  accommodation_kes_per_year: number;
+  other_costs_kes: number;
+  total_annual_kes: number;
+  govt_sponsored_tuition: number;
+  notes: string;
+}
+
 export interface ProgrammeDetail {
   school: string;
   code: string;
@@ -246,6 +272,65 @@ export interface ProgrammeDetail {
   mode: string;
   career_opportunities: string[];
   entry_requirements: string[];
+  learning_outcomes?: string[];
+  course_structure?: CourseStructureYear[];
+  accreditation?: Accreditation;
+  employability_data?: EmployabilityData;
+  fee_structure?: FeeStructure;
+}
+
+export interface EligibleProgramme {
+  name: string;
+  code: string;
+  school: string;
+  min_grade: string;
+  min_points: number;
+  duration: string;
+  career_hint: string;
+  note?: string;
+}
+
+export interface EligibilityResult {
+  verdict: 'eligible' | 'borderline' | 'not_eligible';
+  pathway: string;
+  mean_grade: string;
+  grade_points: number;
+  message: string;
+  eligible_programmes: EligibleProgramme[];
+  alternative_options: EligibleProgramme[];
+  next_steps: { label: string; url: string }[];
+}
+
+export interface FeeItem {
+  label: string;
+  amount: number;
+  note: string;
+}
+
+export interface FeePathway {
+  id: string;
+  title: string;
+  subtitle: string;
+  tuition_note: string;
+  annual_items: FeeItem[];
+  estimated_annual_total: number;
+  estimated_4yr_total?: number;
+  estimated_annual_total_usd?: number;
+  helb_note: string;
+  scholarships: string[];
+}
+
+export interface PaymentMethod {
+  method: string;
+  details: string;
+}
+
+export interface AdmissionsFees {
+  currency: string;
+  academic_year: string;
+  pathways: FeePathway[];
+  payment_methods: PaymentMethod[];
+  note: string;
 }
 
 export interface AdmissionsStep {

@@ -13,6 +13,8 @@ import type {
   OpportunityDetail,
   ContactInfo,
   AdmissionsData,
+  AdmissionsFees,
+  EligibilityResult,
   ProgrammeDetail,
   StaffMember,
   StaffProfile,
@@ -195,6 +197,29 @@ export function useProgrammeDetail(school: string, code: string) {
     queryFn: () => fetchApi<ProgrammeDetail>(`/programmes/${encodeURIComponent(school)}/${encodeURIComponent(code)}`),
     enabled: !!school && !!code,
   });
+}
+
+export function useAdmissionsFees() {
+  return useQuery({
+    queryKey: ["admissions-fees"],
+    queryFn: () => fetchApi<AdmissionsFees>("/admissions/fees"),
+  });
+}
+
+export async function checkEligibility(params: {
+  pathway: string;
+  qualification_type: string;
+  mean_grade: string;
+}): Promise<EligibilityResult> {
+  const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
+  const res = await fetch(`${BASE}/api/admissions/eligibility`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(params),
+  });
+  if (!res.ok) throw new Error("Eligibility check failed");
+  const json = await res.json();
+  return json.data as EligibilityResult;
 }
 
 // Research & Innovation Hooks

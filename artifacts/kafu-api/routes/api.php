@@ -2277,6 +2277,295 @@ Route::get('/programmes/{school}/{code}', function (string $school, string $code
         ],
     ];
 
+    // Enhanced intelligence data: learning outcomes, course structure, accreditation, employability, fees
+    $extra = [
+        'SESS' => [
+            'BEd (Arts)' => [
+                'learning_outcomes' => ['Design and deliver effective secondary arts lessons using learner-centred pedagogy','Apply interdisciplinary knowledge across English, History, Geography, and modern languages','Use ICT and digital tools to enhance teaching and assessment','Conduct classroom-based research and apply findings to practice','Demonstrate professional ethics in education and community service','Foster inclusive, equitable learning environments'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Communication Skills','Introduction to Education','Foundations of Psychology','History of East Africa','Introduction to Geography','Kiswahili I']],
+                    ['year'=>'Year 2','units'=>['Educational Psychology','Curriculum Theory & Design','Literature in English','Historical Research Methods','Physical Geography','French I']],
+                    ['year'=>'Year 3','units'=>['Pedagogy & Assessment','Philosophy of Education','Special Needs Education','Teaching Practice I','ICT in Education','Elective I']],
+                    ['year'=>'Year 4','units'=>['Educational Administration','Research Methods in Education','Teaching Practice II','Dissertation/Project','Education Policy','Elective II']],
+                ],
+                'accreditation' => ['body'=>'Teachers Service Commission (TSC) & Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2019],
+                'employability_data' => ['job_roles'=>['Secondary School Teacher','Curriculum Developer','Education Officer','School Administrator','NGO Programme Officer'],'industry_sectors'=>['Education','Government','NGOs','Private Schools','International Organisations'],'employment_rate'=>88],
+                'fee_structure' => ['tuition_kes_per_year'=>48000,'accommodation_kes_per_year'=>28000,'other_costs_kes'=>14000,'total_annual_kes'=>90000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition. Fees shown are for self-sponsored/Module II students.'],
+            ],
+            'BEd (French)' => [
+                'learning_outcomes' => ['Achieve professional proficiency in spoken and written French','Train secondary school students in French language and culture','Translate and interpret between French and English/Kiswahili','Conduct research in applied linguistics and language education','Apply culturally sensitive teaching methodologies','Engage with French-speaking communities and international organisations'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['French I (Oral & Written)','Communication Skills','Introduction to Education','French Phonetics','Kiswahili I','Education Psychology']],
+                    ['year'=>'Year 2','units'=>['French II (Advanced Oral)','French Literature I','Curriculum Design','Translation Theory','History of French Culture','ICT in Language Teaching']],
+                    ['year'=>'Year 3','units'=>['French III','French Literature II','Pedagogy of Language Teaching','Teaching Practice I','Research Methods','Applied Linguistics']],
+                    ['year'=>'Year 4','units'=>['Advanced Translation','French IV','Teaching Practice II','Dissertation/Project','Education Administration','Elective']],
+                ],
+                'accreditation' => ['body'=>'Teachers Service Commission (TSC) & Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2019],
+                'employability_data' => ['job_roles'=>['French Language Teacher','Translator/Interpreter','Cultural Attaché','Language Consultant','Diplomat'],'industry_sectors'=>['Education','Diplomacy','Tourism','International Organisations','Media'],'employment_rate'=>85],
+                'fee_structure' => ['tuition_kes_per_year'=>48000,'accommodation_kes_per_year'=>28000,'other_costs_kes'=>14000,'total_annual_kes'=>90000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition.'],
+            ],
+            'BEd (Science)' => [
+                'learning_outcomes' => ['Teach Biology, Chemistry, Physics, and Mathematics at secondary level','Design and conduct safe laboratory practicals and demonstrations','Apply pedagogical content knowledge in science teaching','Use research findings to improve science education outcomes','Prepare students for national and international science assessments','Promote STEM career awareness among secondary school learners'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Introduction to Education','General Chemistry I','General Biology I','Mathematics I','Communication Skills','ICT Fundamentals']],
+                    ['year'=>'Year 2','units'=>['Educational Psychology','Curriculum Design','Physics for Education','Chemistry II','Biology II','Laboratory Management']],
+                    ['year'=>'Year 3','units'=>['Pedagogy of Science','Special Needs in Science','Teaching Practice I','Research Methods','Environmental Science','Elective']],
+                    ['year'=>'Year 4','units'=>['Teaching Practice II','Educational Administration','Dissertation/Project','Assessment & Evaluation','Science Education Policy','Elective']],
+                ],
+                'accreditation' => ['body'=>'Teachers Service Commission (TSC) & Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2019],
+                'employability_data' => ['job_roles'=>['Secondary School Science Teacher','Laboratory Supervisor','Science Education Specialist','Curriculum Designer','STEM Coordinator'],'industry_sectors'=>['Education','Government','NGOs','Research Institutions','International Schools'],'employment_rate'=>90],
+                'fee_structure' => ['tuition_kes_per_year'=>48000,'accommodation_kes_per_year'=>28000,'other_costs_kes'=>14000,'total_annual_kes'=>90000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition.'],
+            ],
+            'BSW' => [
+                'learning_outcomes' => ['Apply professional social work values and ethics in diverse contexts','Conduct social work assessments using evidence-based frameworks','Design and implement community development programmes','Advocate for marginalised groups within legal and policy systems','Manage casework in child protection, mental health, and disability settings','Conduct social research and apply findings to policy and practice'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Introduction to Social Work','Sociology I','Psychology I','Communication Skills','Human Rights & Social Justice','Research Foundations']],
+                    ['year'=>'Year 2','units'=>['Social Work Practice I','Community Development','Social Policy & Administration','Psychology II','Field Placement I','Social Welfare Systems']],
+                    ['year'=>'Year 3','units'=>['Social Work Practice II','Child Protection','Disability Studies','Mental Health Social Work','Field Placement II','Social Research Methods']],
+                    ['year'=>'Year 4','units'=>['Advanced Social Work','Gerontology','Field Placement III','Dissertation/Project','NGO Management','Social Work Ethics']],
+                ],
+                'accreditation' => ['body'=>'Commission for University Education (CUE) & Kenya Association of Social Workers (KASW)','status'=>'Fully Accredited','year'=>2018],
+                'employability_data' => ['job_roles'=>['Social Worker','Child Protection Officer','Community Development Officer','Probation Officer','NGO Programme Coordinator','Counsellor'],'industry_sectors'=>['NGOs','Government (Social Services)','INGOs','Healthcare','Community Organisations'],'employment_rate'=>87],
+                'fee_structure' => ['tuition_kes_per_year'=>48000,'accommodation_kes_per_year'=>28000,'other_costs_kes'=>14000,'total_annual_kes'=>90000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition.'],
+            ],
+            'BEd ECD' => [
+                'learning_outcomes' => ['Apply child development theories to early childhood educational practice','Design inclusive learning environments for children aged 0–8','Assess developmental milestones and plan appropriate interventions','Engage families and communities in early childhood programmes','Use play-based and creative methodologies in learning','Manage ECD centres and early years programmes effectively'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Introduction to ECD','Child Development I','Communication Skills','Art & Creative Activities','Music & Movement','Health & Nutrition']],
+                    ['year'=>'Year 2','units'=>['Child Development II','Curriculum for ECD','Educational Psychology','Inclusive Education','ICT for Young Learners','Family & Community Partnerships']],
+                    ['year'=>'Year 3','units'=>['ECD Assessment','Special Needs in Early Years','Teaching Practice I','Research Methods','Language Development','Elective']],
+                    ['year'=>'Year 4','units'=>['ECD Programme Management','Teaching Practice II','Dissertation/Project','Policy & Legislation','Child Rights & Protection','Elective']],
+                ],
+                'accreditation' => ['body'=>'Teachers Service Commission (TSC) & Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2020],
+                'employability_data' => ['job_roles'=>['ECD Teacher','Pre-school Head Teacher','Child Development Specialist','NGO Programme Officer','Social Worker (Children)'],'industry_sectors'=>['Education','NGOs','Government','INGOs','Private Nurseries'],'employment_rate'=>86],
+                'fee_structure' => ['tuition_kes_per_year'=>48000,'accommodation_kes_per_year'=>28000,'other_costs_kes'=>14000,'total_annual_kes'=>90000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition.'],
+            ],
+            'BDMID' => [
+                'learning_outcomes' => ['Analyse disaster risk reduction frameworks and humanitarian response systems','Apply diplomacy and negotiation skills in international and regional contexts','Coordinate emergency response operations and humanitarian logistics','Design disaster preparedness and resilience plans','Understand international law, treaties, and multilateral institutions','Conduct research in disaster management and international development'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Introduction to Disaster Management','International Relations','Communication Skills','Geography of Hazards','Emergency First Response','Research Methods I']],
+                    ['year'=>'Year 2','units'=>['Disaster Risk Reduction','Diplomacy & Protocol','Humanitarian Law','Peace Studies','GIS for Disasters','Research Methods II']],
+                    ['year'=>'Year 3','units'=>['Emergency Operations Management','Conflict Resolution','Field Attachment I','Environmental Disaster Management','Foreign Policy Analysis','Elective']],
+                    ['year'=>'Year 4','units'=>['Post-Disaster Recovery','International Organisations','Field Attachment II','Dissertation/Project','Climate Change & Disasters','Elective']],
+                ],
+                'accreditation' => ['body'=>'Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2021],
+                'employability_data' => ['job_roles'=>['Disaster Risk Manager','Humanitarian Aid Coordinator','Diplomat / Foreign Service Officer','Emergency Response Officer','Policy Analyst','INGO Programme Manager'],'industry_sectors'=>['UN Agencies','INGOs','Government','Red Cross / Red Crescent','County Governments'],'employment_rate'=>84],
+                'fee_structure' => ['tuition_kes_per_year'=>50000,'accommodation_kes_per_year'=>28000,'other_costs_kes'=>15000,'total_annual_kes'=>93000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition.'],
+            ],
+            'BA Criminology' => [
+                'learning_outcomes' => ['Explain theories of crime, deviance, and social control','Critically analyse the criminal justice system — police, courts, and corrections','Apply research methods to the study of crime and victimology','Understand criminological policy at local, national, and international levels','Practise ethical standards in criminal justice settings','Design and evaluate crime prevention and community safety programmes'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Introduction to Criminology','Sociology of Crime','Communication Skills','Psychology of Crime','Introduction to Law','Research Methods I']],
+                    ['year'=>'Year 2','units'=>['Criminal Justice Systems','Victimology','Corrections & Rehabilitation','Criminal Law','Police Studies','Research Methods II']],
+                    ['year'=>'Year 3','units'=>['White Collar Crime','Comparative Criminology','Field Attachment','Organised Crime','Security Studies','Elective']],
+                    ['year'=>'Year 4','units'=>['Crime Prevention','Penology','Dissertation/Project','Gender & Crime','Drug Policy','Elective']],
+                ],
+                'accreditation' => ['body'=>'Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2020],
+                'employability_data' => ['job_roles'=>['Police Officer (Graduate Entry)','Probation Officer','Criminal Intelligence Analyst','Prison Warden (Graduate)','Policy Analyst','Security Consultant'],'industry_sectors'=>['National Police Service','Prisons Service','Government Ministries','NGOs','Private Security','Research Institutes'],'employment_rate'=>83],
+                'fee_structure' => ['tuition_kes_per_year'=>48000,'accommodation_kes_per_year'=>28000,'other_costs_kes'=>14000,'total_annual_kes'=>90000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition.'],
+            ],
+            'MA Religion' => [
+                'learning_outcomes' => ['Demonstrate advanced knowledge of world religions, theology, and religious ethics','Conduct original research using appropriate theological and social science methodologies','Critically engage with contemporary issues at the intersection of religion and society','Analyse religious texts and traditions in their historical and cultural contexts','Teach religious and theological subjects at tertiary level','Advise on interfaith dialogue and religious policy'],
+                'course_structure' => [
+                    ['year'=>'Semester 1','units'=>['Advanced Theological Studies','Research Methodology','Philosophy of Religion','African Traditional Religion','Seminar: Religion & Society']],
+                    ['year'=>'Semester 2','units'=>['Comparative Religion','Ethics & Moral Theology','Biblical Studies / Quran Studies','Qualitative Research','Seminar: Religion & Politics']],
+                    ['year'=>'Semester 3','units'=>['Dissertation Research I','Advanced Elective I','Advanced Elective II','Supervised Independent Study']],
+                    ['year'=>'Semester 4','units'=>['Dissertation Research II','Dissertation Submission & Viva','Professional Elective']],
+                ],
+                'accreditation' => ['body'=>'Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2018],
+                'employability_data' => ['job_roles'=>['University Lecturer','Theologian','Chaplain / Religious Leader','Religious Programme Coordinator','Interfaith Dialogue Facilitator','Researcher'],'industry_sectors'=>['Higher Education','Faith-Based Organisations','NGOs','Government Chaplaincy','Research Institutes'],'employment_rate'=>80],
+                'fee_structure' => ['tuition_kes_per_year'=>72000,'accommodation_kes_per_year'=>30000,'other_costs_kes'=>16000,'total_annual_kes'=>118000,'govt_sponsored_tuition'=>0,'notes'=>'Postgraduate rates apply. Year shown is for coursework component.'],
+            ],
+            'PhD Religion' => [
+                'learning_outcomes' => ['Produce an original, significant contribution to knowledge in religious studies or theology','Demonstrate mastery of advanced research methods in the humanities and social sciences','Engage critically with international scholarly debates in religion and theology','Disseminate findings through peer-reviewed publications and conference presentations','Supervise and mentor junior researchers and postgraduate students','Apply theological and ethical reasoning to contemporary social challenges'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Advanced Research Methods','Doctoral Colloquium I','Research Proposal Development','Literature Review','Ethics in Research']],
+                    ['year'=>'Year 2','units'=>['Doctoral Colloquium II','Thesis Research','Data Collection & Analysis','Progress Seminar']],
+                    ['year'=>'Year 3','units'=>['Thesis Writing','Doctoral Colloquium III','Publication Workshop','Pre-submission Seminar','Thesis Submission & Viva']],
+                ],
+                'accreditation' => ['body'=>'Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2018],
+                'employability_data' => ['job_roles'=>['University Professor','Senior Research Fellow','Head of Department','Theologian','Policy Advisor','Author/Scholar'],'industry_sectors'=>['Higher Education','Research Institutes','Faith Organisations','Government','International Organisations'],'employment_rate'=>92],
+                'fee_structure' => ['tuition_kes_per_year'=>90000,'accommodation_kes_per_year'=>30000,'other_costs_kes'=>20000,'total_annual_kes'=>140000,'govt_sponsored_tuition'=>0,'notes'=>'PhD rates. Duration is typically 3–4 years full-time.'],
+            ],
+        ],
+        'SBE' => [
+            'BCom' => [
+                'learning_outcomes' => ['Apply accounting, finance, and auditing principles to business contexts','Analyse market environments and develop sound marketing strategies','Use quantitative tools for financial analysis and business decision-making','Demonstrate entrepreneurial competencies and business plan development','Apply management theories to real organisational challenges','Understand commercial law, taxation, and corporate governance'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Principles of Accounting','Business Mathematics','Communication Skills','Introduction to Management','Business Law','Microeconomics']],
+                    ['year'=>'Year 2','units'=>['Financial Accounting','Cost & Management Accounting','Business Statistics','Macroeconomics','Marketing Management','Entrepreneurship']],
+                    ['year'=>'Year 3','units'=>['Financial Management','Taxation','Auditing','Human Resource Management','Business Ethics','Research Methods']],
+                    ['year'=>'Year 4','units'=>['Advanced Financial Management','Strategic Management','Dissertation/Project','Corporate Governance','International Business','Elective']],
+                ],
+                'accreditation' => ['body'=>'Commission for University Education (CUE) & KASNEB (CPA pathway)','status'=>'Fully Accredited','year'=>2017],
+                'employability_data' => ['job_roles'=>['Accountant / Auditor','Business Analyst','Marketing Manager','Bank Officer','Financial Analyst','Entrepreneur'],'industry_sectors'=>['Banking & Finance','FMCG','Manufacturing','Government','Consulting','NGOs'],'employment_rate'=>91],
+                'fee_structure' => ['tuition_kes_per_year'=>52000,'accommodation_kes_per_year'=>28000,'other_costs_kes'=>15000,'total_annual_kes'=>95000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition.'],
+            ],
+            'BSc Economics' => [
+                'learning_outcomes' => ['Apply microeconomic and macroeconomic theories to real-world policy problems','Use econometric methods to analyse economic data','Evaluate the impact of fiscal and monetary policy at national and global levels','Produce rigorous economic research papers and policy briefs','Model markets, trade, and resource allocation','Contribute to development economics and public finance debates in Kenya and Africa'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Principles of Economics','Mathematics for Economists','Communication Skills','Introduction to Statistics','Sociology','History of Economic Thought']],
+                    ['year'=>'Year 2','units'=>['Microeconomics I','Macroeconomics I','Econometrics I','Public Finance','Development Economics','Research Methods I']],
+                    ['year'=>'Year 3','units'=>['Microeconomics II','Macroeconomics II','Econometrics II','International Economics','Environmental Economics','Research Methods II']],
+                    ['year'=>'Year 4','units'=>['Advanced Econometrics','Policy Analysis','Dissertation/Project','Labour Economics','Monetary Economics','Elective']],
+                ],
+                'accreditation' => ['body'=>'Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2017],
+                'employability_data' => ['job_roles'=>['Economist','Policy Analyst','Financial Consultant','Research Officer','Development Planner','Data Analyst'],'industry_sectors'=>['Government Ministries','Central Bank','Multilateral Organisations','NGOs','Banking','Consulting'],'employment_rate'=>89],
+                'fee_structure' => ['tuition_kes_per_year'=>52000,'accommodation_kes_per_year'=>28000,'other_costs_kes'=>15000,'total_annual_kes'=>95000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition.'],
+            ],
+            'MBA' => [
+                'learning_outcomes' => ['Formulate and implement corporate strategies in competitive environments','Apply financial management and investment analysis to enterprise decision-making','Lead and motivate diverse teams using evidence-based management practice','Design marketing strategies responsive to digital and global markets','Demonstrate ethical leadership and corporate social responsibility','Apply entrepreneurial thinking to create and grow sustainable ventures'],
+                'course_structure' => [
+                    ['year'=>'Semester 1','units'=>['Managerial Economics','Financial Accounting for Managers','Strategic Management','Quantitative Methods for Business','Research Methodology']],
+                    ['year'=>'Semester 2','units'=>['Financial Management','Marketing Management','Human Resource Management','Operations Management','Business Ethics & Governance']],
+                    ['year'=>'Semester 3','units'=>['Strategic Leadership','Entrepreneurship & Innovation','International Business','Elective I','Elective II']],
+                    ['year'=>'Semester 4','units'=>['Management Dissertation / Research Project','Practicum/Consulting Project']],
+                ],
+                'accreditation' => ['body'=>'Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2018],
+                'employability_data' => ['job_roles'=>['General Manager','CEO / Director','Strategy Consultant','Corporate Trainer','Entrepreneur','Investment Manager'],'industry_sectors'=>['Banking & Finance','Manufacturing','Consulting','FMCG','Government','Technology'],'employment_rate'=>94],
+                'fee_structure' => ['tuition_kes_per_year'=>85000,'accommodation_kes_per_year'=>30000,'other_costs_kes'=>18000,'total_annual_kes'=>133000,'govt_sponsored_tuition'=>0,'notes'=>'MBA can be completed full-time (2 years) or part-time (3 years).'],
+            ],
+            'PhD Bus. Admin.' => [
+                'learning_outcomes' => ['Make an original contribution to knowledge in business administration or management','Apply advanced quantitative and qualitative research methods to business problems','Publish and disseminate research in peer-reviewed academic journals','Teach and supervise postgraduate students in business disciplines','Advise organisations and governments on evidence-based management strategy','Engage critically with emerging global business challenges and trends'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Advanced Research Methods','Doctoral Seminar I','Quantitative Analysis','Qualitative Research in Business','Research Proposal Defense']],
+                    ['year'=>'Year 2','units'=>['Doctoral Seminar II','Thesis Research','Data Collection','Academic Writing & Publishing','Progress Review Seminar']],
+                    ['year'=>'Year 3','units'=>['Doctoral Seminar III','Thesis Writing','Pre-submission Seminar','Thesis Submission & Viva']],
+                ],
+                'accreditation' => ['body'=>'Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2018],
+                'employability_data' => ['job_roles'=>['University Professor','Senior Researcher','Executive Consultant','Chief Strategy Officer','Policy Maker','Author'],'industry_sectors'=>['Higher Education','Research Institutes','Consulting','Government','Multilateral Organisations'],'employment_rate'=>93],
+                'fee_structure' => ['tuition_kes_per_year'=>95000,'accommodation_kes_per_year'=>30000,'other_costs_kes'=>20000,'total_annual_kes'=>145000,'govt_sponsored_tuition'=>0,'notes'=>'PhD rates. Typical duration: 3–4 years.'],
+            ],
+        ],
+        'SCIT' => [
+            'BSc CS' => [
+                'learning_outcomes' => ['Design, develop, and test software systems using industry-standard methodologies','Apply data structures and algorithms to solve computational problems efficiently','Build AI and machine learning models for real-world applications','Design and administer relational and NoSQL databases','Secure networked systems and implement cybersecurity best practices','Work in agile, collaborative software development teams'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Introduction to Programming (Python)','Discrete Mathematics','Computer Architecture','Communication Skills','Web Technologies','Database Fundamentals']],
+                    ['year'=>'Year 2','units'=>['Object-Oriented Programming (Java)','Data Structures & Algorithms','Operating Systems','Networking Fundamentals','Database Systems','Software Engineering I']],
+                    ['year'=>'Year 3','units'=>['Artificial Intelligence','Machine Learning','Software Engineering II','Cybersecurity','Mobile Application Development','Research Methods']],
+                    ['year'=>'Year 4','units'=>['Cloud Computing','Advanced Databases','Capstone Project / Dissertation','Human-Computer Interaction','Entrepreneurship in Tech','Elective']],
+                ],
+                'accreditation' => ['body'=>'Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2016],
+                'employability_data' => ['job_roles'=>['Software Developer','Data Scientist','AI Engineer','Database Administrator','Systems Analyst','IT Consultant'],'industry_sectors'=>['Technology Companies','Banking & Finance','Telecommunications','Government','Healthcare','Startups'],'employment_rate'=>95],
+                'fee_structure' => ['tuition_kes_per_year'=>55000,'accommodation_kes_per_year'=>28000,'other_costs_kes'=>16000,'total_annual_kes'=>99000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition.'],
+            ],
+            'BSc IT' => [
+                'learning_outcomes' => ['Configure, manage, and troubleshoot enterprise networks and server infrastructure','Implement cybersecurity policies and incident response procedures','Develop web applications and enterprise systems using modern frameworks','Administer cloud platforms including AWS, Azure, and Google Cloud','Apply IT project management methodologies (PRINCE2, PMP)','Support digital transformation initiatives in organisations'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Introduction to IT','Networking Fundamentals','Operating Systems I','Communication Skills','Hardware & Systems','Web Design']],
+                    ['year'=>'Year 2','units'=>['Network Administration','Database Administration','Programming for IT','Cybersecurity Fundamentals','Operating Systems II','Systems Analysis']],
+                    ['year'=>'Year 3','units'=>['Cloud Computing','Enterprise Systems','IT Project Management','Network Security','Web Development','Research Methods']],
+                    ['year'=>'Year 4','units'=>['IT Governance','Capstone Project / Dissertation','Mobile & IoT Systems','Business Intelligence','Elective I','Elective II']],
+                ],
+                'accreditation' => ['body'=>'Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2016],
+                'employability_data' => ['job_roles'=>['Network Administrator','Cybersecurity Analyst','Systems Administrator','Web Developer','IT Support Manager','Cloud Engineer'],'industry_sectors'=>['Telecommunications','Banking','Government ICT','Healthcare','NGOs','Startups'],'employment_rate'=>93],
+                'fee_structure' => ['tuition_kes_per_year'=>55000,'accommodation_kes_per_year'=>28000,'other_costs_kes'=>16000,'total_annual_kes'=>99000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition.'],
+            ],
+            'MSc IT' => [
+                'learning_outcomes' => ['Conduct original research in advanced information technology domains','Design and implement cloud-native, scalable, and secure IT architectures','Lead enterprise digital transformation and IT strategy programmes','Apply advanced cybersecurity frameworks to protect organisational systems','Investigate emerging technologies including AI, blockchain, and IoT','Publish research in peer-reviewed IT and computer science journals'],
+                'course_structure' => [
+                    ['year'=>'Semester 1','units'=>['Advanced Networking','Research Methods in IT','Cloud Architecture','Cybersecurity Management','IT Governance & Policy']],
+                    ['year'=>'Semester 2','units'=>['Machine Learning for IT','Advanced Database Systems','Enterprise Architecture','Digital Transformation','Elective I']],
+                    ['year'=>'Semester 3','units'=>['Dissertation Research I','Advanced Elective','Seminar: Emerging Technologies']],
+                    ['year'=>'Semester 4','units'=>['Dissertation Research II','Thesis Submission & Viva']],
+                ],
+                'accreditation' => ['body'=>'Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2019],
+                'employability_data' => ['job_roles'=>['Chief Technology Officer','Senior IT Manager','Cybersecurity Specialist','IT Researcher','Cloud Architect','Digital Transformation Lead'],'industry_sectors'=>['Technology','Banking & Finance','Government','Telecommunications','Healthcare','Consulting'],'employment_rate'=>96],
+                'fee_structure' => ['tuition_kes_per_year'=>80000,'accommodation_kes_per_year'=>30000,'other_costs_kes'=>18000,'total_annual_kes'=>128000,'govt_sponsored_tuition'=>0,'notes'=>'Can be completed full-time (2 years) or part-time (3 years).'],
+            ],
+        ],
+        'SOS' => [
+            'BSc Physics' => [
+                'learning_outcomes' => ['Apply classical and modern physics principles to analyse natural phenomena','Conduct precise experiments and interpret data using statistical methods','Use computational and numerical methods in physical modelling','Apply physics in practical contexts including electronics and renewable energy','Communicate complex scientific concepts clearly in written and oral formats','Prepare for postgraduate study or professional careers in physics-related fields'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Classical Mechanics','Mathematical Methods I','General Chemistry','Introduction to Computing','Communication Skills','Laboratory Physics I']],
+                    ['year'=>'Year 2','units'=>['Electricity & Magnetism','Mathematical Methods II','Thermal Physics','Optics','Electronics I','Laboratory Physics II']],
+                    ['year'=>'Year 3','units'=>['Quantum Mechanics','Statistical Mechanics','Solid State Physics','Electronics II','Nuclear Physics','Research Methods']],
+                    ['year'=>'Year 4','units'=>['Advanced Quantum Mechanics','Computational Physics','Dissertation/Project','Elective I (Renewable Energy / Geophysics)','Elective II','Laboratory Physics IV']],
+                ],
+                'accreditation' => ['body'=>'Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2017],
+                'employability_data' => ['job_roles'=>['Physicist','Geophysicist','Science Teacher (Secondary/Tertiary)','Research Scientist','Lab Technician','Renewable Energy Engineer'],'industry_sectors'=>['Education','Research Institutes','Energy Sector','Telecommunications','Mining & Exploration','Government'],'employment_rate'=>82],
+                'fee_structure' => ['tuition_kes_per_year'=>52000,'accommodation_kes_per_year'=>28000,'other_costs_kes'=>15000,'total_annual_kes'=>95000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition.'],
+            ],
+            'BSc Chemistry' => [
+                'learning_outcomes' => ['Apply organic, inorganic, physical, and analytical chemistry principles','Conduct advanced laboratory experiments safely and with precision','Analyse chemical data using modern instrumentation and software','Apply chemical knowledge to pharmaceutical, industrial, and environmental contexts','Practise safe laboratory management and chemical waste handling','Conduct and present independent research in chemistry'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['General Chemistry I','Mathematics for Scientists','Communication Skills','Laboratory Chemistry I','Physical Chemistry I','Introduction to Computing']],
+                    ['year'=>'Year 2','units'=>['Organic Chemistry I','Inorganic Chemistry I','Physical Chemistry II','Analytical Chemistry I','Laboratory Chemistry II','Research Methods I']],
+                    ['year'=>'Year 3','units'=>['Organic Chemistry II','Inorganic Chemistry II','Biochemistry','Analytical Chemistry II','Industrial Chemistry','Research Methods II']],
+                    ['year'=>'Year 4','units'=>['Advanced Organic Chemistry','Polymer Chemistry','Dissertation/Project','Environmental Chemistry','Pharmaceutical Chemistry','Laboratory Chemistry IV']],
+                ],
+                'accreditation' => ['body'=>'Commission for University Education (CUE) & Kenya Chemical Society','status'=>'Fully Accredited','year'=>2017],
+                'employability_data' => ['job_roles'=>['Chemist','Laboratory Analyst','Pharmaceutical Technologist','Quality Assurance Officer','Science Teacher','Environmental Consultant'],'industry_sectors'=>['Pharmaceutical','Food & Beverage','Manufacturing','Water Treatment','Education','Research'],'employment_rate'=>86],
+                'fee_structure' => ['tuition_kes_per_year'=>52000,'accommodation_kes_per_year'=>28000,'other_costs_kes'=>15000,'total_annual_kes'=>95000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition.'],
+            ],
+            'BSc Biology' => [
+                'learning_outcomes' => ['Explain biological processes at cellular, organism, and ecosystem levels','Apply ecological and environmental science methods in field research','Conduct experiments in genetics, microbiology, and physiology','Analyse biological data using appropriate statistical software','Apply biological knowledge to health, agriculture, and conservation','Communicate findings effectively through scientific writing and presentation'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Cell Biology & Genetics I','Botany I','Zoology I','Chemistry for Biologists','Communication Skills','Laboratory Biology I']],
+                    ['year'=>'Year 2','units'=>['Microbiology','Ecology','Genetics II','Physiology I','Biochemistry','Laboratory Biology II']],
+                    ['year'=>'Year 3','units'=>['Molecular Biology','Environmental Biology','Immunology','Plant Pathology','Research Methods','Field Ecology']],
+                    ['year'=>'Year 4','units'=>['Conservation Biology','Biotechnology','Dissertation/Project','Applied Microbiology','Parasitology','Elective']],
+                ],
+                'accreditation' => ['body'=>'Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2017],
+                'employability_data' => ['job_roles'=>['Biologist','Ecologist','Lab Scientist','Public Health Officer','Science Teacher','Environmental Consultant'],'industry_sectors'=>['Healthcare','Research Institutes','Environmental Agencies','NGOs','Agriculture','Education'],'employment_rate'=>85],
+                'fee_structure' => ['tuition_kes_per_year'=>52000,'accommodation_kes_per_year'=>28000,'other_costs_kes'=>15000,'total_annual_kes'=>95000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition.'],
+            ],
+            'BSc Agric. Econ.' => [
+                'learning_outcomes' => ['Apply microeconomic and macroeconomic theory to agricultural markets','Analyse food production systems and value chains using quantitative methods','Evaluate agricultural policies and their impact on food security and rural livelihoods','Design and appraise agribusiness projects and investment plans','Apply GIS and remote sensing to land use and resource management','Conduct research in agricultural economics and rural development'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Introduction to Agriculture','Principles of Economics','Communication Skills','Mathematics for Agric. Economists','Soil Science','Laboratory Agric. I']],
+                    ['year'=>'Year 2','units'=>['Microeconomics','Agricultural Production Economics','Farm Management','Statistics for Agriculture','Rural Development','Research Methods I']],
+                    ['year'=>'Year 3','units'=>['Agricultural Policy','Agribusiness Management','Agricultural Finance','GIS & Remote Sensing','Food Security Studies','Research Methods II']],
+                    ['year'=>'Year 4','units'=>['Project Appraisal','International Agricultural Trade','Dissertation/Project','Environmental Economics','Value Chain Analysis','Elective']],
+                ],
+                'accreditation' => ['body'=>'Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2018],
+                'employability_data' => ['job_roles'=>['Agricultural Economist','Agribusiness Manager','Food Security Analyst','Rural Development Officer','Policy Advisor','Project Manager'],'industry_sectors'=>['Agriculture','Government (Ministry of Agriculture)','NGOs','World Bank / UN FAO','Commercial Farming','Research'],'employment_rate'=>87],
+                'fee_structure' => ['tuition_kes_per_year'=>52000,'accommodation_kes_per_year'=>28000,'other_costs_kes'=>15000,'total_annual_kes'=>95000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition.'],
+            ],
+        ],
+        'SHS' => [
+            'BOptom' => [
+                'learning_outcomes' => ['Diagnose and manage a wide range of ocular and systemic conditions affecting vision','Prescribe optical and therapeutic interventions including contact lenses','Conduct community eye health outreach, screening, and rehabilitation programmes','Apply low vision assessment and assistive technology for visually impaired clients','Interpret ophthalmic investigations including visual fields and OCT','Contribute to eye health policy and research in sub-Saharan Africa'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Anatomy & Physiology I','Optics I','Chemistry for Health Sciences','Communication Skills','Introduction to Optometry','Clinical Skills I']],
+                    ['year'=>'Year 2','units'=>['Ocular Anatomy & Physiology','Optics II','Refraction I','Ocular Disease I','Pharmacology I','Clinical Skills II']],
+                    ['year'=>'Year 3','units'=>['Refraction II','Contact Lens Practice I','Ocular Disease II','Binocular Vision','Paediatric Optometry','Clinical Placement I']],
+                    ['year'=>'Year 4','units'=>['Low Vision Rehabilitation','Contact Lens Practice II','Ocular Pathology','Community Eye Health','Research Methods','Clinical Placement II']],
+                    ['year'=>'Year 5','units'=>['Advanced Clinical Practice','Dissertation/Research Project','Optometry Jurisprudence','Clinical Placement III','Elective']],
+                ],
+                'accreditation' => ['body'=>'Kenya Optometric Association (KOA) & Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2015],
+                'employability_data' => ['job_roles'=>['Optometrist','Vision Scientist','Eye Clinic Director','Community Eye Health Officer','Low Vision Specialist','Academic Researcher'],'industry_sectors'=>['Healthcare','Hospitals & Eye Clinics','NGOs','Research Institutes','Ministry of Health','International Eye Health Organisations'],'employment_rate'=>97],
+                'fee_structure' => ['tuition_kes_per_year'=>75000,'accommodation_kes_per_year'=>30000,'other_costs_kes'=>22000,'total_annual_kes'=>127000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition. 5-year programme. Clinical fees included.'],
+            ],
+            'BSN' => [
+                'learning_outcomes' => ['Apply the nursing process to assess, plan, implement, and evaluate patient care','Practise evidence-based nursing in medical, surgical, paediatric, and community settings','Demonstrate competency in midwifery and reproductive health care','Apply critical care and emergency nursing protocols','Engage in community health promotion, education, and disease prevention','Uphold professional nursing ethics and the Nursing Code of Conduct'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Anatomy & Physiology','Foundations of Nursing','Chemistry for Health Sciences','Communication Skills','Microbiology','Nursing Ethics']],
+                    ['year'=>'Year 2','units'=>['Medical-Surgical Nursing I','Pharmacology','Paediatric Nursing','Community Health Nursing I','Nutrition & Dietetics','Clinical Placement I']],
+                    ['year'=>'Year 3','units'=>['Medical-Surgical Nursing II','Midwifery & Reproductive Health','Psychiatric Nursing','Community Health Nursing II','Research Methods','Clinical Placement II']],
+                    ['year'=>'Year 4','units'=>['Critical Care Nursing','Nursing Management & Leadership','Nursing Research Project','Community Placement','Elective (Oncology / Renal)','Clinical Placement III']],
+                ],
+                'accreditation' => ['body'=>'Nursing Council of Kenya (NCK) & Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2016],
+                'employability_data' => ['job_roles'=>['Registered Nurse','Midwife','ICU/Critical Care Nurse','Community Health Nurse','Nurse Manager','Public Health Officer'],'industry_sectors'=>['Public Hospitals','Private Hospitals & Clinics','NGOs','Ministry of Health','Community Health Centres','International Health Organisations'],'employment_rate'=>98],
+                'fee_structure' => ['tuition_kes_per_year'=>70000,'accommodation_kes_per_year'=>30000,'other_costs_kes'=>20000,'total_annual_kes'=>120000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition. Clinical placement fees included.'],
+            ],
+            'BSc Clinical Med.' => [
+                'learning_outcomes' => ['Diagnose and manage common and complex medical conditions at clinical officer level','Apply clinical reasoning in medical, surgical, paediatric, obstetric, and psychiatric settings','Prescribe medications within the scope of Clinical Officer practice','Conduct community health assessments and design health promotion interventions','Apply research evidence to clinical decision-making and protocols','Uphold medical ethics, patient rights, and professional standards'],
+                'course_structure' => [
+                    ['year'=>'Year 1','units'=>['Human Anatomy','Physiology','Biochemistry','Communication Skills','Introduction to Clinical Medicine','Clinical Skills I']],
+                    ['year'=>'Year 2','units'=>['Pathology','Pharmacology I','Medicine I','Surgery I','Community Health','Clinical Placement I']],
+                    ['year'=>'Year 3','units'=>['Medicine II','Surgery II','Paediatrics','Obstetrics & Gynaecology','Research Methods','Clinical Placement II']],
+                    ['year'=>'Year 4','units'=>['Psychiatry & Mental Health','Emergency Medicine','Clinical Dissertation','Elective Rotation','Clinical Placement III','Professional Ethics']],
+                ],
+                'accreditation' => ['body'=>'Kenya Medical Practitioners and Dentists Council (KMPDC) & Commission for University Education (CUE)','status'=>'Fully Accredited','year'=>2016],
+                'employability_data' => ['job_roles'=>['Clinical Officer','Community Health Specialist','Medical Researcher','Public Health Officer','Primary Care Practitioner','Lecturer (with postgrad)'],'industry_sectors'=>['Public Hospitals','County Health Departments','NGOs','Ministry of Health','Private Clinics','Community Health Centres'],'employment_rate'=>99],
+                'fee_structure' => ['tuition_kes_per_year'=>75000,'accommodation_kes_per_year'=>30000,'other_costs_kes'=>22000,'total_annual_kes'=>127000,'govt_sponsored_tuition'=>0,'notes'=>'Government-sponsored students pay no tuition. Clinical placement fees included.'],
+            ],
+        ],
+    ];
+
     if (!isset($details[$school])) {
         return response()->json(['error' => 'School not found'], 404);
     }
@@ -2288,22 +2577,23 @@ Route::get('/programmes/{school}/{code}', function (string $school, string $code
                 'code' => $code,
                 'overview' => 'Detailed information for this programme is being updated. Please contact the Admissions Office for full details.',
                 'mode' => 'Full-time',
-                'career' => ['Career information coming soon'],
-                'requirements' => ['Please contact the Admissions Office for entry requirements'],
+                'career_opportunities' => ['Career information coming soon'],
+                'entry_requirements' => ['Please contact the Admissions Office for entry requirements'],
             ]
         ]);
     }
 
     $d = $details[$school][$code];
+    $x = $extra[$school][$code] ?? [];
     return response()->json([
-        'data' => [
+        'data' => array_merge([
             'school' => $school,
             'code' => $code,
             'overview' => $d['overview'],
             'mode' => $d['mode'],
             'career_opportunities' => $d['career'],
             'entry_requirements' => $d['requirements'],
-        ]
+        ], $x)
     ]);
 });
 
@@ -3352,5 +3642,212 @@ Route::get('/service-points/{slug}', function (string $slug) {
         ->with('campus:id,name,slug,address,latitude,longitude')
         ->firstOrFail();
     return response()->json($sp);
+});
+
+// ─── ADMISSIONS ELIGIBILITY CHECKER ──────────────────────────────────────────
+Route::post('/admissions/eligibility', function (Request $request) {
+    $pathway = $request->input('pathway', 'undergraduate');
+    $qualType = $request->input('qualification_type', 'KCSE');
+    $meanGrade = strtoupper(trim($request->input('mean_grade', 'C+')));
+
+    // KCSE grade points (Kenya standard)
+    $gradePoints = ['A' => 12,'A-' => 11,'B+' => 10,'B' => 9,'B-' => 8,'C+' => 7,'C' => 6,'C-' => 5,'D+' => 4,'D' => 3,'D-' => 2,'E' => 1];
+    $userPoints = $gradePoints[$meanGrade] ?? 0;
+
+    // Undergraduate programmes with their minimum grade points
+    $ugProgrammes = [
+        ['name'=>'BEd (Arts)','code'=>'BEd (Arts)','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Teaching, Education'],
+        ['name'=>'BEd (French)','code'=>'BEd (French)','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Language Teaching, Diplomacy'],
+        ['name'=>'BEd (Science)','code'=>'BEd (Science)','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Science Teaching, STEM'],
+        ['name'=>'BSW','code'=>'BSW','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Social Work, NGOs, Community Development'],
+        ['name'=>'BEd ECD','code'=>'BEd ECD','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Early Childhood Education'],
+        ['name'=>'BDMID','code'=>'BDMID','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Disaster Management, Diplomacy'],
+        ['name'=>'BA Criminology','code'=>'BA Criminology','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Police, Security, Justice'],
+        ['name'=>'BCom','code'=>'BCom','school'=>'SBE','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Accounting, Finance, Business'],
+        ['name'=>'BSc Economics','code'=>'BSc Economics','school'=>'SBE','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Economics, Policy, Development'],
+        ['name'=>'BSc CS','code'=>'BSc CS','school'=>'SCIT','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Software, AI, Data Science'],
+        ['name'=>'BSc IT','code'=>'BSc IT','school'=>'SCIT','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Networking, Cybersecurity, Web Dev'],
+        ['name'=>'BSc Physics','code'=>'BSc Physics','school'=>'SOS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Research, Energy, Technology'],
+        ['name'=>'BSc Chemistry','code'=>'BSc Chemistry','school'=>'SOS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Pharmaceutical, Lab Science'],
+        ['name'=>'BSc Biology','code'=>'BSc Biology','school'=>'SOS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Healthcare, Research, Environment'],
+        ['name'=>'BSc Agric. Econ.','code'=>'BSc Agric. Econ.','school'=>'SOS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Agriculture, Policy, Food Security'],
+        ['name'=>'BOptom','code'=>'BOptom','school'=>'SHS','min_grade'=>'C+','min_points'=>7,'duration'=>'5 years','career_hint'=>'Eye Care, Vision Science'],
+        ['name'=>'BSN','code'=>'BSN','school'=>'SHS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Nursing, Midwifery, Healthcare'],
+        ['name'=>'BSc Clinical Med.','code'=>'BSc Clinical Med.','school'=>'SHS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Clinical Practice, Community Health'],
+    ];
+
+    $pgProgrammes = [
+        ['name'=>'MA Religion','code'=>'MA Religion','school'=>'SESS','min_qual'=>'Bachelor\'s degree (2nd Class or above)','duration'=>'2 years','career_hint'=>'Theology, Academia, Development'],
+        ['name'=>'MBA','code'=>'MBA','school'=>'SBE','min_qual'=>'Bachelor\'s degree + 2 years work experience','duration'=>'2 years','career_hint'=>'Management, Entrepreneurship'],
+        ['name'=>'MSc IT','code'=>'MSc IT','school'=>'SCIT','min_qual'=>'Bachelor\'s in CS/IT or related (2nd Class or above)','duration'=>'2 years','career_hint'=>'Technology Leadership, Research'],
+    ];
+
+    $eligible = [];
+    $alternatives = [];
+
+    if ($pathway === 'undergraduate') {
+        if ($qualType === 'KCSE') {
+            foreach ($ugProgrammes as $prog) {
+                if ($userPoints >= $prog['min_points']) {
+                    $eligible[] = $prog;
+                } elseif ($userPoints >= ($prog['min_points'] - 1)) {
+                    $alternatives[] = array_merge($prog, ['note' => 'You are one sub-grade below the minimum. Consider re-sitting or Direct Entry.']);
+                }
+            }
+        } else {
+            // For A-Level or international, assume eligibility for all if grade data provided
+            $eligible = $ugProgrammes;
+        }
+
+        $verdict = count($eligible) > 0 ? 'eligible' : ($userPoints >= 6 ? 'borderline' : 'not_eligible');
+        $message = match($verdict) {
+            'eligible' => 'Based on your grade, you qualify to apply for ' . count($eligible) . ' undergraduate programme(s) at KAFU.',
+            'borderline' => 'Your grade is just below the minimum for some programmes. You may qualify for Module II (self-sponsored) pathways. Review alternative options below.',
+            default => 'Your current grade may not meet standard entry requirements. Contact the Admissions Office — special consideration or diploma pathways may be available.',
+        };
+
+        return response()->json([
+            'data' => [
+                'verdict' => $verdict,
+                'pathway' => $pathway,
+                'mean_grade' => $meanGrade,
+                'grade_points' => $userPoints,
+                'message' => $message,
+                'eligible_programmes' => $eligible,
+                'alternative_options' => $alternatives,
+                'next_steps' => [
+                    ['label' => 'Browse All Programmes', 'url' => '/programmes'],
+                    ['label' => 'View Admissions Guide', 'url' => '/admissions'],
+                    ['label' => 'Apply via KUCCPS', 'url' => 'https://students.kuccps.net/'],
+                    ['label' => 'Contact Admissions', 'url' => '/contact'],
+                ],
+            ]
+        ]);
+    }
+
+    if ($pathway === 'postgraduate') {
+        return response()->json([
+            'data' => [
+                'verdict' => 'eligible',
+                'pathway' => $pathway,
+                'message' => 'KAFU offers the following postgraduate programmes. Entry is based on your undergraduate degree classification and relevant experience.',
+                'eligible_programmes' => $pgProgrammes,
+                'alternative_options' => [],
+                'next_steps' => [
+                    ['label' => 'Apply via Student Portal', 'url' => 'https://portal.kafu.ac.ke'],
+                    ['label' => 'View Postgraduate Guide', 'url' => '/admissions#postgraduate'],
+                    ['label' => 'Contact Admissions', 'url' => '/contact'],
+                ],
+            ]
+        ]);
+    }
+
+    return response()->json([
+        'data' => [
+            'verdict' => 'eligible',
+            'pathway' => $pathway,
+            'message' => 'KAFU welcomes international and self-sponsored applicants. Contact the Admissions Office to confirm your qualification equivalency.',
+            'eligible_programmes' => $ugProgrammes,
+            'alternative_options' => [],
+            'next_steps' => [
+                ['label' => 'Apply via Student Portal', 'url' => 'https://portal.kafu.ac.ke'],
+                ['label' => 'International Students Guide', 'url' => '/international'],
+                ['label' => 'Contact Admissions', 'url' => '/contact'],
+            ],
+        ]
+    ]);
+});
+
+// ─── ADMISSIONS FEE & COST INTELLIGENCE ──────────────────────────────────────
+Route::get('/admissions/fees', function () {
+    return response()->json([
+        'data' => [
+            'currency' => 'KES',
+            'academic_year' => '2025/2026',
+            'pathways' => [
+                [
+                    'id' => 'government',
+                    'title' => 'Government Sponsored (KUCCPS)',
+                    'subtitle' => 'For KUCCPS-placed students',
+                    'tuition_note' => 'Tuition is fully funded by the government. Students pay a government-regulated annual student contribution.',
+                    'annual_items' => [
+                        ['label' => 'Government Student Contribution', 'amount' => 16000, 'note' => 'Regulated by the State (Higher Education Loans Board rates)'],
+                        ['label' => 'On-Campus Accommodation (optional)', 'amount' => 28000, 'note' => 'Single room per year. Shared rooms from KES 18,000.'],
+                        ['label' => 'Medical / Health Levy', 'amount' => 5000, 'note' => 'Covers access to the university clinic and basic health services'],
+                        ['label' => 'Activity & Sports Fee', 'amount' => 2500, 'note' => 'Student Union, clubs, and sports facilities'],
+                        ['label' => 'Library & IT Levy', 'amount' => 2000, 'note' => 'Library resources, internet access, and computer labs'],
+                        ['label' => 'Caution Money (once-off, refundable)', 'amount' => 5000, 'note' => 'Refundable deposit for accommodation or equipment'],
+                    ],
+                    'estimated_annual_total' => 58500,
+                    'estimated_4yr_total' => 234000,
+                    'helb_note' => 'KUCCPS students may apply for a Higher Education Loans Board (HELB) loan of up to KES 60,000 per year.',
+                    'scholarships' => ['HELB Loan (up to KES 60,000/year)','KAFU Merit Scholarship (top 5% of intake)','KAFU Bursary (means-tested)','Constituency Development Fund (CDF) Bursary','County Government Bursaries'],
+                ],
+                [
+                    'id' => 'self-sponsored',
+                    'title' => 'Self-Sponsored (Module II)',
+                    'subtitle' => 'For direct-entry and working professional students',
+                    'tuition_note' => 'Tuition varies by school and programme. Figures below represent typical costs.',
+                    'annual_items' => [
+                        ['label' => 'Tuition Fee (SESS / SBE / SOS)', 'amount' => 48000, 'note' => 'Per year. Health Sciences programmes are higher.'],
+                        ['label' => 'Tuition Fee (SCIT)', 'amount' => 55000, 'note' => 'Computing and IT programmes'],
+                        ['label' => 'Tuition Fee (SHS)', 'amount' => 72000, 'note' => 'Nursing, Optometry, Clinical Medicine'],
+                        ['label' => 'On-Campus Accommodation (optional)', 'amount' => 28000, 'note' => 'Single room per year'],
+                        ['label' => 'Medical / Health Levy', 'amount' => 5000, 'note' => ''],
+                        ['label' => 'Activity & Sports Fee', 'amount' => 2500, 'note' => ''],
+                        ['label' => 'Library & IT Levy', 'amount' => 2000, 'note' => ''],
+                    ],
+                    'estimated_annual_total' => 90000,
+                    'estimated_4yr_total' => 360000,
+                    'helb_note' => 'Self-sponsored students may apply for HELB loans. Applications open annually on the HELB portal.',
+                    'scholarships' => ['HELB Loan (up to KES 50,000/year for self-sponsored)','KAFU Bursary (means-tested)','CDF Bursary','County Government Bursaries','Church / Quaker Foundation Scholarships'],
+                ],
+                [
+                    'id' => 'postgraduate',
+                    'title' => 'Postgraduate (Masters & PhD)',
+                    'subtitle' => 'For Masters and Doctoral candidates',
+                    'tuition_note' => 'Postgraduate fees vary by programme type (coursework vs research) and school.',
+                    'annual_items' => [
+                        ['label' => 'Masters Tuition (SESS / SBE)', 'amount' => 72000, 'note' => 'Per year for coursework Masters'],
+                        ['label' => 'Masters Tuition (SCIT / SOS)', 'amount' => 80000, 'note' => 'Per year for MSc programmes'],
+                        ['label' => 'MBA Tuition', 'amount' => 85000, 'note' => 'Per year'],
+                        ['label' => 'PhD Tuition', 'amount' => 90000, 'note' => 'Per year (all schools)'],
+                        ['label' => 'Research Levy / Supervision Fee', 'amount' => 15000, 'note' => 'Applicable to research-track students'],
+                        ['label' => 'On-Campus Accommodation (optional)', 'amount' => 30000, 'note' => 'Postgraduate halls — priority given'],
+                        ['label' => 'Library & IT Levy', 'amount' => 3000, 'note' => ''],
+                    ],
+                    'estimated_annual_total' => 128000,
+                    'estimated_4yr_total' => 256000,
+                    'helb_note' => 'Postgraduate HELB loans are available for qualified candidates. Applications open annually.',
+                    'scholarships' => ['HELB Postgraduate Loan','KAFU Research Scholarship (competitive)','AfDB / PASET Scholarship','WHO / Global Health Scholarships (SHS)','British Council Scholarships (International)'],
+                ],
+                [
+                    'id' => 'international',
+                    'title' => 'International Students',
+                    'subtitle' => 'For students from outside Kenya',
+                    'tuition_note' => 'International students pay tuition in USD. Below are the annual USD equivalents.',
+                    'annual_items' => [
+                        ['label' => 'Tuition (Undergraduate — Arts / Social Sciences)', 'amount' => 1800, 'note' => 'Per year in USD'],
+                        ['label' => 'Tuition (Undergraduate — Sciences / Health)', 'amount' => 2500, 'note' => 'Per year in USD'],
+                        ['label' => 'Tuition (Postgraduate Masters)', 'amount' => 3200, 'note' => 'Per year in USD'],
+                        ['label' => 'Tuition (PhD)', 'amount' => 3600, 'note' => 'Per year in USD'],
+                        ['label' => 'International Student Levy', 'amount' => 500, 'note' => 'USD — covers registration, orientation, and student services'],
+                        ['label' => 'On-Campus Accommodation', 'amount' => 1200, 'note' => 'USD per year — single furnished room'],
+                        ['label' => 'Medical Insurance', 'amount' => 300, 'note' => 'USD per year — mandatory for international students'],
+                    ],
+                    'estimated_annual_total_usd' => 4000,
+                    'helb_note' => 'International students are not eligible for HELB. Students may seek scholarships from their home country or international bodies.',
+                    'scholarships' => ['Kenyan Government Scholarship (via bilateral agreements)','African Union Scholarships','DAAD (German)','British Council Scholarships','Home Country Government Scholarships'],
+                ],
+            ],
+            'payment_methods' => [
+                ['method' => 'M-Pesa', 'details' => 'Paybill Number: 123456 (KAFU Finance Office). Include your student ID as account number.'],
+                ['method' => 'Bank Deposit / Transfer', 'details' => 'Kenya Commercial Bank (KCB) — Account: Kaimosi Friends University, A/C No: 1234567890, Branch: Kaimosi'],
+                ['method' => 'Cooperative Bank', 'details' => 'Cooperative Bank — Account: 0123456789, Branch: Kakamega'],
+                ['method' => 'Cash (Finance Office)', 'details' => 'Finance Office, Ground Floor, Administration Block. Mon–Fri, 8:00 AM – 4:00 PM.'],
+            ],
+            'note' => 'All fees are reviewed annually. The figures above reflect 2025/2026 rates. Prospective students should confirm current rates with the Finance Office before payment.',
+        ]
+    ]);
 });
 
