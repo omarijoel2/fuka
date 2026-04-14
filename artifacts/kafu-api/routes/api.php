@@ -3645,35 +3645,175 @@ Route::get('/service-points/{slug}', function (string $slug) {
 });
 
 // ─── ADMISSIONS ELIGIBILITY CHECKER ──────────────────────────────────────────
+// ─── CERTIFICATE UPLOAD ──────────────────────────────────────────────────────
+Route::post('/admissions/documents/upload', function (Request $request) {
+    $request->validate([
+        'certificate' => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        'document_type' => 'nullable|string|max:60',
+    ]);
+
+    $file = $request->file('certificate');
+    $docType = $request->input('document_type', 'certificate');
+    $ext = $file->getClientOriginalExtension();
+    $safeName = \Illuminate\Support\Str::uuid() . '.' . $ext;
+    $stored = $file->storeAs('admissions-uploads', $safeName);
+
+    return response()->json([
+        'data' => [
+            'reference_id' => \Illuminate\Support\Str::uuid(),
+            'file_name'    => $file->getClientOriginalName(),
+            'document_type'=> $docType,
+            'size_kb'      => round($file->getSize() / 1024, 1),
+            'stored_path'  => $stored,
+            'message'      => 'Document uploaded successfully. It will be verified by the Admissions Office when you submit your formal application.',
+        ]
+    ]);
+});
+
+// ─── ELIGIBILITY CHECKER ──────────────────────────────────────────────────────
 Route::post('/admissions/eligibility', function (Request $request) {
     $pathway = $request->input('pathway', 'undergraduate');
     $qualType = $request->input('qualification_type', 'KCSE');
     $meanGrade = strtoupper(trim($request->input('mean_grade', 'C+')));
+    $subjectGrades = $request->input('subject_grades', []);   // e.g. {"Mathematics":"B+","Biology":"A-",...}
 
     // KCSE grade points (Kenya standard)
     $gradePoints = ['A' => 12,'A-' => 11,'B+' => 10,'B' => 9,'B-' => 8,'C+' => 7,'C' => 6,'C-' => 5,'D+' => 4,'D' => 3,'D-' => 2,'E' => 1];
     $userPoints = $gradePoints[$meanGrade] ?? 0;
 
-    // Undergraduate programmes with their minimum grade points
+    // ── Subject grades helper ──────────────────────────────────────────────────
+    // subject_grades: assoc array {subject => grade}
+    $subjectGradePoints = [];
+    foreach ($subjectGrades as $subj => $grd) {
+        $subjectGradePoints[strtolower(trim($subj))] = $gradePoints[strtoupper(trim($grd))] ?? 0;
+    }
+
+    /**
+     * Evaluate a programme's cluster requirements against submitted subject grades.
+     * Each requirement group: { desc, options (lowercase subject names), min_points, count }
+     * Returns: [ { description, pass, best_subject, best_grade, required_grade }, ... ]
+     */
+    $checkCluster = function(array $clusterReqs) use ($subjectGradePoints, $gradePoints) {
+        if (empty($subjectGradePoints)) return null; // No subjects submitted — skip check
+        $invertedGrades = array_flip($gradePoints); // points => grade string
+        $results = [];
+        foreach ($clusterReqs as $req) {
+            $matched = 0;
+            $bestPts = 0;
+            $bestSubj = null;
+            foreach ($req['options'] as $opt) {
+                $pts = $subjectGradePoints[$opt] ?? 0;
+                if ($pts >= $req['min_points']) $matched++;
+                if ($pts > $bestPts) { $bestPts = $pts; $bestSubj = $opt; }
+            }
+            $pass = $matched >= $req['count'];
+            $results[] = [
+                'description'    => $req['desc'],
+                'required_grade' => $invertedGrades[$req['min_points']] ?? 'C',
+                'required_count' => $req['count'],
+                'options'        => $req['options'],
+                'best_subject'   => $bestSubj ? ucwords($bestSubj) : null,
+                'best_grade'     => $bestSubj ? ($invertedGrades[$subjectGradePoints[$bestSubj]] ?? '—') : null,
+                'pass'           => $pass,
+            ];
+        }
+        return $results;
+    };
+
+    // Undergraduate programmes with cluster subjects
     $ugProgrammes = [
-        ['name'=>'BEd (Arts)','code'=>'BEd (Arts)','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Teaching, Education'],
-        ['name'=>'BEd (French)','code'=>'BEd (French)','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Language Teaching, Diplomacy'],
-        ['name'=>'BEd (Science)','code'=>'BEd (Science)','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Science Teaching, STEM'],
-        ['name'=>'BSW','code'=>'BSW','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Social Work, NGOs, Community Development'],
-        ['name'=>'BEd ECD','code'=>'BEd ECD','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Early Childhood Education'],
-        ['name'=>'BDMID','code'=>'BDMID','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Disaster Management, Diplomacy'],
-        ['name'=>'BA Criminology','code'=>'BA Criminology','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Police, Security, Justice'],
-        ['name'=>'BCom','code'=>'BCom','school'=>'SBE','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Accounting, Finance, Business'],
-        ['name'=>'BSc Economics','code'=>'BSc Economics','school'=>'SBE','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Economics, Policy, Development'],
-        ['name'=>'BSc CS','code'=>'BSc CS','school'=>'SCIT','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Software, AI, Data Science'],
-        ['name'=>'BSc IT','code'=>'BSc IT','school'=>'SCIT','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Networking, Cybersecurity, Web Dev'],
-        ['name'=>'BSc Physics','code'=>'BSc Physics','school'=>'SOS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Research, Energy, Technology'],
-        ['name'=>'BSc Chemistry','code'=>'BSc Chemistry','school'=>'SOS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Pharmaceutical, Lab Science'],
-        ['name'=>'BSc Biology','code'=>'BSc Biology','school'=>'SOS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Healthcare, Research, Environment'],
-        ['name'=>'BSc Agric. Econ.','code'=>'BSc Agric. Econ.','school'=>'SOS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Agriculture, Policy, Food Security'],
-        ['name'=>'BOptom','code'=>'BOptom','school'=>'SHS','min_grade'=>'C+','min_points'=>7,'duration'=>'5 years','career_hint'=>'Eye Care, Vision Science'],
-        ['name'=>'BSN','code'=>'BSN','school'=>'SHS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Nursing, Midwifery, Healthcare'],
-        ['name'=>'BSc Clinical Med.','code'=>'BSc Clinical Med.','school'=>'SHS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Clinical Practice, Community Health'],
+        ['name'=>'BEd (Arts)','code'=>'BEd (Arts)','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Teaching, Education',
+         'cluster_requirements'=>[
+            ['desc'=>'English or Kiswahili at C+','options'=>['english','kiswahili'],'min_points'=>7,'count'=>1],
+            ['desc'=>'Any two of: History, Geography, French, CRE, IRE at C','options'=>['history','geography','french','cre','ire'],'min_points'=>6,'count'=>2],
+        ]],
+        ['name'=>'BEd (French)','code'=>'BEd (French)','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Language Teaching, Diplomacy',
+         'cluster_requirements'=>[
+            ['desc'=>'French or English at C+','options'=>['french','english'],'min_points'=>7,'count'=>1],
+            ['desc'=>'Any two other subjects at C','options'=>['kiswahili','history','geography','cre','ire','mathematics'],'min_points'=>6,'count'=>2],
+        ]],
+        ['name'=>'BEd (Science)','code'=>'BEd (Science)','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Science Teaching, STEM',
+         'cluster_requirements'=>[
+            ['desc'=>'Any two of: Biology, Chemistry, Physics, Mathematics at C+','options'=>['biology','chemistry','physics','mathematics'],'min_points'=>7,'count'=>2],
+        ]],
+        ['name'=>'BSW','code'=>'BSW','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Social Work, NGOs, Community Development',
+         'cluster_requirements'=>[
+            ['desc'=>'English or Kiswahili at C','options'=>['english','kiswahili'],'min_points'=>6,'count'=>1],
+            ['desc'=>'Any three other subjects at C','options'=>['mathematics','history','geography','biology','chemistry','physics','cre','ire','business studies'],'min_points'=>6,'count'=>3],
+        ]],
+        ['name'=>'BEd ECD','code'=>'BEd ECD','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Early Childhood Education',
+         'cluster_requirements'=>[
+            ['desc'=>'English or Kiswahili at C','options'=>['english','kiswahili'],'min_points'=>6,'count'=>1],
+            ['desc'=>'Any two other subjects at C','options'=>['mathematics','history','geography','biology','chemistry','physics','cre','ire'],'min_points'=>6,'count'=>2],
+        ]],
+        ['name'=>'BDMID','code'=>'BDMID','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Disaster Management, Diplomacy',
+         'cluster_requirements'=>[
+            ['desc'=>'English at C','options'=>['english'],'min_points'=>6,'count'=>1],
+            ['desc'=>'Any three other subjects at C','options'=>['kiswahili','mathematics','history','geography','biology','chemistry','physics','cre'],'min_points'=>6,'count'=>3],
+        ]],
+        ['name'=>'BA Criminology','code'=>'BA Criminology','school'=>'SESS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Police, Security, Justice',
+         'cluster_requirements'=>[
+            ['desc'=>'English at C','options'=>['english'],'min_points'=>6,'count'=>1],
+            ['desc'=>'Any three other subjects at C','options'=>['kiswahili','mathematics','history','geography','biology','chemistry','physics','cre','ire'],'min_points'=>6,'count'=>3],
+        ]],
+        ['name'=>'BCom','code'=>'BCom','school'=>'SBE','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Accounting, Finance, Business',
+         'cluster_requirements'=>[
+            ['desc'=>'Mathematics at C','options'=>['mathematics'],'min_points'=>6,'count'=>1],
+            ['desc'=>'English at C','options'=>['english'],'min_points'=>6,'count'=>1],
+            ['desc'=>'Any two other subjects at C','options'=>['kiswahili','history','geography','biology','chemistry','physics','business studies','cre'],'min_points'=>6,'count'=>2],
+        ]],
+        ['name'=>'BSc Economics','code'=>'BSc Economics','school'=>'SBE','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Economics, Policy, Development',
+         'cluster_requirements'=>[
+            ['desc'=>'Mathematics at C+','options'=>['mathematics'],'min_points'=>7,'count'=>1],
+            ['desc'=>'English at C','options'=>['english'],'min_points'=>6,'count'=>1],
+        ]],
+        ['name'=>'BSc CS','code'=>'BSc CS','school'=>'SCIT','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Software, AI, Data Science',
+         'cluster_requirements'=>[
+            ['desc'=>'Mathematics at C+','options'=>['mathematics'],'min_points'=>7,'count'=>1],
+            ['desc'=>'Any one science at C: Physics, Chemistry, Biology, Computer Studies','options'=>['physics','chemistry','biology','computer studies'],'min_points'=>6,'count'=>1],
+        ]],
+        ['name'=>'BSc IT','code'=>'BSc IT','school'=>'SCIT','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Networking, Cybersecurity, Web Dev',
+         'cluster_requirements'=>[
+            ['desc'=>'Mathematics at C+','options'=>['mathematics'],'min_points'=>7,'count'=>1],
+            ['desc'=>'Any one science at C: Physics, Chemistry, Biology, Computer Studies','options'=>['physics','chemistry','biology','computer studies'],'min_points'=>6,'count'=>1],
+        ]],
+        ['name'=>'BSc Physics','code'=>'BSc Physics','school'=>'SOS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Research, Energy, Technology',
+         'cluster_requirements'=>[
+            ['desc'=>'Physics at C+','options'=>['physics'],'min_points'=>7,'count'=>1],
+            ['desc'=>'Mathematics at C+','options'=>['mathematics'],'min_points'=>7,'count'=>1],
+        ]],
+        ['name'=>'BSc Chemistry','code'=>'BSc Chemistry','school'=>'SOS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Pharmaceutical, Lab Science',
+         'cluster_requirements'=>[
+            ['desc'=>'Chemistry at C+','options'=>['chemistry'],'min_points'=>7,'count'=>1],
+            ['desc'=>'Biology or Physics at C','options'=>['biology','physics'],'min_points'=>6,'count'=>1],
+        ]],
+        ['name'=>'BSc Biology','code'=>'BSc Biology','school'=>'SOS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Healthcare, Research, Environment',
+         'cluster_requirements'=>[
+            ['desc'=>'Biology at C+','options'=>['biology'],'min_points'=>7,'count'=>1],
+            ['desc'=>'Chemistry at C','options'=>['chemistry'],'min_points'=>6,'count'=>1],
+        ]],
+        ['name'=>'BSc Agric. Econ.','code'=>'BSc Agric. Econ.','school'=>'SOS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Agriculture, Policy, Food Security',
+         'cluster_requirements'=>[
+            ['desc'=>'Agriculture or Biology at C+','options'=>['agriculture','biology'],'min_points'=>7,'count'=>1],
+        ]],
+        ['name'=>'BOptom','code'=>'BOptom','school'=>'SHS','min_grade'=>'C+','min_points'=>7,'duration'=>'5 years','career_hint'=>'Eye Care, Vision Science',
+         'cluster_requirements'=>[
+            ['desc'=>'Biology at C+','options'=>['biology'],'min_points'=>7,'count'=>1],
+            ['desc'=>'Chemistry at C','options'=>['chemistry'],'min_points'=>6,'count'=>1],
+            ['desc'=>'Physics or Mathematics at C','options'=>['physics','mathematics'],'min_points'=>6,'count'=>1],
+        ]],
+        ['name'=>'BSN','code'=>'BSN','school'=>'SHS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Nursing, Midwifery, Healthcare',
+         'cluster_requirements'=>[
+            ['desc'=>'Biology at C+','options'=>['biology'],'min_points'=>7,'count'=>1],
+            ['desc'=>'Chemistry at C+','options'=>['chemistry'],'min_points'=>7,'count'=>1],
+            ['desc'=>'Physics or Mathematics at C','options'=>['physics','mathematics'],'min_points'=>6,'count'=>1],
+        ]],
+        ['name'=>'BSc Clinical Med.','code'=>'BSc Clinical Med.','school'=>'SHS','min_grade'=>'C+','min_points'=>7,'duration'=>'4 years','career_hint'=>'Clinical Practice, Community Health',
+         'cluster_requirements'=>[
+            ['desc'=>'Biology at C+','options'=>['biology'],'min_points'=>7,'count'=>1],
+            ['desc'=>'Chemistry at C+','options'=>['chemistry'],'min_points'=>7,'count'=>1],
+            ['desc'=>'Physics or Mathematics at C','options'=>['physics','mathematics'],'min_points'=>6,'count'=>1],
+        ]],
     ];
 
     $pgProgrammes = [
@@ -3685,36 +3825,48 @@ Route::post('/admissions/eligibility', function (Request $request) {
     $eligible = [];
     $alternatives = [];
 
+    // Helper: add cluster_check to a programme
+    $withCluster = function(array $prog) use ($checkCluster) {
+        $clusterCheck = isset($prog['cluster_requirements']) ? $checkCluster($prog['cluster_requirements']) : null;
+        $clusterPass  = is_null($clusterCheck) ? null : collect($clusterCheck)->every(fn($r) => $r['pass']);
+        return array_merge($prog, ['cluster_check' => $clusterCheck, 'cluster_pass' => $clusterPass]);
+    };
+
     if ($pathway === 'undergraduate') {
         if ($qualType === 'KCSE') {
             foreach ($ugProgrammes as $prog) {
+                $enriched = $withCluster($prog);
                 if ($userPoints >= $prog['min_points']) {
-                    $eligible[] = $prog;
+                    $eligible[] = $enriched;
                 } elseif ($userPoints >= ($prog['min_points'] - 1)) {
-                    $alternatives[] = array_merge($prog, ['note' => 'You are one sub-grade below the minimum. Consider re-sitting or Direct Entry.']);
+                    $alternatives[] = array_merge($enriched, ['note' => 'You are one sub-grade below the minimum. Consider re-sitting or Direct Entry (Module II).']);
                 }
             }
         } else {
-            // For A-Level or international, assume eligibility for all if grade data provided
-            $eligible = $ugProgrammes;
+            foreach ($ugProgrammes as $prog) {
+                $eligible[] = $withCluster($prog);
+            }
         }
 
         $verdict = count($eligible) > 0 ? 'eligible' : ($userPoints >= 6 ? 'borderline' : 'not_eligible');
+        $clusterFailed = !empty($subjectGradePoints) ? collect($eligible)->filter(fn($p) => $p['cluster_pass'] === false)->count() : 0;
         $message = match($verdict) {
-            'eligible' => 'Based on your grade, you qualify to apply for ' . count($eligible) . ' undergraduate programme(s) at KAFU.',
-            'borderline' => 'Your grade is just below the minimum for some programmes. You may qualify for Module II (self-sponsored) pathways. Review alternative options below.',
+            'eligible' => 'Based on your mean grade of ' . $meanGrade . ', you qualify to apply for ' . count($eligible) . ' undergraduate programme(s) at KAFU.'
+                . ($clusterFailed > 0 ? ' Note: ' . $clusterFailed . ' programme(s) have unmet cluster subject requirements based on the subjects you entered.' : ''),
+            'borderline' => 'Your grade is just below the minimum for most programmes. You may qualify for Module II (self-sponsored) pathways. Review alternative options below.',
             default => 'Your current grade may not meet standard entry requirements. Contact the Admissions Office — special consideration or diploma pathways may be available.',
         };
 
         return response()->json([
             'data' => [
-                'verdict' => $verdict,
-                'pathway' => $pathway,
-                'mean_grade' => $meanGrade,
-                'grade_points' => $userPoints,
-                'message' => $message,
-                'eligible_programmes' => $eligible,
-                'alternative_options' => $alternatives,
+                'verdict'              => $verdict,
+                'pathway'              => $pathway,
+                'mean_grade'           => $meanGrade,
+                'grade_points'         => $userPoints,
+                'subject_grades_provided' => !empty($subjectGradePoints),
+                'message'              => $message,
+                'eligible_programmes'  => $eligible,
+                'alternative_options'  => $alternatives,
                 'next_steps' => [
                     ['label' => 'Browse All Programmes', 'url' => '/programmes'],
                     ['label' => 'View Admissions Guide', 'url' => '/admissions'],
@@ -3730,6 +3882,9 @@ Route::post('/admissions/eligibility', function (Request $request) {
             'data' => [
                 'verdict' => 'eligible',
                 'pathway' => $pathway,
+                'mean_grade' => $meanGrade,
+                'grade_points' => $userPoints,
+                'subject_grades_provided' => false,
                 'message' => 'KAFU offers the following postgraduate programmes. Entry is based on your undergraduate degree classification and relevant experience.',
                 'eligible_programmes' => $pgProgrammes,
                 'alternative_options' => [],
@@ -3746,8 +3901,11 @@ Route::post('/admissions/eligibility', function (Request $request) {
         'data' => [
             'verdict' => 'eligible',
             'pathway' => $pathway,
+            'mean_grade' => $meanGrade,
+            'grade_points' => $userPoints,
+            'subject_grades_provided' => false,
             'message' => 'KAFU welcomes international and self-sponsored applicants. Contact the Admissions Office to confirm your qualification equivalency.',
-            'eligible_programmes' => $ugProgrammes,
+            'eligible_programmes' => array_map($withCluster, $ugProgrammes),
             'alternative_options' => [],
             'next_steps' => [
                 ['label' => 'Apply via Student Portal', 'url' => 'https://portal.kafu.ac.ke'],

@@ -290,15 +290,40 @@ export interface EligibleProgramme {
   note?: string;
 }
 
+export interface ClusterRequirementResult {
+  description: string;
+  required_grade: string;
+  required_count: number;
+  options: string[];
+  best_subject: string | null;
+  best_grade: string | null;
+  pass: boolean;
+}
+
 export interface EligibilityResult {
   verdict: 'eligible' | 'borderline' | 'not_eligible';
   pathway: string;
   mean_grade: string;
   grade_points: number;
+  subject_grades_provided: boolean;
   message: string;
-  eligible_programmes: EligibleProgramme[];
-  alternative_options: EligibleProgramme[];
+  eligible_programmes: (EligibleProgramme & {
+    cluster_check: ClusterRequirementResult[] | null;
+    cluster_pass: boolean | null;
+  })[];
+  alternative_options: (EligibleProgramme & {
+    cluster_check: ClusterRequirementResult[] | null;
+    cluster_pass: boolean | null;
+  })[];
   next_steps: { label: string; url: string }[];
+}
+
+export interface CertificateUploadResult {
+  reference_id: string;
+  file_name: string;
+  document_type: string;
+  size_kb: number;
+  message: string;
 }
 
 export interface FeeItem {

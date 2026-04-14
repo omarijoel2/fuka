@@ -210,6 +210,7 @@ export async function checkEligibility(params: {
   pathway: string;
   qualification_type: string;
   mean_grade: string;
+  subject_grades?: Record<string, string>;
 }): Promise<EligibilityResult> {
   const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
   const res = await fetch(`${BASE}/api/admissions/eligibility`, {
@@ -220,6 +221,23 @@ export async function checkEligibility(params: {
   if (!res.ok) throw new Error("Eligibility check failed");
   const json = await res.json();
   return json.data as EligibilityResult;
+}
+
+export async function uploadCertificate(file: File, documentType: string): Promise<import("./api-types").CertificateUploadResult> {
+  const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
+  const formData = new FormData();
+  formData.append("certificate", file);
+  formData.append("document_type", documentType);
+  const res = await fetch(`${BASE}/api/admissions/documents/upload`, {
+    method: "POST",
+    body: formData,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.message ?? "Upload failed. Please check the file type and size (max 5 MB).");
+  }
+  const json = await res.json();
+  return json.data as import("./api-types").CertificateUploadResult;
 }
 
 // Research & Innovation Hooks

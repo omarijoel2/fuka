@@ -24,7 +24,7 @@ import {
   CalendarDays,
   CheckCheck,
 } from "lucide-react";
-import { addToCompare, isInCompare } from "./programme-compare";
+import { addToCompare, isInCompare } from "@/lib/compare-store";
 
 const SCHOOL_NAMES: Record<string, string> = {
   SESS: "School of Education and Social Sciences",

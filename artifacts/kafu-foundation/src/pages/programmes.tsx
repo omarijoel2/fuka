@@ -14,7 +14,7 @@ import {
   X,
   CheckCircle2,
 } from "lucide-react";
-import { addToCompare, removeFromCompare, isInCompare, getCompareList } from "./programme-compare";
+import { addToCompare, removeFromCompare, isInCompare, getCompareList } from "@/lib/compare-store";
 
 const SCHOOL_NAMES: Record<string, string> = {
   SESS: "Education & Social Sciences",

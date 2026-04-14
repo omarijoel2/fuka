@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { SeoHead } from "@/components/seo-head";
 import { useProgrammeDetail } from "@/lib/api-hooks";
 import type { ProgrammeDetail } from "@/lib/api-types";
+import { getCompareList, addToCompare, removeFromCompare, isInCompare, clearCompare } from "@/lib/compare-store";
 import {
   ChevronRight,
   X,
@@ -33,38 +34,6 @@ const LEVEL_LABELS: Record<string, string> = {
   postgraduate: "Postgraduate",
   doctoral: "Doctoral",
 };
-
-// Comparison storage key
-const COMPARE_KEY = "kafu_compare_progs";
-
-export function getCompareList(): { school: string; code: string; name: string }[] {
-  try {
-    return JSON.parse(localStorage.getItem(COMPARE_KEY) ?? "[]");
-  } catch {
-    return [];
-  }
-}
-
-export function addToCompare(item: { school: string; code: string; name: string }): boolean {
-  const list = getCompareList();
-  if (list.length >= 3) return false;
-  if (list.some((l) => l.school === item.school && l.code === item.code)) return true;
-  localStorage.setItem(COMPARE_KEY, JSON.stringify([...list, item]));
-  return true;
-}
-
-export function removeFromCompare(school: string, code: string) {
-  const list = getCompareList().filter((l) => !(l.school === school && l.code === code));
-  localStorage.setItem(COMPARE_KEY, JSON.stringify(list));
-}
-
-export function isInCompare(school: string, code: string): boolean {
-  return getCompareList().some((l) => l.school === school && l.code === code);
-}
-
-export function clearCompare() {
-  localStorage.setItem(COMPARE_KEY, "[]");
-}
 
 function ProgrammeColumn({ school, code, name, onRemove }: { school: string; code: string; name: string; onRemove: () => void }) {
   const { data: detail, isLoading } = useProgrammeDetail(school.toUpperCase(), code);
