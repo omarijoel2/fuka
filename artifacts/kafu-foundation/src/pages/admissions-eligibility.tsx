@@ -23,32 +23,9 @@ import {
   Loader2,
 } from "lucide-react";
 
+// ── KCSE constants ─────────────────────────────────────────────────────────────
 const KCSE_GRADES = ["A", "A-", "B+", "B", "B-", "C+", "C", "C-", "D+", "D", "D-", "E"];
 
-const QUALIFICATION_TYPES = [
-  { value: "KCSE", label: "KCSE (Kenya Certificate of Secondary Education)" },
-  { value: "A-Level", label: "A-Level (British System)" },
-  { value: "IB", label: "International Baccalaureate (IB)" },
-  { value: "IGCSE", label: "IGCSE / O-Level" },
-  { value: "Other", label: "Other International Qualification" },
-];
-
-const PATHWAY_OPTIONS = [
-  { value: "undergraduate", label: "Undergraduate Degree", desc: "Bachelor's programmes (4–5 years)" },
-  { value: "postgraduate", label: "Postgraduate", desc: "Masters & PhD programmes" },
-  { value: "international", label: "International Student", desc: "From outside Kenya" },
-  { value: "self-sponsored", label: "Self-Sponsored (Module II)", desc: "Direct entry without KUCCPS" },
-];
-
-const SCHOOL_NAMES: Record<string, string> = {
-  SESS: "Education & Social Sciences",
-  SBE: "Business & Economics",
-  SCIT: "Computing & IT",
-  SOS: "Science",
-  SHS: "Health Sciences",
-};
-
-// The key KCSE subjects applicants need to enter for cluster checking
 const KCSE_SUBJECTS = [
   { key: "English", label: "English" },
   { key: "Kiswahili", label: "Kiswahili" },
@@ -67,6 +44,59 @@ const KCSE_SUBJECTS = [
   { key: "Home Science", label: "Home Science" },
 ];
 
+// ── Pathway options ────────────────────────────────────────────────────────────
+const PATHWAY_OPTIONS = [
+  { value: "undergraduate", label: "Undergraduate Degree", desc: "Bachelor's programmes (4–5 years)" },
+  { value: "postgraduate", label: "Postgraduate", desc: "Masters & PhD programmes" },
+  { value: "international", label: "International Student", desc: "From outside Kenya" },
+  { value: "self-sponsored", label: "Self-Sponsored (Module II)", desc: "Direct entry without KUCCPS" },
+];
+
+// ── Step 2 qualification options by pathway ────────────────────────────────────
+const UG_QUAL_TYPES = [
+  { value: "KCSE", label: "KCSE (Kenya Certificate of Secondary Education)" },
+  { value: "A-Level", label: "A-Level (British System)" },
+  { value: "IB", label: "International Baccalaureate (IB)" },
+  { value: "IGCSE", label: "IGCSE / O-Level" },
+  { value: "Other", label: "Other International Qualification" },
+];
+
+const PG_QUAL_TYPES = [
+  {
+    value: "bachelors",
+    label: "Bachelor's Degree",
+    desc: "I hold an undergraduate degree — I want to pursue a Masters programme",
+  },
+  {
+    value: "masters_degree",
+    label: "Master's Degree",
+    desc: "I hold a Masters degree — I want to pursue a PhD / Doctoral programme",
+  },
+  {
+    value: "secondary",
+    label: "Secondary School Certificate only",
+    desc: "I have not yet completed an undergraduate degree",
+  },
+];
+
+// ── Degree classification options (postgraduate Step 3) ────────────────────────
+const DEGREE_CLASSES = [
+  { value: "first", label: "First Class Honours" },
+  { value: "upper_second", label: "Second Class Honours — Upper Division (2:1)" },
+  { value: "lower_second", label: "Second Class Honours — Lower Division (2:2)" },
+  { value: "third", label: "Third Class Honours / Pass" },
+  { value: "pass", label: "Pass / Unclassified (e.g. MBA direct entry)" },
+];
+
+// ── Misc ───────────────────────────────────────────────────────────────────────
+const SCHOOL_NAMES: Record<string, string> = {
+  SESS: "Education & Social Sciences",
+  SBE: "Business & Economics",
+  SCIT: "Computing & IT",
+  SOS: "Science",
+  SHS: "Health Sciences",
+};
+
 const ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/jpg", "image/png"];
 const MAX_FILE_MB = 5;
 
@@ -75,7 +105,7 @@ type Step = 1 | 2 | 3 | 4 | 5;
 const STEP_LABELS: Record<Step, string> = {
   1: "Pathway",
   2: "Qualification",
-  3: "Grade & Subjects",
+  3: "Grade / Class",
   4: "Upload Certificate",
   5: "Results",
 };
@@ -83,8 +113,9 @@ const STEP_LABELS: Record<Step, string> = {
 export default function AdmissionsEligibilityPage() {
   const [step, setStep] = useState<Step>(1);
   const [pathway, setPathway] = useState("");
-  const [qualType, setQualType] = useState("KCSE");
+  const [qualType, setQualType] = useState("");
   const [meanGrade, setMeanGrade] = useState("");
+  const [degreeClass, setDegreeClass] = useState("");
   const [subjectGrades, setSubjectGrades] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<EligibilityResult | null>(null);
@@ -98,7 +129,9 @@ export default function AdmissionsEligibilityPage() {
   const [uploadResult, setUploadResult] = useState<CertificateUploadResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const isKCSE = qualType === "KCSE";
+  const isPostgraduate = pathway === "postgraduate";
+  const isKCSE = !isPostgraduate && qualType === "KCSE";
+  const subjectCount = Object.keys(subjectGrades).length;
 
   function setSubjectGrade(subj: string, grade: string) {
     setSubjectGrades((prev) => {
@@ -107,16 +140,24 @@ export default function AdmissionsEligibilityPage() {
     });
   }
 
+  // Step 2 options depend on pathway
+  const step2Options = isPostgraduate ? PG_QUAL_TYPES : UG_QUAL_TYPES;
+
+  // Step 3 is "Grade" for UG, "Degree Classification" for PG
+  const step3Complete = isPostgraduate ? !!degreeClass : !!meanGrade;
+
   async function handleCheck() {
     setLoading(true);
     setError(null);
     try {
-      const data = await checkEligibility({
+      const params: Parameters<typeof checkEligibility>[0] = {
         pathway,
         qualification_type: qualType,
-        mean_grade: meanGrade,
-        subject_grades: isKCSE && Object.keys(subjectGrades).length > 0 ? subjectGrades : undefined,
-      });
+        mean_grade: isPostgraduate ? "N/A" : meanGrade,
+        degree_class: isPostgraduate ? degreeClass : undefined,
+        subject_grades: isKCSE && subjectCount > 0 ? subjectGrades : undefined,
+      };
+      const data = await checkEligibility(params);
       setResult(data);
       setStep(5);
     } catch {
@@ -157,8 +198,9 @@ export default function AdmissionsEligibilityPage() {
   function reset() {
     setStep(1);
     setPathway("");
-    setQualType("KCSE");
+    setQualType("");
     setMeanGrade("");
+    setDegreeClass("");
     setSubjectGrades({});
     setResult(null);
     setError(null);
@@ -167,13 +209,11 @@ export default function AdmissionsEligibilityPage() {
     setUploadError(null);
   }
 
-  const subjectCount = Object.keys(subjectGrades).length;
-
   return (
     <div className="flex flex-col min-h-screen">
       <SeoHead
         title="Eligibility Checker — Admissions | KAFU"
-        description="Check your eligibility for KAFU programmes. Enter your KCSE grade and subjects to see which programmes you qualify for, including cluster subject verification."
+        description="Check your eligibility for KAFU programmes. Undergraduate KCSE cluster checking, postgraduate degree classification, and certificate upload in one wizard."
         path="/admissions/eligibility"
         breadcrumbs={[
           { name: "Admissions", path: "/admissions" },
@@ -195,7 +235,7 @@ export default function AdmissionsEligibilityPage() {
             Eligibility <span className="text-accent">Pre-Check</span>
           </h1>
           <p className="text-primary-foreground/80 max-w-xl text-base leading-relaxed">
-            Find out which KAFU programmes you qualify for. Enter your grades, check cluster subject requirements, and upload your certificate for a complete pre-assessment. This is indicative guidance — not a binding admissions decision.
+            Find out which KAFU programmes you qualify for. This is indicative guidance — not a binding admissions decision.
           </p>
         </div>
       </div>
@@ -226,7 +266,7 @@ export default function AdmissionsEligibilityPage() {
       <div className="container mx-auto px-4 py-10">
         <div className="max-w-2xl mx-auto">
 
-          {/* STEP 1: Pathway */}
+          {/* ── STEP 1: Pathway ─────────────────────────────────────────────── */}
           {step === 1 && (
             <div data-testid="step-1">
               <h2 className="text-xl font-serif font-bold text-foreground mb-2">Step 1: Choose Your Pathway</h2>
@@ -250,122 +290,190 @@ export default function AdmissionsEligibilityPage() {
                 ))}
               </div>
               <div className="mt-6">
-                <Button onClick={() => setStep(2)} disabled={!pathway} className="bg-primary text-white" data-testid="btn-next-step1">
+                <Button onClick={() => { setQualType(""); setStep(2); }} disabled={!pathway} className="bg-primary text-white" data-testid="btn-next-step1">
                   Continue <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </div>
             </div>
           )}
 
-          {/* STEP 2: Qualification */}
+          {/* ── STEP 2: Qualification ────────────────────────────────────────── */}
           {step === 2 && (
             <div data-testid="step-2">
               <h2 className="text-xl font-serif font-bold text-foreground mb-2">Step 2: Your Qualification</h2>
-              <p className="text-muted-foreground text-sm mb-6">What secondary/high school qualification do you hold or expect to receive?</p>
+              <p className="text-muted-foreground text-sm mb-6">
+                {isPostgraduate
+                  ? "What is your highest academic qualification?"
+                  : "What secondary / high school qualification do you hold or expect to receive?"}
+              </p>
               <div className="space-y-3">
-                {QUALIFICATION_TYPES.map((qt) => (
+                {step2Options.map((qt) => (
                   <button
                     key={qt.value}
                     onClick={() => setQualType(qt.value)}
-                    className={`w-full text-left flex items-center gap-4 p-4 rounded-xl border transition-all ${qualType === qt.value ? "border-primary bg-primary/5" : "border-border bg-card hover:border-primary/50"}`}
+                    className={`w-full text-left flex items-start gap-4 p-4 rounded-xl border transition-all ${qualType === qt.value ? "border-primary bg-primary/5" : "border-border bg-card hover:border-primary/50"}`}
                     data-testid={`qual-option-${qt.value}`}
                   >
-                    <div className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center ${qualType === qt.value ? "border-primary" : "border-muted-foreground/40"}`}>
+                    <div className={`w-5 h-5 rounded-full border-2 mt-0.5 shrink-0 flex items-center justify-center ${qualType === qt.value ? "border-primary" : "border-muted-foreground/40"}`}>
                       {qualType === qt.value && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
                     </div>
-                    <span className="text-sm font-medium text-foreground">{qt.label}</span>
+                    <div>
+                      <span className="text-sm font-medium text-foreground block">{qt.label}</span>
+                      {"desc" in qt && <span className="text-xs text-muted-foreground mt-0.5 block">{qt.desc}</span>}
+                    </div>
                   </button>
                 ))}
               </div>
+
+              {/* Postgraduate ineligible warning */}
+              {isPostgraduate && qualType === "secondary" && (
+                <div className="mt-4 flex items-start gap-3 p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm text-amber-800" data-testid="pg-secondary-warning">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <div>
+                    Postgraduate programmes require a minimum of a Bachelor's degree. Complete an undergraduate degree before applying for Masters or PhD programmes.
+                    <div className="mt-2">
+                      <Button size="sm" variant="outline" className="border-amber-500 text-amber-700" onClick={() => { setPathway("undergraduate"); setQualType(""); setStep(2); }} data-testid="btn-switch-ug">
+                        Switch to Undergraduate Check
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               <div className="mt-6 flex gap-3">
                 <Button variant="outline" onClick={() => setStep(1)} data-testid="btn-back-step2">Back</Button>
-                <Button onClick={() => setStep(3)} disabled={!qualType} className="bg-primary text-white" data-testid="btn-next-step2">
+                <Button
+                  onClick={() => setStep(3)}
+                  disabled={!qualType || (isPostgraduate && qualType === "secondary")}
+                  className="bg-primary text-white"
+                  data-testid="btn-next-step2"
+                >
                   Continue <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </div>
             </div>
           )}
 
-          {/* STEP 3: Mean Grade + Subject Grades */}
+          {/* ── STEP 3: Grade / Degree Class ────────────────────────────────── */}
           {step === 3 && (
             <div data-testid="step-3">
-              <h2 className="text-xl font-serif font-bold text-foreground mb-2">Step 3: Your Grades</h2>
-              <p className="text-muted-foreground text-sm mb-6">
-                {isKCSE
-                  ? "Select your KCSE overall mean grade, then optionally enter individual subject grades to check cluster subject requirements for specific programmes."
-                  : "Select the closest equivalent KCSE mean grade for your qualification system."}
-              </p>
-
-              {/* Mean Grade Grid */}
-              <div className="mb-6">
-                <label className="block text-sm font-semibold text-foreground mb-3">
-                  {isKCSE ? "KCSE Overall Mean Grade" : "Equivalent Mean Grade"}
-                </label>
-                <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
-                  {KCSE_GRADES.map((g) => (
-                    <button
-                      key={g}
-                      onClick={() => setMeanGrade(g)}
-                      className={`py-3 rounded-xl border text-sm font-bold transition-all ${meanGrade === g ? "bg-primary text-white border-primary shadow" : "bg-card border-border hover:border-primary text-foreground"}`}
-                      data-testid={`grade-option-${g}`}
-                    >
-                      {g}
-                    </button>
-                  ))}
-                </div>
-                {meanGrade && (
-                  <div className="mt-3 p-3 bg-secondary rounded-lg text-sm text-foreground">
-                    Selected: <strong>{meanGrade}</strong>
-                    {["C+", "B-", "B", "B+", "A-", "A"].includes(meanGrade)
-                      ? " — Meets the standard minimum for most undergraduate programmes."
-                      : meanGrade === "C"
-                      ? " — Slightly below the standard minimum. Check Module II (Self-Sponsored) options."
-                      : " — Contact the Admissions Office to discuss available options."}
-                  </div>
-                )}
-              </div>
-
-              {/* Subject Grades — KCSE only */}
-              {isKCSE && (
-                <div className="border rounded-xl overflow-hidden">
-                  <div className="flex items-center gap-2 px-5 py-3 bg-primary/5 border-b">
-                    <Info className="w-4 h-4 text-primary shrink-0" />
-                    <span className="text-sm font-semibold text-foreground">Individual Subject Grades</span>
-                    <span className="ml-auto text-xs text-muted-foreground font-normal">Optional — enables cluster subject checking</span>
-                  </div>
-                  <div className="p-5">
-                    <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
-                      Enter grades for any subjects you sat. Only fill in subjects relevant to your intended programme. Leaving a subject blank means it won't be checked against cluster requirements.
-                    </p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" data-testid="subject-grades-grid">
-                      {KCSE_SUBJECTS.map((subj) => (
-                        <div key={subj.key} className="flex items-center gap-3">
-                          <label className="text-xs font-medium text-foreground min-w-0 flex-1 truncate" htmlFor={`subj-${subj.key}`}>
-                            {subj.label}
-                          </label>
-                          <select
-                            id={`subj-${subj.key}`}
-                            value={subjectGrades[subj.key] ?? ""}
-                            onChange={(e) => setSubjectGrade(subj.key, e.target.value)}
-                            className="border rounded-lg text-xs px-2 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 w-20 shrink-0"
-                            data-testid={`subject-grade-${subj.key.toLowerCase().replace(/\s+/g, "-")}`}
-                          >
-                            <option value="">—</option>
-                            {KCSE_GRADES.map((g) => (
-                              <option key={g} value={g}>{g}</option>
-                            ))}
-                          </select>
+              {isPostgraduate ? (
+                /* ── Postgraduate: Degree Classification ── */
+                <>
+                  <h2 className="text-xl font-serif font-bold text-foreground mb-2">Step 3: Degree Classification</h2>
+                  <p className="text-muted-foreground text-sm mb-6">
+                    {qualType === "masters_degree"
+                      ? "Select your Masters degree level. All Masters degree holders are eligible to apply for Doctoral programmes."
+                      : "Select your Bachelor's degree classification. Most Masters programmes require at least a Second Class Honours (Lower Division)."}
+                  </p>
+                  <div className="space-y-3">
+                    {(qualType === "masters_degree"
+                      ? [{ value: "masters", label: "Master's Degree (any specialisation)" }]
+                      : DEGREE_CLASSES
+                    ).map((dc) => (
+                      <button
+                        key={dc.value}
+                        onClick={() => setDegreeClass(dc.value)}
+                        className={`w-full text-left flex items-center gap-4 p-4 rounded-xl border transition-all ${degreeClass === dc.value ? "border-primary bg-primary/5" : "border-border bg-card hover:border-primary/50"}`}
+                        data-testid={`degree-class-${dc.value}`}
+                      >
+                        <div className={`w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center ${degreeClass === dc.value ? "border-primary" : "border-muted-foreground/40"}`}>
+                          {degreeClass === dc.value && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
                         </div>
+                        <span className="text-sm font-medium text-foreground">{dc.label}</span>
+                      </button>
+                    ))}
+                  </div>
+
+                  {qualType === "masters_degree" && (
+                    <div className="mt-4 flex items-start gap-2 p-3 bg-primary/5 border border-primary/20 rounded-lg text-xs text-foreground">
+                      <Info className="w-4 h-4 shrink-0 text-primary mt-0.5" />
+                      Holders of a Master's degree are eligible for all KAFU Doctoral (PhD) programmes, subject to availability and research proposal approval.
+                    </div>
+                  )}
+                </>
+              ) : (
+                /* ── Undergraduate: KCSE Mean Grade + Subject Grades ── */
+                <>
+                  <h2 className="text-xl font-serif font-bold text-foreground mb-2">Step 3: Your Grades</h2>
+                  <p className="text-muted-foreground text-sm mb-6">
+                    {isKCSE
+                      ? "Select your KCSE overall mean grade, then optionally enter individual subject grades to check cluster subject requirements."
+                      : "Select the closest equivalent KCSE mean grade for your qualification."}
+                  </p>
+
+                  {/* Mean Grade Grid */}
+                  <div className="mb-6">
+                    <label className="block text-sm font-semibold text-foreground mb-3">
+                      {isKCSE ? "KCSE Overall Mean Grade" : "Equivalent Mean Grade"}
+                    </label>
+                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                      {KCSE_GRADES.map((g) => (
+                        <button
+                          key={g}
+                          onClick={() => setMeanGrade(g)}
+                          className={`py-3 rounded-xl border text-sm font-bold transition-all ${meanGrade === g ? "bg-primary text-white border-primary shadow" : "bg-card border-border hover:border-primary text-foreground"}`}
+                          data-testid={`grade-option-${g}`}
+                        >
+                          {g}
+                        </button>
                       ))}
                     </div>
-                    {subjectCount > 0 && (
-                      <div className="mt-3 flex items-center gap-2 text-xs text-emerald-700 font-medium">
-                        <CheckCircle2 className="w-3.5 h-3.5" />
-                        {subjectCount} subject{subjectCount > 1 ? "s" : ""} entered — cluster requirements will be checked.
+                    {meanGrade && (
+                      <div className="mt-3 p-3 bg-secondary rounded-lg text-sm text-foreground">
+                        Selected: <strong>{meanGrade}</strong>
+                        {["C+", "B-", "B", "B+", "A-", "A"].includes(meanGrade)
+                          ? " — Meets the standard minimum for most undergraduate programmes."
+                          : meanGrade === "C"
+                          ? " — Slightly below the standard minimum. Check Module II (Self-Sponsored) options."
+                          : " — Contact the Admissions Office to discuss available options."}
                       </div>
                     )}
                   </div>
-                </div>
+
+                  {/* Subject Grades — KCSE only */}
+                  {isKCSE && (
+                    <div className="border rounded-xl overflow-hidden">
+                      <div className="flex items-center gap-2 px-5 py-3 bg-primary/5 border-b">
+                        <Info className="w-4 h-4 text-primary shrink-0" />
+                        <span className="text-sm font-semibold text-foreground">Individual Subject Grades</span>
+                        <span className="ml-auto text-xs text-muted-foreground font-normal">Optional — enables cluster subject checking</span>
+                      </div>
+                      <div className="p-5">
+                        <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
+                          Enter grades for subjects you sat. Only fill in subjects relevant to your intended programme. Blank subjects won't be checked against cluster requirements.
+                        </p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3" data-testid="subject-grades-grid">
+                          {KCSE_SUBJECTS.map((subj) => (
+                            <div key={subj.key} className="flex items-center gap-3">
+                              <label className="text-xs font-medium text-foreground min-w-0 flex-1 truncate" htmlFor={`subj-${subj.key}`}>
+                                {subj.label}
+                              </label>
+                              <select
+                                id={`subj-${subj.key}`}
+                                value={subjectGrades[subj.key] ?? ""}
+                                onChange={(e) => setSubjectGrade(subj.key, e.target.value)}
+                                className="border rounded-lg text-xs px-2 py-1.5 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 w-20 shrink-0"
+                                data-testid={`subject-grade-${subj.key.toLowerCase().replace(/\s+/g, "-")}`}
+                              >
+                                <option value="">—</option>
+                                {KCSE_GRADES.map((g) => (
+                                  <option key={g} value={g}>{g}</option>
+                                ))}
+                              </select>
+                            </div>
+                          ))}
+                        </div>
+                        {subjectCount > 0 && (
+                          <div className="mt-3 flex items-center gap-2 text-xs text-emerald-700 font-medium">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            {subjectCount} subject{subjectCount > 1 ? "s" : ""} entered — cluster requirements will be checked.
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
 
               {error && (
@@ -376,19 +484,21 @@ export default function AdmissionsEligibilityPage() {
 
               <div className="mt-6 flex gap-3">
                 <Button variant="outline" onClick={() => setStep(2)} data-testid="btn-back-step3">Back</Button>
-                <Button onClick={() => setStep(4)} disabled={!meanGrade} className="bg-primary text-white" data-testid="btn-next-step3">
+                <Button onClick={() => setStep(4)} disabled={!step3Complete} className="bg-primary text-white" data-testid="btn-next-step3">
                   Continue <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
               </div>
             </div>
           )}
 
-          {/* STEP 4: Certificate Upload */}
+          {/* ── STEP 4: Certificate Upload ───────────────────────────────────── */}
           {step === 4 && (
             <div data-testid="step-4">
               <h2 className="text-xl font-serif font-bold text-foreground mb-2">Step 4: Upload Your Certificate</h2>
               <p className="text-muted-foreground text-sm mb-6">
-                Upload your KCSE result slip, academic transcript, or equivalent certificate. This is optional for the pre-check but required when you submit a formal application. Accepted formats: PDF, JPG, PNG (max 5 MB).
+                {isPostgraduate
+                  ? "Upload your degree certificate or academic transcript. Accepted formats: PDF, JPG, PNG (max 5 MB)."
+                  : "Upload your KCSE result slip, academic transcript, or equivalent certificate. Optional here but required for formal applications. Accepted formats: PDF, JPG, PNG (max 5 MB)."}
               </p>
 
               {/* Document type */}
@@ -400,14 +510,26 @@ export default function AdmissionsEligibilityPage() {
                   className="w-full border rounded-lg text-sm px-3 py-2.5 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
                   data-testid="select-doc-type"
                 >
-                  <option>KCSE Result Slip</option>
-                  <option>KCSE Certificate</option>
-                  <option>A-Level Certificate</option>
-                  <option>IB Diploma</option>
-                  <option>O-Level / IGCSE Certificate</option>
-                  <option>Degree Certificate</option>
-                  <option>Academic Transcript</option>
-                  <option>Other Qualification</option>
+                  {isPostgraduate ? (
+                    <>
+                      <option>Degree Certificate</option>
+                      <option>Academic Transcript</option>
+                      <option>Masters Certificate</option>
+                      <option>Postgraduate Diploma Certificate</option>
+                      <option>Other Qualification</option>
+                    </>
+                  ) : (
+                    <>
+                      <option>KCSE Result Slip</option>
+                      <option>KCSE Certificate</option>
+                      <option>A-Level Certificate</option>
+                      <option>IB Diploma</option>
+                      <option>O-Level / IGCSE Certificate</option>
+                      <option>Degree Certificate</option>
+                      <option>Academic Transcript</option>
+                      <option>Other Qualification</option>
+                    </>
+                  )}
                 </select>
               </div>
 
@@ -431,12 +553,7 @@ export default function AdmissionsEligibilityPage() {
                           <X className="w-4 h-4" />
                         </button>
                       </div>
-                      <Button
-                        onClick={handleUpload}
-                        disabled={uploading}
-                        className="bg-primary text-white"
-                        data-testid="btn-upload-file"
-                      >
+                      <Button onClick={handleUpload} disabled={uploading} className="bg-primary text-white" data-testid="btn-upload-file">
                         {uploading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Uploading...</> : <><Upload className="w-4 h-4 mr-2" /> Upload Document</>}
                       </Button>
                     </div>
@@ -445,12 +562,7 @@ export default function AdmissionsEligibilityPage() {
                       <Upload className="w-10 h-10 text-muted-foreground mx-auto mb-3 opacity-50" />
                       <p className="text-sm font-medium text-foreground mb-1">Drag and drop your file here</p>
                       <p className="text-xs text-muted-foreground mb-4">PDF, JPG, or PNG — maximum 5 MB</p>
-                      <Button
-                        variant="outline"
-                        className="border-primary text-primary"
-                        onClick={() => fileInputRef.current?.click()}
-                        data-testid="btn-choose-file"
-                      >
+                      <Button variant="outline" className="border-primary text-primary" onClick={() => fileInputRef.current?.click()} data-testid="btn-choose-file">
                         Choose File
                       </Button>
                       <input
@@ -486,10 +598,10 @@ export default function AdmissionsEligibilityPage() {
 
               <div className="mt-4 p-3 bg-secondary border rounded-lg text-xs text-muted-foreground flex items-start gap-2">
                 <Info className="w-4 h-4 shrink-0 mt-0.5" />
-                Your document is stored securely and will only be used by the KAFU Admissions Office to verify your qualifications. You can also submit documents in person at the Admissions Office.
+                Your document is stored securely and will only be used by the KAFU Admissions Office to verify your qualifications.
               </div>
 
-              <div className="mt-6 flex gap-3">
+              <div className="mt-6 flex flex-wrap gap-3">
                 <Button variant="outline" onClick={() => setStep(3)} data-testid="btn-back-step4">Back</Button>
                 <Button
                   onClick={handleCheck}
@@ -500,13 +612,7 @@ export default function AdmissionsEligibilityPage() {
                   {loading ? <><Loader2 className="w-4 h-4 mr-2 animate-spin" /> Checking...</> : <>Check Eligibility <ArrowRight className="ml-2 w-4 h-4" /></>}
                 </Button>
                 {!uploadResult && !loading && (
-                  <Button
-                    variant="ghost"
-                    onClick={handleCheck}
-                    disabled={loading}
-                    className="text-muted-foreground text-sm"
-                    data-testid="btn-skip-upload"
-                  >
+                  <Button variant="ghost" onClick={handleCheck} disabled={loading} className="text-muted-foreground text-sm" data-testid="btn-skip-upload">
                     Skip upload
                   </Button>
                 )}
@@ -514,7 +620,7 @@ export default function AdmissionsEligibilityPage() {
             </div>
           )}
 
-          {/* STEP 5: Results */}
+          {/* ── STEP 5: Results ──────────────────────────────────────────────── */}
           {step === 5 && result && (
             <div data-testid="step-5-results">
               {/* Verdict Banner */}
@@ -528,15 +634,18 @@ export default function AdmissionsEligibilityPage() {
                  <XCircle className="w-6 h-6 shrink-0 mt-0.5" />}
                 <div>
                   <div className="font-bold text-base mb-1">
-                    {result.verdict === "eligible" ? "You Qualify" : result.verdict === "borderline" ? "Borderline — Review Options" : "Below Standard Minimum"}
+                    {result.verdict === "eligible" ? "You Qualify" : result.verdict === "borderline" ? "Borderline — Review Options" : "Not Eligible for This Level"}
                   </div>
                   <p className="text-sm leading-relaxed">{result.message}</p>
-                  <p className="text-xs mt-1 opacity-75">Mean Grade: {result.mean_grade} · Pathway: {result.pathway}</p>
-                  {uploadResult && (
-                    <p className="text-xs mt-1 flex items-center gap-1">
-                      <CheckCheck className="w-3.5 h-3.5" /> Certificate uploaded · Ref: <code className="font-mono">{uploadResult.reference_id.slice(0, 8)}…</code>
-                    </p>
-                  )}
+                  <div className="text-xs mt-1 opacity-75 flex flex-wrap gap-3">
+                    <span>Pathway: {result.pathway}</span>
+                    {result.mean_grade && result.mean_grade !== "N/A" && <span>Mean Grade: {result.mean_grade}</span>}
+                    {uploadResult && (
+                      <span className="flex items-center gap-1">
+                        <CheckCheck className="w-3.5 h-3.5" /> Certificate uploaded
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -545,10 +654,12 @@ export default function AdmissionsEligibilityPage() {
                 <div className="mb-8">
                   <h3 className="font-serif font-bold text-lg text-foreground mb-4 flex items-center gap-2">
                     <GraduationCap className="w-5 h-5 text-primary" />
-                    {result.verdict === "eligible" ? "Programmes You Qualify For" : "Available Programmes"} ({result.eligible_programmes.length})
+                    Programmes You Qualify For ({result.eligible_programmes.length})
                   </h3>
                   <div className="space-y-3">
                     {result.eligible_programmes.map((prog, i) => {
+                      const levelBadge = (prog as { level?: string }).level === "doctoral"
+                        ? "PhD" : (prog as { level?: string }).level === "masters" ? "Masters" : null;
                       const clusterAll = prog.cluster_check?.every((c) => c.pass) ?? null;
                       const clusterFailed = prog.cluster_check?.filter((c) => !c.pass) ?? [];
                       return (
@@ -562,7 +673,14 @@ export default function AdmissionsEligibilityPage() {
                                 <BookOpen className="w-4 h-4" />
                               </div>
                               <div>
-                                <div className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">{prog.name}</div>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <span className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">{prog.name}</span>
+                                  {levelBadge && (
+                                    <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${levelBadge === "PhD" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>
+                                      {levelBadge}
+                                    </span>
+                                  )}
+                                </div>
                                 <div className="text-xs text-muted-foreground">{SCHOOL_NAMES[prog.school] ?? prog.school} · {prog.duration}</div>
                                 <div className="text-xs text-accent font-medium mt-0.5 flex items-center gap-1">
                                   <Briefcase className="w-3 h-3" /> {prog.career_hint}
@@ -579,6 +697,13 @@ export default function AdmissionsEligibilityPage() {
                               <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                             </div>
                           </Link>
+
+                          {/* min_qual row for postgraduate */}
+                          {(prog as { min_qual?: string }).min_qual && !prog.cluster_check && (
+                            <div className="border-t px-4 py-2 bg-secondary/30 text-xs text-muted-foreground">
+                              Minimum requirement: {(prog as { min_qual?: string }).min_qual}
+                            </div>
+                          )}
 
                           {/* Cluster subject detail */}
                           {prog.cluster_check && prog.cluster_check.length > 0 && (
@@ -615,12 +740,23 @@ export default function AdmissionsEligibilityPage() {
                     <AlertCircle className="w-4 h-4 text-accent" /> Alternative Options
                   </h3>
                   <div className="space-y-2">
-                    {result.alternative_options.map((prog, i) => (
-                      <div key={i} className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm" data-testid={`alt-prog-${i}`}>
-                        <div className="font-semibold text-foreground">{prog.name} ({SCHOOL_NAMES[prog.school] ?? prog.school})</div>
-                        {prog.note && <div className="text-amber-700 text-xs mt-1">{prog.note}</div>}
-                      </div>
-                    ))}
+                    {result.alternative_options.map((prog, i) => {
+                      const levelBadge = (prog as { level?: string }).level === "doctoral" ? "PhD" : (prog as { level?: string }).level === "masters" ? "Masters" : null;
+                      return (
+                        <div key={i} className="p-4 bg-amber-50 border border-amber-200 rounded-xl text-sm" data-testid={`alt-prog-${i}`}>
+                          <div className="flex items-center gap-2 flex-wrap font-semibold text-foreground mb-1">
+                            {prog.name}
+                            {levelBadge && (
+                              <span className={`text-xs px-1.5 py-0.5 rounded font-medium ${levelBadge === "PhD" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>
+                                {levelBadge}
+                              </span>
+                            )}
+                            <span className="text-muted-foreground font-normal text-xs">({SCHOOL_NAMES[prog.school] ?? prog.school})</span>
+                          </div>
+                          {prog.note && <div className="text-amber-700 text-xs">{prog.note}</div>}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -630,9 +766,9 @@ export default function AdmissionsEligibilityPage() {
                 <div className="mb-6 p-4 border border-dashed rounded-xl flex items-start gap-3 text-sm" data-testid="upload-prompt">
                   <Upload className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                   <div>
-                    <div className="font-semibold text-foreground mb-1">Upload your certificate now</div>
+                    <div className="font-semibold text-foreground mb-1">Upload your certificate</div>
                     <p className="text-xs text-muted-foreground leading-relaxed mb-3">
-                      You didn't upload a certificate. When applying formally, you must submit certified copies of your academic certificates. Upload it now to save time.
+                      You skipped the upload step. When applying formally, you must submit certified copies of your academic documents.
                     </p>
                     <Button size="sm" variant="outline" className="border-primary text-primary" onClick={() => setStep(4)} data-testid="btn-go-upload">
                       <Upload className="w-3.5 h-3.5 mr-1.5" /> Upload Certificate
@@ -646,17 +782,15 @@ export default function AdmissionsEligibilityPage() {
                 <h3 className="font-serif font-bold text-base text-foreground mb-3">Next Steps</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {result.next_steps.map((ns, i) => (
-                    <div key={i} className="flex items-center gap-2">
-                      {ns.url.startsWith("http") ? (
-                        <a href={ns.url} target="_blank" rel="noreferrer" className="flex-1 flex items-center gap-2 p-3 bg-card border rounded-lg text-sm font-medium text-foreground hover:border-primary hover:text-primary transition-all" data-testid={`next-step-${i}`}>
-                          <ExternalLink className="w-3.5 h-3.5 shrink-0 text-primary" /> {ns.label}
-                        </a>
-                      ) : (
-                        <Link href={ns.url} className="flex-1 flex items-center gap-2 p-3 bg-card border rounded-lg text-sm font-medium text-foreground hover:border-primary hover:text-primary transition-all" data-testid={`next-step-${i}`}>
-                          <ChevronRight className="w-4 h-4 shrink-0 text-primary" /> {ns.label}
-                        </Link>
-                      )}
-                    </div>
+                    ns.url.startsWith("http") ? (
+                      <a key={i} href={ns.url} target="_blank" rel="noreferrer" className="flex items-center gap-2 p-3 bg-card border rounded-lg text-sm font-medium text-foreground hover:border-primary hover:text-primary transition-all" data-testid={`next-step-${i}`}>
+                        <ExternalLink className="w-3.5 h-3.5 shrink-0 text-primary" /> {ns.label}
+                      </a>
+                    ) : (
+                      <Link key={i} href={ns.url} className="flex items-center gap-2 p-3 bg-card border rounded-lg text-sm font-medium text-foreground hover:border-primary hover:text-primary transition-all" data-testid={`next-step-${i}`}>
+                        <ChevronRight className="w-4 h-4 shrink-0 text-primary" /> {ns.label}
+                      </Link>
+                    )
                   ))}
                 </div>
               </div>
@@ -666,7 +800,7 @@ export default function AdmissionsEligibilityPage() {
               </Button>
 
               <p className="mt-4 text-xs text-muted-foreground leading-relaxed">
-                This tool provides indicative guidance only. Admission is subject to the availability of places, meeting specific cluster subject requirements, and formal verification of documents by the KAFU Admissions Office.
+                This tool provides indicative guidance only. Admission is subject to the availability of places, meeting specific entry requirements, and formal verification by the KAFU Admissions Office.
               </p>
             </div>
           )}
@@ -680,7 +814,7 @@ export default function AdmissionsEligibilityPage() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 max-w-2xl mx-auto">
             <div>
               <p className="font-semibold text-foreground">Need personalised guidance?</p>
-              <p className="text-sm text-muted-foreground">Our admissions team can answer specific questions about your qualifications and cluster requirements.</p>
+              <p className="text-sm text-muted-foreground">Our admissions team can answer specific questions about your qualifications and requirements.</p>
             </div>
             <div className="flex gap-3 shrink-0">
               <Button variant="outline" className="border-primary text-primary" asChild data-testid="btn-contact-admissions">

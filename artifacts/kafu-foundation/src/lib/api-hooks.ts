@@ -210,6 +210,7 @@ export async function checkEligibility(params: {
   pathway: string;
   qualification_type: string;
   mean_grade: string;
+  degree_class?: string;
   subject_grades?: Record<string, string>;
 }): Promise<EligibilityResult> {
   const BASE = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";

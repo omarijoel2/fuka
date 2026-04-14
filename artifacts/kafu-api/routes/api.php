@@ -3817,10 +3817,27 @@ Route::post('/admissions/eligibility', function (Request $request) {
     ];
 
     $pgProgrammes = [
-        ['name'=>'MA Religion','code'=>'MA Religion','school'=>'SESS','min_qual'=>'Bachelor\'s degree (2nd Class or above)','duration'=>'2 years','career_hint'=>'Theology, Academia, Development'],
-        ['name'=>'MBA','code'=>'MBA','school'=>'SBE','min_qual'=>'Bachelor\'s degree + 2 years work experience','duration'=>'2 years','career_hint'=>'Management, Entrepreneurship'],
-        ['name'=>'MSc IT','code'=>'MSc IT','school'=>'SCIT','min_qual'=>'Bachelor\'s in CS/IT or related (2nd Class or above)','duration'=>'2 years','career_hint'=>'Technology Leadership, Research'],
+        // Masters programmes — require a Bachelor's degree (2nd Class or above)
+        ['level'=>'masters','name'=>'MA Religion','code'=>'MA Religion','school'=>'SESS','min_qual'=>'Bachelor\'s degree, 2nd Class Honours or above','min_class'=>'lower_second','duration'=>'2 years','career_hint'=>'Theology, Academia, Development'],
+        ['level'=>'masters','name'=>'MA English Language','code'=>'MA English','school'=>'SESS','min_qual'=>'Bachelor\'s in English, Linguistics or related','min_class'=>'lower_second','duration'=>'2 years','career_hint'=>'Language Studies, Research, Teaching'],
+        ['level'=>'masters','name'=>'MA Kiswahili','code'=>'MA Kiswahili','school'=>'SESS','min_qual'=>'Bachelor\'s in Kiswahili or related (2nd Class or above)','min_class'=>'lower_second','duration'=>'2 years','career_hint'=>'Language, Research, Teaching'],
+        ['level'=>'masters','name'=>'MEd Educational Psychology','code'=>'MEd Ed. Psych.','school'=>'SESS','min_qual'=>'Bachelor\'s in Education or Psychology (2nd Class or above)','min_class'=>'lower_second','duration'=>'2 years','career_hint'=>'Educational Psychology, Counselling'],
+        ['level'=>'masters','name'=>'MBA','code'=>'MBA','school'=>'SBE','min_qual'=>'Bachelor\'s degree + 2 years relevant work experience','min_class'=>'pass','duration'=>'2 years','career_hint'=>'Management, Entrepreneurship, Leadership'],
+        ['level'=>'masters','name'=>'MSc Economics','code'=>'MSc Economics','school'=>'SBE','min_qual'=>'Bachelor\'s in Economics, Mathematics or Statistics (2nd Class or above)','min_class'=>'lower_second','duration'=>'2 years','career_hint'=>'Economic Policy, Research, Development'],
+        ['level'=>'masters','name'=>'MSc IT','code'=>'MSc IT','school'=>'SCIT','min_qual'=>'Bachelor\'s in CS, IT or related (2nd Class or above)','min_class'=>'lower_second','duration'=>'2 years','career_hint'=>'Technology Leadership, Research'],
+        ['level'=>'masters','name'=>'MSc Computer Science','code'=>'MSc CS','school'=>'SCIT','min_qual'=>'Bachelor\'s in Computer Science or related (2nd Class or above)','min_class'=>'lower_second','duration'=>'2 years','career_hint'=>'AI, Software Engineering, Data Science'],
+        ['level'=>'masters','name'=>'MSc Biology','code'=>'MSc Biology','school'=>'SOS','min_qual'=>'Bachelor\'s in Biology or related Life Sciences (2nd Class or above)','min_class'=>'lower_second','duration'=>'2 years','career_hint'=>'Research, Healthcare, Environmental Science'],
+        ['level'=>'masters','name'=>'MSc Chemistry','code'=>'MSc Chemistry','school'=>'SOS','min_qual'=>'Bachelor\'s in Chemistry or related (2nd Class or above)','min_class'=>'lower_second','duration'=>'2 years','career_hint'=>'Pharmaceutical, Research, Lab Science'],
+        // Doctoral programmes — require a Master's degree
+        ['level'=>'doctoral','name'=>'PhD Business Administration','code'=>'PhD Bus. Admin.','school'=>'SBE','min_qual'=>'Master\'s degree in Business or related field from a recognized university','min_class'=>'masters','duration'=>'3–4 years','career_hint'=>'Academia, Executive Leadership, Research'],
+        ['level'=>'doctoral','name'=>'PhD Computer Science','code'=>'PhD CS','school'=>'SCIT','min_qual'=>'Master\'s degree in CS, IT or related field','min_class'=>'masters','duration'=>'3–4 years','career_hint'=>'AI Research, Academia, Tech Innovation'],
+        ['level'=>'doctoral','name'=>'PhD Education','code'=>'PhD Education','school'=>'SESS','min_qual'=>'Master\'s degree in Education or related field','min_class'=>'masters','duration'=>'3–4 years','career_hint'=>'Educational Leadership, Academia, Policy'],
+        ['level'=>'doctoral','name'=>'PhD Biology','code'=>'PhD Biology','school'=>'SOS','min_qual'=>'Master\'s degree in Biology or Life Sciences','min_class'=>'masters','duration'=>'3–4 years','career_hint'=>'Life Sciences Research, Conservation, Academia'],
     ];
+
+    // Degree class hierarchy: higher index = higher qualification
+    $degreeClassRank = ['pass'=>1,'third'=>2,'lower_second'=>3,'upper_second'=>4,'first'=>5,'masters'=>6];
+    $degreeClass = $request->input('degree_class', 'lower_second'); // default assumed
 
     $eligible = [];
     $alternatives = [];
@@ -3878,16 +3895,78 @@ Route::post('/admissions/eligibility', function (Request $request) {
     }
 
     if ($pathway === 'postgraduate') {
+        $userClassRank = $degreeClassRank[$degreeClass] ?? 3;
+
+        // Determine which programme levels the applicant can access
+        // qualType here carries the applicant's highest qualification:
+        //   'bachelors'  → may apply for Masters
+        //   'masters_degree' → may apply for Doctoral
+        //   anything else (KCSE etc.) → not eligible for postgraduate
+        $qualifiesForMasters  = $qualType === 'bachelors';   // Bachelor's only → Masters programmes
+        $qualifiesForDoctoral = $qualType === 'masters_degree'; // Master's → Doctoral programmes
+
+        if (!$qualifiesForMasters && !$qualifiesForDoctoral) {
+            return response()->json([
+                'data' => [
+                    'verdict' => 'not_eligible',
+                    'pathway' => $pathway,
+                    'mean_grade' => $meanGrade,
+                    'grade_points' => $userPoints,
+                    'subject_grades_provided' => false,
+                    'message' => 'Postgraduate programmes at KAFU require a minimum of a Bachelor\'s degree. If you are currently completing your undergraduate degree, you may apply once you have graduated.',
+                    'eligible_programmes' => [],
+                    'alternative_options' => [],
+                    'next_steps' => [
+                        ['label' => 'Browse Undergraduate Programmes', 'url' => '/programmes'],
+                        ['label' => 'View Admissions Guide', 'url' => '/admissions'],
+                        ['label' => 'Contact Admissions', 'url' => '/contact'],
+                    ],
+                ]
+            ]);
+        }
+
+        $pgEligible   = [];
+        $pgAlternatives = [];
+
+        foreach ($pgProgrammes as $prog) {
+            $progLevel = $prog['level']; // 'masters' or 'doctoral'
+            $progMinClassRank = $degreeClassRank[$prog['min_class']] ?? 3;
+
+            if ($progLevel === 'masters' && $qualifiesForMasters) {
+                if ($userClassRank >= $progMinClassRank) {
+                    $pgEligible[] = array_merge($prog, ['cluster_check' => null, 'cluster_pass' => null]);
+                } elseif ($userClassRank >= ($progMinClassRank - 1)) {
+                    $pgAlternatives[] = array_merge($prog, ['cluster_check' => null, 'cluster_pass' => null,
+                        'note' => 'Your degree classification is slightly below the standard minimum. Contact the Admissions Office — exceptional candidates may be considered.']);
+                }
+            } elseif ($progLevel === 'doctoral' && $qualifiesForDoctoral) {
+                $pgEligible[] = array_merge($prog, ['cluster_check' => null, 'cluster_pass' => null]);
+            } elseif ($progLevel === 'doctoral' && !$qualifiesForDoctoral) {
+                // Show doctoral programmes as alternatives if user has a bachelors
+                $pgAlternatives[] = array_merge($prog, ['cluster_check' => null, 'cluster_pass' => null,
+                    'note' => 'PhD programmes require a Master\'s degree. Complete a Masters programme first.']);
+            }
+        }
+
+        $pgVerdict = count($pgEligible) > 0 ? 'eligible' : (count($pgAlternatives) > 0 ? 'borderline' : 'not_eligible');
+        $levelLabel = $qualifiesForDoctoral ? 'Doctoral (PhD)' : 'Masters';
+        $pgMessage = $pgVerdict === 'eligible'
+            ? 'Based on your qualifications, you are eligible for ' . count($pgEligible) . ' ' . $levelLabel . ' programme(s) at KAFU.'
+            : 'Your current qualification or degree classification does not meet the standard requirements. Contact the Admissions Office for guidance.';
+
         return response()->json([
             'data' => [
-                'verdict' => 'eligible',
+                'verdict' => $pgVerdict,
                 'pathway' => $pathway,
                 'mean_grade' => $meanGrade,
                 'grade_points' => $userPoints,
                 'subject_grades_provided' => false,
-                'message' => 'KAFU offers the following postgraduate programmes. Entry is based on your undergraduate degree classification and relevant experience.',
-                'eligible_programmes' => $pgProgrammes,
-                'alternative_options' => [],
+                'qualification_type' => $qualType,
+                'degree_class' => $degreeClass,
+                'programme_level' => $qualifiesForDoctoral ? 'doctoral' : 'masters',
+                'message' => $pgMessage,
+                'eligible_programmes' => $pgEligible,
+                'alternative_options' => $pgAlternatives,
                 'next_steps' => [
                     ['label' => 'Apply via Student Portal', 'url' => 'https://portal.kafu.ac.ke'],
                     ['label' => 'View Postgraduate Guide', 'url' => '/admissions#postgraduate'],
