@@ -73,6 +73,8 @@ function AppRoutes() {
         <Route path="/redirects" component={RedirectsCmsPage} />
         <Route path="/content-health" component={ContentHealthPage} />
         <Route path="/admissions" component={AdmissionsCmsPage} />
+        <Route path="/admissions/programmes" component={AdmissionsCmsPage} />
+        <Route path="/admissions/settings" component={AdmissionsCmsPage} />
         <Route path="/workflow" component={WorkflowConsolePage} />
         <Route>{() => <DashboardPage />}</Route>
       </Switch>

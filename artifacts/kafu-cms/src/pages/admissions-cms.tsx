@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { useLocation } from "wouter";
 import { apiFetch } from "@/lib/api";
 import {
   GraduationCap, FileText, Settings2, Upload, CheckCircle2, XCircle,
@@ -691,14 +692,25 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
   { id: "settings",  label: "Eligibility Settings",       icon: <Settings2 className="w-4 h-4" /> },
 ];
 
-function getInitialTab(): Tab {
-  const p = new URLSearchParams(window.location.search).get("tab");
-  if (p === "programmes" || p === "settings") return p;
+const TAB_PATHS: Record<Tab, string> = {
+  uploads:    "/admissions",
+  programmes: "/admissions/programmes",
+  settings:   "/admissions/settings",
+};
+
+function pathToTab(path: string): Tab {
+  if (path.endsWith("/programmes")) return "programmes";
+  if (path.endsWith("/settings"))   return "settings";
   return "uploads";
 }
 
 export default function AdmissionsCmsPage() {
-  const [tab, setTab] = useState<Tab>(getInitialTab);
+  const [location, navigate] = useLocation();
+  const tab = pathToTab(location);
+
+  function switchTab(id: Tab) {
+    navigate(TAB_PATHS[id]);
+  }
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -718,7 +730,7 @@ export default function AdmissionsCmsPage() {
         {TABS.map((t) => (
           <button
             key={t.id}
-            onClick={() => setTab(t.id)}
+            onClick={() => switchTab(t.id)}
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
               tab === t.id
                 ? "border-[#1A5C38] text-[#1A5C38]"

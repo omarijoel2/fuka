@@ -84,9 +84,9 @@ const navItems: NavItem[] = [
     icon: <GraduationCap className="w-4 h-4" />,
     roles: ADMIN_ROLES,
     children: [
-      { label: "Document Uploads", href: "/admissions?tab=uploads" },
-      { label: "Postgraduate Programmes", href: "/admissions?tab=programmes" },
-      { label: "Eligibility Settings", href: "/admissions?tab=settings" },
+      { label: "Document Uploads", href: "/admissions" },
+      { label: "Postgraduate Programmes", href: "/admissions/programmes" },
+      { label: "Eligibility Settings", href: "/admissions/settings" },
     ],
   },
   {
