@@ -5,6 +5,7 @@ import { Button } from "./ui/button";
 
 // ─── Navigation structure ───────────────────────────────────────────────────
 const navItems = [
+  { name: "Home", path: "/" },
   {
     name: "About",
     path: "/about",
