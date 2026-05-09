@@ -9,6 +9,7 @@ import {
   ArrowRight,
   BookOpen,
   ChevronRight,
+  ChevronLeft,
   GraduationCap,
   Search,
   Monitor,
@@ -23,6 +24,233 @@ import {
   Briefcase,
   BadgeCheck,
 } from "lucide-react";
+
+// ─── Hero Carousel ─────────────────────────────────────────────────────────────
+const SLIDES = [
+  {
+    image: "https://kafu.ac.ke/wp-content/uploads/2026/03/IMG_6424-scaled.jpg",
+    badge: "Est. 2014 · Kaimosi, Western Kenya · Quaker Heritage",
+    headline: "Spring of",
+    accent: "Knowledge",
+    body: "Kaimosi Friends University — a premier institution in Western Kenya dedicated to truth, service, and academic excellence. Join over 5,000 students shaping Kenya's future.",
+    cta1: { label: "Apply for Admissions", href: "https://portal.kafu.ac.ke", external: true },
+    cta2: { label: "Explore Programmes", href: "/programmes", external: false },
+    testid: "hero-slide-0",
+  },
+  {
+    image: "https://kafu.ac.ke/wp-content/uploads/2025/10/posgraduate.jpg",
+    badge: "5 Schools · 60+ Programmes · All Levels",
+    headline: "World-Class",
+    accent: "Programmes",
+    body: "From Optometry to Computer Science, Education to Business — KAFU offers over 60 nationally accredited programmes, preparing graduates for a competitive and changing world.",
+    cta1: { label: "Browse Programmes", href: "/programmes", external: false },
+    cta2: { label: "Check Eligibility", href: "/admissions/eligibility", external: false },
+    testid: "hero-slide-1",
+  },
+  {
+    image: "https://kafu.ac.ke/wp-content/uploads/2025/10/campus-1-scaled.jpg",
+    badge: "Research · Innovation · Community Impact",
+    headline: "Advancing",
+    accent: "Research",
+    body: "KAFU's research centres are driving solutions in health, environment, and development across Kenya and beyond — supported by national and international partnerships.",
+    cta1: { label: "Explore Research", href: "/research", external: false },
+    cta2: { label: "International Programmes", href: "/international", external: false },
+    testid: "hero-slide-2",
+  },
+  {
+    image: "https://kafu.ac.ke/wp-content/uploads/2025/10/art-culture.jpg",
+    badge: "Vibrant Campus Life · Western Kenya Highlands",
+    headline: "A Community",
+    accent: "That Inspires",
+    body: "Experience rich campus life in the lush highlands of Kaimosi — where friendships form, talents flourish, and futures are forged in the spirit of service and truth.",
+    cta1: { label: "Admissions Open", href: "/admissions", external: false },
+    cta2: { label: "About KAFU", href: "/about", external: false },
+    testid: "hero-slide-3",
+  },
+];
+
+interface HeroCarouselProps {
+  stats?: { label: string; value: string | number }[];
+  statsLoading?: boolean;
+}
+
+function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
+  const [current, setCurrent] = React.useState(0);
+  const [paused, setPaused] = React.useState(false);
+  const [animating, setAnimating] = React.useState(false);
+  const count = SLIDES.length;
+
+  const goTo = React.useCallback(
+    (idx: number) => {
+      if (animating) return;
+      setAnimating(true);
+      setCurrent((idx + count) % count);
+      setTimeout(() => setAnimating(false), 700);
+    },
+    [animating, count]
+  );
+
+  React.useEffect(() => {
+    if (paused) return;
+    const t = setInterval(() => goTo(current + 1), 6000);
+    return () => clearInterval(t);
+  }, [current, paused, goTo]);
+
+  const slide = SLIDES[current];
+
+  return (
+    <section
+      className="relative min-h-[620px] md:min-h-[700px] flex items-center justify-center overflow-hidden bg-primary"
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      aria-label="Hero carousel"
+      data-testid="hero-carousel"
+    >
+      {/* Slide backgrounds — crossfade */}
+      {SLIDES.map((s, i) => (
+        <img
+          key={s.image}
+          src={s.image}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700"
+          style={{
+            opacity: i === current ? 1 : 0,
+            filter: "brightness(0.42)",
+            zIndex: 0,
+          }}
+        />
+      ))}
+
+      {/* Overlays */}
+      <div className="absolute inset-0 bg-primary/60" style={{ zIndex: 1 }} />
+      <div
+        className="absolute inset-0 opacity-25"
+        style={{
+          zIndex: 1,
+          backgroundImage:
+            "radial-gradient(ellipse at 20% 60%, #D4A017 0%, transparent 55%), radial-gradient(ellipse at 80% 10%, rgba(255,255,255,0.15) 0%, transparent 45%)",
+        }}
+      />
+
+      {/* Slide content */}
+      <div
+        className="relative container mx-auto px-4 py-20 text-center text-white max-w-5xl"
+        style={{ zIndex: 2 }}
+      >
+        <span className="inline-block py-1 px-4 rounded-full bg-accent/20 text-accent border border-accent/40 font-medium text-sm mb-6 transition-opacity duration-500">
+          {slide.badge}
+        </span>
+        <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 leading-tight transition-opacity duration-500">
+          {slide.headline}{" "}
+          <span className="text-accent">{slide.accent}</span>
+        </h1>
+        <p className="text-lg md:text-xl mb-10 max-w-3xl mx-auto text-white/85 leading-relaxed transition-opacity duration-500">
+          {slide.body}
+        </p>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-14">
+          <Button
+            size="lg"
+            className="bg-accent text-accent-foreground hover:bg-accent/90 text-base px-8 h-12 font-semibold"
+            asChild
+            data-testid="hero-button-apply"
+          >
+            {slide.cta1.external ? (
+              <a href={slide.cta1.href} target="_blank" rel="noreferrer">{slide.cta1.label}</a>
+            ) : (
+              <Link href={slide.cta1.href}>{slide.cta1.label}</Link>
+            )}
+          </Button>
+          <Button
+            size="lg"
+            variant="outline"
+            className="bg-transparent text-white border-white/60 hover:bg-white/10 text-base px-8 h-12"
+            asChild
+            data-testid="hero-button-programmes"
+          >
+            {slide.cta2.external ? (
+              <a href={slide.cta2.href} target="_blank" rel="noreferrer">{slide.cta2.label}</a>
+            ) : (
+              <Link href={slide.cta2.href}>{slide.cta2.label}</Link>
+            )}
+          </Button>
+        </div>
+
+        {/* Stats overlay */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
+          {statsLoading
+            ? Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="bg-white/10 rounded-xl p-4 animate-pulse h-20" />
+              ))
+            : stats?.map((stat) => (
+                <div
+                  key={stat.label}
+                  className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-3"
+                  data-testid={`hero-stat-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}
+                >
+                  <div className="text-2xl md:text-3xl font-serif font-bold text-accent">{stat.value}+</div>
+                  <div className="text-xs text-white/75 mt-0.5 uppercase tracking-wide">{stat.label}</div>
+                </div>
+              ))}
+        </div>
+      </div>
+
+      {/* Prev / Next arrows */}
+      <button
+        onClick={() => goTo(current - 1)}
+        className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm transition-colors border border-white/20"
+        aria-label="Previous slide"
+        data-testid="carousel-prev"
+      >
+        <ChevronLeft className="w-5 h-5" />
+      </button>
+      <button
+        onClick={() => goTo(current + 1)}
+        className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm transition-colors border border-white/20"
+        aria-label="Next slide"
+        data-testid="carousel-next"
+      >
+        <ChevronRight className="w-5 h-5" />
+      </button>
+
+      {/* Dot indicators */}
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
+        {SLIDES.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => goTo(i)}
+            className={`rounded-full transition-all duration-300 ${
+              i === current
+                ? "w-7 h-2.5 bg-accent"
+                : "w-2.5 h-2.5 bg-white/40 hover:bg-white/70"
+            }`}
+            aria-label={`Go to slide ${i + 1}`}
+            data-testid={`carousel-dot-${i}`}
+          />
+        ))}
+      </div>
+
+      {/* Progress bar */}
+      <div className="absolute bottom-0 left-0 right-0 z-10 h-0.5 bg-white/10">
+        <div
+          className={`h-full bg-accent/70 transition-none ${!paused ? "animate-none" : ""}`}
+          style={{
+            width: paused ? "100%" : undefined,
+            animation: paused ? "none" : `progress-bar 6000ms linear`,
+          }}
+          key={`${current}-${paused}`}
+        />
+      </div>
+
+      <style>{`
+        @keyframes progress-bar {
+          from { width: 0%; }
+          to { width: 100%; }
+        }
+      `}</style>
+    </section>
+  );
+}
 
 export default function Home() {
   const { data: stats, isLoading: statsLoading } = useStats();
@@ -196,75 +424,8 @@ export default function Home() {
         jsonLd={[ORG_JSONLD, websiteJsonLd]}
       />
 
-      {/* ─── HERO ─── */}
-      <section className="relative min-h-[620px] md:min-h-[700px] flex items-center justify-center overflow-hidden bg-primary">
-        <img
-          src="https://kafu.ac.ke/wp-content/uploads/2026/03/IMG_6424-scaled.jpg"
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover object-center"
-          style={{ filter: "brightness(0.45)" }}
-        />
-        <div className="absolute inset-0 bg-primary/60" />
-        <div
-          className="absolute inset-0 opacity-25"
-          style={{
-            backgroundImage:
-              "radial-gradient(ellipse at 20% 60%, #D4A017 0%, transparent 55%), radial-gradient(ellipse at 80% 10%, rgba(255,255,255,0.15) 0%, transparent 45%)",
-          }}
-        />
-        <div className="relative container mx-auto px-4 py-20 text-center text-white z-10 max-w-5xl">
-          <span className="inline-block py-1 px-4 rounded-full bg-accent/20 text-accent border border-accent/40 font-medium text-sm mb-6">
-            Est. 2014 — Kaimosi, Western Kenya — Quaker Heritage
-          </span>
-          <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 leading-tight">
-            Spring of <span className="text-accent">Knowledge</span>
-          </h1>
-          <p className="text-lg md:text-xl mb-10 max-w-3xl mx-auto text-white/85 leading-relaxed">
-            Kaimosi Friends University — a premier institution in Western Kenya dedicated to truth, service,
-            and academic excellence. Join over 5,000 students shaping Kenya's future.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-14">
-            <Button
-              size="lg"
-              className="bg-accent text-accent-foreground hover:bg-accent/90 text-base px-8 h-12 font-semibold"
-              asChild
-              data-testid="hero-button-apply"
-            >
-              <a href="https://portal.kafu.ac.ke" target="_blank" rel="noreferrer">
-                Apply for Admissions
-              </a>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="bg-transparent text-white border-white/60 hover:bg-white/10 text-base px-8 h-12"
-              asChild
-              data-testid="hero-button-programmes"
-            >
-              <Link href="/programmes">Explore Programmes</Link>
-            </Button>
-          </div>
-
-          {/* Stats overlay */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
-            {statsLoading
-              ? Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="bg-white/10 rounded-xl p-4 animate-pulse h-20" />
-                ))
-              : stats?.map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-3"
-                    data-testid={`hero-stat-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}
-                  >
-                    <div className="text-2xl md:text-3xl font-serif font-bold text-accent">{stat.value}+</div>
-                    <div className="text-xs text-white/75 mt-0.5 uppercase tracking-wide">{stat.label}</div>
-                  </div>
-                ))}
-          </div>
-        </div>
-      </section>
+      {/* ─── HERO CAROUSEL ─── */}
+      <HeroCarousel stats={stats} statsLoading={statsLoading} />
 
       {/* ─── PROGRAMME DISCOVERY ─── */}
       <section className="py-20 bg-background" id="programmes">
