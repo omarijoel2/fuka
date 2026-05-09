@@ -3,31 +3,31 @@ import { Link, useLocation } from "wouter";
 import { Menu, X, ChevronDown, ChevronRight, MapPin, Phone, ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
 
-// ─── Streamlined nav: 6 top-level groups ──────────────────────────────────────
+// ─── Navigation structure ───────────────────────────────────────────────────
 const navItems = [
   {
     name: "About",
     path: "/about",
     children: [
-      { name: "About KAFU",        path: "/about" },
-      { name: "Vision & Mission",  path: "/about#vision" },
-      { name: "Leadership & Staff",path: "/staff" },
-      { name: "Campuses",          path: "/campuses" },
-      { name: "Offices & Services",path: "/offices" },
-      { name: "Contact Us",        path: "/contact" },
+      { name: "About KAFU",          path: "/about" },
+      { name: "Vision & Mission",    path: "/about#vision" },
+      { name: "Leadership & Staff",  path: "/staff" },
+      { name: "Campuses",            path: "/campuses" },
+      { name: "Offices & Services",  path: "/offices" },
+      { name: "Contact Us",          path: "/contact" },
     ],
   },
   {
     name: "Academics",
     path: "/schools",
     children: [
-      { name: "Schools & Faculties",           path: "/schools" },
-      { name: "Programme Catalogue",           path: "/programmes" },
-      { name: "SESS — Education & Social Sci.",path: "/schools/SESS" },
-      { name: "SBE — Business & Economics",    path: "/schools/SBE" },
-      { name: "SCIT — Computing & IT",         path: "/schools/SCIT" },
-      { name: "SOS — Science",                 path: "/schools/SOS" },
-      { name: "SHS — Health Sciences",         path: "/schools/SHS" },
+      { name: "Schools & Faculties",            path: "/schools" },
+      { name: "Programme Catalogue",            path: "/programmes" },
+      { name: "SESS — Education & Social Sci.", path: "/schools/SESS" },
+      { name: "SBE — Business & Economics",     path: "/schools/SBE" },
+      { name: "SCIT — Computing & IT",          path: "/schools/SCIT" },
+      { name: "SOS — Science",                  path: "/schools/SOS" },
+      { name: "SHS — Health Sciences",          path: "/schools/SHS" },
     ],
   },
   {
@@ -47,14 +47,14 @@ const navItems = [
     name: "Research",
     path: "/research",
     children: [
-      { name: "Research Overview",    path: "/research" },
-      { name: "Projects",             path: "/research/projects" },
-      { name: "Publications",         path: "/research/publications" },
-      { name: "Partnerships & Grants",path: "/research/partnerships" },
-      { name: "Repository",           path: "/repository" },
-      { name: "International",        path: "/international" },
-      { name: "Exchange Programmes",  path: "/international/exchange" },
-      { name: "Global Partners",      path: "/international/partnerships" },
+      { name: "Research Overview",     path: "/research" },
+      { name: "Projects",              path: "/research/projects" },
+      { name: "Publications",          path: "/research/publications" },
+      { name: "Partnerships & Grants", path: "/research/partnerships" },
+      { name: "Repository",            path: "/repository" },
+      { name: "International",         path: "/international" },
+      { name: "Exchange Programmes",   path: "/international/exchange" },
+      { name: "Global Partners",       path: "/international/partnerships" },
     ],
   },
   {
@@ -63,29 +63,23 @@ const navItems = [
     children: [
       { name: "Student Services", path: "/student-services" },
       { name: "News",             path: "/news" },
-      { name: "Events",          path: "/events" },
-      { name: "Announcements",   path: "/announcements" },
-      { name: "Opportunities",   path: "/opportunities" },
-      { name: "Student Portal",  path: "https://portal.kafu.ac.ke",  external: true },
-      { name: "E-Learning",      path: "https://elearning.kafu.ac.ke", external: true },
+      { name: "Events",           path: "/events" },
+      { name: "Announcements",    path: "/announcements" },
+      { name: "Opportunities",    path: "/opportunities" },
+      { name: "Student Portal",   path: "https://portal.kafu.ac.ke",   external: true },
+      { name: "E-Learning",       path: "https://elearning.kafu.ac.ke", external: true },
     ],
   },
   { name: "Contact", path: "/contact" },
 ];
 
-type Child = { name: string; path: string; external?: boolean };
-type NavItem = { name: string; path: string; children?: Child[] };
+type Child    = { name: string; path: string; external?: boolean };
+type NavItem  = { name: string; path: string; children?: Child[] };
 
-// ─── Dropdown Panel ────────────────────────────────────────────────────────────
-function DropdownPanel({
-  item,
-  onClose,
-}: {
-  item: NavItem;
-  onClose: () => void;
-}) {
+// ─── Desktop Dropdown ────────────────────────────────────────────────────────
+function DropdownPanel({ item, onClose }: { item: NavItem; onClose: () => void }) {
   return (
-    <div className="absolute top-full left-0 mt-0 w-60 bg-white rounded-b-xl shadow-2xl border-t-2 border-accent py-2 z-50">
+    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 w-60 bg-white rounded-b-xl shadow-2xl border-t-2 border-accent py-2 z-50">
       {item.children!.map((child) =>
         child.external ? (
           <a
@@ -115,17 +109,11 @@ function DropdownPanel({
   );
 }
 
-// ─── Mobile Accordion Item ─────────────────────────────────────────────────────
-function MobileNavItem({
-  item,
-  onClose,
-}: {
-  item: NavItem;
-  onClose: () => void;
-}) {
+// ─── Mobile Accordion Item ────────────────────────────────────────────────────
+function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }) {
   const [open, setOpen] = React.useState(false);
-  const [location] = useLocation();
-  const isActive = item.path === "/" ? location === "/" : location.startsWith(item.path);
+  const [location]      = useLocation();
+  const isActive        = item.path === "/" ? location === "/" : location.startsWith(item.path);
 
   if (!item.children) {
     return (
@@ -185,17 +173,17 @@ function MobileNavItem({
   );
 }
 
-// ─── Main Navbar ───────────────────────────────────────────────────────────────
+// ─── Main Navbar ─────────────────────────────────────────────────────────────
 export function Navbar() {
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen,   setMobileOpen]   = React.useState(false);
   const [openDropdown, setOpenDropdown] = React.useState<string | null>(null);
-  const [location] = useLocation();
-  const navRef = React.useRef<HTMLDivElement>(null);
+  const [location]                      = useLocation();
+  const navRowRef                       = React.useRef<HTMLDivElement>(null);
 
   // Close dropdown on outside click
   React.useEffect(() => {
     function onClickOutside(e: MouseEvent) {
-      if (navRef.current && !navRef.current.contains(e.target as Node)) {
+      if (navRowRef.current && !navRowRef.current.contains(e.target as Node)) {
         setOpenDropdown(null);
       }
     }
@@ -203,10 +191,8 @@ export function Navbar() {
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
 
-  // Close mobile menu on route change
-  React.useEffect(() => {
-    setMobileOpen(false);
-  }, [location]);
+  // Close mobile drawer on navigation
+  React.useEffect(() => { setMobileOpen(false); }, [location]);
 
   const isActive = (path: string) =>
     path === "/" ? location === "/" : location.startsWith(path);
@@ -214,11 +200,12 @@ export function Navbar() {
   const closeMobile = () => setMobileOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white shadow-sm">
-      {/* ── Utility Bar (hidden on mobile) ── */}
+    <header className="sticky top-0 z-50 w-full bg-white shadow-md">
+
+      {/* ── Row 1: Utility bar ─────────────────────────────── desktop only ── */}
       <div className="hidden sm:block bg-primary text-primary-foreground py-1.5 text-xs">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex items-center gap-4 opacity-90">
+        <div className="container mx-auto px-6 flex justify-between items-center">
+          <div className="flex items-center gap-5 opacity-90">
             <span className="flex items-center gap-1.5">
               <MapPin className="w-3 h-3 shrink-0" />
               <span className="hidden md:inline">P.O BOX 385 – 50309, </span>Kaimosi, Kenya
@@ -229,59 +216,71 @@ export function Navbar() {
             </span>
           </div>
           <div className="flex items-center gap-3 font-medium">
-            <a
-              href="https://portal.kafu.ac.ke"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-accent transition-colors"
-              data-testid="link-student-portal"
-            >
+            <a href="https://portal.kafu.ac.ke" target="_blank" rel="noreferrer"
+               className="hover:text-accent transition-colors" data-testid="link-student-portal">
               Student Portal
             </a>
             <span className="opacity-40">|</span>
-            <a
-              href="https://elearning.kafu.ac.ke"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-accent transition-colors"
-              data-testid="link-elearning"
-            >
+            <a href="https://elearning.kafu.ac.ke" target="_blank" rel="noreferrer"
+               className="hover:text-accent transition-colors" data-testid="link-elearning">
               E-Learning
             </a>
             <span className="opacity-40 hidden md:inline">|</span>
-            <a
-              href="mailto:info@kafu.ac.ke"
-              className="hover:text-accent transition-colors hidden md:inline"
-              data-testid="link-email"
-            >
+            <a href="mailto:info@kafu.ac.ke"
+               className="hover:text-accent transition-colors hidden md:inline" data-testid="link-email">
               info@kafu.ac.ke
             </a>
           </div>
         </div>
       </div>
 
-      {/* ── Main Bar ── */}
-      <div
-        className="container mx-auto px-4 h-16 flex items-center justify-between"
-        ref={navRef}
-      >
+      {/* ── Row 2: Logo + Apply Now / Hamburger ─────────────────────────────── */}
+      <div className="container mx-auto px-6 h-[68px] flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center shrink-0 mr-4" data-testid="link-home-logo">
+        <Link href="/" className="flex items-center shrink-0" data-testid="link-home-logo">
           <img
             src="https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png"
             alt="Kaimosi Friends University"
-            className="h-10 object-contain"
+            className="h-11 object-contain"
             onError={(e) => {
               const img = e.target as HTMLImageElement;
               img.style.display = "none";
               const p = img.parentElement;
-              if (p) p.innerHTML = `<div class="flex flex-col leading-tight"><span class="font-serif font-bold text-lg text-primary">KAFU</span><span class="text-xs text-accent italic">Spring of Knowledge</span></div>`;
+              if (p) p.innerHTML = `<div class="flex flex-col leading-tight"><span class="font-serif font-bold text-xl text-primary">KAFU</span><span class="text-xs text-accent italic">Spring of Knowledge</span></div>`;
             }}
           />
         </Link>
 
-        {/* ── Desktop Nav (xl and above) ── */}
-        <nav className="hidden xl:flex items-center gap-0.5 flex-1 justify-center">
+        <div className="flex items-center gap-3">
+          {/* Apply Now — visible on desktop */}
+          <Button
+            asChild
+            size="sm"
+            className="hidden lg:flex bg-accent text-accent-foreground hover:bg-accent/90 font-semibold px-5"
+            data-testid="button-apply-now"
+          >
+            <a href="/admissions">Apply Now</a>
+          </Button>
+
+          {/* Hamburger — visible below lg */}
+          <button
+            className="lg:hidden flex items-center justify-center w-10 h-10 rounded-md text-foreground hover:bg-muted transition-colors"
+            onClick={() => setMobileOpen((o) => !o)}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+            data-testid="button-mobile-menu"
+          >
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+      </div>
+
+      {/* ── Row 3: Full-width nav bar ──────────────── desktop (lg+) only ───── */}
+      <div
+        className="hidden lg:block border-t border-gray-100 bg-white"
+        ref={navRowRef}
+      >
+        <nav className="container mx-auto px-6 flex items-center justify-center gap-1">
           {navItems.map((item) => (
             <div key={item.name} className="relative">
               {item.children ? (
@@ -290,37 +289,28 @@ export function Navbar() {
                   onMouseLeave={() => setOpenDropdown(null)}
                 >
                   <button
-                    onClick={() =>
-                      setOpenDropdown(openDropdown === item.name ? null : item.name)
-                    }
-                    className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
+                    onClick={() => setOpenDropdown(openDropdown === item.name ? null : item.name)}
+                    className={`flex items-center gap-1 px-4 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
                       isActive(item.path)
-                        ? "text-accent bg-accent/10"
-                        : "text-foreground hover:text-primary hover:bg-muted"
+                        ? "border-accent text-accent"
+                        : "border-transparent text-foreground hover:text-primary hover:border-primary/30"
                     }`}
                     data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
                   >
                     {item.name}
-                    <ChevronDown
-                      className={`w-3.5 h-3.5 transition-transform ${
-                        openDropdown === item.name ? "rotate-180" : ""
-                      }`}
-                    />
+                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openDropdown === item.name ? "rotate-180" : ""}`} />
                   </button>
                   {openDropdown === item.name && (
-                    <DropdownPanel
-                      item={item}
-                      onClose={() => setOpenDropdown(null)}
-                    />
+                    <DropdownPanel item={item} onClose={() => setOpenDropdown(null)} />
                   )}
                 </div>
               ) : (
                 <Link
                   href={item.path}
-                  className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
+                  className={`block px-4 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
                     isActive(item.path)
-                      ? "text-accent bg-accent/10"
-                      : "text-foreground hover:text-primary hover:bg-muted"
+                      ? "border-accent text-accent"
+                      : "border-transparent text-foreground hover:text-primary hover:border-primary/30"
                   }`}
                   data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
                 >
@@ -330,42 +320,16 @@ export function Navbar() {
             </div>
           ))}
         </nav>
-
-        {/* Apply Now — desktop */}
-        <Button
-          asChild
-          size="sm"
-          className="hidden xl:flex ml-3 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold shrink-0"
-          data-testid="button-apply-now"
-        >
-          <a href="/admissions" rel="noreferrer">
-            Apply Now
-          </a>
-        </Button>
-
-        {/* Hamburger — shown below xl */}
-        <button
-          className="xl:hidden flex items-center gap-2 px-3 py-2 rounded-md text-foreground hover:bg-muted transition-colors"
-          onClick={() => setMobileOpen((o) => !o)}
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          aria-expanded={mobileOpen}
-          data-testid="button-mobile-menu"
-        >
-          {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
       </div>
 
-      {/* ── Mobile Drawer ── */}
+      {/* ── Mobile Drawer ────────────────────────────────────────────────────── */}
       {mobileOpen && (
-        <div className="xl:hidden fixed inset-0 top-16 z-40 flex">
+        <div className="lg:hidden fixed inset-0 top-[68px] z-40 flex">
           {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
-            onClick={closeMobile}
-          />
-          {/* Panel */}
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={closeMobile} />
+          {/* Slide-in panel */}
           <div className="relative w-full max-w-sm bg-white shadow-2xl flex flex-col overflow-y-auto">
-            {/* Mobile header */}
+            {/* Panel header */}
             <div className="bg-primary px-5 py-3 flex items-center justify-between">
               <span className="text-white font-semibold text-sm">Menu</span>
               <div className="flex gap-3 text-xs text-white/80">
@@ -379,7 +343,7 @@ export function Navbar() {
               </div>
             </div>
 
-            {/* Nav items */}
+            {/* Nav accordion */}
             <div className="flex-1">
               {navItems.map((item) => (
                 <MobileNavItem key={item.name} item={item} onClose={closeMobile} />
