@@ -1,116 +1,227 @@
 import React from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, ChevronDown, MapPin, Phone } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronRight, MapPin, Phone, ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
 
+// ─── Streamlined nav: 6 top-level groups ──────────────────────────────────────
 const navItems = [
-  { name: "Home", path: "/" },
   {
     name: "About",
     path: "/about",
     children: [
-      { name: "About KAFU", path: "/about" },
-      { name: "Vision & Mission", path: "/about#vision" },
-      { name: "Staff Directory", path: "/staff" },
-      { name: "Contact Us", path: "/contact" },
+      { name: "About KAFU",        path: "/about" },
+      { name: "Vision & Mission",  path: "/about#vision" },
+      { name: "Leadership & Staff",path: "/staff" },
+      { name: "Campuses",          path: "/campuses" },
+      { name: "Offices & Services",path: "/offices" },
+      { name: "Contact Us",        path: "/contact" },
     ],
   },
   {
     name: "Academics",
     path: "/schools",
     children: [
-      { name: "Schools & Faculties", path: "/schools" },
-      { name: "Programme Catalogue", path: "/programmes" },
-      { name: "SESS — Education & Social Sciences", path: "/schools/SESS" },
-      { name: "SBE — Business & Economics", path: "/schools/SBE" },
-      { name: "SCIT — Computing & IT", path: "/schools/SCIT" },
-      { name: "SOS — Science", path: "/schools/SOS" },
-      { name: "SHS — Health Sciences", path: "/schools/SHS" },
+      { name: "Schools & Faculties",           path: "/schools" },
+      { name: "Programme Catalogue",           path: "/programmes" },
+      { name: "SESS — Education & Social Sci.",path: "/schools/SESS" },
+      { name: "SBE — Business & Economics",    path: "/schools/SBE" },
+      { name: "SCIT — Computing & IT",         path: "/schools/SCIT" },
+      { name: "SOS — Science",                 path: "/schools/SOS" },
+      { name: "SHS — Health Sciences",         path: "/schools/SHS" },
     ],
   },
   {
     name: "Admissions",
     path: "/admissions",
     children: [
-      { name: "Admissions Overview", path: "/admissions" },
+      { name: "Admissions Overview",    path: "/admissions" },
+      { name: "Eligibility Checker",    path: "/admissions/eligibility" },
+      { name: "Tuition & Fees",         path: "/admissions/fees" },
       { name: "Undergraduate (KUCCPS)", path: "/admissions#undergraduate" },
-      { name: "Postgraduate", path: "/admissions#postgraduate" },
+      { name: "Postgraduate",           path: "/admissions#postgraduate" },
       { name: "International Students", path: "/admissions#international" },
-      { name: "Self-Sponsored", path: "/admissions#self-sponsored" },
-    ],
-  },
-  {
-    name: "Students",
-    path: "/student-services",
-    children: [
-      { name: "Student Services", path: "/student-services" },
-      { name: "Student Portal", path: "https://portal.kafu.ac.ke", external: true },
-      { name: "E-Learning", path: "https://elearning.kafu.ac.ke", external: true },
-    ],
-  },
-  {
-    name: "News",
-    path: "/news",
-    children: [
-      { name: "Latest News", path: "/news" },
-      { name: "Events Calendar", path: "/events" },
-      { name: "Announcements", path: "/announcements" },
+      { name: "Self-Sponsored",         path: "/admissions#self-sponsored" },
     ],
   },
   {
     name: "Research",
     path: "/research",
     children: [
-      { name: "Research Overview", path: "/research" },
-      { name: "Research Projects", path: "/research/projects" },
-      { name: "Publications", path: "/research/publications" },
-      { name: "Partnerships & Grants", path: "/research/partnerships" },
-      { name: "Institutional Repository", path: "/repository" },
+      { name: "Research Overview",    path: "/research" },
+      { name: "Projects",             path: "/research/projects" },
+      { name: "Publications",         path: "/research/publications" },
+      { name: "Partnerships & Grants",path: "/research/partnerships" },
+      { name: "Repository",           path: "/repository" },
+      { name: "International",        path: "/international" },
+      { name: "Exchange Programmes",  path: "/international/exchange" },
+      { name: "Global Partners",      path: "/international/partnerships" },
     ],
   },
   {
-    name: "International",
-    path: "/international",
+    name: "Campus Life",
+    path: "/student-services",
     children: [
-      { name: "Global Overview", path: "/international" },
-      { name: "Study at KAFU", path: "/international/study" },
-      { name: "Visa & Immigration", path: "/international/visa" },
-      { name: "Exchange Programmes", path: "/international/exchange" },
-      { name: "Our Partners", path: "/international/partnerships" },
+      { name: "Student Services", path: "/student-services" },
+      { name: "News",             path: "/news" },
+      { name: "Events",          path: "/events" },
+      { name: "Announcements",   path: "/announcements" },
+      { name: "Opportunities",   path: "/opportunities" },
+      { name: "Student Portal",  path: "https://portal.kafu.ac.ke",  external: true },
+      { name: "E-Learning",      path: "https://elearning.kafu.ac.ke", external: true },
     ],
   },
-  { name: "Opportunities", path: "/opportunities" },
   { name: "Contact", path: "/contact" },
 ];
 
+type Child = { name: string; path: string; external?: boolean };
+type NavItem = { name: string; path: string; children?: Child[] };
+
+// ─── Dropdown Panel ────────────────────────────────────────────────────────────
+function DropdownPanel({
+  item,
+  onClose,
+}: {
+  item: NavItem;
+  onClose: () => void;
+}) {
+  return (
+    <div className="absolute top-full left-0 mt-0 w-60 bg-white rounded-b-xl shadow-2xl border-t-2 border-accent py-2 z-50">
+      {item.children!.map((child) =>
+        child.external ? (
+          <a
+            key={child.path}
+            href={child.path}
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center justify-between px-4 py-2.5 text-sm text-foreground/80 hover:bg-primary hover:text-white transition-colors group"
+            data-testid={`nav-dropdown-${child.name.toLowerCase().replace(/\s+/g, "-")}`}
+          >
+            {child.name}
+            <ExternalLink className="w-3 h-3 opacity-40 group-hover:opacity-100" />
+          </a>
+        ) : (
+          <Link
+            key={child.path}
+            href={child.path}
+            className="block px-4 py-2.5 text-sm text-foreground/80 hover:bg-primary hover:text-white transition-colors"
+            onClick={onClose}
+            data-testid={`nav-dropdown-${child.name.toLowerCase().replace(/\s+/g, "-")}`}
+          >
+            {child.name}
+          </Link>
+        )
+      )}
+    </div>
+  );
+}
+
+// ─── Mobile Accordion Item ─────────────────────────────────────────────────────
+function MobileNavItem({
+  item,
+  onClose,
+}: {
+  item: NavItem;
+  onClose: () => void;
+}) {
+  const [open, setOpen] = React.useState(false);
+  const [location] = useLocation();
+  const isActive = item.path === "/" ? location === "/" : location.startsWith(item.path);
+
+  if (!item.children) {
+    return (
+      <Link
+        href={item.path}
+        onClick={onClose}
+        className={`flex items-center px-5 py-4 text-sm font-semibold border-b border-gray-100 transition-colors ${
+          isActive ? "text-accent bg-accent/5" : "text-foreground hover:bg-gray-50"
+        }`}
+        data-testid={`mobile-nav-${item.name.toLowerCase()}`}
+      >
+        {item.name}
+      </Link>
+    );
+  }
+
+  return (
+    <div className="border-b border-gray-100">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className={`w-full flex items-center justify-between px-5 py-4 text-sm font-semibold transition-colors ${
+          isActive ? "text-accent" : "text-foreground hover:bg-gray-50"
+        }`}
+        data-testid={`mobile-nav-${item.name.toLowerCase()}`}
+      >
+        {item.name}
+        <ChevronRight className={`w-4 h-4 transition-transform duration-200 ${open ? "rotate-90" : ""}`} />
+      </button>
+      {open && (
+        <div className="bg-gray-50 border-t border-gray-100">
+          {item.children.map((child) =>
+            child.external ? (
+              <a
+                key={child.path}
+                href={child.path}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2 pl-8 pr-5 py-3 text-sm text-muted-foreground hover:text-primary"
+              >
+                {child.name}
+                <ExternalLink className="w-3 h-3 opacity-50" />
+              </a>
+            ) : (
+              <Link
+                key={child.path}
+                href={child.path}
+                onClick={onClose}
+                className="block pl-8 pr-5 py-3 text-sm text-muted-foreground hover:text-primary"
+              >
+                {child.name}
+              </Link>
+            )
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main Navbar ───────────────────────────────────────────────────────────────
 export function Navbar() {
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = React.useState(false);
   const [openDropdown, setOpenDropdown] = React.useState<string | null>(null);
   const [location] = useLocation();
-  const dropdownRef = React.useRef<HTMLDivElement>(null);
+  const navRef = React.useRef<HTMLDivElement>(null);
 
+  // Close dropdown on outside click
   React.useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+    function onClickOutside(e: MouseEvent) {
+      if (navRef.current && !navRef.current.contains(e.target as Node)) {
         setOpenDropdown(null);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
+
+  // Close mobile menu on route change
+  React.useEffect(() => {
+    setMobileOpen(false);
+  }, [location]);
 
   const isActive = (path: string) =>
     path === "/" ? location === "/" : location.startsWith(path);
 
+  const closeMobile = () => setMobileOpen(false);
+
   return (
-    <header className="sticky top-0 z-50 w-full shadow-sm bg-white">
-      {/* Utility Bar */}
-      <div className="bg-primary text-primary-foreground py-1.5 text-xs">
+    <header className="sticky top-0 z-50 w-full bg-white shadow-sm">
+      {/* ── Utility Bar (hidden on mobile) ── */}
+      <div className="hidden sm:block bg-primary text-primary-foreground py-1.5 text-xs">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="flex items-center gap-4 opacity-90">
             <span className="flex items-center gap-1.5">
               <MapPin className="w-3 h-3 shrink-0" />
-              P.O BOX 385 – 50309, Kaimosi, Kenya
+              <span className="hidden md:inline">P.O BOX 385 – 50309, </span>Kaimosi, Kenya
             </span>
             <span className="hidden md:flex items-center gap-1.5">
               <Phone className="w-3 h-3 shrink-0" />
@@ -137,10 +248,10 @@ export function Navbar() {
             >
               E-Learning
             </a>
-            <span className="opacity-40 hidden sm:inline">|</span>
+            <span className="opacity-40 hidden md:inline">|</span>
             <a
               href="mailto:info@kafu.ac.ke"
-              className="hover:text-accent transition-colors hidden sm:inline"
+              className="hover:text-accent transition-colors hidden md:inline"
               data-testid="link-email"
             >
               info@kafu.ac.ke
@@ -149,166 +260,143 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* Main Nav */}
-      <div className="container mx-auto px-4 h-[70px] flex items-center justify-between" ref={dropdownRef}>
-        <Link href="/" className="flex items-center shrink-0" data-testid="link-home-logo">
+      {/* ── Main Bar ── */}
+      <div
+        className="container mx-auto px-4 h-16 flex items-center justify-between"
+        ref={navRef}
+      >
+        {/* Logo */}
+        <Link href="/" className="flex items-center shrink-0 mr-4" data-testid="link-home-logo">
           <img
             src="https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png"
             alt="Kaimosi Friends University"
-            className="h-11 object-contain"
+            className="h-10 object-contain"
             onError={(e) => {
               const img = e.target as HTMLImageElement;
               img.style.display = "none";
-              const parent = img.parentElement;
-              if (parent) {
-                parent.innerHTML = `<div class="flex flex-col"><span class="font-serif font-bold text-xl text-primary leading-tight">KAFU</span><span class="text-xs text-accent italic">Spring of Knowledge</span></div>`;
-              }
+              const p = img.parentElement;
+              if (p) p.innerHTML = `<div class="flex flex-col leading-tight"><span class="font-serif font-bold text-lg text-primary">KAFU</span><span class="text-xs text-accent italic">Spring of Knowledge</span></div>`;
             }}
           />
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden lg:flex items-center gap-0.5">
+        {/* ── Desktop Nav (xl and above) ── */}
+        <nav className="hidden xl:flex items-center gap-0.5 flex-1 justify-center">
           {navItems.map((item) => (
-            <div key={item.path} className="relative">
+            <div key={item.name} className="relative">
               {item.children ? (
-                <>
+                <div
+                  onMouseEnter={() => setOpenDropdown(item.name)}
+                  onMouseLeave={() => setOpenDropdown(null)}
+                >
                   <button
-                    onClick={() => setOpenDropdown(openDropdown === item.name ? null : item.name)}
-                    onMouseEnter={() => setOpenDropdown(item.name)}
-                    className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    onClick={() =>
+                      setOpenDropdown(openDropdown === item.name ? null : item.name)
+                    }
+                    className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                       isActive(item.path)
                         ? "text-accent bg-accent/10"
                         : "text-foreground hover:text-primary hover:bg-muted"
                     }`}
-                    data-testid={`nav-${item.name.toLowerCase()}`}
+                    data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
                   >
                     {item.name}
-                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openDropdown === item.name ? "rotate-180" : ""}`} />
+                    <ChevronDown
+                      className={`w-3.5 h-3.5 transition-transform ${
+                        openDropdown === item.name ? "rotate-180" : ""
+                      }`}
+                    />
                   </button>
                   {openDropdown === item.name && (
-                    <div
-                      className="absolute top-full left-0 mt-1 w-64 bg-white rounded-lg shadow-xl border py-2 z-50"
-                      onMouseLeave={() => setOpenDropdown(null)}
-                    >
-                      {item.children.map((child) =>
-                        child.external ? (
-                          <a
-                            key={child.path}
-                            href={child.path}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="block px-4 py-2.5 text-sm text-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
-                            data-testid={`nav-dropdown-${child.name.toLowerCase().replace(/\s+/g, "-")}`}
-                          >
-                            {child.name}
-                          </a>
-                        ) : (
-                          <Link
-                            key={child.path}
-                            href={child.path}
-                            className="block px-4 py-2.5 text-sm text-foreground hover:bg-primary hover:text-primary-foreground transition-colors"
-                            onClick={() => setOpenDropdown(null)}
-                            data-testid={`nav-dropdown-${child.name.toLowerCase().replace(/\s+/g, "-")}`}
-                          >
-                            {child.name}
-                          </Link>
-                        )
-                      )}
-                    </div>
+                    <DropdownPanel
+                      item={item}
+                      onClose={() => setOpenDropdown(null)}
+                    />
                   )}
-                </>
+                </div>
               ) : (
                 <Link
                   href={item.path}
-                  className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                     isActive(item.path)
                       ? "text-accent bg-accent/10"
                       : "text-foreground hover:text-primary hover:bg-muted"
                   }`}
-                  data-testid={`nav-${item.name.toLowerCase()}`}
+                  data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
                 >
                   {item.name}
                 </Link>
               )}
             </div>
           ))}
-          <Button
-            asChild
-            className="ml-3 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
-            data-testid="button-apply-now"
-          >
-            <a href="https://portal.kafu.ac.ke" target="_blank" rel="noreferrer">
-              Apply Now
-            </a>
-          </Button>
         </nav>
 
-        {/* Mobile Toggle */}
+        {/* Apply Now — desktop */}
         <Button
-          variant="ghost"
-          size="icon"
-          className="lg:hidden"
-          onClick={() => setIsOpen(!isOpen)}
+          asChild
+          size="sm"
+          className="hidden xl:flex ml-3 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold shrink-0"
+          data-testid="button-apply-now"
+        >
+          <a href="/admissions" rel="noreferrer">
+            Apply Now
+          </a>
+        </Button>
+
+        {/* Hamburger — shown below xl */}
+        <button
+          className="xl:hidden flex items-center gap-2 px-3 py-2 rounded-md text-foreground hover:bg-muted transition-colors"
+          onClick={() => setMobileOpen((o) => !o)}
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
           data-testid="button-mobile-menu"
         >
-          {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </Button>
+          {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
       </div>
 
-      {/* Mobile Nav */}
-      {isOpen && (
-        <div className="lg:hidden border-t bg-white flex flex-col max-h-[80vh] overflow-y-auto">
-          {navItems.map((item) => (
-            <div key={item.path}>
-              <Link
-                href={item.path}
-                onClick={() => setIsOpen(false)}
-                className={`block px-5 py-3.5 text-sm font-medium border-b border-muted ${
-                  isActive(item.path) ? "text-accent bg-accent/5" : "text-foreground hover:bg-muted"
-                }`}
-                data-testid={`mobile-nav-${item.name.toLowerCase()}`}
-              >
-                {item.name}
-              </Link>
-              {item.children && (
-                <div className="bg-muted/50">
-                  {item.children.map((child) =>
-                    child.external ? (
-                      <a
-                        key={child.path}
-                        href={child.path}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="block pl-8 pr-5 py-2.5 text-xs text-muted-foreground hover:text-primary border-b border-muted"
-                      >
-                        {child.name}
-                      </a>
-                    ) : (
-                      <Link
-                        key={child.path}
-                        href={child.path}
-                        onClick={() => setIsOpen(false)}
-                        className="block pl-8 pr-5 py-2.5 text-xs text-muted-foreground hover:text-primary border-b border-muted"
-                      >
-                        {child.name}
-                      </Link>
-                    )
-                  )}
-                </div>
-              )}
+      {/* ── Mobile Drawer ── */}
+      {mobileOpen && (
+        <div className="xl:hidden fixed inset-0 top-16 z-40 flex">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/30 backdrop-blur-sm"
+            onClick={closeMobile}
+          />
+          {/* Panel */}
+          <div className="relative w-full max-w-sm bg-white shadow-2xl flex flex-col overflow-y-auto">
+            {/* Mobile header */}
+            <div className="bg-primary px-5 py-3 flex items-center justify-between">
+              <span className="text-white font-semibold text-sm">Menu</span>
+              <div className="flex gap-3 text-xs text-white/80">
+                <a href="https://portal.kafu.ac.ke" target="_blank" rel="noreferrer" className="hover:text-accent">
+                  Portal
+                </a>
+                <span className="opacity-40">|</span>
+                <a href="https://elearning.kafu.ac.ke" target="_blank" rel="noreferrer" className="hover:text-accent">
+                  E-Learning
+                </a>
+              </div>
             </div>
-          ))}
-          <div className="p-4">
-            <a
-              href="https://portal.kafu.ac.ke"
-              target="_blank"
-              rel="noreferrer"
-              className="block w-full text-center py-3 bg-accent text-accent-foreground rounded-lg font-semibold"
-              data-testid="mobile-button-apply-now"
-            >
-              Apply Now
-            </a>
+
+            {/* Nav items */}
+            <div className="flex-1">
+              {navItems.map((item) => (
+                <MobileNavItem key={item.name} item={item} onClose={closeMobile} />
+              ))}
+            </div>
+
+            {/* Apply Now */}
+            <div className="p-4 border-t">
+              <a
+                href="/admissions"
+                onClick={closeMobile}
+                className="block w-full text-center py-3.5 bg-accent text-accent-foreground rounded-xl font-semibold text-sm hover:bg-accent/90 transition-colors"
+                data-testid="mobile-button-apply-now"
+              >
+                Apply Now
+              </a>
+            </div>
           </div>
         </div>
       )}
