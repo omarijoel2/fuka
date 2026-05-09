@@ -3,18 +3,18 @@ import { Link, useLocation } from "wouter";
 import { Menu, X, ChevronDown, ChevronRight, MapPin, Phone, ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
 
-// ─── Navigation structure ───────────────────────────────────────────────────
+// ─── Streamlined nav: 6 top-level groups ──────────────────────────────────────
 const navItems = [
   {
     name: "About",
     path: "/about",
     children: [
-      { name: "About KAFU",          path: "/about" },
-      { name: "Vision & Mission",    path: "/about#vision" },
-      { name: "Leadership & Staff",  path: "/staff" },
-      { name: "Campuses",            path: "/campuses" },
-      { name: "Offices & Services",  path: "/offices" },
-      { name: "Contact Us",          path: "/contact" },
+      { name: "About KAFU",         path: "/about" },
+      { name: "Vision & Mission",   path: "/about#vision" },
+      { name: "Leadership & Staff", path: "/staff" },
+      { name: "Campuses",           path: "/campuses" },
+      { name: "Offices & Services", path: "/offices" },
+      { name: "Contact Us",         path: "/contact" },
     ],
   },
   {
@@ -73,13 +73,13 @@ const navItems = [
   { name: "Contact", path: "/contact" },
 ];
 
-type Child    = { name: string; path: string; external?: boolean };
-type NavItem  = { name: string; path: string; children?: Child[] };
+type Child   = { name: string; path: string; external?: boolean };
+type NavItem = { name: string; path: string; children?: Child[] };
 
-// ─── Desktop Dropdown ────────────────────────────────────────────────────────
+// ─── Desktop Dropdown ─────────────────────────────────────────────────────────
 function DropdownPanel({ item, onClose }: { item: NavItem; onClose: () => void }) {
   return (
-    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 w-60 bg-white rounded-b-xl shadow-2xl border-t-2 border-accent py-2 z-50">
+    <div className="absolute top-full left-0 mt-0 w-60 bg-white rounded-b-xl shadow-2xl border-t-2 border-accent py-2 z-50">
       {item.children!.map((child) =>
         child.external ? (
           <a
@@ -173,17 +173,16 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
   );
 }
 
-// ─── Main Navbar ─────────────────────────────────────────────────────────────
+// ─── Main Navbar ──────────────────────────────────────────────────────────────
 export function Navbar() {
   const [mobileOpen,   setMobileOpen]   = React.useState(false);
   const [openDropdown, setOpenDropdown] = React.useState<string | null>(null);
   const [location]                      = useLocation();
-  const navRowRef                       = React.useRef<HTMLDivElement>(null);
+  const dropdownRef                     = React.useRef<HTMLDivElement>(null);
 
-  // Close dropdown on outside click
   React.useEffect(() => {
     function onClickOutside(e: MouseEvent) {
-      if (navRowRef.current && !navRowRef.current.contains(e.target as Node)) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setOpenDropdown(null);
       }
     }
@@ -191,21 +190,18 @@ export function Navbar() {
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
 
-  // Close mobile drawer on navigation
   React.useEffect(() => { setMobileOpen(false); }, [location]);
 
-  const isActive = (path: string) =>
-    path === "/" ? location === "/" : location.startsWith(path);
-
+  const isActive    = (path: string) => path === "/" ? location === "/" : location.startsWith(path);
   const closeMobile = () => setMobileOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white shadow-md">
+    <header className="sticky top-0 z-50 w-full shadow-sm bg-white">
 
-      {/* ── Row 1: Utility bar ─────────────────────────────── desktop only ── */}
+      {/* ── Utility Bar ── */}
       <div className="hidden sm:block bg-primary text-primary-foreground py-1.5 text-xs">
-        <div className="container mx-auto px-6 flex justify-between items-center">
-          <div className="flex items-center gap-5 opacity-90">
+        <div className="container mx-auto px-4 flex justify-between items-center">
+          <div className="flex items-center gap-4 opacity-90">
             <span className="flex items-center gap-1.5">
               <MapPin className="w-3 h-3 shrink-0" />
               <span className="hidden md:inline">P.O BOX 385 – 50309, </span>Kaimosi, Kenya
@@ -234,8 +230,11 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* ── Row 2: Logo + Apply Now / Hamburger ─────────────────────────────── */}
-      <div className="container mx-auto px-6 h-[68px] flex items-center justify-between">
+      {/* ── Logo + Nav row ── */}
+      <div
+        className="container mx-auto px-4 h-[70px] flex items-center justify-between"
+        ref={dropdownRef}
+      >
         {/* Logo */}
         <Link href="/" className="flex items-center shrink-0" data-testid="link-home-logo">
           <img
@@ -251,36 +250,8 @@ export function Navbar() {
           />
         </Link>
 
-        <div className="flex items-center gap-3">
-          {/* Apply Now — visible on desktop */}
-          <Button
-            asChild
-            size="sm"
-            className="hidden lg:flex bg-accent text-accent-foreground hover:bg-accent/90 font-semibold px-5"
-            data-testid="button-apply-now"
-          >
-            <a href="/admissions">Apply Now</a>
-          </Button>
-
-          {/* Hamburger — visible below lg */}
-          <button
-            className="lg:hidden flex items-center justify-center w-10 h-10 rounded-md text-foreground hover:bg-muted transition-colors"
-            onClick={() => setMobileOpen((o) => !o)}
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileOpen}
-            data-testid="button-mobile-menu"
-          >
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-        </div>
-      </div>
-
-      {/* ── Row 3: Full-width nav bar ──────────────── desktop (lg+) only ───── */}
-      <div
-        className="hidden lg:block border-t border-gray-100 bg-white"
-        ref={navRowRef}
-      >
-        <nav className="container mx-auto px-6 flex items-center justify-center gap-1">
+        {/* Desktop Nav — xl and above */}
+        <nav className="hidden xl:flex items-center gap-0.5">
           {navItems.map((item) => (
             <div key={item.name} className="relative">
               {item.children ? (
@@ -290,10 +261,10 @@ export function Navbar() {
                 >
                   <button
                     onClick={() => setOpenDropdown(openDropdown === item.name ? null : item.name)}
-                    className={`flex items-center gap-1 px-4 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
+                    className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                       isActive(item.path)
-                        ? "border-accent text-accent"
-                        : "border-transparent text-foreground hover:text-primary hover:border-primary/30"
+                        ? "text-accent bg-accent/10"
+                        : "text-foreground hover:text-primary hover:bg-muted"
                     }`}
                     data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
                   >
@@ -307,10 +278,10 @@ export function Navbar() {
               ) : (
                 <Link
                   href={item.path}
-                  className={`block px-4 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
+                  className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
                     isActive(item.path)
-                      ? "border-accent text-accent"
-                      : "border-transparent text-foreground hover:text-primary hover:border-primary/30"
+                      ? "text-accent bg-accent/10"
+                      : "text-foreground hover:text-primary hover:bg-muted"
                   }`}
                   data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
                 >
@@ -319,38 +290,47 @@ export function Navbar() {
               )}
             </div>
           ))}
+
+          <Button
+            asChild
+            size="sm"
+            className="ml-3 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold shrink-0"
+            data-testid="button-apply-now"
+          >
+            <a href="/admissions">Apply Now</a>
+          </Button>
         </nav>
+
+        {/* Hamburger — shown below xl */}
+        <button
+          className="xl:hidden flex items-center justify-center w-10 h-10 rounded-md text-foreground hover:bg-muted transition-colors"
+          onClick={() => setMobileOpen((o) => !o)}
+          aria-label={mobileOpen ? "Close menu" : "Open menu"}
+          aria-expanded={mobileOpen}
+          data-testid="button-mobile-menu"
+        >
+          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+        </button>
       </div>
 
-      {/* ── Mobile Drawer ────────────────────────────────────────────────────── */}
+      {/* ── Mobile Drawer ── */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 top-[68px] z-40 flex">
-          {/* Backdrop */}
+        <div className="xl:hidden fixed inset-0 top-[70px] z-40 flex">
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={closeMobile} />
-          {/* Slide-in panel */}
           <div className="relative w-full max-w-sm bg-white shadow-2xl flex flex-col overflow-y-auto">
-            {/* Panel header */}
             <div className="bg-primary px-5 py-3 flex items-center justify-between">
               <span className="text-white font-semibold text-sm">Menu</span>
               <div className="flex gap-3 text-xs text-white/80">
-                <a href="https://portal.kafu.ac.ke" target="_blank" rel="noreferrer" className="hover:text-accent">
-                  Portal
-                </a>
+                <a href="https://portal.kafu.ac.ke" target="_blank" rel="noreferrer" className="hover:text-accent">Portal</a>
                 <span className="opacity-40">|</span>
-                <a href="https://elearning.kafu.ac.ke" target="_blank" rel="noreferrer" className="hover:text-accent">
-                  E-Learning
-                </a>
+                <a href="https://elearning.kafu.ac.ke" target="_blank" rel="noreferrer" className="hover:text-accent">E-Learning</a>
               </div>
             </div>
-
-            {/* Nav accordion */}
             <div className="flex-1">
               {navItems.map((item) => (
                 <MobileNavItem key={item.name} item={item} onClose={closeMobile} />
               ))}
             </div>
-
-            {/* Apply Now */}
             <div className="p-4 border-t">
               <a
                 href="/admissions"

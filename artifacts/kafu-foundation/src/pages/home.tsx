@@ -126,14 +126,14 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
           className="absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700"
           style={{
             opacity: i === current ? 1 : 0,
-            filter: "brightness(0.42)",
+            filter: "brightness(0.68)",
             zIndex: 0,
           }}
         />
       ))}
 
       {/* Overlays */}
-      <div className="absolute inset-0 bg-primary/60" style={{ zIndex: 1 }} />
+      <div className="absolute inset-0 bg-primary/30" style={{ zIndex: 1 }} />
       <div
         className="absolute inset-0 opacity-25"
         style={{
