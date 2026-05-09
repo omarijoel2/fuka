@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Menu, X, ChevronDown, ChevronRight, MapPin, Phone, ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
 
-// ─── Streamlined nav: 6 top-level groups ──────────────────────────────────────
+// ─── Navigation structure ───────────────────────────────────────────────────
 const navItems = [
   {
     name: "About",
@@ -73,13 +73,13 @@ const navItems = [
   { name: "Contact", path: "/contact" },
 ];
 
-type Child   = { name: string; path: string; external?: boolean };
-type NavItem = { name: string; path: string; children?: Child[] };
+type Child    = { name: string; path: string; external?: boolean };
+type NavItem  = { name: string; path: string; children?: Child[] };
 
-// ─── Desktop Dropdown ─────────────────────────────────────────────────────────
+// ─── Desktop Dropdown ────────────────────────────────────────────────────────
 function DropdownPanel({ item, onClose }: { item: NavItem; onClose: () => void }) {
   return (
-    <div className="absolute top-full left-0 mt-0 w-60 bg-white rounded-b-xl shadow-2xl border-t-2 border-accent py-2 z-50">
+    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 w-60 bg-white rounded-b-xl shadow-2xl border-t-2 border-accent py-2 z-50">
       {item.children!.map((child) =>
         child.external ? (
           <a
@@ -173,16 +173,16 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
   );
 }
 
-// ─── Main Navbar ──────────────────────────────────────────────────────────────
+// ─── Main Navbar ─────────────────────────────────────────────────────────────
 export function Navbar() {
   const [mobileOpen,   setMobileOpen]   = React.useState(false);
   const [openDropdown, setOpenDropdown] = React.useState<string | null>(null);
   const [location]                      = useLocation();
-  const dropdownRef                     = React.useRef<HTMLDivElement>(null);
+  const navRowRef                       = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     function onClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      if (navRowRef.current && !navRowRef.current.contains(e.target as Node)) {
         setOpenDropdown(null);
       }
     }
@@ -196,12 +196,12 @@ export function Navbar() {
   const closeMobile = () => setMobileOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full shadow-sm bg-white">
+    <header className="sticky top-0 z-50 w-full bg-white shadow-md">
 
-      {/* ── Utility Bar ── */}
+      {/* ── Row 1: Utility bar — desktop only ── */}
       <div className="hidden sm:block bg-primary text-primary-foreground py-1.5 text-xs">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex items-center gap-4 opacity-90">
+        <div className="container mx-auto px-6 flex justify-between items-center">
+          <div className="flex items-center gap-5 opacity-90">
             <span className="flex items-center gap-1.5">
               <MapPin className="w-3 h-3 shrink-0" />
               <span className="hidden md:inline">P.O BOX 385 – 50309, </span>Kaimosi, Kenya
@@ -230,12 +230,8 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* ── Logo + Nav row ── */}
-      <div
-        className="container mx-auto px-4 h-[70px] flex items-center justify-between"
-        ref={dropdownRef}
-      >
-        {/* Logo */}
+      {/* ── Row 2: Logo + Apply Now / Hamburger ── */}
+      <div className="container mx-auto px-6 h-[68px] flex items-center justify-between">
         <Link href="/" className="flex items-center shrink-0" data-testid="link-home-logo">
           <img
             src="https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png"
@@ -250,8 +246,31 @@ export function Navbar() {
           />
         </Link>
 
-        {/* Desktop Nav — xl and above */}
-        <nav className="hidden xl:flex items-center gap-0.5">
+        <div className="flex items-center gap-3">
+          <Button
+            asChild
+            size="sm"
+            className="hidden lg:flex bg-accent text-accent-foreground hover:bg-accent/90 font-semibold px-5"
+            data-testid="button-apply-now"
+          >
+            <a href="/admissions">Apply Now</a>
+          </Button>
+
+          <button
+            className="lg:hidden flex items-center justify-center w-10 h-10 rounded-md text-foreground hover:bg-muted transition-colors"
+            onClick={() => setMobileOpen((o) => !o)}
+            aria-label={mobileOpen ? "Close menu" : "Open menu"}
+            aria-expanded={mobileOpen}
+            data-testid="button-mobile-menu"
+          >
+            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
+      </div>
+
+      {/* ── Row 3: Full-width nav — desktop (lg+) only ── */}
+      <div className="hidden lg:block border-t border-gray-100" ref={navRowRef}>
+        <nav className="container mx-auto px-6 flex items-center justify-center gap-1">
           {navItems.map((item) => (
             <div key={item.name} className="relative">
               {item.children ? (
@@ -261,10 +280,10 @@ export function Navbar() {
                 >
                   <button
                     onClick={() => setOpenDropdown(openDropdown === item.name ? null : item.name)}
-                    className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
+                    className={`flex items-center gap-1 px-4 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
                       isActive(item.path)
-                        ? "text-accent bg-accent/10"
-                        : "text-foreground hover:text-primary hover:bg-muted"
+                        ? "border-accent text-accent"
+                        : "border-transparent text-foreground hover:text-primary hover:border-primary/30"
                     }`}
                     data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
                   >
@@ -278,10 +297,10 @@ export function Navbar() {
               ) : (
                 <Link
                   href={item.path}
-                  className={`block px-3 py-2 rounded-md text-sm font-medium transition-colors whitespace-nowrap ${
+                  className={`block px-4 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
                     isActive(item.path)
-                      ? "text-accent bg-accent/10"
-                      : "text-foreground hover:text-primary hover:bg-muted"
+                      ? "border-accent text-accent"
+                      : "border-transparent text-foreground hover:text-primary hover:border-primary/30"
                   }`}
                   data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
                 >
@@ -290,32 +309,12 @@ export function Navbar() {
               )}
             </div>
           ))}
-
-          <Button
-            asChild
-            size="sm"
-            className="ml-3 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold shrink-0"
-            data-testid="button-apply-now"
-          >
-            <a href="/admissions">Apply Now</a>
-          </Button>
         </nav>
-
-        {/* Hamburger — shown below xl */}
-        <button
-          className="xl:hidden flex items-center justify-center w-10 h-10 rounded-md text-foreground hover:bg-muted transition-colors"
-          onClick={() => setMobileOpen((o) => !o)}
-          aria-label={mobileOpen ? "Close menu" : "Open menu"}
-          aria-expanded={mobileOpen}
-          data-testid="button-mobile-menu"
-        >
-          {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
       </div>
 
       {/* ── Mobile Drawer ── */}
       {mobileOpen && (
-        <div className="xl:hidden fixed inset-0 top-[70px] z-40 flex">
+        <div className="lg:hidden fixed inset-0 top-[68px] z-40 flex">
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={closeMobile} />
           <div className="relative w-full max-w-sm bg-white shadow-2xl flex flex-col overflow-y-auto">
             <div className="bg-primary px-5 py-3 flex items-center justify-between">
