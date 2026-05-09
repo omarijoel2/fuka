@@ -3,32 +3,30 @@ import { Link, useLocation } from "wouter";
 import { Menu, X, ChevronDown, ChevronRight, MapPin, Phone, ExternalLink } from "lucide-react";
 import { Button } from "./ui/button";
 
-// ─── Navigation structure ───────────────────────────────────────────────────
+// ─── Original 10-item nav structure ──────────────────────────────────────────
 const navItems = [
   { name: "Home", path: "/" },
   {
     name: "About",
     path: "/about",
     children: [
-      { name: "About KAFU",         path: "/about" },
-      { name: "Vision & Mission",   path: "/about#vision" },
-      { name: "Leadership & Staff", path: "/staff" },
-      { name: "Campuses",           path: "/campuses" },
-      { name: "Offices & Services", path: "/offices" },
-      { name: "Contact Us",         path: "/contact" },
+      { name: "About KAFU",        path: "/about" },
+      { name: "Vision & Mission",  path: "/about#vision" },
+      { name: "Staff Directory",   path: "/staff" },
+      { name: "Contact Us",        path: "/contact" },
     ],
   },
   {
     name: "Academics",
     path: "/schools",
     children: [
-      { name: "Schools & Faculties",            path: "/schools" },
-      { name: "Programme Catalogue",            path: "/programmes" },
-      { name: "SESS — Education & Social Sci.", path: "/schools/SESS" },
-      { name: "SBE — Business & Economics",     path: "/schools/SBE" },
-      { name: "SCIT — Computing & IT",          path: "/schools/SCIT" },
-      { name: "SOS — Science",                  path: "/schools/SOS" },
-      { name: "SHS — Health Sciences",          path: "/schools/SHS" },
+      { name: "Schools & Faculties",                  path: "/schools" },
+      { name: "Programme Catalogue",                  path: "/programmes" },
+      { name: "SESS — Education & Social Sciences",   path: "/schools/SESS" },
+      { name: "SBE — Business & Economics",           path: "/schools/SBE" },
+      { name: "SCIT — Computing & IT",                path: "/schools/SCIT" },
+      { name: "SOS — Science",                        path: "/schools/SOS" },
+      { name: "SHS — Health Sciences",                path: "/schools/SHS" },
     ],
   },
   {
@@ -36,8 +34,6 @@ const navItems = [
     path: "/admissions",
     children: [
       { name: "Admissions Overview",    path: "/admissions" },
-      { name: "Eligibility Checker",    path: "/admissions/eligibility" },
-      { name: "Tuition & Fees",         path: "/admissions/fees" },
       { name: "Undergraduate (KUCCPS)", path: "/admissions#undergraduate" },
       { name: "Postgraduate",           path: "/admissions#postgraduate" },
       { name: "International Students", path: "/admissions#international" },
@@ -45,42 +41,56 @@ const navItems = [
     ],
   },
   {
-    name: "Research",
-    path: "/research",
-    children: [
-      { name: "Research Overview",     path: "/research" },
-      { name: "Projects",              path: "/research/projects" },
-      { name: "Publications",          path: "/research/publications" },
-      { name: "Partnerships & Grants", path: "/research/partnerships" },
-      { name: "Repository",            path: "/repository" },
-      { name: "International",         path: "/international" },
-      { name: "Exchange Programmes",   path: "/international/exchange" },
-      { name: "Global Partners",       path: "/international/partnerships" },
-    ],
-  },
-  {
-    name: "Campus Life",
+    name: "Students",
     path: "/student-services",
     children: [
       { name: "Student Services", path: "/student-services" },
-      { name: "News",             path: "/news" },
-      { name: "Events",           path: "/events" },
-      { name: "Announcements",    path: "/announcements" },
-      { name: "Opportunities",    path: "/opportunities" },
       { name: "Student Portal",   path: "https://portal.kafu.ac.ke",   external: true },
       { name: "E-Learning",       path: "https://elearning.kafu.ac.ke", external: true },
     ],
   },
-  { name: "Contact", path: "/contact" },
+  {
+    name: "News",
+    path: "/news",
+    children: [
+      { name: "Latest News",    path: "/news" },
+      { name: "Events Calendar", path: "/events" },
+      { name: "Announcements",  path: "/announcements" },
+    ],
+  },
+  {
+    name: "Research",
+    path: "/research",
+    children: [
+      { name: "Research Overview",        path: "/research" },
+      { name: "Research Projects",        path: "/research/projects" },
+      { name: "Publications",             path: "/research/publications" },
+      { name: "Partnerships & Grants",    path: "/research/partnerships" },
+      { name: "Institutional Repository", path: "/repository" },
+    ],
+  },
+  {
+    name: "International",
+    path: "/international",
+    children: [
+      { name: "Global Overview",     path: "/international" },
+      { name: "Study at KAFU",       path: "/international/study" },
+      { name: "Visa & Immigration",  path: "/international/visa" },
+      { name: "Exchange Programmes", path: "/international/exchange" },
+      { name: "Our Partners",        path: "/international/partnerships" },
+    ],
+  },
+  { name: "Opportunities", path: "/opportunities" },
+  { name: "Contact",       path: "/contact" },
 ];
 
-type Child    = { name: string; path: string; external?: boolean };
-type NavItem  = { name: string; path: string; children?: Child[] };
+type Child   = { name: string; path: string; external?: boolean };
+type NavItem = { name: string; path: string; children?: Child[] };
 
 // ─── Desktop Dropdown ────────────────────────────────────────────────────────
 function DropdownPanel({ item, onClose }: { item: NavItem; onClose: () => void }) {
   return (
-    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 w-60 bg-white rounded-b-xl shadow-2xl border-t-2 border-accent py-2 z-50">
+    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 w-56 bg-white rounded-b-xl shadow-2xl border-t-2 border-accent py-2 z-50">
       {item.children!.map((child) =>
         child.external ? (
           <a
@@ -201,8 +211,8 @@ export function Navbar() {
 
       {/* ── Row 1: Utility bar — desktop only ── */}
       <div className="hidden sm:block bg-primary text-primary-foreground py-1.5 text-xs">
-        <div className="container mx-auto px-6 flex justify-between items-center">
-          <div className="flex items-center gap-5 opacity-90">
+        <div className="container mx-auto px-4 flex justify-between items-center">
+          <div className="flex items-center gap-4 opacity-90">
             <span className="flex items-center gap-1.5">
               <MapPin className="w-3 h-3 shrink-0" />
               <span className="hidden md:inline">P.O BOX 385 – 50309, </span>Kaimosi, Kenya
@@ -232,7 +242,7 @@ export function Navbar() {
       </div>
 
       {/* ── Row 2: Logo + Apply Now / Hamburger ── */}
-      <div className="container mx-auto px-6 h-[68px] flex items-center justify-between">
+      <div className="container mx-auto px-4 h-[68px] flex items-center justify-between">
         <Link href="/" className="flex items-center shrink-0" data-testid="link-home-logo">
           <img
             src="https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png"
@@ -251,14 +261,14 @@ export function Navbar() {
           <Button
             asChild
             size="sm"
-            className="hidden lg:flex bg-accent text-accent-foreground hover:bg-accent/90 font-semibold px-5"
+            className="hidden xl:flex bg-accent text-accent-foreground hover:bg-accent/90 font-semibold px-5"
             data-testid="button-apply-now"
           >
             <a href="/admissions">Apply Now</a>
           </Button>
 
           <button
-            className="lg:hidden flex items-center justify-center w-10 h-10 rounded-md text-foreground hover:bg-muted transition-colors"
+            className="xl:hidden flex items-center justify-center w-10 h-10 rounded-md text-foreground hover:bg-muted transition-colors"
             onClick={() => setMobileOpen((o) => !o)}
             aria-label={mobileOpen ? "Close menu" : "Open menu"}
             aria-expanded={mobileOpen}
@@ -269,9 +279,9 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* ── Row 3: Full-width nav — desktop (lg+) only ── */}
-      <div className="hidden lg:block border-t border-gray-100" ref={navRowRef}>
-        <nav className="container mx-auto px-6 flex items-center justify-center gap-1">
+      {/* ── Row 3: Full-width nav — desktop xl+ only ── */}
+      <div className="hidden xl:block border-t border-gray-100" ref={navRowRef}>
+        <nav className="container mx-auto px-4 flex items-center justify-center gap-0">
           {navItems.map((item) => (
             <div key={item.name} className="relative">
               {item.children ? (
@@ -281,7 +291,7 @@ export function Navbar() {
                 >
                   <button
                     onClick={() => setOpenDropdown(openDropdown === item.name ? null : item.name)}
-                    className={`flex items-center gap-1 px-4 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
+                    className={`flex items-center gap-0.5 px-3 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
                       isActive(item.path)
                         ? "border-accent text-accent"
                         : "border-transparent text-foreground hover:text-primary hover:border-primary/30"
@@ -289,7 +299,7 @@ export function Navbar() {
                     data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
                   >
                     {item.name}
-                    <ChevronDown className={`w-3.5 h-3.5 transition-transform ${openDropdown === item.name ? "rotate-180" : ""}`} />
+                    <ChevronDown className={`w-3 h-3 transition-transform ${openDropdown === item.name ? "rotate-180" : ""}`} />
                   </button>
                   {openDropdown === item.name && (
                     <DropdownPanel item={item} onClose={() => setOpenDropdown(null)} />
@@ -298,7 +308,7 @@ export function Navbar() {
               ) : (
                 <Link
                   href={item.path}
-                  className={`block px-4 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
+                  className={`block px-3 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
                     isActive(item.path)
                       ? "border-accent text-accent"
                       : "border-transparent text-foreground hover:text-primary hover:border-primary/30"
@@ -315,7 +325,7 @@ export function Navbar() {
 
       {/* ── Mobile Drawer ── */}
       {mobileOpen && (
-        <div className="lg:hidden fixed inset-0 top-[68px] z-40 flex">
+        <div className="xl:hidden fixed inset-0 top-[68px] z-40 flex">
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={closeMobile} />
           <div className="relative w-full max-w-sm bg-white shadow-2xl flex flex-col overflow-y-auto">
             <div className="bg-primary px-5 py-3 flex items-center justify-between">
