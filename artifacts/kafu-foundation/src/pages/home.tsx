@@ -58,6 +58,16 @@ const SLIDES = [
     testid: "hero-slide-2",
   },
   {
+    image: "https://kafu.ac.ke/wp-content/uploads/Vice-Chancellor-Prof.-Peter-Mwita-addresses-fourth-year-teacher-trainees-during-the-opening-of-the-Competency-Based-Education-CBE-training-at-Kaimosi-Friends-University.jpg",
+    badge: "Strong Leadership · Visionary Direction · Academic Excellence",
+    headline: "Led by",
+    accent: "Vision",
+    body: "Under the leadership of Vice-Chancellor Prof. Peter Mwita, KAFU is transforming into a globally competitive university — driven by innovation, integrity, and a commitment to the people of Kenya.",
+    cta1: { label: "Meet Our Team", href: "/staff", external: false },
+    cta2: { label: "About KAFU", href: "/about", external: false },
+    testid: "hero-slide-3",
+  },
+  {
     image: "https://kafu.ac.ke/wp-content/uploads/2025/10/art-culture.jpg",
     badge: "Vibrant Campus Life · Western Kenya Highlands",
     headline: "A Community",
@@ -65,7 +75,7 @@ const SLIDES = [
     body: "Experience rich campus life in the lush highlands of Kaimosi — where friendships form, talents flourish, and futures are forged in the spirit of service and truth.",
     cta1: { label: "Admissions Open", href: "/admissions", external: false },
     cta2: { label: "About KAFU", href: "/about", external: false },
-    testid: "hero-slide-3",
+    testid: "hero-slide-4",
   },
 ];
 
