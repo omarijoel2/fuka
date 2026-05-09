@@ -160,6 +160,72 @@ export default function StaffProfilePage() {
     );
   }
 
+  // Loading skeleton — shown while profile data is in-flight.
+  // Returning here also narrows `profile` to StaffProfile for everything below,
+  // removing the need for optional-chaining or non-null assertions.
+  if (!profile) {
+    return (
+      <div className="flex flex-col min-h-screen" data-testid="profile-loading">
+        {/* Skeleton hero */}
+        <div className="bg-primary text-primary-foreground py-10">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center gap-1.5 mb-7">
+              <div className="h-3 w-8 bg-white/20 rounded animate-pulse" />
+              <div className="h-3 w-3 bg-white/10 rounded animate-pulse" />
+              <div className="h-3 w-24 bg-white/20 rounded animate-pulse" />
+              <div className="h-3 w-3 bg-white/10 rounded animate-pulse" />
+              <div className="h-3 w-32 bg-white/15 rounded animate-pulse" />
+            </div>
+            <div className="flex flex-col sm:flex-row gap-7">
+              <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-2xl bg-white/20 animate-pulse shrink-0" />
+              <div className="flex-1 space-y-3 pt-2">
+                <div className="flex gap-2">
+                  <div className="h-6 w-16 bg-white/20 rounded-full animate-pulse" />
+                  <div className="h-6 w-24 bg-white/15 rounded-full animate-pulse" />
+                </div>
+                <div className="h-9 w-80 max-w-full bg-white/20 rounded animate-pulse" />
+                <div className="h-5 w-56 bg-white/15 rounded animate-pulse" />
+                <div className="h-4 w-64 bg-white/10 rounded animate-pulse" />
+                <div className="flex gap-2 pt-2">
+                  <div className="h-8 w-28 bg-white/15 rounded-lg animate-pulse" />
+                  <div className="h-8 w-24 bg-white/10 rounded-lg animate-pulse" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Skeleton tab nav */}
+        <div className="border-b bg-background">
+          <div className="container mx-auto px-4 flex gap-6 py-1">
+            {NAV_TABS.map((t) => (
+              <div key={t.id} className="h-10 w-20 bg-muted rounded animate-pulse" />
+            ))}
+          </div>
+        </div>
+        {/* Skeleton body */}
+        <div className="container mx-auto px-4 py-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+            <div className="lg:col-span-2 space-y-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="h-5 bg-muted rounded animate-pulse" style={{ width: `${85 - (i % 3) * 15}%` }} />
+              ))}
+              <div className="h-px bg-border my-4" />
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="h-16 bg-muted rounded-lg animate-pulse" />
+              ))}
+            </div>
+            <div className="space-y-4">
+              <div className="h-20 bg-muted rounded-xl animate-pulse" />
+              <div className="h-32 bg-muted rounded-xl animate-pulse" />
+              <div className="h-40 bg-muted rounded-xl animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // From here profile is guaranteed to be defined (StaffProfile).
   const gradient = getGradient(slug);
   const schoolColor = profile?.school ? SCHOOL_COLORS[profile.school] : null;
   const supervision = profile?.supervision ?? { masters_count: 0, phd_count: 0 };
