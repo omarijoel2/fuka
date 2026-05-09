@@ -1191,6 +1191,49 @@ Route::prefix('admin')->group(function () {
         Route::get('/content-health', [\App\Http\Controllers\Admin\ContentHealthController::class, 'index']);
 
         // -------------------------------------------------------------------------
+        // Archive Expired Content (manual trigger)
+        // -------------------------------------------------------------------------
+        Route::post('/archive-expired', function (\Illuminate\Http\Request $request) {
+            $user  = $request->user();
+            $types = ['news', 'announcement'];
+
+            $items = \App\Models\CmsContent::whereIn('type', $types)
+                ->where('status', 'published')
+                ->whereNotNull('expiry_date')
+                ->where('expiry_date', '<', now())
+                ->where('is_deleted', false)
+                ->get();
+
+            $archived = 0;
+            foreach ($items as $item) {
+                $item->update([
+                    'status'      => 'archived',
+                    'archived_at' => now(),
+                ]);
+
+                \App\Models\AuditLog::record(
+                    $user,
+                    'manual_archive_expired',
+                    $item->type,
+                    $item->id,
+                    $item->title,
+                    ['status' => 'published'],
+                    ['status' => 'archived'],
+                    "Manually archived via Content Health by {$user->name}."
+                );
+
+                $archived++;
+            }
+
+            return response()->json([
+                'archived' => $archived,
+                'message'  => $archived > 0
+                    ? "Archived {$archived} expired item(s) successfully."
+                    : 'No expired published news or announcements found.',
+            ]);
+        });
+
+        // -------------------------------------------------------------------------
         // Workflow Queue
         // -------------------------------------------------------------------------
         Route::get('/workflow-queue', [\App\Http\Controllers\Admin\WorkflowQueueController::class, 'index']);

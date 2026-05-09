@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { apiGet } from "../lib/api";
+import { apiGet, apiPost } from "../lib/api";
 import { Link } from "wouter";
 
 interface HealthSummary {
@@ -11,6 +11,7 @@ interface HealthSummary {
   missing_seo: number;
   overdue_reviews: number;
   recently_published: number;
+  expired_news_announcements?: number;
 }
 
 interface ContentItem {
@@ -31,6 +32,7 @@ interface HealthData {
   stale_drafts_list: ContentItem[];
   overdue_review_list: ContentItem[];
   expired_list: ContentItem[];
+  expired_news_announcements_list?: ContentItem[];
 }
 
 function ScoreRing({ score }: { score: number }) {
@@ -126,10 +128,79 @@ function ContentList({ items, emptyMsg }: { items: ContentItem[]; emptyMsg: stri
   );
 }
 
+function ArchiveExpiredPanel({ initialItems }: { initialItems: ContentItem[] }) {
+  const [items, setItems]       = useState<ContentItem[]>(initialItems);
+  const [running, setRunning]   = useState(false);
+  const [result, setResult]     = useState<{ archived: number; message: string } | null>(null);
+  const [error, setError]       = useState("");
+
+  const handleArchive = async () => {
+    setRunning(true);
+    setError("");
+    setResult(null);
+    try {
+      const res = await apiPost("/archive-expired");
+      setResult(res);
+      setItems([]);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to archive expired content.");
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  return (
+    <div className="bg-white border border-gray-200 rounded-xl p-5">
+      <div className="flex items-start justify-between mb-4">
+        <div>
+          <h3 className="text-sm font-semibold text-gray-800">
+            Expired News &amp; Announcements
+            {items.length > 0 && (
+              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-700">
+                {items.length} pending
+              </span>
+            )}
+          </h3>
+          <p className="text-xs text-gray-500 mt-0.5">
+            Published items whose expiry date has passed. The scheduler archives these nightly,
+            or you can trigger it manually below.
+          </p>
+        </div>
+        {items.length > 0 && (
+          <button
+            onClick={handleArchive}
+            disabled={running}
+            data-testid="button-archive-expired"
+            className="ml-4 shrink-0 px-3 py-1.5 rounded-lg bg-red-600 text-white text-xs font-semibold hover:bg-red-700 disabled:opacity-50 transition-colors"
+          >
+            {running ? "Archiving..." : `Archive ${items.length} item${items.length !== 1 ? "s" : ""}`}
+          </button>
+        )}
+      </div>
+
+      {result && (
+        <div className="mb-3 px-3 py-2 rounded-lg bg-green-50 border border-green-200 text-green-800 text-xs font-medium">
+          {result.message}
+        </div>
+      )}
+      {error && (
+        <div className="mb-3 px-3 py-2 rounded-lg bg-red-50 border border-red-200 text-red-800 text-xs">
+          {error}
+        </div>
+      )}
+
+      <ContentList
+        items={items}
+        emptyMsg={result ? "All expired items have been archived." : "No expired news or announcements found."}
+      />
+    </div>
+  );
+}
+
 export default function ContentHealthPage() {
-  const [data, setData] = useState<HealthData | null>(null);
+  const [data, setData]     = useState<HealthData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError]   = useState("");
 
   useEffect(() => {
     apiGet("/content-health")
@@ -138,10 +209,11 @@ export default function ContentHealthPage() {
   }, []);
 
   if (loading) return <div className="p-8 text-center text-gray-500">Analyzing content health...</div>;
-  if (error) return <div className="p-8 text-center text-red-500">{error}</div>;
-  if (!data) return null;
+  if (error)   return <div className="p-8 text-center text-red-500">{error}</div>;
+  if (!data)   return null;
 
   const { summary, stale_content_list, stale_drafts_list, overdue_review_list, expired_list } = data;
+  const expiredNewsList = data.expired_news_announcements_list ?? [];
 
   const issues = [
     {
@@ -155,6 +227,12 @@ export default function ContentHealthPage() {
       count: summary.stale_drafts,
       severity: summary.stale_drafts > 10 ? "warning" : "ok",
       description: "Old drafts that may need attention or archiving.",
+    },
+    {
+      title: "Expired news & announcements still published",
+      count: summary.expired_news_announcements ?? expiredNewsList.length,
+      severity: (summary.expired_news_announcements ?? expiredNewsList.length) > 0 ? "critical" : "ok",
+      description: "Past-date items that should be archived.",
     },
     {
       title: "Expired opportunities still published",
@@ -233,7 +311,7 @@ export default function ContentHealthPage() {
         ))}
       </div>
 
-      {/* Content by status */}
+      {/* Content by status / type */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <div className="bg-white border border-gray-200 rounded-xl p-5">
           <h3 className="text-sm font-semibold text-gray-800 mb-3">Content by Status</h3>
@@ -283,6 +361,9 @@ export default function ContentHealthPage() {
           <ContentList items={expired_list} emptyMsg="No expired opportunities still published." />
         </div>
       </div>
+
+      {/* Archive expired news & announcements */}
+      <ArchiveExpiredPanel initialItems={expiredNewsList} />
     </div>
   );
 }

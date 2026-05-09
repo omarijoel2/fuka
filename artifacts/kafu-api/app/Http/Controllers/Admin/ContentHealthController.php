@@ -106,9 +106,28 @@ class ContentHealthController extends Controller
             ->whereNotNull('expiry_date')
             ->where('expiry_date', '<', $now)
             ->where('is_deleted', false)
-            ->select('id', 'title', 'status', 'expiry_date')
+            ->select('id', 'title', 'type', 'status', 'expiry_date', 'updated_at')
             ->orderBy('expiry_date', 'asc')
             ->limit(10)
+            ->get();
+
+        // Expired news & announcements still published
+        $expiredNewsCount = DB::table('cms_content')
+            ->whereIn('type', ['news', 'announcement'])
+            ->where('status', 'published')
+            ->whereNotNull('expiry_date')
+            ->where('expiry_date', '<', $now)
+            ->where('is_deleted', false)
+            ->count();
+
+        $expiredNewsList = DB::table('cms_content')
+            ->whereIn('type', ['news', 'announcement'])
+            ->where('status', 'published')
+            ->whereNotNull('expiry_date')
+            ->where('expiry_date', '<', $now)
+            ->where('is_deleted', false)
+            ->select('id', 'title', 'type', 'status', 'expiry_date', 'updated_at')
+            ->orderBy('expiry_date', 'asc')
             ->get();
 
         // Content by status summary
@@ -136,28 +155,30 @@ class ContentHealthController extends Controller
             ->count();
 
         $score = $this->calculateHealthScore(
-            $staleContent, $staleDrafts, $expiredOpportunities,
+            $staleContent, $staleDrafts, $expiredOpportunities + $expiredNewsCount,
             $missingAlt, $incompleteProfiles, $missingSeo, $overdueReview
         );
 
         return response()->json([
             'health_score' => $score,
             'summary' => [
-                'stale_content'              => $staleContent,
-                'stale_drafts'               => $staleDrafts,
-                'expired_opportunities'      => $expiredOpportunities,
-                'missing_alt_text'           => $missingAlt,
-                'incomplete_staff_profiles'  => $incompleteProfiles,
-                'missing_seo'                => $missingSeo,
-                'overdue_reviews'            => $overdueReview,
-                'recently_published'         => $recentlyPublished,
+                'stale_content'                => $staleContent,
+                'stale_drafts'                 => $staleDrafts,
+                'expired_opportunities'        => $expiredOpportunities,
+                'expired_news_announcements'   => $expiredNewsCount,
+                'missing_alt_text'             => $missingAlt,
+                'incomplete_staff_profiles'    => $incompleteProfiles,
+                'missing_seo'                  => $missingSeo,
+                'overdue_reviews'              => $overdueReview,
+                'recently_published'           => $recentlyPublished,
             ],
-            'status_breakdown'     => $statusSummary,
-            'type_breakdown'       => $typeSummary,
-            'stale_content_list'   => $staleContentList,
-            'stale_drafts_list'    => $staleDraftsList,
-            'overdue_review_list'  => $overdueList,
-            'expired_list'         => $expiredList,
+            'status_breakdown'                  => $statusSummary,
+            'type_breakdown'                    => $typeSummary,
+            'stale_content_list'                => $staleContentList,
+            'stale_drafts_list'                 => $staleDraftsList,
+            'overdue_review_list'               => $overdueList,
+            'expired_list'                      => $expiredList,
+            'expired_news_announcements_list'   => $expiredNewsList,
         ]);
     }
 
