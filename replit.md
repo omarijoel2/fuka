@@ -47,9 +47,58 @@ The KAFU website is built as a pnpm monorepo consisting of a React-based fronten
 - **MP08 (CMS & Governance Engine)**: Provides a robust content management system with user roles, content workflows, media management, and audit logging.
 - **MP16 (Staff Account Updater Portal)**: Allows staff to manage their academic profiles, with a submission and review process integrated into the CMS.
 
+## Database & Hosting Strategy
+
+### Development (Replit)
+- Uses **SQLite** locally in Replit — no external database server required for development.
+- All migrations and seeders run against the local SQLite file at `artifacts/kafu-api/database/database.sqlite`.
+
+### Production (University Hosting)
+- Target database: **MySQL / MariaDB** (standard on cPanel university hosting).
+- The Laravel backend is already fully MySQL-compatible — all migrations use standard column types (`decimal`, `json`, `text`, `timestamps`, etc.).
+- To deploy to university hosting, see **Deployment Checklist** below.
+
+### Switching from SQLite to MySQL
+Only the `.env` file needs changing — no code changes required:
+```
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=kafu_website
+DB_USERNAME=kafu_db_user
+DB_PASSWORD=<password>
+```
+Then run: `php artisan migrate --seed`
+
+### Deployment Checklist (University cPanel Hosting)
+**Backend (Laravel API) — deploy to `api.kafu.ac.ke` or a subdirectory:**
+1. Upload `artifacts/kafu-api/` to the hosting server (exclude `.git`, `node_modules`)
+2. Run `composer install --no-dev --optimize-autoloader` on the server
+3. Copy `.env.example` to `.env` and fill in all values (database, mail, app URL, app key)
+4. Run `php artisan key:generate`
+5. Create MySQL database + user in cPanel → MySQL Databases
+6. Run `php artisan migrate --seed`
+7. Point `DocumentRoot` to `public/` (or use `.htaccess` for subdirectory installs)
+8. Run `php artisan config:cache && php artisan route:cache`
+9. Set up a cron job for the scheduler: `* * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1`
+
+**Frontend (React/Vite) — deploy to `www.kafu.ac.ke`:**
+1. Set `VITE_API_URL=https://api.kafu.ac.ke` in the frontend `.env`
+2. Run `pnpm --filter @workspace/kafu-foundation run build`
+3. Upload the `dist/` folder contents to `public_html/`
+4. Configure Apache/Nginx to serve `index.html` for all routes (SPA fallback)
+
+**CMS Admin — deploy to `cms.kafu.ac.ke`:**
+1. Run `pnpm --filter @workspace/kafu-cms run build`
+2. Upload `dist/` to the CMS subdomain document root
+
+**Staff Portal — deploy to `staff.kafu.ac.ke` or `portal-update.kafu.ac.ke`:**
+1. Run `pnpm --filter @workspace/kafu-staff run build`
+2. Upload `dist/` to the staff portal subdomain document root
+
 ## External Dependencies
 
-- **Database**: Implied relational database (likely MySQL/PostgreSQL) managed by Laravel's ORM.
+- **Database**: MySQL / MariaDB on university cPanel hosting. SQLite used in Replit development.
 - **Frontend Libraries**:
     - **React**: For UI development.
     - **Vite**: Build tool for frontend.
