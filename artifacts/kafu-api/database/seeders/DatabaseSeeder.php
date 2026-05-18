@@ -21,5 +21,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ResearchSeeder::class);
         $this->call(InternationalSeeder::class);
         $this->call(RepositorySeeder::class);
+        $this->call(AdmissionsModuleSeeder::class);
     }
 }

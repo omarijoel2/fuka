@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { SeoHead } from "@/components/seo-head";
 import { useAdmissions, useProgrammes } from "@/lib/api-hooks";
 import type { AdmissionsPathway } from "@/lib/api-types";
+import ApplicationWizard from "@/components/application-wizard";
 import {
   CheckCircle2,
   GraduationCap,
@@ -134,6 +135,7 @@ export default function Admissions() {
   const { data: programmes } = useProgrammes();
   const [activePathway, setActivePathway] = React.useState<string>("undergraduate");
   const [activeDocCategory, setActiveDocCategory] = React.useState<string>("Application Forms");
+  const [wizardOpen, setWizardOpen] = useState(false);
 
   const pathways = data?.pathways ?? [];
   const deadlines = data?.deadlines ?? [];
@@ -146,6 +148,7 @@ export default function Admissions() {
   const activePathwayData = pathways.find((p) => p.id === activePathway);
 
   return (
+    <>
     <div className="flex flex-col min-h-screen">
       <SeoHead
         title="Admissions — Apply to Kaimosi Friends University"
@@ -186,12 +189,10 @@ export default function Admissions() {
               <Button
                 size="lg"
                 className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
-                asChild
+                onClick={() => setWizardOpen(true)}
                 data-testid="hero-btn-apply"
               >
-                <a href="https://portal.kafu.ac.ke" target="_blank" rel="noreferrer">
-                  Apply Now <ExternalLink className="ml-2 w-4 h-4" />
-                </a>
+                Apply Now <ArrowRight className="ml-2 w-4 h-4" />
               </Button>
               <Button
                 size="lg"
@@ -666,5 +667,8 @@ export default function Admissions() {
         </div>
       </div>
     </div>
+
+    {wizardOpen && <ApplicationWizard onClose={() => setWizardOpen(false)} />}
+    </>
   );
 }

@@ -1,11 +1,13 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { apiFetch } from "@/lib/api";
 import {
   GraduationCap, FileText, Settings2, Upload, CheckCircle2, XCircle,
   Clock, Search, Plus, Edit2, Trash2, Save, X, RefreshCw, AlertCircle,
   Filter, Eye, ToggleLeft, ToggleRight, ChevronDown, ChevronUp,
-  BookOpen, Briefcase,
+  BookOpen, Briefcase, Calendar, Users, FileUp, BarChart3, Download,
+  ChevronRight, Inbox, AlertOctagon, CheckSquare, MessageSquare, Ban,
+  SkipForward, DollarSign, Loader2,
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -43,14 +45,62 @@ interface Setting {
   value: string;
 }
 
+interface Intake {
+  id: number;
+  name: string;
+  academic_year: string;
+  intake_period: string;
+  status: string;
+  is_published: boolean;
+  open_at: string;
+  close_at: string;
+  application_fee_undergraduate: number;
+  application_fee_masters: number;
+  application_fee_phd: number;
+  max_applications: number | null;
+  notes: string | null;
+  created_at: string;
+}
+
+interface Application {
+  id: number;
+  application_number: string;
+  reference: string;
+  full_name: string;
+  email: string;
+  phone: string | null;
+  programme_name: string;
+  school_code: string;
+  level: string;
+  pathway_name: string;
+  status: string;
+  payment_status: string;
+  completeness_score: number;
+  submitted_at: string | null;
+  created_at: string;
+}
+
+interface KuccpsBatch {
+  id: number;
+  filename: string;
+  academic_year: string;
+  intake_period: string;
+  status: "pending" | "processing" | "completed" | "failed";
+  total_rows: number;
+  processed_rows: number;
+  successful_rows: number;
+  failed_rows: number;
+  error_log: string | null;
+  imported_by: number;
+  created_at: string;
+  completed_at: string | null;
+}
+
 // ── Constants ─────────────────────────────────────────────────────────────────
 const SCHOOLS = ["SESS", "SBE", "SCIT", "SOS", "SHS"];
 const SCHOOL_NAMES: Record<string, string> = {
-  SESS: "Education & Social Sciences",
-  SBE: "Business & Economics",
-  SCIT: "Computing & IT",
-  SOS: "Science",
-  SHS: "Health Sciences",
+  SESS: "Education & Social Sciences", SBE: "Business & Economics",
+  SCIT: "Computing & IT", SOS: "Science", SHS: "Health Sciences",
 };
 const DEGREE_CLASSES = [
   { value: "pass", label: "Pass / Unclassified" },
@@ -61,10 +111,32 @@ const DEGREE_CLASSES = [
   { value: "masters", label: "Masters Degree" },
 ];
 
-const STATUS_CONFIG = {
+const UPLOAD_STATUS_CONFIG = {
   pending:  { label: "Pending", cls: "bg-yellow-100 text-yellow-800", icon: <Clock className="w-3.5 h-3.5" /> },
   verified: { label: "Verified", cls: "bg-emerald-100 text-emerald-800", icon: <CheckCircle2 className="w-3.5 h-3.5" /> },
   rejected: { label: "Rejected", cls: "bg-red-100 text-red-800", icon: <XCircle className="w-3.5 h-3.5" /> },
+};
+
+const APP_STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
+  draft:       { label: "Draft",        cls: "bg-gray-100 text-gray-700" },
+  submitted:   { label: "Submitted",    cls: "bg-blue-100 text-blue-700" },
+  under_review:{ label: "Under Review", cls: "bg-purple-100 text-purple-700" },
+  eligible:    { label: "Eligible",     cls: "bg-teal-100 text-teal-700" },
+  offered:     { label: "Offer Sent",   cls: "bg-emerald-100 text-emerald-700" },
+  rejected:    { label: "Rejected",     cls: "bg-red-100 text-red-700" },
+  query:       { label: "Query Docs",   cls: "bg-amber-100 text-amber-700" },
+  deferred:    { label: "Deferred",     cls: "bg-orange-100 text-orange-700" },
+};
+
+const INTAKE_STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
+  draft:         { label: "Draft",          cls: "bg-gray-100 text-gray-600" },
+  published:     { label: "Published",      cls: "bg-blue-100 text-blue-700" },
+  open:          { label: "Open",           cls: "bg-emerald-100 text-emerald-700" },
+  closing_soon:  { label: "Closing Soon",   cls: "bg-amber-100 text-amber-700" },
+  extended:      { label: "Extended",       cls: "bg-cyan-100 text-cyan-700" },
+  closed:        { label: "Closed",         cls: "bg-red-100 text-red-700" },
+  processing:    { label: "Processing",     cls: "bg-purple-100 text-purple-700" },
+  archived:      { label: "Archived",       cls: "bg-gray-100 text-gray-500" },
 };
 
 function fmt(d?: string | null) {
@@ -76,17 +148,15 @@ function fmtDate(d?: string | null) {
   return new Date(d).toLocaleDateString("en-KE", { day: "2-digit", month: "short", year: "numeric" });
 }
 
-// ── Status Badge ───────────────────────────────────────────────────────────────
-function StatusBadge({ status }: { status: UploadRecord["status"] }) {
-  const cfg = STATUS_CONFIG[status] ?? STATUS_CONFIG.pending;
-  return (
-    <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${cfg.cls}`}>
-      {cfg.icon} {cfg.label}
-    </span>
-  );
+// ── Generic Badge ─────────────────────────────────────────────────────────────
+function Badge({ label, cls }: { label: string; cls: string }) {
+  return <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${cls}`}>{label}</span>;
 }
 
-// ── Upload Review Modal ────────────────────────────────────────────────────────
+// ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
+// ── Tab: Document Uploads ─────────────────────────────────────────────────────
+// ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
+
 function ReviewModal({ upload, onClose, onSaved }: { upload: UploadRecord; onClose: () => void; onSaved: () => void }) {
   const [status, setStatus] = useState<UploadRecord["status"]>(upload.status);
   const [notes, setNotes] = useState(upload.reviewer_notes ?? "");
@@ -103,9 +173,7 @@ function ReviewModal({ upload, onClose, onSaved }: { upload: UploadRecord; onClo
       onSaved();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Save failed");
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   }
 
   return (
@@ -127,33 +195,28 @@ function ReviewModal({ upload, onClose, onSaved }: { upload: UploadRecord; onClo
             <label className="block text-sm font-semibold text-gray-700 mb-2">Decision</label>
             <div className="flex gap-3">
               {(["pending","verified","rejected"] as const).map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setStatus(s)}
+                <button key={s} onClick={() => setStatus(s)}
                   className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-all ${status === s ? "border-[#1A5C38] bg-[#1A5C38]/5 text-[#1A5C38]" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}
-                  data-testid={`review-status-${s}`}
-                >
-                  {STATUS_CONFIG[s].label}
+                  data-testid={`review-status-${s}`}>
+                  {UPLOAD_STATUS_CONFIG[s].label}
                 </button>
               ))}
             </div>
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-1">Reviewer Notes <span className="font-normal text-gray-400">(optional)</span></label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={3}
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3}
               placeholder="e.g. Document verified against original. Approved for processing."
               className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30"
-              data-testid="review-notes"
-            />
+              data-testid="review-notes" />
           </div>
           {error && <div className="flex items-center gap-2 text-sm text-red-600"><AlertCircle className="w-4 h-4" />{error}</div>}
         </div>
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t bg-gray-50">
           <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">Cancel</button>
-          <button onClick={save} disabled={saving} className="px-5 py-2 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90 disabled:opacity-50 flex items-center gap-2" data-testid="btn-save-review">
+          <button onClick={save} disabled={saving}
+            className="px-5 py-2 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90 disabled:opacity-50 flex items-center gap-2"
+            data-testid="btn-save-review">
             {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Decision
           </button>
         </div>
@@ -162,7 +225,702 @@ function ReviewModal({ upload, onClose, onSaved }: { upload: UploadRecord; onClo
   );
 }
 
-// ── PG Programme Modal ─────────────────────────────────────────────────────────
+function UploadsTab() {
+  const [uploads, setUploads] = useState<UploadRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [reviewing, setReviewing] = useState<UploadRecord | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (statusFilter) params.set("status", statusFilter);
+      const data = await apiFetch(`/admissions/uploads?${params}`);
+      setUploads(data.data ?? []);
+    } finally { setLoading(false); }
+  }, [search, statusFilter]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const pendingCount = uploads.filter((u) => u.status === "pending").length;
+
+  return (
+    <div>
+      <div className="flex flex-wrap items-center gap-3 mb-6">
+        <div className="relative flex-1 min-w-48">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by file or reference…"
+            className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30"
+            data-testid="search-uploads" />
+        </div>
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none"
+          data-testid="filter-status">
+          <option value="">All Statuses</option>
+          <option value="pending">Pending</option>
+          <option value="verified">Verified</option>
+          <option value="rejected">Rejected</option>
+        </select>
+        {pendingCount > 0 && (
+          <div className="flex items-center gap-1.5 px-3 py-2 bg-amber-50 border border-amber-200 text-amber-800 rounded-lg text-sm">
+            <AlertOctagon className="w-4 h-4" /> {pendingCount} pending review
+          </div>
+        )}
+      </div>
+
+      {loading ? (
+        <div className="text-center py-16 text-gray-400 text-sm">Loading uploads…</div>
+      ) : uploads.length === 0 ? (
+        <div className="text-center py-16 text-gray-400">
+          <Upload className="w-10 h-10 mx-auto mb-3 opacity-30" />
+          <div className="font-medium">No document uploads found</div>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {uploads.map((u) => (
+            <div key={u.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-gray-300 bg-white" data-testid={`upload-row-${u.id}`}>
+              <FileText className="w-8 h-8 text-gray-300 shrink-0" />
+              <div className="flex-1 min-w-0">
+                <div className="font-medium text-sm text-gray-800 truncate">{u.file_name}</div>
+                <div className="text-xs text-gray-500 mt-0.5">{u.document_type} · {u.size_kb} KB · Ref: <code className="font-mono bg-gray-100 px-1 rounded">{u.reference_id}</code></div>
+                <div className="text-xs text-gray-400 mt-0.5">{fmt(u.created_at)}</div>
+              </div>
+              <Badge label={UPLOAD_STATUS_CONFIG[u.status]?.label ?? u.status} cls={UPLOAD_STATUS_CONFIG[u.status]?.cls ?? ""} />
+              <button onClick={() => setReviewing(u)}
+                className="flex items-center gap-1.5 px-3 py-1.5 border border-[#1A5C38] text-[#1A5C38] rounded-lg text-xs font-medium hover:bg-[#1A5C38]/5 transition-colors"
+                data-testid={`btn-review-${u.id}`}>
+                <Eye className="w-3.5 h-3.5" /> Review
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {reviewing && <ReviewModal upload={reviewing} onClose={() => setReviewing(null)} onSaved={() => { setReviewing(null); load(); }} />}
+    </div>
+  );
+}
+
+// ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
+// ── Tab: Intake Management ────────────────────────────────────────────────────
+// ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
+
+const BLANK_INTAKE: Omit<Intake, "id" | "created_at"> = {
+  name: "", academic_year: "", intake_period: "January",
+  status: "draft", is_published: false,
+  open_at: "", close_at: "",
+  application_fee_undergraduate: 1000,
+  application_fee_masters: 1500,
+  application_fee_phd: 2000,
+  max_applications: null, notes: null,
+};
+
+function IntakeModal({ intake, onClose, onSaved }: { intake: Partial<Intake> | null; onClose: () => void; onSaved: () => void }) {
+  const isNew = !intake?.id;
+  const [form, setForm] = useState({ ...BLANK_INTAKE, ...(intake ?? {}) });
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+
+  function set(k: string, v: string | boolean | number | null) { setForm((f) => ({ ...f, [k]: v })); }
+
+  async function save(e: React.FormEvent) {
+    e.preventDefault(); setSaving(true); setError("");
+    try {
+      if (!form.name || !form.academic_year || !form.open_at || !form.close_at) {
+        setError("Please fill all required fields."); setSaving(false); return;
+      }
+      const endpoint = isNew ? "/admin/admissions/intakes" : `/admin/admissions/intakes/${intake!.id}`;
+      const method = isNew ? "POST" : "PUT";
+      await apiFetch(endpoint, { method, body: JSON.stringify(form) });
+      onSaved();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Save failed");
+    } finally { setSaving(false); }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 overflow-y-auto py-8">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl mx-4">
+        <div className="flex items-center justify-between px-6 py-4 border-b">
+          <h2 className="font-semibold text-base text-gray-900">{isNew ? "Create Intake" : "Edit Intake"}</h2>
+          <button onClick={onClose}><X className="w-5 h-5 text-gray-400" /></button>
+        </div>
+        <form onSubmit={save} className="p-6 space-y-4">
+          <div className="grid grid-cols-2 gap-3">
+            <FormField label="Intake Name" required className="col-span-2">
+              <input value={form.name} onChange={(e) => set("name",e.target.value)}
+                placeholder="e.g. September 2026 Intake"
+                className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="intake-name" />
+            </FormField>
+            <FormField label="Academic Year" required>
+              <input value={form.academic_year} onChange={(e) => set("academic_year",e.target.value)}
+                placeholder="e.g. 2026/2027"
+                className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="intake-year" />
+            </FormField>
+            <FormField label="Intake Period" required>
+              <select value={form.intake_period} onChange={(e) => set("intake_period",e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="intake-period">
+                {["January","May","September"].map(p => <option key={p}>{p}</option>)}
+              </select>
+            </FormField>
+            <FormField label="Open Date" required>
+              <input type="date" value={form.open_at?.split("T")[0] ?? ""} onChange={(e) => set("open_at",e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="intake-open-at" />
+            </FormField>
+            <FormField label="Close Date" required>
+              <input type="date" value={form.close_at?.split("T")[0] ?? ""} onChange={(e) => set("close_at",e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="intake-close-at" />
+            </FormField>
+            <FormField label="UG Fee (KES)">
+              <input type="number" value={form.application_fee_undergraduate} onChange={(e) => set("application_fee_undergraduate",Number(e.target.value))}
+                className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="intake-fee-ug" />
+            </FormField>
+            <FormField label="Masters Fee (KES)">
+              <input type="number" value={form.application_fee_masters} onChange={(e) => set("application_fee_masters",Number(e.target.value))}
+                className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="intake-fee-masters" />
+            </FormField>
+            <FormField label="PhD Fee (KES)">
+              <input type="number" value={form.application_fee_phd} onChange={(e) => set("application_fee_phd",Number(e.target.value))}
+                className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="intake-fee-phd" />
+            </FormField>
+            <FormField label="Max Applications">
+              <input type="number" value={form.max_applications ?? ""} onChange={(e) => set("max_applications",e.target.value ? Number(e.target.value) : null)}
+                placeholder="Leave blank for unlimited"
+                className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="intake-max" />
+            </FormField>
+          </div>
+          <FormField label="Notes">
+            <textarea value={form.notes ?? ""} onChange={(e) => set("notes",e.target.value || null)} rows={2}
+              className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="intake-notes" />
+          </FormField>
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" checked={form.is_published} onChange={(e) => set("is_published",e.target.checked)}
+              className="accent-[#1A5C38]" data-testid="intake-published" />
+            Publish intake (visible to applicants)
+          </label>
+          {error && <div className="flex items-center gap-2 text-sm text-red-600"><AlertCircle className="w-4 h-4" />{error}</div>}
+          <div className="flex justify-end gap-3 pt-2">
+            <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">Cancel</button>
+            <button type="submit" disabled={saving}
+              className="px-5 py-2 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90 disabled:opacity-50 flex items-center gap-2"
+              data-testid="btn-save-intake">
+              {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} {isNew ? "Create Intake" : "Save Changes"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+function IntakesTab() {
+  const [intakes, setIntakes] = useState<Intake[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [editing, setEditing] = useState<Partial<Intake> | null | false>(false);
+  const [actioning, setActioning] = useState<number | null>(null);
+  const [error, setError] = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await apiFetch("/admin/admissions/intakes");
+      setIntakes(data.data ?? []);
+    } finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  async function doAction(id: number, action: "publish" | "open" | "close" | "archive") {
+    setActioning(id); setError("");
+    try {
+      await apiFetch(`/admin/admissions/intakes/${id}/${action}`, { method: "POST" });
+      await load();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Action failed");
+    } finally { setActioning(null); }
+  }
+
+  async function handleDelete(id: number, name: string) {
+    if (!confirm(`Delete intake "${name}"? This cannot be undone.`)) return;
+    setError("");
+    try {
+      await apiFetch(`/admin/admissions/intakes/${id}`, { method: "DELETE" });
+      await load();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Delete failed");
+    }
+  }
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex gap-3">
+          {[
+            { cls: "bg-emerald-50 text-emerald-800", count: intakes.filter(i => i.status === "open").length, label: "Open" },
+            { cls: "bg-blue-50 text-blue-800",    count: intakes.filter(i => i.status === "published").length, label: "Published" },
+            { cls: "bg-gray-50 text-gray-600",    count: intakes.filter(i => i.status === "draft").length, label: "Draft" },
+          ].map(s => (
+            <div key={s.label} className={`${s.cls} rounded-xl px-4 py-2 text-center`}>
+              <div className="text-xl font-bold">{s.count}</div>
+              <div className="text-xs font-medium">{s.label}</div>
+            </div>
+          ))}
+        </div>
+        <button onClick={() => setEditing({})}
+          className="flex items-center gap-1.5 px-4 py-2 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90"
+          data-testid="btn-create-intake">
+          <Plus className="w-4 h-4" /> Create Intake
+        </button>
+      </div>
+
+      {error && <div className="mb-4 flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3"><AlertCircle className="w-4 h-4" />{error}</div>}
+
+      {loading ? (
+        <div className="text-center py-16 text-gray-400 text-sm">Loading intakes…</div>
+      ) : intakes.length === 0 ? (
+        <div className="text-center py-16 text-gray-400">
+          <Calendar className="w-10 h-10 mx-auto mb-3 opacity-30" />
+          <div className="font-medium">No intakes configured yet</div>
+          <div className="text-xs mt-1">Create your first intake to begin accepting applications</div>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {intakes.map((intake) => {
+            const cfg = INTAKE_STATUS_CONFIG[intake.status] ?? { label: intake.status, cls: "bg-gray-100 text-gray-600" };
+            return (
+              <div key={intake.id} className="border border-gray-200 rounded-xl bg-white overflow-hidden" data-testid={`intake-row-${intake.id}`}>
+                <div className="flex items-start gap-4 p-4">
+                  <div className="w-10 h-10 rounded-xl bg-[#1A5C38]/10 text-[#1A5C38] flex items-center justify-center shrink-0">
+                    <Calendar className="w-5 h-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap mb-0.5">
+                      <span className="font-semibold text-sm text-gray-900">{intake.name}</span>
+                      <Badge label={cfg.label} cls={cfg.cls} />
+                      {intake.is_published && <Badge label="Published" cls="bg-blue-100 text-blue-700" />}
+                    </div>
+                    <div className="text-xs text-gray-500">{intake.academic_year} · {intake.intake_period}</div>
+                    <div className="text-xs text-gray-400 mt-0.5">
+                      Open: {fmtDate(intake.open_at)} — Close: {fmtDate(intake.close_at)}
+                    </div>
+                    <div className="flex gap-4 mt-1.5 text-xs text-gray-500">
+                      <span>UG: KES {intake.application_fee_undergraduate.toLocaleString()}</span>
+                      <span>Masters: KES {intake.application_fee_masters.toLocaleString()}</span>
+                      <span>PhD: KES {intake.application_fee_phd.toLocaleString()}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => setEditing(intake)} title="Edit"
+                      className="p-1.5 text-gray-400 hover:text-[#1A5C38] rounded-lg hover:bg-[#1A5C38]/10"
+                      data-testid={`btn-edit-intake-${intake.id}`}>
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button onClick={() => handleDelete(intake.id, intake.name)} title="Delete"
+                      className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
+                      data-testid={`btn-delete-intake-${intake.id}`}>
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+                {/* Action bar */}
+                <div className="border-t bg-gray-50 px-4 py-2 flex flex-wrap gap-2">
+                  {intake.status === "draft" && (
+                    <ActionBtn id={intake.id} action="publish" label="Publish" icon={<Eye className="w-3.5 h-3.5" />} cls="border-blue-300 text-blue-700 hover:bg-blue-50" actioning={actioning} doAction={doAction} />
+                  )}
+                  {(intake.status === "published" || intake.status === "draft") && (
+                    <ActionBtn id={intake.id} action="open" label="Open Now" icon={<CheckCircle2 className="w-3.5 h-3.5" />} cls="border-emerald-300 text-emerald-700 hover:bg-emerald-50" actioning={actioning} doAction={doAction} />
+                  )}
+                  {intake.status === "open" && (
+                    <ActionBtn id={intake.id} action="close" label="Close" icon={<Ban className="w-3.5 h-3.5" />} cls="border-red-300 text-red-700 hover:bg-red-50" actioning={actioning} doAction={doAction} />
+                  )}
+                  {!["archived","draft"].includes(intake.status) && (
+                    <ActionBtn id={intake.id} action="archive" label="Archive" icon={<SkipForward className="w-3.5 h-3.5" />} cls="border-gray-300 text-gray-600 hover:bg-gray-100" actioning={actioning} doAction={doAction} />
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {editing !== false && (
+        <IntakeModal intake={editing || null} onClose={() => setEditing(false)} onSaved={() => { setEditing(false); load(); }} />
+      )}
+    </div>
+  );
+}
+
+function ActionBtn({ id, action, label, icon, cls, actioning, doAction }: { id: number; action: "publish"|"open"|"close"|"archive"; label: string; icon: React.ReactNode; cls: string; actioning: number | null; doAction: (id: number, action: "publish"|"open"|"close"|"archive") => void }) {
+  return (
+    <button onClick={() => doAction(id, action)} disabled={actioning === id}
+      className={`flex items-center gap-1.5 px-3 py-1 border rounded-lg text-xs font-medium transition-colors disabled:opacity-50 ${cls}`}
+      data-testid={`btn-${action}-${id}`}>
+      {actioning === id ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : icon}
+      {label}
+    </button>
+  );
+}
+
+// ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
+// ── Tab: Application Review Queue ─────────────────────────────────────────────
+// ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
+
+function ApplicationDetailModal({ app, onClose, onRefresh }: { app: Application; onClose: () => void; onRefresh: () => void }) {
+  const [notes, setNotes] = useState("");
+  const [actioning, setActioning] = useState<string | null>(null);
+  const [error, setError] = useState("");
+
+  async function doAction(action: string) {
+    if (action === "reject" || action === "query-documents") {
+      if (!notes.trim()) { setError("Please provide notes before this action."); return; }
+    }
+    setActioning(action); setError("");
+    try {
+      await apiFetch(`/admin/admin-applications/${app.reference}/${action}`, {
+        method: "POST",
+        body: JSON.stringify({ notes }),
+      });
+      onRefresh(); onClose();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Action failed");
+    } finally { setActioning(null); }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 overflow-y-auto py-8">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl mx-4">
+        <div className="flex items-center justify-between px-6 py-4 border-b">
+          <div>
+            <h2 className="font-semibold text-base text-gray-900">{app.full_name}</h2>
+            <code className="text-xs text-gray-500 font-mono">{app.application_number ?? app.reference}</code>
+          </div>
+          <button onClick={onClose}><X className="w-5 h-5 text-gray-400" /></button>
+        </div>
+        <div className="p-6 space-y-4">
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            {[
+              ["Programme", app.programme_name],
+              ["School", SCHOOL_NAMES[app.school_code] ?? app.school_code],
+              ["Level", app.level],
+              ["Pathway", app.pathway_name],
+              ["Status", <Badge key="s" label={APP_STATUS_CONFIG[app.status]?.label ?? app.status} cls={APP_STATUS_CONFIG[app.status]?.cls ?? ""} />],
+              ["Payment", app.payment_status],
+              ["Completeness", `${app.completeness_score ?? 0}%`],
+              ["Submitted", fmtDate(app.submitted_at)],
+            ].map(([k, v]) => (
+              <div key={k as string} className="flex justify-between gap-2 border-b pb-1.5 col-span-1">
+                <span className="text-gray-500 text-xs">{k}</span>
+                <span className="text-gray-800 text-xs font-medium text-right">{v}</span>
+              </div>
+            ))}
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1">Notes (required for Query / Reject)</label>
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3}
+              placeholder="Internal review notes or rejection reason…"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30"
+              data-testid="app-review-notes" />
+          </div>
+
+          {error && <div className="flex items-center gap-2 text-sm text-red-600"><AlertCircle className="w-4 h-4" />{error}</div>}
+
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            {[
+              { action: "mark-eligible", label: "Mark Eligible", icon: <CheckSquare className="w-4 h-4" />, cls: "bg-teal-600 hover:bg-teal-700", show: ["submitted","under_review"].includes(app.status) },
+              { action: "offer",         label: "Send Offer",    icon: <CheckCircle2 className="w-4 h-4" />, cls: "bg-[#1A5C38] hover:bg-[#1A5C38]/90", show: app.status === "eligible" },
+              { action: "query-documents", label: "Query Docs", icon: <MessageSquare className="w-4 h-4" />, cls: "bg-amber-600 hover:bg-amber-700", show: ["submitted","under_review","eligible"].includes(app.status) },
+              { action: "reject",        label: "Reject",        icon: <XCircle className="w-4 h-4" />, cls: "bg-red-600 hover:bg-red-700", show: !["draft","rejected","offered"].includes(app.status) },
+              { action: "defer",         label: "Defer",         icon: <SkipForward className="w-4 h-4" />, cls: "bg-orange-500 hover:bg-orange-600", show: ["submitted","under_review","eligible"].includes(app.status) },
+            ].filter(a => a.show).map(a => (
+              <button key={a.action} onClick={() => doAction(a.action)} disabled={actioning === a.action}
+                className={`flex items-center justify-center gap-1.5 py-2 ${a.cls} text-white rounded-lg text-sm font-medium disabled:opacity-50`}
+                data-testid={`btn-${a.action}`}>
+                {actioning === a.action ? <RefreshCw className="w-4 h-4 animate-spin" /> : a.icon}
+                {a.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ApplicationsTab() {
+  const [apps, setApps] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("submitted");
+  const [levelFilter, setLevelFilter] = useState("");
+  const [selected, setSelected] = useState<Application | null>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (search) params.set("search", search);
+      if (statusFilter) params.set("status", statusFilter);
+      if (levelFilter) params.set("level", levelFilter);
+      const data = await apiFetch(`/admin/admin-applications?${params}`);
+      setApps(data.data ?? []);
+    } finally { setLoading(false); }
+  }, [search, statusFilter, levelFilter]);
+
+  useEffect(() => { load(); }, [load]);
+
+  const statusCounts = Object.entries(APP_STATUS_CONFIG).map(([k, cfg]) => ({
+    status: k, label: cfg.label,
+    count: apps.filter(a => a.status === k).length,
+  }));
+
+  return (
+    <div>
+      {/* Summary pills */}
+      <div className="flex gap-2 flex-wrap mb-5">
+        {statusCounts.filter(s => s.count > 0).map(s => (
+          <button key={s.status} onClick={() => setStatusFilter(s.status === statusFilter ? "" : s.status)}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${statusFilter === s.status ? "border-[#1A5C38] bg-[#1A5C38]/5 text-[#1A5C38]" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}
+            data-testid={`filter-status-${s.status}`}>
+            {s.label} ({s.count})
+          </button>
+        ))}
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap gap-3 mb-5">
+        <div className="relative flex-1 min-w-48">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by name, email, reference…"
+            className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none"
+            data-testid="search-apps" />
+        </div>
+        <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none" data-testid="filter-app-status">
+          <option value="">All Statuses</option>
+          {Object.entries(APP_STATUS_CONFIG).map(([k,v]) => <option key={k} value={k}>{v.label}</option>)}
+        </select>
+        <select value={levelFilter} onChange={(e) => setLevelFilter(e.target.value)}
+          className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none" data-testid="filter-app-level">
+          <option value="">All Levels</option>
+          <option value="undergraduate">Undergraduate</option>
+          <option value="masters">Masters</option>
+          <option value="phd">PhD</option>
+        </select>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-16 text-gray-400 text-sm flex flex-col items-center gap-2">
+          <Loader2 className="w-6 h-6 animate-spin" />Loading applications…
+        </div>
+      ) : apps.length === 0 ? (
+        <div className="text-center py-16 text-gray-400">
+          <Inbox className="w-10 h-10 mx-auto mb-3 opacity-30" />
+          <div className="font-medium">No applications found</div>
+          <div className="text-xs mt-1">Applications will appear here once submitted by applicants</div>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {apps.map((app) => {
+            const cfg = APP_STATUS_CONFIG[app.status];
+            return (
+              <div key={app.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-gray-300 bg-white cursor-pointer"
+                onClick={() => setSelected(app)} data-testid={`app-row-${app.id}`}>
+                <div className="w-9 h-9 rounded-full bg-[#1A5C38]/10 text-[#1A5C38] flex items-center justify-center text-xs font-bold shrink-0">
+                  {app.full_name?.charAt(0)?.toUpperCase() ?? "A"}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="font-semibold text-sm text-gray-900">{app.full_name}</span>
+                    {cfg && <Badge label={cfg.label} cls={cfg.cls} />}
+                  </div>
+                  <div className="text-xs text-gray-500 truncate">{app.programme_name} · {app.pathway_name}</div>
+                  <div className="text-xs text-gray-400 mt-0.5">{app.application_number ?? app.reference} · Submitted {fmtDate(app.submitted_at)}</div>
+                </div>
+                <div className="text-right shrink-0">
+                  <div className="text-xs font-semibold text-gray-700">{app.completeness_score ?? 0}% complete</div>
+                  <div className="text-xs text-gray-400 mt-0.5">{app.payment_status}</div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-gray-300 shrink-0" />
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {selected && <ApplicationDetailModal app={selected} onClose={() => setSelected(null)} onRefresh={() => { setSelected(null); load(); }} />}
+    </div>
+  );
+}
+
+// ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
+// ── Tab: KUCCPS Import ────────────────────────────────────────────────────────
+// ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
+
+function KuccpsTab() {
+  const [batches, setBatches] = useState<KuccpsBatch[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [uploadSuccess, setUploadSuccess] = useState("");
+  const [academicYear, setAcademicYear] = useState("2025/2026");
+  const [intakePeriod, setIntakePeriod] = useState("September");
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await apiFetch("/admin/admissions/kuccps/batches");
+      setBatches(data.data ?? []);
+    } finally { setLoading(false); }
+  }, []);
+
+  useEffect(() => { load(); }, [load]);
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.name.endsWith(".csv")) { setUploadError("Only CSV files are accepted."); return; }
+    setUploading(true); setUploadError(""); setUploadSuccess("");
+    try {
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("academic_year", academicYear);
+      fd.append("intake_period", intakePeriod);
+      const res = await fetch("/api/admin/admissions/kuccps/import", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${localStorage.getItem("kafu_cms_token") ?? ""}` },
+        body: fd,
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Upload failed");
+      setUploadSuccess(`Import started: ${json.total_rows} rows queued for processing. Batch ID: ${json.batch_id}`);
+      await load();
+    } catch (err: unknown) {
+      setUploadError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
+
+  const BATCH_STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
+    pending:    { label: "Pending",    cls: "bg-gray-100 text-gray-600" },
+    processing: { label: "Processing", cls: "bg-blue-100 text-blue-700" },
+    completed:  { label: "Completed",  cls: "bg-emerald-100 text-emerald-700" },
+    failed:     { label: "Failed",     cls: "bg-red-100 text-red-700" },
+  };
+
+  return (
+    <div className="max-w-3xl space-y-6">
+      {/* Upload card */}
+      <div className="border border-gray-200 rounded-xl overflow-hidden">
+        <div className="bg-gray-50 px-5 py-3 border-b flex items-center gap-2">
+          <FileUp className="w-4 h-4 text-[#1A5C38]" />
+          <span className="font-semibold text-sm text-gray-800">Import KUCCPS Placement Data (CSV)</span>
+        </div>
+        <div className="p-5 space-y-4">
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
+            Upload a CSV file exported from the KUCCPS portal. Required columns: <code className="font-mono text-xs bg-amber-100 px-1 rounded">kcse_index_number, student_name, institution_code, programme_code, cluster_points</code>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <FormField label="Academic Year">
+              <input value={academicYear} onChange={(e) => setAcademicYear(e.target.value)}
+                placeholder="e.g. 2025/2026"
+                className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="kuccps-year" />
+            </FormField>
+            <FormField label="Intake Period">
+              <select value={intakePeriod} onChange={(e) => setIntakePeriod(e.target.value)}
+                className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="kuccps-period">
+                {["January","May","September"].map(p => <option key={p}>{p}</option>)}
+              </select>
+            </FormField>
+          </div>
+
+          {uploadError && <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3"><AlertCircle className="w-4 h-4" />{uploadError}</div>}
+          {uploadSuccess && <div className="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg p-3"><CheckCircle2 className="w-4 h-4" />{uploadSuccess}</div>}
+
+          <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={handleFileUpload} data-testid="kuccps-file-input" />
+          <button onClick={() => fileRef.current?.click()} disabled={uploading}
+            className="flex items-center gap-2 px-5 py-2.5 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90 disabled:opacity-50"
+            data-testid="btn-upload-kuccps">
+            {uploading ? <><RefreshCw className="w-4 h-4 animate-spin" />Uploading…</> : <><Upload className="w-4 h-4" />Choose CSV File & Upload</>}
+          </button>
+
+          <div className="border rounded-lg p-3 bg-gray-50 text-xs text-gray-500 space-y-1">
+            <p className="font-medium text-gray-700">CSV Format Guide</p>
+            <p>Row 1: Header row (column names exactly as listed above)</p>
+            <p>Row 2+: One applicant per row. institution_code must be <code className="font-mono bg-gray-200 px-1 rounded">04300</code> (KAFU's TCU code)</p>
+            <p>cluster_points: numeric, e.g. <code className="font-mono bg-gray-200 px-1 rounded">37.5</code></p>
+          </div>
+        </div>
+      </div>
+
+      {/* Batch history */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="font-semibold text-sm text-gray-800">Import History</h3>
+          <button onClick={load} className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700" data-testid="btn-refresh-batches">
+            <RefreshCw className="w-3.5 h-3.5" /> Refresh
+          </button>
+        </div>
+        {loading ? (
+          <div className="text-center py-8 text-gray-400 text-sm">Loading…</div>
+        ) : batches.length === 0 ? (
+          <div className="text-center py-8 text-gray-400 text-sm border border-dashed border-gray-200 rounded-xl">
+            No import batches yet
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {batches.map((batch) => {
+              const cfg = BATCH_STATUS_CONFIG[batch.status] ?? { label: batch.status, cls: "bg-gray-100 text-gray-600" };
+              const pct = batch.total_rows > 0 ? Math.round((batch.processed_rows / batch.total_rows) * 100) : 0;
+              return (
+                <div key={batch.id} className="border border-gray-200 rounded-xl p-4" data-testid={`batch-row-${batch.id}`}>
+                  <div className="flex items-start justify-between gap-4 mb-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-medium text-sm text-gray-800 truncate">{batch.filename}</span>
+                        <Badge label={cfg.label} cls={cfg.cls} />
+                      </div>
+                      <div className="text-xs text-gray-500 mt-0.5">{batch.academic_year} · {batch.intake_period} · Uploaded {fmt(batch.created_at)}</div>
+                    </div>
+                    <div className="text-right shrink-0 text-xs text-gray-600">
+                      <div>{batch.successful_rows}/{batch.total_rows} rows OK</div>
+                      {batch.failed_rows > 0 && <div className="text-red-600">{batch.failed_rows} failed</div>}
+                    </div>
+                  </div>
+                  {batch.status === "processing" && (
+                    <div className="mt-2">
+                      <div className="flex justify-between text-xs text-gray-500 mb-1"><span>Progress</span><span>{pct}%</span></div>
+                      <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-[#1A5C38] transition-all" style={{ width: `${pct}%` }} />
+                      </div>
+                    </div>
+                  )}
+                  {batch.error_log && (
+                    <details className="mt-2">
+                      <summary className="text-xs text-red-600 cursor-pointer">View error log</summary>
+                      <pre className="text-xs bg-red-50 p-2 rounded mt-1 overflow-x-auto max-h-32">{batch.error_log}</pre>
+                    </details>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
+// ── Tab: Postgraduate Programmes ──────────────────────────────────────────────
+// ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
+
 const PG_BLANK: Omit<PgProgramme, "id"> = {
   code: "", name: "", level: "masters", school: "SESS", duration: "2 years",
   min_qual: "", min_class: "lower_second", career_hint: "", is_active: true, sort_order: 0,
@@ -187,9 +945,7 @@ function ProgrammeModal({ prog, onClose, onSaved }: { prog: Partial<PgProgramme>
       onSaved();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Save failed");
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   }
 
   return (
@@ -197,68 +953,56 @@ function ProgrammeModal({ prog, onClose, onSaved }: { prog: Partial<PgProgramme>
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-xl mx-4">
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <h2 className="font-semibold text-base text-gray-900">{isNew ? "Add Postgraduate Programme" : "Edit Programme"}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-700"><X className="w-5 h-5" /></button>
+          <button onClick={onClose}><X className="w-5 h-5 text-gray-400" /></button>
         </div>
         <form onSubmit={save} className="p-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">Programme Code *</label>
-              <input value={form.code} onChange={(e) => set("code", e.target.value)} required placeholder="e.g. MSc IT" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30" data-testid="field-code" />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">Level *</label>
-              <select value={form.level} onChange={(e) => set("level", e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30" data-testid="field-level">
+          <div className="grid grid-cols-2 gap-3">
+            <FormField label="Programme Code" required>
+              <input value={form.code} onChange={(e) => set("code",e.target.value)} placeholder="e.g. MBA" className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="prog-code" />
+            </FormField>
+            <FormField label="Level" required>
+              <select value={form.level} onChange={(e) => set("level",e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="prog-level">
                 <option value="masters">Masters</option>
                 <option value="doctoral">Doctoral (PhD)</option>
               </select>
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">Programme Name *</label>
-            <input value={form.name} onChange={(e) => set("name", e.target.value)} required placeholder="e.g. Master of Science in Information Technology" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30" data-testid="field-name" />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">School *</label>
-              <select value={form.school} onChange={(e) => set("school", e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30" data-testid="field-school">
-                {SCHOOLS.map((s) => <option key={s} value={s}>{s} — {SCHOOL_NAMES[s]}</option>)}
+            </FormField>
+            <FormField label="Programme Name" required className="col-span-2">
+              <input value={form.name} onChange={(e) => set("name",e.target.value)} placeholder="e.g. Master of Business Administration" className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="prog-name" />
+            </FormField>
+            <FormField label="School" required>
+              <select value={form.school} onChange={(e) => set("school",e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="prog-school">
+                {SCHOOLS.map((s) => <option key={s} value={s}>{SCHOOL_NAMES[s]}</option>)}
               </select>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">Duration *</label>
-              <input value={form.duration} onChange={(e) => set("duration", e.target.value)} required placeholder="2 years" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30" data-testid="field-duration" />
-            </div>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">Minimum Qualification *</label>
-            <input value={form.min_qual} onChange={(e) => set("min_qual", e.target.value)} required placeholder={form.level === "doctoral" ? "Master's degree in relevant field" : "Bachelor's degree, 2nd Class Honours or above"} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30" data-testid="field-min-qual" />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">Minimum Degree Class *</label>
-              <select value={form.min_class} onChange={(e) => set("min_class", e.target.value)} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30" data-testid="field-min-class">
+            </FormField>
+            <FormField label="Duration" required>
+              <input value={form.duration} onChange={(e) => set("duration",e.target.value)} placeholder="e.g. 2 years" className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="prog-duration" />
+            </FormField>
+            <FormField label="Minimum Qualification" className="col-span-2">
+              <input value={form.min_qual} onChange={(e) => set("min_qual",e.target.value)} placeholder="e.g. Bachelor's Degree in related field" className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="prog-min-qual" />
+            </FormField>
+            <FormField label="Minimum Degree Class" required>
+              <select value={form.min_class} onChange={(e) => set("min_class",e.target.value)} className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="prog-min-class">
                 {DEGREE_CLASSES.map((dc) => <option key={dc.value} value={dc.value}>{dc.label}</option>)}
               </select>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-gray-600 mb-1">Display Order</label>
-              <input type="number" value={form.sort_order} onChange={(e) => set("sort_order", Number(e.target.value))} className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30" data-testid="field-sort-order" />
-            </div>
+            </FormField>
+            <FormField label="Sort Order">
+              <input type="number" value={form.sort_order} onChange={(e) => set("sort_order",Number(e.target.value))} className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="prog-sort" />
+            </FormField>
+            <FormField label="Career Hint" className="col-span-2">
+              <input value={form.career_hint} onChange={(e) => set("career_hint",e.target.value)} placeholder="e.g. University Lecturer, Senior Researcher" className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="prog-career" />
+            </FormField>
           </div>
-          <div>
-            <label className="block text-xs font-semibold text-gray-600 mb-1">Career Outcomes / Hint</label>
-            <input value={form.career_hint} onChange={(e) => set("career_hint", e.target.value)} placeholder="e.g. Technology Leadership, Research" className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30" data-testid="field-career-hint" />
-          </div>
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" checked={form.is_active} onChange={(e) => set("is_active", e.target.checked)} className="rounded" data-testid="field-is-active" />
-            <span className="text-sm text-gray-700">Active (visible on eligibility checker)</span>
+          <label className="flex items-center gap-2 text-sm cursor-pointer">
+            <input type="checkbox" checked={form.is_active} onChange={(e) => set("is_active",e.target.checked)} className="accent-[#1A5C38]" data-testid="prog-active" />
+            Programme is active and visible to applicants
           </label>
           {error && <div className="flex items-center gap-2 text-sm text-red-600"><AlertCircle className="w-4 h-4" />{error}</div>}
-          <div className="flex items-center justify-end gap-3 pt-2">
+          <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">Cancel</button>
-            <button type="submit" disabled={saving} className="px-5 py-2 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90 disabled:opacity-50 flex items-center gap-2" data-testid="btn-save-programme">
-              {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              {isNew ? "Add Programme" : "Save Changes"}
+            <button type="submit" disabled={saving}
+              className="px-5 py-2 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90 disabled:opacity-50 flex items-center gap-2"
+              data-testid="btn-save-prog">
+              {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} {isNew ? "Add Programme" : "Save Changes"}
             </button>
           </div>
         </form>
@@ -267,209 +1011,43 @@ function ProgrammeModal({ prog, onClose, onSaved }: { prog: Partial<PgProgramme>
   );
 }
 
-// ── Tab: Document Uploads ──────────────────────────────────────────────────────
-function UploadsTab() {
-  const [uploads, setUploads] = useState<UploadRecord[]>([]);
-  const [total, setTotal] = useState(0);
-  const [page, setPage] = useState(1);
-  const [lastPage, setLastPage] = useState(1);
-  const [status, setStatus] = useState("");
-  const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [reviewing, setReviewing] = useState<UploadRecord | null>(null);
-  const [deleting, setDeleting] = useState<string | null>(null);
-  const [expandedRef, setExpandedRef] = useState<string | null>(null);
-
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const params = new URLSearchParams({ page: String(page), per_page: "15" });
-      if (status) params.set("status", status);
-      if (search) params.set("search", search);
-      const data = await apiFetch(`/admissions/uploads?${params}`);
-      setUploads(data.data ?? []);
-      setTotal(data.total ?? 0);
-      setLastPage(data.last_page ?? 1);
-    } finally {
-      setLoading(false);
-    }
-  }, [page, status, search]);
-
-  useEffect(() => { load(); }, [load]);
-
-  async function handleDelete(ref: string) {
-    if (!confirm("Delete this upload record? This cannot be undone.")) return;
-    setDeleting(ref);
-    try { await apiFetch(`/admissions/uploads/${ref}`, { method: "DELETE" }); load(); }
-    finally { setDeleting(null); }
-  }
-
-  const pendingCount = uploads.filter((u) => u.status === "pending").length;
-
-  return (
-    <div>
-      {/* Summary bar */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        {[
-          { label: "Total Uploads", value: total, cls: "bg-blue-50 text-blue-800" },
-          { label: "Pending Review", value: pendingCount, cls: "bg-yellow-50 text-yellow-800" },
-          { label: "Verified", value: uploads.filter((u) => u.status === "verified").length, cls: "bg-emerald-50 text-emerald-800" },
-          { label: "Rejected", value: uploads.filter((u) => u.status === "rejected").length, cls: "bg-red-50 text-red-800" },
-        ].map((s) => (
-          <div key={s.label} className={`${s.cls} rounded-xl p-4`}>
-            <div className="text-2xl font-bold">{s.value}</div>
-            <div className="text-xs font-medium mt-0.5 opacity-80">{s.label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Filters */}
-      <div className="flex flex-wrap gap-3 mb-4">
-        <div className="relative flex-1 min-w-44">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-          <input
-            value={search}
-            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            placeholder="Search by filename..."
-            className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30"
-            data-testid="search-uploads"
-          />
-        </div>
-        <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30" data-testid="filter-status">
-          <option value="">All Statuses</option>
-          <option value="pending">Pending</option>
-          <option value="verified">Verified</option>
-          <option value="rejected">Rejected</option>
-        </select>
-        <button onClick={load} className="flex items-center gap-1.5 px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-600 hover:text-gray-900 hover:border-gray-400" data-testid="btn-refresh-uploads">
-          <RefreshCw className="w-4 h-4" /> Refresh
-        </button>
-      </div>
-
-      {loading ? (
-        <div className="text-center py-16 text-gray-400 text-sm">Loading uploads...</div>
-      ) : uploads.length === 0 ? (
-        <div className="text-center py-16 text-gray-400">
-          <Upload className="w-10 h-10 mx-auto mb-3 opacity-30" />
-          <div className="font-medium">No uploads found</div>
-          <div className="text-xs mt-1">Certificate uploads from the public eligibility checker will appear here</div>
-        </div>
-      ) : (
-        <div className="border border-gray-200 rounded-xl overflow-hidden">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">File / Reference</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden sm:table-cell">Type</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider hidden md:table-cell">Submitted</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {uploads.map((u) => (
-                <React.Fragment key={u.reference_id}>
-                  <tr className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3">
-                      <button className="flex items-center gap-2 text-left" onClick={() => setExpandedRef(expandedRef === u.reference_id ? null : u.reference_id)} data-testid={`expand-upload-${u.id}`}>
-                        {expandedRef === u.reference_id ? <ChevronUp className="w-3.5 h-3.5 text-gray-400 shrink-0" /> : <ChevronDown className="w-3.5 h-3.5 text-gray-400 shrink-0" />}
-                        <div>
-                          <div className="font-medium text-gray-800 truncate max-w-xs">{u.file_name}</div>
-                          <div className="text-xs text-gray-400 font-mono">{u.reference_id.slice(0, 16)}…</div>
-                        </div>
-                      </button>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 hidden sm:table-cell">{u.document_type}</td>
-                    <td className="px-4 py-3 text-gray-500 hidden md:table-cell">{fmtDate(u.created_at)}</td>
-                    <td className="px-4 py-3"><StatusBadge status={u.status} /></td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <button onClick={() => setReviewing(u)} className="p-1.5 text-gray-400 hover:text-[#1A5C38] rounded-lg hover:bg-[#1A5C38]/10 transition-colors" title="Review" data-testid={`btn-review-${u.id}`}>
-                          <Eye className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => handleDelete(u.reference_id)} disabled={deleting === u.reference_id} className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors" title="Delete" data-testid={`btn-delete-upload-${u.id}`}>
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                  {expandedRef === u.reference_id && (
-                    <tr className="bg-gray-50">
-                      <td colSpan={5} className="px-6 py-4 text-sm">
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
-                          <div><span className="text-gray-500 text-xs block">Reference ID</span><code className="font-mono text-xs">{u.reference_id}</code></div>
-                          <div><span className="text-gray-500 text-xs block">File Size</span>{u.size_kb} KB</div>
-                          <div><span className="text-gray-500 text-xs block">Submitted</span>{fmt(u.created_at)}</div>
-                          {u.reviewed_by && <div><span className="text-gray-500 text-xs block">Reviewed by</span>{u.reviewed_by}</div>}
-                          {u.reviewed_at && <div><span className="text-gray-500 text-xs block">Reviewed at</span>{fmt(u.reviewed_at)}</div>}
-                          {u.reviewer_notes && <div className="col-span-2 sm:col-span-3"><span className="text-gray-500 text-xs block">Notes</span>{u.reviewer_notes}</div>}
-                        </div>
-                      </td>
-                    </tr>
-                  )}
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
-          {lastPage > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-gray-200 bg-gray-50 text-sm">
-              <span className="text-gray-500">Page {page} of {lastPage} · {total} records</span>
-              <div className="flex gap-2">
-                <button onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page === 1} className="px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:border-gray-400 disabled:opacity-40 text-xs">Previous</button>
-                <button onClick={() => setPage((p) => Math.min(lastPage, p + 1))} disabled={page === lastPage} className="px-3 py-1.5 border border-gray-200 rounded-lg text-gray-600 hover:border-gray-400 disabled:opacity-40 text-xs">Next</button>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {reviewing && (
-        <ReviewModal upload={reviewing} onClose={() => setReviewing(null)} onSaved={() => { setReviewing(null); load(); }} />
-      )}
-    </div>
-  );
-}
-
-// ── Tab: Postgraduate Programmes ───────────────────────────────────────────────
 function ProgrammesTab() {
   const [progs, setProgs] = useState<PgProgramme[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filterLevel, setFilterLevel] = useState("");
   const [editing, setEditing] = useState<Partial<PgProgramme> | null | false>(false);
   const [deleting, setDeleting] = useState<number | null>(null);
   const [seeding, setSeeding] = useState(false);
   const [seedMsg, setSeedMsg] = useState("");
-  const [filterLevel, setFilterLevel] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await apiFetch("/admissions/pg-programmes");
+      const data = await apiFetch(`/admissions/pg-programmes${filterLevel ? `?level=${filterLevel}` : ""}`);
       setProgs(data.data ?? []);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    } finally { setLoading(false); }
+  }, [filterLevel]);
 
   useEffect(() => { load(); }, [load]);
 
   async function handleDelete(id: number, name: string) {
     if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
     setDeleting(id);
-    try { await apiFetch(`/admissions/pg-programmes/${id}`, { method: "DELETE" }); load(); }
-    finally { setDeleting(null); }
+    try {
+      await apiFetch(`/admissions/pg-programmes/${id}`, { method: "DELETE" });
+      load();
+    } finally { setDeleting(null); }
   }
 
   async function handleSeed() {
     setSeeding(true); setSeedMsg("");
     try {
-      const data = await apiFetch("/admissions/pg-programmes/seed", { method: "POST" });
-      setSeedMsg(data.data?.message ?? "Done");
+      const res = await apiFetch("/admissions/pg-programmes/seed", { method: "POST" });
+      setSeedMsg(res.message ?? "Programmes seeded successfully");
       load();
     } catch (e: unknown) {
       setSeedMsg(e instanceof Error ? e.message : "Seed failed");
-    } finally {
-      setSeeding(false);
-    }
+    } finally { setSeeding(false); }
   }
 
   const filtered = filterLevel ? progs.filter((p) => p.level === filterLevel) : progs;
@@ -491,16 +1069,21 @@ function ProgrammesTab() {
         </div>
         <div className="flex gap-2 flex-wrap">
           {progs.length === 0 && (
-            <button onClick={handleSeed} disabled={seeding} className="flex items-center gap-1.5 px-3 py-2 border border-amber-300 bg-amber-50 text-amber-800 rounded-lg text-sm hover:bg-amber-100 disabled:opacity-50" data-testid="btn-seed">
+            <button onClick={handleSeed} disabled={seeding}
+              className="flex items-center gap-1.5 px-3 py-2 border border-amber-300 bg-amber-50 text-amber-800 rounded-lg text-sm hover:bg-amber-100 disabled:opacity-50"
+              data-testid="btn-seed">
               <RefreshCw className={`w-4 h-4 ${seeding ? "animate-spin" : ""}`} /> Import Default Programmes
             </button>
           )}
-          <select value={filterLevel} onChange={(e) => setFilterLevel(e.target.value)} className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none" data-testid="filter-level">
+          <select value={filterLevel} onChange={(e) => setFilterLevel(e.target.value)}
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none" data-testid="filter-level">
             <option value="">All Levels</option>
             <option value="masters">Masters</option>
             <option value="doctoral">Doctoral (PhD)</option>
           </select>
-          <button onClick={() => setEditing({})} className="flex items-center gap-1.5 px-4 py-2 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90" data-testid="btn-add-programme">
+          <button onClick={() => setEditing({})}
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90"
+            data-testid="btn-add-programme">
             <Plus className="w-4 h-4" /> Add Programme
           </button>
         </div>
@@ -509,14 +1092,16 @@ function ProgrammesTab() {
       {seedMsg && <div className="mb-4 px-4 py-2 bg-emerald-50 border border-emerald-200 rounded-lg text-sm text-emerald-700">{seedMsg}</div>}
 
       {loading ? (
-        <div className="text-center py-16 text-gray-400 text-sm">Loading programmes...</div>
+        <div className="text-center py-16 text-gray-400 text-sm">Loading programmes…</div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <BookOpen className="w-10 h-10 mx-auto mb-3 opacity-30" />
           <div className="font-medium">No postgraduate programmes yet</div>
-          <div className="text-xs mt-1 mb-4">Add programmes manually or import the 14 default programmes</div>
+          <div className="text-xs mt-1 mb-4">Add programmes manually or import the default set</div>
           {progs.length === 0 && (
-            <button onClick={handleSeed} disabled={seeding} className="flex items-center gap-1.5 px-4 py-2 border border-[#1A5C38] text-[#1A5C38] rounded-lg text-sm mx-auto hover:bg-[#1A5C38]/5" data-testid="btn-seed-empty">
+            <button onClick={handleSeed} disabled={seeding}
+              className="flex items-center gap-1.5 px-4 py-2 border border-[#1A5C38] text-[#1A5C38] rounded-lg text-sm mx-auto hover:bg-[#1A5C38]/5"
+              data-testid="btn-seed-empty">
               <RefreshCw className={`w-4 h-4 ${seeding ? "animate-spin" : ""}`} /> Import Default Programmes
             </button>
           )}
@@ -524,7 +1109,8 @@ function ProgrammesTab() {
       ) : (
         <div className="space-y-2">
           {filtered.map((prog) => (
-            <div key={prog.id} className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${prog.is_active ? "border-gray-200 bg-white hover:border-gray-300" : "border-gray-100 bg-gray-50 opacity-70"}`} data-testid={`prog-row-${prog.id}`}>
+            <div key={prog.id} className={`flex items-center gap-4 p-4 border rounded-xl transition-colors ${prog.is_active ? "border-gray-200 bg-white hover:border-gray-300" : "border-gray-100 bg-gray-50 opacity-70"}`}
+              data-testid={`prog-row-${prog.id}`}>
               <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-xs font-bold ${prog.level === "doctoral" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>
                 {prog.level === "doctoral" ? "PhD" : "MSc"}
               </div>
@@ -544,10 +1130,10 @@ function ProgrammesTab() {
                 )}
               </div>
               <div className="flex items-center gap-1 shrink-0">
-                <button onClick={() => setEditing(prog)} className="p-1.5 text-gray-400 hover:text-[#1A5C38] rounded-lg hover:bg-[#1A5C38]/10 transition-colors" title="Edit" data-testid={`btn-edit-prog-${prog.id}`}>
+                <button onClick={() => setEditing(prog)} className="p-1.5 text-gray-400 hover:text-[#1A5C38] rounded-lg hover:bg-[#1A5C38]/10" title="Edit" data-testid={`btn-edit-prog-${prog.id}`}>
                   <Edit2 className="w-4 h-4" />
                 </button>
-                <button onClick={() => handleDelete(prog.id, prog.name)} disabled={deleting === prog.id} className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors" title="Delete" data-testid={`btn-delete-prog-${prog.id}`}>
+                <button onClick={() => handleDelete(prog.id, prog.name)} disabled={deleting === prog.id} className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50" title="Delete" data-testid={`btn-delete-prog-${prog.id}`}>
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
@@ -557,17 +1143,16 @@ function ProgrammesTab() {
       )}
 
       {editing !== false && (
-        <ProgrammeModal
-          prog={editing || null}
-          onClose={() => setEditing(false)}
-          onSaved={() => { setEditing(false); load(); }}
-        />
+        <ProgrammeModal prog={editing || null} onClose={() => setEditing(false)} onSaved={() => { setEditing(false); load(); }} />
       )}
     </div>
   );
 }
 
-// ── Tab: Eligibility Settings ──────────────────────────────────────────────────
+// ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
+// ── Tab: Eligibility Settings ─────────────────────────────────────────────────
+// ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
+
 function SettingsTab() {
   const [settings, setSettings] = useState<Setting[]>([]);
   const [loading, setLoading] = useState(true);
@@ -580,9 +1165,7 @@ function SettingsTab() {
     try {
       const data = await apiFetch("/admissions/settings");
       setSettings(data.data ?? []);
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }, []);
 
   useEffect(() => { load(); }, [load]);
@@ -603,19 +1186,17 @@ function SettingsTab() {
       setTimeout(() => setSaved(false), 3000);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Save failed");
-    } finally {
-      setSaving(false);
-    }
+    } finally { setSaving(false); }
   }
 
-  const intakeSettings = settings.filter((s) => s.key.includes("intake") || s.key.includes("deadline"));
-  const cutoffSettings = settings.filter((s) => s.key.includes("cutoff") || s.key.includes("cutoff") || s.key.includes("pg_masters"));
+  const intakeSettings  = settings.filter((s) => s.key.includes("intake") || s.key.includes("deadline"));
+  const cutoffSettings  = settings.filter((s) => s.key.includes("cutoff") || s.key.includes("pg_masters"));
   const contactSettings = settings.filter((s) => s.key.includes("contact"));
 
   return (
     <div className="max-w-2xl">
       {loading ? (
-        <div className="text-center py-16 text-gray-400 text-sm">Loading settings...</div>
+        <div className="text-center py-16 text-gray-400 text-sm">Loading settings…</div>
       ) : (
         <div className="space-y-8">
           {[
@@ -631,39 +1212,23 @@ function SettingsTab() {
                 {group.items.map((setting, i) => (
                   <div key={setting.key} className={`flex items-center gap-4 px-4 py-3 ${i > 0 ? "border-t border-gray-100" : ""}`}>
                     <div className="flex-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-0.5" htmlFor={`setting-${setting.key}`}>
-                        {setting.label}
-                      </label>
+                      <label className="block text-sm font-medium text-gray-700 mb-0.5" htmlFor={`setting-${setting.key}`}>{setting.label}</label>
                       <div className="text-xs text-gray-400 font-mono">{setting.key}</div>
                     </div>
                     {setting.type === "boolean" ? (
-                      <button
-                        onClick={() => updateValue(setting.key, setting.value === "1" ? "0" : "1")}
+                      <button onClick={() => updateValue(setting.key, setting.value === "1" ? "0" : "1")}
                         className={`flex items-center gap-1.5 text-sm font-medium transition-colors ${setting.value === "1" ? "text-emerald-700" : "text-gray-400"}`}
-                        data-testid={`toggle-${setting.key}`}
-                      >
-                        {setting.value === "1"
-                          ? <><ToggleRight className="w-8 h-8 text-emerald-600" /> Open</>
-                          : <><ToggleLeft className="w-8 h-8 text-gray-400" /> Closed</>}
+                        data-testid={`toggle-${setting.key}`}>
+                        {setting.value === "1" ? <><ToggleRight className="w-8 h-8 text-emerald-600" /> Open</> : <><ToggleLeft className="w-8 h-8 text-gray-400" /> Closed</>}
                       </button>
                     ) : setting.type === "date" ? (
-                      <input
-                        id={`setting-${setting.key}`}
-                        type="date"
-                        value={setting.value}
-                        onChange={(e) => updateValue(setting.key, e.target.value)}
+                      <input id={`setting-${setting.key}`} type="date" value={setting.value} onChange={(e) => updateValue(setting.key, e.target.value)}
                         className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30"
-                        data-testid={`input-${setting.key}`}
-                      />
+                        data-testid={`input-${setting.key}`} />
                     ) : (
-                      <input
-                        id={`setting-${setting.key}`}
-                        type="text"
-                        value={setting.value}
-                        onChange={(e) => updateValue(setting.key, e.target.value)}
+                      <input id={`setting-${setting.key}`} type="text" value={setting.value} onChange={(e) => updateValue(setting.key, e.target.value)}
                         className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30 w-56"
-                        data-testid={`input-${setting.key}`}
-                      />
+                        data-testid={`input-${setting.key}`} />
                     )}
                   </div>
                 ))}
@@ -674,7 +1239,9 @@ function SettingsTab() {
           {error && <div className="flex items-center gap-2 text-sm text-red-600"><AlertCircle className="w-4 h-4" />{error}</div>}
           {saved && <div className="flex items-center gap-2 text-sm text-emerald-700"><CheckCircle2 className="w-4 h-4" />Settings saved successfully.</div>}
 
-          <button onClick={save} disabled={saving} className="flex items-center gap-2 px-6 py-2.5 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90 disabled:opacity-50" data-testid="btn-save-settings">
+          <button onClick={save} disabled={saving}
+            className="flex items-center gap-2 px-6 py-2.5 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90 disabled:opacity-50"
+            data-testid="btn-save-settings">
             {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save All Settings
           </button>
         </div>
@@ -683,25 +1250,50 @@ function SettingsTab() {
   );
 }
 
-// ── Main Page ──────────────────────────────────────────────────────────────────
-type Tab = "uploads" | "programmes" | "settings";
+// ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
+// ── Shared Field Wrapper ──────────────────────────────────────────────────────
+// ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
+
+function FormField({ label, required, className, children }: { label: string; required?: boolean; className?: string; children: React.ReactNode }) {
+  return (
+    <div className={className}>
+      <label className="block text-xs font-semibold text-gray-700 mb-1">{label}{required && <span className="text-red-500 ml-0.5">*</span>}</label>
+      {children}
+    </div>
+  );
+}
+
+// ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
+// ── Main Page ─────────────────────────────────────────────────────────────────
+// ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
+
+type Tab = "intakes" | "applications" | "kuccps" | "uploads" | "programmes" | "settings";
 
 const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
-  { id: "uploads",    label: "Document Uploads",          icon: <Upload className="w-4 h-4" /> },
-  { id: "programmes", label: "Postgraduate Programmes",   icon: <GraduationCap className="w-4 h-4" /> },
-  { id: "settings",  label: "Eligibility Settings",       icon: <Settings2 className="w-4 h-4" /> },
+  { id: "intakes",      label: "Intake Management",        icon: <Calendar className="w-4 h-4" /> },
+  { id: "applications", label: "Application Review",        icon: <Users className="w-4 h-4" /> },
+  { id: "kuccps",       label: "KUCCPS Import",             icon: <FileUp className="w-4 h-4" /> },
+  { id: "uploads",      label: "Document Uploads",          icon: <Upload className="w-4 h-4" /> },
+  { id: "programmes",   label: "Postgraduate Programmes",   icon: <GraduationCap className="w-4 h-4" /> },
+  { id: "settings",     label: "Eligibility Settings",      icon: <Settings2 className="w-4 h-4" /> },
 ];
 
 const TAB_PATHS: Record<Tab, string> = {
-  uploads:    "/admissions",
-  programmes: "/admissions/programmes",
-  settings:   "/admissions/settings",
+  intakes:      "/admissions",
+  applications: "/admissions/applications",
+  kuccps:       "/admissions/kuccps",
+  uploads:      "/admissions/uploads",
+  programmes:   "/admissions/programmes",
+  settings:     "/admissions/settings",
 };
 
 function pathToTab(path: string): Tab {
-  if (path.endsWith("/programmes")) return "programmes";
-  if (path.endsWith("/settings"))   return "settings";
-  return "uploads";
+  if (path.endsWith("/applications")) return "applications";
+  if (path.endsWith("/kuccps"))       return "kuccps";
+  if (path.endsWith("/uploads"))      return "uploads";
+  if (path.endsWith("/programmes"))   return "programmes";
+  if (path.endsWith("/settings"))     return "settings";
+  return "intakes";
 }
 
 export default function AdmissionsCmsPage() {
@@ -721,17 +1313,17 @@ export default function AdmissionsCmsPage() {
         </div>
         <div>
           <h1 className="text-xl font-bold text-gray-900">Admissions Management</h1>
-          <p className="text-sm text-gray-500">Certificate uploads, postgraduate programme catalogue, and eligibility settings</p>
+          <p className="text-sm text-gray-500">Manage intakes, review applications, import KUCCPS data, and configure settings</p>
         </div>
       </div>
 
       {/* Tab Bar */}
-      <div className="flex gap-1 border-b border-gray-200 mb-6">
+      <div className="flex gap-0.5 border-b border-gray-200 mb-6 overflow-x-auto">
         {TABS.map((t) => (
           <button
             key={t.id}
             onClick={() => switchTab(t.id)}
-            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
+            className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               tab === t.id
                 ? "border-[#1A5C38] text-[#1A5C38]"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
@@ -744,9 +1336,12 @@ export default function AdmissionsCmsPage() {
       </div>
 
       {/* Tab Content */}
-      {tab === "uploads"    && <UploadsTab />}
-      {tab === "programmes" && <ProgrammesTab />}
-      {tab === "settings"   && <SettingsTab />}
+      {tab === "intakes"      && <IntakesTab />}
+      {tab === "applications" && <ApplicationsTab />}
+      {tab === "kuccps"       && <KuccpsTab />}
+      {tab === "uploads"      && <UploadsTab />}
+      {tab === "programmes"   && <ProgrammesTab />}
+      {tab === "settings"     && <SettingsTab />}
     </div>
   );
 }

@@ -296,6 +296,27 @@ function AppRoutes() {
             </RequireRole>
           )}
         </Route>
+        <Route path="/admissions/applications">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <AdmissionsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/admissions/kuccps">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <AdmissionsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/admissions/uploads">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <AdmissionsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
 
         <Route>{() => <DashboardPage />}</Route>
       </Switch>

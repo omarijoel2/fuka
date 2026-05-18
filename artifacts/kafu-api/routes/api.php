@@ -4279,3 +4279,647 @@ Route::middleware(['auth:sanctum'])->prefix('admin/admissions')->group(function 
         return response()->json(['data' => compact('total','pending','verified','rejected','programmes')]);
     });
 });
+
+// =============================================================================
+// ADMISSIONS APPLICATION MODULE — PUBLIC ROUTES
+// =============================================================================
+
+Route::prefix('admissions-app')->group(function () {
+
+    // ── Open Intakes ──────────────────────────────────────────────────────────
+    Route::get('/intakes/open', function () {
+        $now = now();
+        $intakes = \Illuminate\Support\Facades\DB::table('admissions_intakes')
+            ->where('is_published', true)
+            ->whereIn('status', ['open', 'closing_soon', 'extended'])
+            ->orWhere(function ($q) use ($now) {
+                $q->where('is_published', true)
+                  ->where('open_at', '<=', $now)
+                  ->where('close_at', '>=', $now);
+            })
+            ->orderBy('open_at', 'asc')
+            ->get();
+        return response()->json(['data' => $intakes]);
+    });
+
+    // All published intakes (for programme discovery)
+    Route::get('/intakes', function () {
+        $intakes = \Illuminate\Support\Facades\DB::table('admissions_intakes')
+            ->where('is_published', true)
+            ->orderBy('open_at', 'desc')
+            ->get();
+        return response()->json(['data' => $intakes]);
+    });
+
+    // ── Pathways ──────────────────────────────────────────────────────────────
+    Route::get('/pathways', function () {
+        $pathways = \Illuminate\Support\Facades\DB::table('admission_pathways')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->get();
+        return response()->json(['data' => $pathways]);
+    });
+
+    // ── Programme Catalogue ───────────────────────────────────────────────────
+    Route::get('/programmes', function (Illuminate\Http\Request $request) {
+        $q = \Illuminate\Support\Facades\DB::table('admission_programmes')
+            ->where('is_active', true);
+
+        if ($request->filled('level')) {
+            $q->where('level', $request->level);
+        }
+        if ($request->filled('school')) {
+            $q->where('school_code', $request->school);
+        }
+        if ($request->filled('pathway')) {
+            $q->whereJsonContains('available_pathways', $request->pathway);
+        }
+        if ($request->filled('intake')) {
+            $q->whereJsonContains('available_intakes', $request->intake);
+        }
+        if ($request->filled('search')) {
+            $s = $request->search;
+            $q->where(function ($sq) use ($s) {
+                $sq->where('programme_name', 'like', "%{$s}%")
+                   ->orWhere('school_code', 'like', "%{$s}%")
+                   ->orWhere('department', 'like', "%{$s}%");
+            });
+        }
+
+        $programmes = $q->orderBy('school_code')->orderBy('programme_name')->get();
+        return response()->json(['data' => $programmes]);
+    });
+
+    // ── KUCCPS Verification ───────────────────────────────────────────────────
+    Route::post('/kuccps/verify', function (Illuminate\Http\Request $request) {
+        $data = $request->validate([
+            'kcse_index_number' => 'required|string',
+            'kcse_year'         => 'required|string',
+            'id_document_number' => 'required|string',
+        ]);
+
+        $placement = \Illuminate\Support\Facades\DB::table('kuccps_placements')
+            ->where('kcse_index_number', $data['kcse_index_number'])
+            ->where('kcse_year',         $data['kcse_year'])
+            ->where(function ($q) use ($data) {
+                $q->where('id_document_number', $data['id_document_number'])
+                  ->orWhereNull('id_document_number');
+            })
+            ->whereIn('status', ['unverified', 'verified'])
+            ->first();
+
+        if (!$placement) {
+            return response()->json([
+                'verified' => false,
+                'message'  => 'We could not verify your KUCCPS placement. Please check your details or contact Admissions Office.',
+            ]);
+        }
+
+        $programme = \Illuminate\Support\Facades\DB::table('admission_programmes')
+            ->where('programme_code', $placement->programme_code)
+            ->first();
+
+        return response()->json([
+            'verified'      => true,
+            'placement_id'  => $placement->id,
+            'programme'     => $programme,
+            'placement'     => $placement,
+        ]);
+    });
+});
+
+// =============================================================================
+// APPLICATIONS — APPLICANT PORTAL (token-based auth via portal_token)
+// =============================================================================
+
+Route::prefix('applications')->group(function () {
+
+    // Middleware helper: resolve applicant from Bearer token
+    function resolveApplicant(Illuminate\Http\Request $request) {
+        $token = $request->bearerToken();
+        if (!$token) return null;
+        return \Illuminate\Support\Facades\DB::table('applicants')
+            ->where('portal_token', $token)
+            ->first();
+    }
+
+    // ── Create/Resume Applicant Account & Start Application ───────────────────
+    Route::post('/register', function (Illuminate\Http\Request $request) {
+        $data = $request->validate([
+            'email'            => 'required|email',
+            'password'         => 'required|min:8',
+            'full_name'        => 'required|string|max:200',
+            'phone'            => 'nullable|string|max:20',
+        ]);
+
+        $existing = \Illuminate\Support\Facades\DB::table('applicants')
+            ->where('email', $data['email'])
+            ->first();
+
+        if ($existing) {
+            return response()->json(['error' => 'An account with this email already exists. Please log in.'], 409);
+        }
+
+        $token = \Illuminate\Support\Str::random(64);
+        $id = \Illuminate\Support\Facades\DB::table('applicants')->insertGetId([
+            'email'          => $data['email'],
+            'full_name'      => $data['full_name'],
+            'phone'          => $data['phone'] ?? null,
+            'password_hash'  => password_hash($data['password'], PASSWORD_DEFAULT),
+            'portal_token'   => $token,
+            'email_verified' => false,
+            'created_at'     => now(),
+            'updated_at'     => now(),
+        ]);
+
+        return response()->json(['token' => $token, 'applicant_id' => $id]);
+    });
+
+    Route::post('/login', function (Illuminate\Http\Request $request) {
+        $data = $request->validate([
+            'email'    => 'required|email',
+            'password' => 'required|string',
+        ]);
+
+        $applicant = \Illuminate\Support\Facades\DB::table('applicants')
+            ->where('email', $data['email'])
+            ->first();
+
+        if (!$applicant || !password_verify($data['password'], $applicant->password_hash)) {
+            return response()->json(['error' => 'Invalid email or password.'], 401);
+        }
+
+        // Refresh token on login
+        $token = \Illuminate\Support\Str::random(64);
+        \Illuminate\Support\Facades\DB::table('applicants')
+            ->where('id', $applicant->id)
+            ->update(['portal_token' => $token, 'updated_at' => now()]);
+
+        return response()->json(['token' => $token, 'applicant_id' => $applicant->id, 'full_name' => $applicant->full_name]);
+    });
+
+    // ── Start Application (creates draft) ─────────────────────────────────────
+    Route::post('/start', function (Illuminate\Http\Request $request) {
+        $applicant = resolveApplicant($request);
+        if (!$applicant) {
+            return response()->json(['error' => 'Authentication required.'], 401);
+        }
+
+        $data = $request->validate([
+            'intake_id'   => 'required|integer',
+            'programme_id' => 'required|integer',
+            'pathway_id'  => 'required|integer',
+        ]);
+
+        // Validate intake is open
+        $intake = \Illuminate\Support\Facades\DB::table('admissions_intakes')
+            ->where('id', $data['intake_id'])
+            ->where('is_published', true)
+            ->first();
+        if (!$intake) {
+            return response()->json(['error' => 'Selected intake is not available.'], 422);
+        }
+        $now = now();
+        if ($intake->close_at && $now->gt($intake->close_at)) {
+            return response()->json(['error' => 'Applications for this intake are closed. Please select another available intake or contact Admissions.'], 422);
+        }
+
+        // Validate programme
+        $programme = \Illuminate\Support\Facades\DB::table('admission_programmes')
+            ->where('id', $data['programme_id'])
+            ->where('is_active', true)
+            ->first();
+        if (!$programme) {
+            return response()->json(['error' => 'Selected programme is not available.'], 422);
+        }
+
+        $pathway = \Illuminate\Support\Facades\DB::table('admission_pathways')
+            ->where('id', $data['pathway_id'])
+            ->where('is_active', true)
+            ->first();
+        if (!$pathway) {
+            return response()->json(['error' => 'Selected pathway is not valid.'], 422);
+        }
+
+        // Check for existing active application for same programme/intake
+        $existing = \Illuminate\Support\Facades\DB::table('applications')
+            ->where('applicant_id', $applicant->id)
+            ->where('intake_id', $data['intake_id'])
+            ->where('programme_id', $data['programme_id'])
+            ->whereNotIn('status', ['cancelled', 'archived'])
+            ->first();
+        if ($existing) {
+            return response()->json(['reference' => $existing->reference, 'message' => 'You have an existing application for this programme.']);
+        }
+
+        $ref = (string)\Illuminate\Support\Str::uuid();
+        \Illuminate\Support\Facades\DB::table('applications')->insert([
+            'reference'      => $ref,
+            'applicant_id'   => $applicant->id,
+            'intake_id'      => $data['intake_id'],
+            'programme_id'   => $data['programme_id'],
+            'pathway_id'     => $data['pathway_id'],
+            'level'          => $programme->level,
+            'status'         => 'draft',
+            'payment_status' => 'pending',
+            'created_at'     => $now,
+            'updated_at'     => $now,
+        ]);
+
+        // Status log
+        \Illuminate\Support\Facades\DB::table('application_status_logs')->insert([
+            'application_id' => \Illuminate\Support\Facades\DB::table('applications')->where('reference',$ref)->value('id'),
+            'from_status'    => null,
+            'to_status'      => 'draft',
+            'changed_by_type' => 'applicant',
+            'changed_by'     => $applicant->id,
+            'reason'         => 'Application started',
+            'created_at'     => $now,
+            'updated_at'     => $now,
+        ]);
+
+        return response()->json(['reference' => $ref]);
+    });
+
+    // Helper to get application owned by applicant
+    function getOwnedApplication(string $ref, int $applicantId) {
+        return \Illuminate\Support\Facades\DB::table('applications')
+            ->where('reference', $ref)
+            ->where('applicant_id', $applicantId)
+            ->first();
+    }
+
+    // ── Get Application State ─────────────────────────────────────────────────
+    Route::get('/{ref}', function (Illuminate\Http\Request $request, string $ref) {
+        $applicant = resolveApplicant($request);
+        if (!$applicant) return response()->json(['error' => 'Unauthenticated.'], 401);
+
+        $app = getOwnedApplication($ref, $applicant->id);
+        if (!$app) return response()->json(['error' => 'Application not found.'], 404);
+
+        $programme = \Illuminate\Support\Facades\DB::table('admission_programmes')->where('id', $app->programme_id)->first();
+        $intake    = \Illuminate\Support\Facades\DB::table('admissions_intakes')->where('id', $app->intake_id)->first();
+        $pathway   = \Illuminate\Support\Facades\DB::table('admission_pathways')->where('id', $app->pathway_id)->first();
+        $qualifications = \Illuminate\Support\Facades\DB::table('academic_qualifications')->where('application_id', $app->id)->get();
+        $documents  = \Illuminate\Support\Facades\DB::table('application_documents')->where('application_id', $app->id)->get();
+        $payment    = \Illuminate\Support\Facades\DB::table('application_payments')->where('application_id', $app->id)->orderBy('id','desc')->first();
+
+        return response()->json([
+            'data' => array_merge((array)$app, [
+                'programme'      => $programme,
+                'intake'         => $intake,
+                'pathway'        => $pathway,
+                'qualifications' => $qualifications,
+                'documents'      => $documents,
+                'payment'        => $payment,
+                'applicant'      => (function() use ($applicant) {
+                    $a = (array)$applicant;
+                    unset($a['password_hash'], $a['otp_code'], $a['portal_token']);
+                    return $a;
+                })(),
+            ]),
+        ]);
+    });
+
+    // ── Personal Details ──────────────────────────────────────────────────────
+    Route::patch('/{ref}/personal', function (Illuminate\Http\Request $request, string $ref) {
+        $applicant = resolveApplicant($request);
+        if (!$applicant) return response()->json(['error' => 'Unauthenticated.'], 401);
+
+        $app = getOwnedApplication($ref, $applicant->id);
+        if (!$app || in_array($app->status, ['submitted','under_review','eligible','rejected','offered','offer_accepted','archived'])) {
+            return response()->json(['error' => 'Application cannot be modified.'], 422);
+        }
+
+        $data = $request->validate([
+            'full_name'              => 'required|string|max:200',
+            'gender'                 => 'required|in:male,female,other',
+            'date_of_birth'          => 'required|date',
+            'nationality'            => 'required|string|max:80',
+            'id_document_type'       => 'required|in:national_id,passport,birth_cert',
+            'id_document_number'     => 'required|string|max:50',
+            'county'                 => 'nullable|string|max:80',
+            'sub_county'             => 'nullable|string|max:80',
+            'postal_address'         => 'nullable|string|max:300',
+            'physical_address'       => 'nullable|string|max:300',
+            'emergency_contact_name' => 'nullable|string|max:120',
+            'emergency_contact_phone' => 'nullable|string|max:20',
+            'has_disability'         => 'boolean',
+            'disability_description' => 'nullable|string|max:300',
+        ]);
+
+        \Illuminate\Support\Facades\DB::table('applicants')
+            ->where('id', $applicant->id)
+            ->update(array_merge($data, ['updated_at' => now()]));
+
+        \Illuminate\Support\Facades\DB::table('applications')
+            ->where('id', $app->id)
+            ->update(['updated_at' => now()]);
+
+        return response()->json(['message' => 'Personal details saved.']);
+    });
+
+    // ── Academic Qualifications ───────────────────────────────────────────────
+    Route::patch('/{ref}/qualifications', function (Illuminate\Http\Request $request, string $ref) {
+        $applicant = resolveApplicant($request);
+        if (!$applicant) return response()->json(['error' => 'Unauthenticated.'], 401);
+
+        $app = getOwnedApplication($ref, $applicant->id);
+        if (!$app || in_array($app->status, ['submitted','under_review','eligible','rejected','offered','archived'])) {
+            return response()->json(['error' => 'Application cannot be modified.'], 422);
+        }
+
+        $data = $request->validate([
+            'qualification_level'   => 'required|string',
+            'institution_name'      => 'nullable|string|max:200',
+            'programme_name'        => 'nullable|string|max:200',
+            'completion_year'       => 'nullable|string|max:10',
+            'grade_or_classification' => 'nullable|string|max:50',
+            'kcse_index_number'     => 'nullable|string|max:30',
+            'kcse_year'             => 'nullable|string|max:10',
+            'mean_grade'            => 'nullable|string|max:5',
+            'subject_grades'        => 'nullable|array',
+            'school_attended'       => 'nullable|string|max:200',
+        ]);
+
+        // Delete existing and re-insert
+        \Illuminate\Support\Facades\DB::table('academic_qualifications')
+            ->where('application_id', $app->id)
+            ->delete();
+
+        \Illuminate\Support\Facades\DB::table('academic_qualifications')->insert(array_merge($data, [
+            'application_id' => $app->id,
+            'subject_grades' => isset($data['subject_grades']) ? json_encode($data['subject_grades']) : null,
+            'created_at'     => now(),
+            'updated_at'     => now(),
+        ]));
+
+        return response()->json(['message' => 'Qualifications saved.']);
+    });
+
+    // ── Document Upload ────────────────────────────────────────────────────────
+    Route::post('/{ref}/documents', function (Illuminate\Http\Request $request, string $ref) {
+        $applicant = resolveApplicant($request);
+        if (!$applicant) return response()->json(['error' => 'Unauthenticated.'], 401);
+
+        $app = getOwnedApplication($ref, $applicant->id);
+        if (!$app || in_array($app->status, ['submitted','under_review','eligible','rejected','offered','archived'])) {
+            return response()->json(['error' => 'Application cannot be modified.'], 422);
+        }
+
+        $request->validate([
+            'document_type' => 'required|string|max:60',
+            'file'          => 'required|file|mimes:pdf,jpg,jpeg,png|max:5120',
+        ]);
+
+        $file = $request->file('file');
+        $path = $file->store("application-docs/{$ref}", 'local');
+
+        // Replace existing document of same type
+        \Illuminate\Support\Facades\DB::table('application_documents')
+            ->where('application_id', $app->id)
+            ->where('document_type', $request->document_type)
+            ->delete();
+
+        $docId = \Illuminate\Support\Facades\DB::table('application_documents')->insertGetId([
+            'application_id'    => $app->id,
+            'document_type'     => $request->document_type,
+            'document_label'    => $request->input('document_label'),
+            'file_path'         => $path,
+            'original_filename' => $file->getClientOriginalName(),
+            'mime_type'         => $file->getMimeType(),
+            'file_size_kb'      => (int)($file->getSize() / 1024),
+            'checksum'          => md5_file($file->getRealPath()),
+            'status'            => 'pending',
+            'created_at'        => now(),
+            'updated_at'        => now(),
+        ]);
+
+        return response()->json(['document_id' => $docId, 'message' => 'Document uploaded.']);
+    });
+
+    Route::delete('/{ref}/documents/{docId}', function (Illuminate\Http\Request $request, string $ref, int $docId) {
+        $applicant = resolveApplicant($request);
+        if (!$applicant) return response()->json(['error' => 'Unauthenticated.'], 401);
+
+        $app = getOwnedApplication($ref, $applicant->id);
+        if (!$app) return response()->json(['error' => 'Application not found.'], 404);
+
+        \Illuminate\Support\Facades\DB::table('application_documents')
+            ->where('id', $docId)
+            ->where('application_id', $app->id)
+            ->delete();
+
+        return response()->json(['message' => 'Document removed.']);
+    });
+
+    // ── Accept Declarations ────────────────────────────────────────────────────
+    Route::patch('/{ref}/declarations', function (Illuminate\Http\Request $request, string $ref) {
+        $applicant = resolveApplicant($request);
+        if (!$applicant) return response()->json(['error' => 'Unauthenticated.'], 401);
+
+        $app = getOwnedApplication($ref, $applicant->id);
+        if (!$app) return response()->json(['error' => 'Application not found.'], 404);
+
+        \Illuminate\Support\Facades\DB::table('applications')
+            ->where('id', $app->id)
+            ->update(['declarations_accepted' => true, 'updated_at' => now()]);
+
+        return response()->json(['message' => 'Declarations accepted.']);
+    });
+
+    // ── Initiate Payment ──────────────────────────────────────────────────────
+    Route::post('/{ref}/payment/initiate', function (Illuminate\Http\Request $request, string $ref) {
+        $applicant = resolveApplicant($request);
+        if (!$applicant) return response()->json(['error' => 'Unauthenticated.'], 401);
+
+        $app = getOwnedApplication($ref, $applicant->id);
+        if (!$app) return response()->json(['error' => 'Application not found.'], 404);
+
+        $pathway = \Illuminate\Support\Facades\DB::table('admission_pathways')->where('id', $app->pathway_id)->first();
+        if ($pathway && !$pathway->requires_payment) {
+            return response()->json(['error' => 'Payment not required for this pathway.'], 422);
+        }
+
+        $intake = \Illuminate\Support\Facades\DB::table('admissions_intakes')->where('id', $app->intake_id)->first();
+        $fee = match($app->level) {
+            'masters' => $intake->application_fee_masters ?? 1500,
+            'phd'     => $intake->application_fee_phd    ?? 2000,
+            default   => $intake->application_fee_undergraduate ?? 1000,
+        };
+
+        $payRef = 'KAFU-APP-' . strtoupper(\Illuminate\Support\Str::random(8));
+        $data = $request->validate([
+            'method'      => 'required|in:mpesa,bank,manual',
+            'mpesa_phone' => 'nullable|string|max:20',
+        ]);
+
+        // Remove unpaid previous payment attempts
+        \Illuminate\Support\Facades\DB::table('application_payments')
+            ->where('application_id', $app->id)
+            ->whereIn('status', ['pending', 'failed', 'cancelled'])
+            ->delete();
+
+        $payId = \Illuminate\Support\Facades\DB::table('application_payments')->insertGetId([
+            'application_id'  => $app->id,
+            'payment_reference' => $payRef,
+            'method'          => $data['method'],
+            'amount_expected' => $fee,
+            'status'          => 'initiated',
+            'mpesa_phone'     => $data['mpesa_phone'] ?? null,
+            'created_at'      => now(),
+            'updated_at'      => now(),
+        ]);
+
+        \Illuminate\Support\Facades\DB::table('applications')
+            ->where('id', $app->id)
+            ->update(['payment_status' => 'initiated', 'updated_at' => now()]);
+
+        return response()->json([
+            'payment_id'        => $payId,
+            'payment_reference' => $payRef,
+            'amount'            => $fee,
+            'method'            => $data['method'],
+            'message'           => $data['method'] === 'mpesa'
+                ? "M-Pesa STK Push sent to {$data['mpesa_phone']}. Enter your M-Pesa PIN to complete payment."
+                : "Please use reference {$payRef} when making payment to KAFU PayBill 400200.",
+        ]);
+    });
+
+    // ── Simulate M-Pesa Payment Callback (dev/demo only) ─────────────────────
+    Route::post('/{ref}/payment/simulate-confirm', function (Illuminate\Http\Request $request, string $ref) {
+        $applicant = resolveApplicant($request);
+        if (!$applicant) return response()->json(['error' => 'Unauthenticated.'], 401);
+
+        $app = getOwnedApplication($ref, $applicant->id);
+        if (!$app) return response()->json(['error' => 'Application not found.'], 404);
+
+        $payment = \Illuminate\Support\Facades\DB::table('application_payments')
+            ->where('application_id', $app->id)
+            ->whereIn('status', ['initiated', 'pending'])
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if (!$payment) return response()->json(['error' => 'No pending payment found.'], 404);
+
+        \Illuminate\Support\Facades\DB::table('application_payments')
+            ->where('id', $payment->id)
+            ->update([
+                'status'                  => 'paid',
+                'amount_paid'             => $payment->amount_expected,
+                'paid_at'                 => now(),
+                'external_transaction_id' => 'SIM' . strtoupper(\Illuminate\Support\Str::random(8)),
+                'updated_at'              => now(),
+            ]);
+
+        \Illuminate\Support\Facades\DB::table('applications')
+            ->where('id', $app->id)
+            ->update(['payment_status' => 'paid', 'updated_at' => now()]);
+
+        return response()->json(['message' => 'Payment confirmed successfully.', 'status' => 'paid']);
+    });
+
+    // ── Final Submission ──────────────────────────────────────────────────────
+    Route::post('/{ref}/submit', function (Illuminate\Http\Request $request, string $ref) {
+        $applicant = resolveApplicant($request);
+        if (!$applicant) return response()->json(['error' => 'Unauthenticated.'], 401);
+
+        $app = getOwnedApplication($ref, $applicant->id);
+        if (!$app) return response()->json(['error' => 'Application not found.'], 404);
+
+        if ($app->status === 'submitted') {
+            return response()->json(['error' => 'Application already submitted.'], 422);
+        }
+
+        $now = now();
+
+        // Re-validate intake window
+        $intake = \Illuminate\Support\Facades\DB::table('admissions_intakes')->where('id', $app->intake_id)->first();
+        if ($intake->close_at && $now->gt($intake->close_at) && !$intake->allow_late_applications) {
+            return response()->json(['error' => 'Applications for this intake are closed. Please select another available intake or contact Admissions.'], 422);
+        }
+
+        // Validate payment for non-KUCCPS
+        $pathway = \Illuminate\Support\Facades\DB::table('admission_pathways')->where('id', $app->pathway_id)->first();
+        if ($pathway->requires_payment && !in_array($app->payment_status, ['paid', 'manually_verified'])) {
+            return response()->json(['error' => 'Application fee payment must be completed before final submission.'], 422);
+        }
+
+        // Validate declarations
+        if (!$app->declarations_accepted) {
+            return response()->json(['error' => 'You must accept the declarations before submitting.'], 422);
+        }
+
+        // Validate required documents
+        $programme = \Illuminate\Support\Facades\DB::table('admission_programmes')->where('id', $app->programme_id)->first();
+        $requiredDocs = json_decode($programme->required_documents ?? '[]', true);
+        $uploadedDocs = \Illuminate\Support\Facades\DB::table('application_documents')
+            ->where('application_id', $app->id)
+            ->pluck('document_type')
+            ->toArray();
+        $missing = array_diff($requiredDocs, $uploadedDocs);
+        if (!empty($missing)) {
+            return response()->json([
+                'error'           => 'Required documents are missing.',
+                'missing_documents' => array_values($missing),
+            ], 422);
+        }
+
+        // Generate application number
+        $year   = $now->format('Y');
+        $period = strtoupper(substr($intake->intake_period, 0, 3));
+        $level  = strtoupper(substr($app->level, 0, 2));
+        $seq    = str_pad(\Illuminate\Support\Facades\DB::table('applications')->where('status','submitted')->count() + 1, 6, '0', STR_PAD_LEFT);
+        $appNumber = "KAFU/APP/{$year}/{$period}/{$level}/{$seq}";
+
+        \Illuminate\Support\Facades\DB::table('applications')
+            ->where('id', $app->id)
+            ->update([
+                'application_number' => $appNumber,
+                'status'             => 'submitted',
+                'submitted_at'       => $now,
+                'locked_at'          => $now,
+                'updated_at'         => $now,
+            ]);
+
+        \Illuminate\Support\Facades\DB::table('application_status_logs')->insert([
+            'application_id'  => $app->id,
+            'from_status'     => $app->status,
+            'to_status'       => 'submitted',
+            'changed_by_type' => 'applicant',
+            'changed_by'      => $applicant->id,
+            'reason'          => 'Applicant submitted application',
+            'created_at'      => $now,
+            'updated_at'      => $now,
+        ]);
+
+        return response()->json([
+            'application_number' => $appNumber,
+            'message'            => 'Your application has been submitted successfully. Your application reference number is ' . $appNumber . '. Please keep this number for future communication.',
+        ]);
+    });
+
+    // ── Application Status Check ──────────────────────────────────────────────
+    Route::get('/{ref}/status', function (Illuminate\Http\Request $request, string $ref) {
+        $applicant = resolveApplicant($request);
+        if (!$applicant) return response()->json(['error' => 'Unauthenticated.'], 401);
+
+        $app = getOwnedApplication($ref, $applicant->id);
+        if (!$app) return response()->json(['error' => 'Application not found.'], 404);
+
+        $logs = \Illuminate\Support\Facades\DB::table('application_status_logs')
+            ->where('application_id', $app->id)
+            ->orderBy('created_at', 'asc')
+            ->get();
+
+        return response()->json([
+            'status'             => $app->status,
+            'payment_status'     => $app->payment_status,
+            'application_number' => $app->application_number,
+            'submitted_at'       => $app->submitted_at,
+            'decision'           => $app->decision,
+            'decision_reason'    => $app->decision_reason,
+            'status_history'     => $logs,
+        ]);
+    });
+});

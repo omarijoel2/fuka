@@ -1238,6 +1238,450 @@ Route::prefix('admin')->group(function () {
         // -------------------------------------------------------------------------
         Route::get('/workflow-queue', [\App\Http\Controllers\Admin\WorkflowQueueController::class, 'index']);
         Route::post('/workflow-queue/{id}/assign', [\App\Http\Controllers\Admin\WorkflowQueueController::class, 'assign']);
+
+        // =====================================================================
+        // ADMISSIONS APPLICATION MODULE — ADMIN ROUTES
+        // =====================================================================
+
+        Route::prefix('admissions')->group(function () {
+
+            // ── Intake Management ─────────────────────────────────────────────
+            Route::get('/intakes', function (Request $request) {
+                $q = \Illuminate\Support\Facades\DB::table('admissions_intakes');
+                if ($request->filled('status')) $q->where('status', $request->status);
+                $intakes = $q->orderBy('open_at', 'desc')->get();
+                // Enrich with counts
+                foreach ($intakes as &$intake) {
+                    $intake->application_count = \Illuminate\Support\Facades\DB::table('applications')
+                        ->where('intake_id', $intake->id)->count();
+                    $intake->submitted_count = \Illuminate\Support\Facades\DB::table('applications')
+                        ->where('intake_id', $intake->id)->where('status','submitted')->count();
+                }
+                return response()->json(['data' => $intakes]);
+            });
+
+            Route::post('/intakes', function (Request $request) {
+                $data = $request->validate([
+                    'name'                          => 'required|string|max:120',
+                    'academic_year'                 => 'required|string|max:20',
+                    'intake_period'                 => 'required|in:january,may,september',
+                    'open_at'                       => 'nullable|date',
+                    'close_at'                      => 'nullable|date',
+                    'application_fee_undergraduate' => 'nullable|numeric|min:0',
+                    'application_fee_masters'       => 'nullable|numeric|min:0',
+                    'application_fee_phd'           => 'nullable|numeric|min:0',
+                    'allow_kuccps'                  => 'boolean',
+                    'allow_self_sponsored_ug'       => 'boolean',
+                    'allow_masters'                 => 'boolean',
+                    'allow_phd'                     => 'boolean',
+                    'notes'                         => 'nullable|string',
+                ]);
+                $id = \Illuminate\Support\Facades\DB::table('admissions_intakes')->insertGetId(array_merge($data, [
+                    'status'     => 'draft',
+                    'created_by' => $request->user()->id,
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]));
+                return response()->json(['data' => \Illuminate\Support\Facades\DB::table('admissions_intakes')->where('id',$id)->first()], 201);
+            });
+
+            Route::put('/intakes/{id}', function (Request $request, int $id) {
+                $data = $request->validate([
+                    'name'                          => 'string|max:120',
+                    'academic_year'                 => 'string|max:20',
+                    'intake_period'                 => 'in:january,may,september',
+                    'open_at'                       => 'nullable|date',
+                    'close_at'                      => 'nullable|date',
+                    'application_fee_undergraduate' => 'nullable|numeric|min:0',
+                    'application_fee_masters'       => 'nullable|numeric|min:0',
+                    'application_fee_phd'           => 'nullable|numeric|min:0',
+                    'allow_kuccps'                  => 'boolean',
+                    'allow_self_sponsored_ug'       => 'boolean',
+                    'allow_masters'                 => 'boolean',
+                    'allow_phd'                     => 'boolean',
+                    'allow_late_applications'       => 'boolean',
+                    'late_application_close_at'     => 'nullable|date',
+                    'notes'                         => 'nullable|string',
+                ]);
+                \Illuminate\Support\Facades\DB::table('admissions_intakes')
+                    ->where('id', $id)
+                    ->update(array_merge($data, ['updated_at' => now()]));
+                return response()->json(['data' => \Illuminate\Support\Facades\DB::table('admissions_intakes')->where('id',$id)->first()]);
+            });
+
+            Route::post('/intakes/{id}/publish', function (Request $request, int $id) {
+                \Illuminate\Support\Facades\DB::table('admissions_intakes')
+                    ->where('id', $id)
+                    ->update(['is_published' => true, 'status' => 'scheduled', 'updated_at' => now()]);
+                return response()->json(['message' => 'Intake published.']);
+            });
+
+            Route::post('/intakes/{id}/open', function (Request $request, int $id) {
+                \Illuminate\Support\Facades\DB::table('admissions_intakes')
+                    ->where('id', $id)
+                    ->update(['status' => 'open', 'is_published' => true, 'open_at' => now(), 'updated_at' => now()]);
+                return response()->json(['message' => 'Intake opened.']);
+            });
+
+            Route::post('/intakes/{id}/close', function (Request $request, int $id) {
+                \Illuminate\Support\Facades\DB::table('admissions_intakes')
+                    ->where('id', $id)
+                    ->update(['status' => 'closed', 'close_at' => now(), 'updated_at' => now()]);
+                return response()->json(['message' => 'Intake closed.']);
+            });
+
+            Route::post('/intakes/{id}/extend', function (Request $request, int $id) {
+                $data = $request->validate(['close_at' => 'required|date', 'notes' => 'nullable|string']);
+                \Illuminate\Support\Facades\DB::table('admissions_intakes')
+                    ->where('id', $id)
+                    ->update(['status' => 'extended', 'close_at' => $data['close_at'], 'allow_late_applications' => true, 'updated_at' => now()]);
+                return response()->json(['message' => 'Deadline extended.']);
+            });
+
+            Route::delete('/intakes/{id}', function (int $id) {
+                $count = \Illuminate\Support\Facades\DB::table('applications')->where('intake_id', $id)->count();
+                if ($count > 0) {
+                    return response()->json(['error' => 'Cannot delete intake with existing applications.'], 422);
+                }
+                \Illuminate\Support\Facades\DB::table('admissions_intakes')->where('id', $id)->delete();
+                return response()->json(['message' => 'Intake deleted.']);
+            });
+
+            // ── Programme Admin ───────────────────────────────────────────────
+            Route::get('/programmes', function (Request $request) {
+                $q = \Illuminate\Support\Facades\DB::table('admission_programmes');
+                if ($request->filled('level'))  $q->where('level', $request->level);
+                if ($request->filled('school')) $q->where('school_code', $request->school);
+                return response()->json(['data' => $q->orderBy('school_code')->orderBy('programme_name')->get()]);
+            });
+
+            Route::put('/programmes/{id}', function (Request $request, int $id) {
+                $data = $request->validate([
+                    'programme_name'       => 'string|max:200',
+                    'school_code'          => 'string|max:20',
+                    'department'           => 'nullable|string|max:100',
+                    'level'                => 'string',
+                    'duration'             => 'string|max:30',
+                    'mode'                 => 'string|max:30',
+                    'minimum_requirements' => 'nullable|string',
+                    'available_intakes'    => 'nullable|array',
+                    'available_pathways'   => 'nullable|array',
+                    'required_documents'   => 'nullable|array',
+                    'is_active'            => 'boolean',
+                ]);
+                if (isset($data['available_intakes']))  $data['available_intakes']  = json_encode($data['available_intakes']);
+                if (isset($data['available_pathways'])) $data['available_pathways'] = json_encode($data['available_pathways']);
+                if (isset($data['required_documents'])) $data['required_documents'] = json_encode($data['required_documents']);
+                \Illuminate\Support\Facades\DB::table('admission_programmes')
+                    ->where('id', $id)
+                    ->update(array_merge($data, ['updated_at' => now()]));
+                return response()->json(['data' => \Illuminate\Support\Facades\DB::table('admission_programmes')->where('id',$id)->first()]);
+            });
+
+            // ── KUCCPS Import ─────────────────────────────────────────────────
+            Route::get('/kuccps/batches', function () {
+                $batches = \Illuminate\Support\Facades\DB::table('kuccps_import_batches')
+                    ->orderBy('created_at', 'desc')
+                    ->limit(20)
+                    ->get();
+                foreach ($batches as &$b) {
+                    $b->placements_count = \Illuminate\Support\Facades\DB::table('kuccps_placements')
+                        ->where('import_batch_id', $b->id)->count();
+                    $b->claimed_count = \Illuminate\Support\Facades\DB::table('kuccps_placements')
+                        ->where('import_batch_id', $b->id)->where('status','claimed')->count();
+                }
+                return response()->json(['data' => $batches]);
+            });
+
+            Route::post('/kuccps/import', function (Request $request) {
+                $request->validate([
+                    'file'          => 'required|file|mimes:csv,txt',
+                    'academic_year' => 'required|string|max:20',
+                    'intake_period' => 'nullable|string|in:january,may,september',
+                    'intake_id'     => 'nullable|integer',
+                ]);
+
+                $file = $request->file('file');
+                $filename = $file->getClientOriginalName();
+                $now = now();
+                $user = $request->user();
+
+                // Parse CSV
+                $lines = array_map('str_getcsv', file($file->getRealPath()));
+                $headers = array_map('trim', array_shift($lines));
+                $headers = array_map('strtolower', $headers);
+
+                $required = ['kcse_index_number','kcse_year','applicant_name','programme_code'];
+                $missing = array_diff($required, $headers);
+                if (!empty($missing)) {
+                    return response()->json([
+                        'error' => 'CSV missing required columns: ' . implode(', ', $missing)
+                    ], 422);
+                }
+
+                $batchId = \Illuminate\Support\Facades\DB::table('kuccps_import_batches')->insertGetId([
+                    'filename'      => $filename,
+                    'academic_year' => $request->academic_year,
+                    'intake_period' => $request->intake_period,
+                    'status'        => 'validating',
+                    'total_rows'    => count($lines),
+                    'imported_by'   => $user->id,
+                    'created_at'    => $now,
+                    'updated_at'    => $now,
+                ]);
+
+                $valid = 0; $invalid = 0; $errors = [];
+
+                foreach ($lines as $i => $row) {
+                    $rec = array_combine($headers, array_pad($row, count($headers), ''));
+                    $idx = trim($rec['kcse_index_number'] ?? '');
+                    $yr  = trim($rec['kcse_year'] ?? '');
+                    $code = trim($rec['programme_code'] ?? '');
+                    $name = trim($rec['applicant_name'] ?? '');
+
+                    if (!$idx || !$yr || !$code || !$name) {
+                        $invalid++;
+                        $errors[] = "Row " . ($i+2) . ": missing required fields";
+                        continue;
+                    }
+
+                    // Check for duplicates
+                    $dup = \Illuminate\Support\Facades\DB::table('kuccps_placements')
+                        ->where('kcse_index_number', $idx)
+                        ->where('kcse_year', $yr)
+                        ->exists();
+                    if ($dup) {
+                        $invalid++;
+                        $errors[] = "Row " . ($i+2) . ": duplicate index {$idx}/{$yr}";
+                        continue;
+                    }
+
+                    $progId = \Illuminate\Support\Facades\DB::table('admission_programmes')
+                        ->where('programme_code', $code)
+                        ->value('id');
+
+                    \Illuminate\Support\Facades\DB::table('kuccps_placements')->insert([
+                        'import_batch_id'    => $batchId,
+                        'kuccps_reference'   => trim($rec['kuccps_reference'] ?? ''),
+                        'kcse_index_number'  => $idx,
+                        'kcse_year'          => $yr,
+                        'applicant_name'     => $name,
+                        'id_document_number' => trim($rec['id_document_number'] ?? ''),
+                        'programme_code'     => $code,
+                        'programme_id'       => $progId,
+                        'academic_year'      => $request->academic_year,
+                        'intake_id'          => $request->intake_id,
+                        'placement_category' => trim($rec['placement_category'] ?? 'category_a'),
+                        'status'             => 'unverified',
+                        'created_at'         => $now,
+                        'updated_at'         => $now,
+                    ]);
+                    $valid++;
+                }
+
+                \Illuminate\Support\Facades\DB::table('kuccps_import_batches')
+                    ->where('id', $batchId)
+                    ->update([
+                        'status'            => $invalid === count($lines) ? 'failed' : 'imported',
+                        'valid_rows'        => $valid,
+                        'invalid_rows'      => $invalid,
+                        'validation_errors' => json_encode($errors),
+                        'imported_at'       => $now,
+                        'updated_at'        => $now,
+                    ]);
+
+                return response()->json([
+                    'batch_id'    => $batchId,
+                    'total'       => count($lines),
+                    'valid'       => $valid,
+                    'invalid'     => $invalid,
+                    'errors'      => $errors,
+                    'message'     => "Import complete: {$valid} records imported, {$invalid} skipped.",
+                ]);
+            });
+
+            // ── Reports ───────────────────────────────────────────────────────
+            Route::get('/reports', function (Request $request) {
+                $intakeId = $request->input('intake_id');
+                $q = \Illuminate\Support\Facades\DB::table('applications');
+                if ($intakeId) $q->where('intake_id', $intakeId);
+
+                $total      = (clone $q)->count();
+                $byStatus   = (clone $q)->selectRaw('status, count(*) as count')->groupBy('status')->get();
+                $byPathway  = (clone $q)->join('admission_pathways','applications.pathway_id','admission_pathways.id')
+                    ->selectRaw('admission_pathways.name as pathway, count(*) as count')->groupBy('admission_pathways.name')->get();
+                $byLevel    = (clone $q)->selectRaw('level, count(*) as count')->groupBy('level')->get();
+                $paid       = (clone $q)->whereIn('payment_status',['paid','manually_verified'])->count();
+                $submitted  = (clone $q)->where('status','submitted')->count();
+                $kuccps     = \Illuminate\Support\Facades\DB::table('kuccps_placements')->where('status','verified')->count();
+
+                return response()->json([
+                    'data' => [
+                        'total_applications' => $total,
+                        'submitted'          => $submitted,
+                        'paid'               => $paid,
+                        'by_status'          => $byStatus,
+                        'by_pathway'         => $byPathway,
+                        'by_level'           => $byLevel,
+                        'kuccps_verified'    => $kuccps,
+                    ],
+                ]);
+            });
+        });
+
+        // ── Application Review Queue ──────────────────────────────────────────
+        Route::prefix('admin-applications')->group(function () {
+
+            Route::get('/', function (Request $request) {
+                $q = \Illuminate\Support\Facades\DB::table('applications as a')
+                    ->join('applicants as ap', 'a.applicant_id', 'ap.id')
+                    ->join('admission_programmes as p', 'a.programme_id', 'p.id')
+                    ->join('admissions_intakes as i', 'a.intake_id', 'i.id')
+                    ->join('admission_pathways as pw', 'a.pathway_id', 'pw.id')
+                    ->select(
+                        'a.id','a.reference','a.application_number','a.status','a.payment_status',
+                        'a.level','a.submitted_at','a.created_at','a.decision',
+                        'ap.full_name','ap.email','ap.phone',
+                        'p.programme_name','p.school_code',
+                        'i.name as intake_name','i.intake_period','i.academic_year',
+                        'pw.name as pathway_name','pw.code as pathway_code'
+                    );
+
+                if ($request->filled('status'))       $q->where('a.status', $request->status);
+                if ($request->filled('intake_id'))    $q->where('a.intake_id', $request->intake_id);
+                if ($request->filled('pathway'))      $q->where('pw.code', $request->pathway);
+                if ($request->filled('level'))        $q->where('a.level', $request->level);
+                if ($request->filled('payment_status')) $q->where('a.payment_status', $request->payment_status);
+                if ($request->filled('search')) {
+                    $s = $request->search;
+                    $q->where(function ($sq) use ($s) {
+                        $sq->where('ap.full_name','like',"%{$s}%")
+                           ->orWhere('ap.email','like',"%{$s}%")
+                           ->orWhere('a.application_number','like',"%{$s}%");
+                    });
+                }
+
+                $perPage = min((int)($request->per_page ?? 25), 100);
+                $total   = (clone $q)->count();
+                $items   = $q->orderBy('a.submitted_at','desc')->orderBy('a.created_at','desc')
+                             ->limit($perPage)->offset(((int)($request->page ?? 1) - 1) * $perPage)
+                             ->get();
+
+                return response()->json(['data' => $items, 'total' => $total]);
+            });
+
+            Route::get('/{ref}', function (string $ref) {
+                $app = \Illuminate\Support\Facades\DB::table('applications as a')
+                    ->join('applicants as ap', 'a.applicant_id', 'ap.id')
+                    ->join('admission_programmes as p', 'a.programme_id', 'p.id')
+                    ->join('admissions_intakes as i', 'a.intake_id', 'i.id')
+                    ->join('admission_pathways as pw', 'a.pathway_id', 'pw.id')
+                    ->select('a.*','ap.full_name','ap.email','ap.phone','ap.gender','ap.date_of_birth',
+                             'ap.nationality','ap.id_document_type','ap.id_document_number',
+                             'ap.county','ap.sub_county','ap.postal_address',
+                             'ap.emergency_contact_name','ap.emergency_contact_phone',
+                             'p.programme_name','p.school_code','p.level as prog_level',
+                             'p.minimum_requirements','p.required_documents',
+                             'i.name as intake_name','i.intake_period','i.academic_year',
+                             'pw.name as pathway_name')
+                    ->where('a.reference', $ref)
+                    ->first();
+
+                if (!$app) return response()->json(['error' => 'Not found'], 404);
+
+                $qualifications = \Illuminate\Support\Facades\DB::table('academic_qualifications')
+                    ->where('application_id', $app->id)->get();
+                $documents = \Illuminate\Support\Facades\DB::table('application_documents')
+                    ->where('application_id', $app->id)->get();
+                $payment = \Illuminate\Support\Facades\DB::table('application_payments')
+                    ->where('application_id', $app->id)->orderBy('id','desc')->first();
+                $statusLogs = \Illuminate\Support\Facades\DB::table('application_status_logs')
+                    ->where('application_id', $app->id)->orderBy('created_at','asc')->get();
+
+                return response()->json(['data' => array_merge((array)$app, [
+                    'qualifications' => $qualifications,
+                    'documents'      => $documents,
+                    'payment'        => $payment,
+                    'status_history' => $statusLogs,
+                ])]);
+            });
+
+            // Status transition actions
+            Route::post('/{ref}/mark-eligible', function (Request $request, string $ref) {
+                return updateApplicationStatus($ref, 'eligible', $request->input('reason'), $request->user()->id);
+            });
+
+            Route::post('/{ref}/reject', function (Request $request, string $ref) {
+                $data = $request->validate(['reason' => 'required|string|min:10']);
+                return updateApplicationStatus($ref, 'rejected', $data['reason'], $request->user()->id, ['decision' => 'rejected', 'decision_reason' => $data['reason']]);
+            });
+
+            Route::post('/{ref}/offer', function (Request $request, string $ref) {
+                return updateApplicationStatus($ref, 'offered', $request->input('reason', 'Admission offer issued'), $request->user()->id, ['decision' => 'offered']);
+            });
+
+            Route::post('/{ref}/query-documents', function (Request $request, string $ref) {
+                $data = $request->validate(['reason' => 'required|string', 'document_ids' => 'nullable|array']);
+                $app = \Illuminate\Support\Facades\DB::table('applications')->where('reference',$ref)->first();
+                if ($app && $request->filled('document_ids')) {
+                    \Illuminate\Support\Facades\DB::table('application_documents')
+                        ->whereIn('id', $data['document_ids'])
+                        ->where('application_id', $app->id)
+                        ->update(['status' => 'queried', 'rejection_reason' => $data['reason'], 'updated_at' => now()]);
+                }
+                return updateApplicationStatus($ref, 'documents_queried', $data['reason'], $request->user()->id);
+            });
+
+            Route::post('/{ref}/defer', function (Request $request, string $ref) {
+                $data = $request->validate(['reason' => 'required|string']);
+                return updateApplicationStatus($ref, 'deferred', $data['reason'], $request->user()->id);
+            });
+
+            Route::post('/{ref}/under-review', function (Request $request, string $ref) {
+                return updateApplicationStatus($ref, 'under_review', 'Application moved to review', $request->user()->id);
+            });
+
+            // Payment verification
+            Route::post('/payments/{payId}/verify', function (Request $request, int $payId) {
+                $data = $request->validate(['notes' => 'nullable|string']);
+                \Illuminate\Support\Facades\DB::table('application_payments')
+                    ->where('id', $payId)
+                    ->update([
+                        'status'      => 'manually_verified',
+                        'verified_by' => $request->user()->id,
+                        'verified_at' => now(),
+                        'manual_notes' => $data['notes'] ?? null,
+                        'updated_at'  => now(),
+                    ]);
+                // Update application payment status
+                $appId = \Illuminate\Support\Facades\DB::table('application_payments')->where('id',$payId)->value('application_id');
+                \Illuminate\Support\Facades\DB::table('applications')
+                    ->where('id', $appId)
+                    ->update(['payment_status' => 'manually_verified', 'updated_at' => now()]);
+                return response()->json(['message' => 'Payment manually verified.']);
+            });
+        });
     });
 
 });
+
+function updateApplicationStatus(string $ref, string $toStatus, ?string $reason, int $userId, array $extra = []) {
+    $app = \Illuminate\Support\Facades\DB::table('applications')->where('reference', $ref)->first();
+    if (!$app) return response()->json(['error' => 'Application not found.'], 404);
+
+    $update = array_merge(['status' => $toStatus, 'reviewed_by' => $userId, 'reviewed_at' => now(), 'updated_at' => now()], $extra);
+    \Illuminate\Support\Facades\DB::table('applications')->where('id', $app->id)->update($update);
+
+    \Illuminate\Support\Facades\DB::table('application_status_logs')->insert([
+        'application_id'  => $app->id,
+        'from_status'     => $app->status,
+        'to_status'       => $toStatus,
+        'changed_by'      => $userId,
+        'changed_by_type' => 'admin',
+        'reason'          => $reason,
+        'created_at'      => now(),
+        'updated_at'      => now(),
+    ]);
+
+    return response()->json(['message' => 'Application status updated to ' . $toStatus . '.']);
+}
