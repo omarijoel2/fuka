@@ -303,6 +303,7 @@ export default function Home() {
   const [progSearch, setProgSearch] = React.useState("");
   const [progLevel, setProgLevel] = React.useState("");
   const [progSchool, setProgSchool] = React.useState("");
+  const [whyIdx, setWhyIdx] = React.useState(0);
 
   const featuredNews = news?.filter((n) => n.featured).slice(0, 3) ?? [];
   const latestNews = news?.slice(0, 4) ?? [];
@@ -321,28 +322,79 @@ export default function Home() {
     })
     .slice(0, 6);
 
-  const whyKafu = [
+  const whyKafuSlides = [
     {
-      icon: <BadgeCheck className="w-7 h-7" />,
+      image: "https://kafu.ac.ke/wp-content/uploads/2025/10/img8696.jpg",
+      category: "Accreditation",
       title: "Accredited Quality",
       body: "Fully accredited by the Commission for University Education (CUE) with programmes meeting national and international standards.",
+      href: "/about",
+      testid: "why-slide-accredited",
     },
     {
-      icon: <Leaf className="w-7 h-7" />,
-      title: "Quaker Values",
-      body: "Founded on the Quaker principles of truth, integrity, and service to humanity — shaping leaders of character since 2014.",
-    },
-    {
-      icon: <Globe className="w-7 h-7" />,
-      title: "Community Impact",
-      body: "Deeply rooted in Western Kenya, KAFU actively engages 47 counties through research, outreach, and partnerships.",
-    },
-    {
-      icon: <Award className="w-7 h-7" />,
+      image: "https://kafu.ac.ke/wp-content/uploads/2025/10/posgraduate.jpg",
+      category: "Programmes",
       title: "Unique Programmes",
       body: "Home to rare and high-demand offerings — including one of only two institutions in Kenya offering Optometry up to PhD level.",
+      href: "/programmes",
+      testid: "why-slide-programmes",
+    },
+    {
+      image: "https://kafu.ac.ke/wp-content/uploads/2025/10/campus-1-scaled.jpg",
+      category: "Research",
+      title: "Research & Innovation",
+      body: "Driving solutions in health, environment, and development across Kenya — supported by national and international partnerships.",
+      href: "/research",
+      testid: "why-slide-research",
+    },
+    {
+      image: "https://kafu.ac.ke/wp-content/uploads/2025/10/art-culture.jpg",
+      category: "Campus Life",
+      title: "Quaker Values",
+      body: "Founded on principles of truth, integrity, and service to humanity — shaping leaders of character since 2014.",
+      href: "/about#vision",
+      testid: "why-slide-values",
+    },
+    {
+      image: "https://kafu.ac.ke/wp-content/uploads/2026/03/IMG_6424-scaled.jpg",
+      category: "Community",
+      title: "Community Impact",
+      body: "Deeply rooted in Western Kenya, KAFU actively engages 47 counties through research, outreach, and partnerships.",
+      href: "/research/partnerships",
+      testid: "why-slide-community",
+    },
+    {
+      image: "https://kafu.ac.ke/wp-content/uploads/2025/10/undergraduate-fin.jpg",
+      category: "Students",
+      title: "Student Life",
+      body: "Thousands of students discovering their potential through rigorous academics, hands-on learning, and vibrant campus community.",
+      href: "/student-services",
+      testid: "why-slide-students",
+    },
+    {
+      image: "https://kafu.ac.ke/wp-content/uploads/2025/10/sports.jpg",
+      category: "Sports",
+      title: "Sports & Recreation",
+      body: "From inter-university tournaments to fitness and wellness, KAFU nurtures the whole student beyond the classroom.",
+      href: "/student-services",
+      testid: "why-slide-sports",
+    },
+    {
+      image: "https://kafu.ac.ke/wp-content/uploads/Vice-Chancellor-Prof.-Peter-Mwita-addresses-fourth-year-teacher-trainees-during-the-opening-of-the-Competency-Based-Education-CBE-training-at-Kaimosi-Friends-University.jpg",
+      category: "Leadership",
+      title: "Visionary Leadership",
+      body: "Under Vice-Chancellor Prof. Peter Mwita, KAFU is transforming into a globally competitive university driven by innovation and integrity.",
+      href: "/staff",
+      testid: "why-slide-leadership",
     },
   ];
+
+  const whyCount = whyKafuSlides.length;
+
+  React.useEffect(() => {
+    const t = setInterval(() => setWhyIdx((i) => (i + 1) % whyCount), 4500);
+    return () => clearInterval(t);
+  }, [whyCount]);
 
   const admissionPathways = [
     {
@@ -687,8 +739,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── WHY KAFU ─── */}
-      <section className="py-20 bg-primary text-primary-foreground">
+      {/* ─── WHY KAFU — Image Carousel ─── */}
+      <section className="py-20 bg-primary text-primary-foreground overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">Why Choose KAFU?</h2>
@@ -696,15 +748,86 @@ export default function Home() {
               More than a university — a community of purpose, rooted in values and driven by impact.
             </p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {whyKafu.map((item, i) => (
-              <div key={i} className="flex flex-col items-start" data-testid={`why-kafu-${i}`}>
-                <div className="w-14 h-14 rounded-xl bg-accent/20 text-accent flex items-center justify-center mb-5">
-                  {item.icon}
-                </div>
-                <h3 className="font-serif text-xl font-bold mb-3">{item.title}</h3>
-                <p className="text-primary-foreground/75 text-sm leading-relaxed">{item.body}</p>
+
+          {/* Sliding cards — 3 visible on desktop, 1 on mobile */}
+          <div className="relative">
+            <div className="overflow-hidden">
+              <div
+                className="flex transition-transform duration-700 ease-in-out"
+                style={{ transform: `translateX(calc(-${whyIdx} * (100% / 3)))` }}
+              >
+                {/* Duplicate slides at end for seamless looping feel */}
+                {[...whyKafuSlides, ...whyKafuSlides.slice(0, 3)].map((slide, i) => (
+                  <div
+                    key={i}
+                    className="shrink-0 w-full md:w-1/2 lg:w-1/3 px-3"
+                  >
+                    <Link
+                      href={slide.href}
+                      className="group block relative rounded-2xl overflow-hidden h-80 shadow-xl"
+                      data-testid={slide.testid}
+                    >
+                      <img
+                        src={slide.image}
+                        alt={slide.title}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                      {/* Gradient overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                      {/* Content */}
+                      <div className="absolute inset-0 flex flex-col justify-end p-6">
+                        <span className="inline-block text-xs font-bold uppercase tracking-widest text-accent mb-2 bg-black/30 px-2 py-0.5 rounded w-fit">
+                          {slide.category}
+                        </span>
+                        <h3 className="font-serif text-xl font-bold text-white mb-2 leading-tight group-hover:text-accent transition-colors">
+                          {slide.title}
+                        </h3>
+                        <p className="text-white/75 text-sm leading-relaxed line-clamp-2">
+                          {slide.body}
+                        </p>
+                        <span className="flex items-center gap-1 text-accent text-sm font-semibold mt-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                          Learn more <ChevronRight className="w-4 h-4" />
+                        </span>
+                      </div>
+                    </Link>
+                  </div>
+                ))}
               </div>
+            </div>
+
+            {/* Prev / Next arrows */}
+            <button
+              onClick={() => setWhyIdx((i) => (i - 1 + whyCount) % whyCount)}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 w-10 h-10 rounded-full bg-white/20 hover:bg-accent text-white flex items-center justify-center transition-colors z-10 shadow-lg"
+              aria-label="Previous"
+              data-testid="why-prev"
+            >
+              <ChevronLeft className="w-5 h-5" />
+            </button>
+            <button
+              onClick={() => setWhyIdx((i) => (i + 1) % whyCount)}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 w-10 h-10 rounded-full bg-white/20 hover:bg-accent text-white flex items-center justify-center transition-colors z-10 shadow-lg"
+              aria-label="Next"
+              data-testid="why-next"
+            >
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Dot indicators */}
+          <div className="flex justify-center gap-2 mt-8">
+            {whyKafuSlides.map((_, i) => (
+              <button
+                key={i}
+                onClick={() => setWhyIdx(i)}
+                className={`rounded-full transition-all duration-300 ${
+                  i === whyIdx
+                    ? "w-7 h-2.5 bg-accent"
+                    : "w-2.5 h-2.5 bg-white/30 hover:bg-white/60"
+                }`}
+                aria-label={`Go to slide ${i + 1}`}
+                data-testid={`why-dot-${i}`}
+              />
             ))}
           </div>
         </div>
