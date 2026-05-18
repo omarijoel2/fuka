@@ -48,11 +48,11 @@ export default function Research() {
       {/* Hero */}
       <div className="relative bg-primary text-primary-foreground py-20 md:py-28 overflow-hidden">
         <img
-          src="https://kafu.ac.ke/wp-content/uploads/2025/10/campus-1-scaled.jpg"
+          src="https://kafu.ac.ke/wp-content/uploads/health.jpg"
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover object-center"
-          style={{ filter: "brightness(0.25)" }}
+          style={{ filter: "brightness(0.28)" }}
         />
         <div className="absolute inset-0 bg-primary/80" />
         <div className="relative container mx-auto px-4 z-10">
@@ -100,6 +100,39 @@ export default function Research() {
           </div>
         </div>
       )}
+
+      {/* ─── Research Photo Strip ─── */}
+      <div className="py-10 bg-background overflow-hidden">
+        <div className="container mx-auto px-4 mb-4">
+          <p className="text-xs font-bold uppercase tracking-widest text-primary">Research in Focus</p>
+        </div>
+        <div className="flex gap-3 overflow-x-auto pb-3 px-4 md:px-[max(1rem,calc((100vw-1280px)/2+1rem))] scrollbar-hide snap-x snap-mandatory">
+          {[
+            { src: "https://kafu.ac.ke/wp-content/uploads/health.jpg",                             alt: "Health sciences research" },
+            { src: "https://kafu.ac.ke/wp-content/uploads/2021/01/1.-Student-visual-acuity.jpg",   alt: "Optometry and visual acuity research" },
+            { src: "https://kafu.ac.ke/wp-content/uploads/2021/01/picture2.png",                   alt: "Laboratory research" },
+            { src: "https://kafu.ac.ke/wp-content/uploads/image-82.jpeg",                          alt: "Research collaboration" },
+            { src: "https://kafu.ac.ke/wp-content/uploads/image-87.jpeg",                          alt: "Academic research activity" },
+            { src: "https://kafu.ac.ke/wp-content/uploads/image-93.jpeg",                          alt: "Research and innovation" },
+            { src: "https://kafu.ac.ke/wp-content/uploads/image-31.jpeg",                          alt: "Research event" },
+            { src: "https://kafu.ac.ke/wp-content/uploads/image-39.jpeg",                          alt: "Research community" },
+            { src: "https://kafu.ac.ke/wp-content/uploads/image-43.jpeg",                          alt: "Research activity" },
+            { src: "https://kafu.ac.ke/wp-content/uploads/2026/02/image-8-1.jpeg",                 alt: "Recent research highlight" },
+          ].map((img, i) => (
+            <div
+              key={i}
+              className="shrink-0 snap-start w-56 h-36 md:w-72 md:h-48 rounded-xl overflow-hidden shadow-md"
+            >
+              <img
+                src={img.src}
+                alt={img.alt}
+                className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
+                loading="lazy"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* Research Themes */}
       {!isLoading && (overview?.themes?.length ?? 0) > 0 && (

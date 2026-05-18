@@ -45,7 +45,7 @@ export default function ResearchPartnerships() {
       />
       {/* Header */}
       <div className="relative bg-primary text-primary-foreground py-16 md:py-20 overflow-hidden">
-        <img src="https://kafu.ac.ke/wp-content/uploads/2025/10/campus-1-scaled.jpg" alt="" aria-hidden="true"
+        <img src="https://kafu.ac.ke/wp-content/uploads/image-82.jpeg" alt="" aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover" style={{ filter: "brightness(0.2)" }} />
         <div className="absolute inset-0 bg-primary/80" />
         <div className="relative container mx-auto px-4 z-10">

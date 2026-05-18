@@ -58,7 +58,7 @@ const SLIDES = [
     testid: "hero-slide-2",
   },
   {
-    image: "https://kafu.ac.ke/wp-content/uploads/2025/10/campus-1-scaled.jpg",
+    image: "https://kafu.ac.ke/wp-content/uploads/health.jpg",
     badge: "Research · Innovation · Community Impact",
     headline: "Advancing",
     accent: "Research",
@@ -340,7 +340,7 @@ export default function Home() {
       testid: "why-slide-programmes",
     },
     {
-      image: "https://kafu.ac.ke/wp-content/uploads/2025/10/campus-1-scaled.jpg",
+      image: "https://kafu.ac.ke/wp-content/uploads/2021/01/1.-Student-visual-acuity.jpg",
       category: "Research",
       title: "Research & Innovation",
       body: "Driving solutions in health, environment, and development across Kenya — supported by national and international partnerships.",
