@@ -48,7 +48,7 @@ const SLIDES = [
     testid: "hero-slide-1",
   },
   {
-    image: "https://kafu.ac.ke/wp-content/uploads/2025/10/img8696.jpg",
+    image: "https://kafu.ac.ke/wp-content/uploads/2025/10/arial-view-e-1.jpg",
     badge: "Modern Infrastructure · Kaimosi Highlands",
     headline: "Built for",
     accent: "Excellence",
