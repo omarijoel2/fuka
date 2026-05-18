@@ -80,7 +80,19 @@ const navItems = [
       { name: "Our Partners",        path: "/international/partnerships" },
     ],
   },
-  { name: "Opportunities", path: "/opportunities" },
+  {
+    name: "Opportunities",
+    path: "/opportunities",
+    children: [
+      { name: "All Opportunities",      path: "/opportunities" },
+      { name: "Tenders",                path: "/opportunities?category=tender" },
+      { name: "Vacancies",              path: "/opportunities?category=vacancy" },
+      { name: "Internships",            path: "/opportunities?category=internship" },
+      { name: "Calls for Applications", path: "/opportunities?category=call" },
+      { name: "Scholarships",           path: "/opportunities?category=scholarship" },
+      { name: "Notices",                path: "/opportunities?category=notice" },
+    ],
+  },
   { name: "Contact",       path: "/contact" },
 ];
 

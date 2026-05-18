@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Link } from "wouter";
+import { useState, useMemo, useEffect } from "react";
+import { Link, useSearch } from "wouter";
 import { useOpportunities } from "@/lib/api-hooks";
 import type { Opportunity } from "@/lib/api-types";
 import { SeoHead } from "@/components/seo-head";
@@ -174,8 +174,16 @@ function EmptyState({ category }: { category: string }) {
 }
 
 export default function Opportunities() {
-  const [activeCategory, setActiveCategory] = useState("all");
+  const urlSearch = useSearch();
+  const [activeCategory, setActiveCategory] = useState(
+    () => new URLSearchParams(urlSearch).get("category") ?? "all"
+  );
   const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    const cat = new URLSearchParams(urlSearch).get("category") ?? "all";
+    setActiveCategory(cat);
+  }, [urlSearch]);
   const [searchInput, setSearchInput] = useState("");
   const [showArchive, setShowArchive] = useState(false);
 

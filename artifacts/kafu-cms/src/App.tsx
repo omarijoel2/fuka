@@ -1,6 +1,7 @@
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { CmsLayout } from "@/components/layout";
+import { AccessDenied } from "@/components/access-denied";
 import LoginPage from "@/pages/login";
 import DashboardPage from "@/pages/dashboard";
 import ContentLibraryPage from "@/pages/content-library";
@@ -33,6 +34,36 @@ import ContentHealthPage from "@/pages/content-health";
 import WorkflowConsolePage from "@/pages/workflow-console";
 import AdmissionsCmsPage from "@/pages/admissions-cms";
 
+// ─── Role constants ───────────────────────────────────────────────────────────
+const ADMIN_ROLES    = ["super_admin", "ict_admin", "communications_admin"];
+const REVIEWER_ROLES = [...ADMIN_ROLES, "reviewer"];
+
+// ─── Route-level RBAC guard ───────────────────────────────────────────────────
+function RequireRole({
+  roles,
+  children,
+}: {
+  roles: string[];
+  children: React.ReactNode;
+}) {
+  const { user } = useAuth();
+  if (user && !roles.includes(user.role)) {
+    return (
+      <AccessDenied
+        message="You do not have permission to access this section."
+        requiredRole={
+          roles.includes("super_admin") && roles.length === 1
+            ? "Super Admin"
+            : roles.includes("reviewer")
+            ? "Reviewer or above"
+            : "Administrator"
+        }
+      />
+    );
+  }
+  return <>{children}</>;
+}
+
 function AppRoutes() {
   const { user } = useAuth();
 
@@ -43,39 +74,229 @@ function AppRoutes() {
   return (
     <CmsLayout>
       <Switch>
+        {/* ── Open to all authenticated CMS users ── */}
         <Route path="/" component={DashboardPage} />
         <Route path="/content" component={ContentLibraryPage} />
         <Route path="/content/new">{() => <ContentEditorPage />}</Route>
         <Route path="/content/:id">{(params: { id: string }) => <ContentEditorPage id={params.id} />}</Route>
-        <Route path="/review-queue" component={ReviewQueuePage} />
         <Route path="/media" component={MediaLibraryPage} />
-        <Route path="/users" component={UsersPage} />
-        <Route path="/taxonomy" component={TaxonomyPage} />
-        <Route path="/audit" component={AuditLogPage} />
-        <Route path="/site-settings" component={SiteSettingsPage} />
-        <Route path="/settings" component={SettingsPage} />
-        <Route path="/research/themes" component={ResearchThemesPage} />
-        <Route path="/research/projects" component={ResearchProjectsCmsPage} />
-        <Route path="/research/publications" component={ResearchPublicationsCmsPage} />
-        <Route path="/research/grants" component={ResearchGrantsCmsPage} />
-        <Route path="/research/partners" component={ResearchPartnersCmsPage} />
-        <Route path="/international/partnerships" component={InternationalPartnershipsCmsPage} />
-        <Route path="/international/exchange" component={ExchangeProgrammesCmsPage} />
-        <Route path="/repository" component={RepositoryCmsPage} />
-        <Route path="/staff-profiles" component={StaffProfilesCmsPage} />
-        <Route path="/campuses" component={CampusesCmsPage} />
-        <Route path="/offices" component={OfficesCmsPage} />
-        <Route path="/staff-review" component={StaffReviewCmsPage} />
-        <Route path="/staff-accounts" component={StaffAccountsCmsPage} />
-        <Route path="/homepage" component={HomepageManagerPage} />
-        <Route path="/navigation" component={NavigationManagerPage} />
-        <Route path="/site-controls" component={SiteControlsPage} />
-        <Route path="/redirects" component={RedirectsCmsPage} />
-        <Route path="/content-health" component={ContentHealthPage} />
-        <Route path="/admissions" component={AdmissionsCmsPage} />
-        <Route path="/admissions/programmes" component={AdmissionsCmsPage} />
-        <Route path="/admissions/settings" component={AdmissionsCmsPage} />
-        <Route path="/workflow" component={WorkflowConsolePage} />
+
+        {/* ── Reviewer + Admin ── */}
+        <Route path="/review-queue">
+          {() => (
+            <RequireRole roles={REVIEWER_ROLES}>
+              <ReviewQueuePage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/audit">
+          {() => (
+            <RequireRole roles={REVIEWER_ROLES}>
+              <AuditLogPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/workflow">
+          {() => (
+            <RequireRole roles={REVIEWER_ROLES}>
+              <WorkflowConsolePage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/content-health">
+          {() => (
+            <RequireRole roles={REVIEWER_ROLES}>
+              <ContentHealthPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* ── Admin only ── */}
+        <Route path="/users">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <UsersPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/taxonomy">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <TaxonomyPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/settings">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <SettingsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/site-settings">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <SiteSettingsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* Research Office */}
+        <Route path="/research/themes">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <ResearchThemesPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/research/projects">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <ResearchProjectsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/research/publications">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <ResearchPublicationsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/research/grants">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <ResearchGrantsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/research/partners">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <ResearchPartnersCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* International Office */}
+        <Route path="/international/partnerships">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <InternationalPartnershipsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/international/exchange">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <ExchangeProgrammesCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* Repository */}
+        <Route path="/repository">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <RepositoryCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* Academic Profiles */}
+        <Route path="/staff-profiles">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <StaffProfilesCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/staff-review">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <StaffReviewCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/staff-accounts">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <StaffAccountsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* Contact & Campus */}
+        <Route path="/campuses">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <CampusesCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/offices">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <OfficesCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* Site Controls */}
+        <Route path="/homepage">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <HomepageManagerPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/navigation">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <NavigationManagerPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/site-controls">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <SiteControlsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* SEO & Redirects */}
+        <Route path="/redirects">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <RedirectsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* Admissions */}
+        <Route path="/admissions">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <AdmissionsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/admissions/programmes">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <AdmissionsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/admissions/settings">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <AdmissionsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+
         <Route>{() => <DashboardPage />}</Route>
       </Switch>
     </CmsLayout>
