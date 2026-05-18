@@ -33,7 +33,7 @@ const SLIDES = [
     headline: "Spring of",
     accent: "Knowledge",
     body: "Kaimosi Friends University — a premier institution in Western Kenya dedicated to truth, service, and academic excellence. Join over 5,000 students shaping Kenya's future.",
-    cta1: { label: "Apply for Admissions", href: "https://portal.kafu.ac.ke", external: true },
+    cta1: { label: "Apply for Admissions", href: "/admissions", external: false },
     cta2: { label: "Explore Programmes", href: "/programmes", external: false },
     testid: "hero-slide-0",
   },
@@ -44,8 +44,18 @@ const SLIDES = [
     accent: "Programmes",
     body: "From Optometry to Computer Science, Education to Business — KAFU offers over 60 nationally accredited programmes, preparing graduates for a competitive and changing world.",
     cta1: { label: "Browse Programmes", href: "/programmes", external: false },
-    cta2: { label: "Check Eligibility", href: "/admissions/eligibility", external: false },
+    cta2: { label: "Admissions Guide", href: "/admissions", external: false },
     testid: "hero-slide-1",
+  },
+  {
+    image: "https://kafu.ac.ke/wp-content/uploads/2025/10/img8696.jpg",
+    badge: "Modern Infrastructure · Kaimosi Highlands",
+    headline: "Built for",
+    accent: "Excellence",
+    body: "State-of-the-art lecture halls, laboratories, and learning spaces set amidst the serene highlands of Kaimosi — an environment designed to inspire academic achievement.",
+    cta1: { label: "About KAFU", href: "/about", external: false },
+    cta2: { label: "Visit Campus", href: "/contact", external: false },
+    testid: "hero-slide-2",
   },
   {
     image: "https://kafu.ac.ke/wp-content/uploads/2025/10/campus-1-scaled.jpg",
@@ -55,7 +65,17 @@ const SLIDES = [
     body: "KAFU's research centres are driving solutions in health, environment, and development across Kenya and beyond — supported by national and international partnerships.",
     cta1: { label: "Explore Research", href: "/research", external: false },
     cta2: { label: "International Programmes", href: "/international", external: false },
-    testid: "hero-slide-2",
+    testid: "hero-slide-3",
+  },
+  {
+    image: "https://kafu.ac.ke/wp-content/uploads/2025/10/undergraduate-fin.jpg",
+    badge: "Student Life · Clubs · Community",
+    headline: "Shaping",
+    accent: "Tomorrow's Leaders",
+    body: "Thousands of undergraduate students are discovering their potential at KAFU — through rigorous academics, hands-on learning, and a vibrant campus community.",
+    cta1: { label: "Apply Now", href: "/admissions", external: false },
+    cta2: { label: "Student Services", href: "/student-services", external: false },
+    testid: "hero-slide-4",
   },
   {
     image: "https://kafu.ac.ke/wp-content/uploads/Vice-Chancellor-Prof.-Peter-Mwita-addresses-fourth-year-teacher-trainees-during-the-opening-of-the-Competency-Based-Education-CBE-training-at-Kaimosi-Friends-University.jpg",
@@ -65,7 +85,17 @@ const SLIDES = [
     body: "Under the leadership of Vice-Chancellor Prof. Peter Mwita, KAFU is transforming into a globally competitive university — driven by innovation, integrity, and a commitment to the people of Kenya.",
     cta1: { label: "Meet Our Team", href: "/staff", external: false },
     cta2: { label: "About KAFU", href: "/about", external: false },
-    testid: "hero-slide-3",
+    testid: "hero-slide-5",
+  },
+  {
+    image: "https://kafu.ac.ke/wp-content/uploads/2025/10/sports.jpg",
+    badge: "Sports · Recreation · Student Wellness",
+    headline: "Compete,",
+    accent: "Grow, Excel",
+    body: "From inter-university tournaments to fitness and recreation, KAFU nurtures the whole student — balancing academic rigour with sport, culture, and community involvement.",
+    cta1: { label: "Student Life", href: "/student-services", external: false },
+    cta2: { label: "Admissions Open", href: "/admissions", external: false },
+    testid: "hero-slide-6",
   },
   {
     image: "https://kafu.ac.ke/wp-content/uploads/2025/10/art-culture.jpg",
@@ -75,7 +105,7 @@ const SLIDES = [
     body: "Experience rich campus life in the lush highlands of Kaimosi — where friendships form, talents flourish, and futures are forged in the spirit of service and truth.",
     cta1: { label: "Admissions Open", href: "/admissions", external: false },
     cta2: { label: "About KAFU", href: "/about", external: false },
-    testid: "hero-slide-4",
+    testid: "hero-slide-7",
   },
 ];
 
@@ -437,95 +467,96 @@ export default function Home() {
       {/* ─── HERO CAROUSEL ─── */}
       <HeroCarousel stats={stats} statsLoading={statsLoading} />
 
-      {/* ─── PROGRAMME DISCOVERY ─── */}
-      <section className="py-20 bg-background" id="programmes">
+      {/* ─── NEWS, EVENTS & ANNOUNCEMENTS ─── */}
+      <section className="py-20 bg-secondary/40 border-y">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary mb-4">Find Your Programme</h2>
-            <p className="text-muted-foreground max-w-xl mx-auto">
-              Search across 38+ programmes spanning Education, Business, Computing, Science, and Health Sciences.
-            </p>
-          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
 
-          {/* Search & Filters */}
-          <div className="flex flex-col md:flex-row gap-3 mb-8 max-w-4xl mx-auto">
-            <div className="relative flex-1">
-              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input
-                type="text"
-                value={progSearch}
-                onChange={(e) => setProgSearch(e.target.value)}
-                placeholder="Search programmes or codes..."
-                className="w-full pl-10 pr-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
-                data-testid="input-programme-search"
-              />
+            {/* News — 2/3 width */}
+            <div className="lg:col-span-2">
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl md:text-3xl font-serif font-bold text-primary">University News</h2>
+                <Button variant="ghost" className="text-primary" asChild data-testid="link-all-news">
+                  <Link href="/news">
+                    All News <ArrowRight className="ml-1 w-4 h-4" />
+                  </Link>
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {newsLoading
+                  ? Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="h-56 bg-muted rounded-xl animate-pulse" />
+                    ))
+                  : latestNews.map((article) => (
+                      <Link key={article.id} href="/news" data-testid={`card-news-${article.id}`}>
+                        <div className="group rounded-xl overflow-hidden bg-card border hover:shadow-md hover:border-primary/30 transition-all h-full flex flex-col">
+                          <div className="p-5 flex flex-col flex-1">
+                            <div className="flex items-center gap-3 mb-3">
+                              <span className="text-xs font-semibold text-accent uppercase tracking-wider bg-accent/10 px-2 py-0.5 rounded">
+                                {article.category}
+                              </span>
+                              <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {new Date(article.date).toLocaleDateString("en-GB", {
+                                  day: "numeric",
+                                  month: "short",
+                                  year: "numeric",
+                                })}
+                              </span>
+                            </div>
+                            <h3 className="text-base font-bold mb-2 font-serif group-hover:text-primary transition-colors line-clamp-3 flex-1">
+                              {article.title}
+                            </h3>
+                            <p className="text-xs text-muted-foreground line-clamp-2">{article.excerpt}</p>
+                          </div>
+                        </div>
+                      </Link>
+                    ))}
+              </div>
             </div>
-            <select
-              value={progLevel}
-              onChange={(e) => setProgLevel(e.target.value)}
-              className="px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white min-w-[160px]"
-              data-testid="select-programme-level"
-            >
-              <option value="">All Levels</option>
-              <option value="undergraduate">Undergraduate</option>
-              <option value="postgraduate">Postgraduate</option>
-              <option value="doctoral">Doctoral</option>
-            </select>
-            <select
-              value={progSchool}
-              onChange={(e) => setProgSchool(e.target.value)}
-              className="px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white min-w-[160px]"
-              data-testid="select-programme-school"
-            >
-              <option value="">All Schools</option>
-              <option value="SESS">SESS — Education</option>
-              <option value="SBE">SBE — Business</option>
-              <option value="SCIT">SCIT — Computing</option>
-              <option value="SOS">SOS — Science</option>
-              <option value="SHS">SHS — Health Sciences</option>
-            </select>
-          </div>
 
-          {/* Programme Cards */}
-          {filteredProgrammes.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto mb-8">
-              {filteredProgrammes.map((prog, i) => (
-                <Link
-                  key={i}
-                  href={`/programmes`}
-                  className="group flex items-start gap-4 p-5 rounded-xl border bg-card hover:border-primary hover:shadow-md transition-all"
-                  data-testid={`card-programme-${prog.code.replace(/\s+/g, "-")}`}
-                >
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
-                    <GraduationCap className="w-5 h-5" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
-                      {prog.name}
-                    </p>
-                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                      <span className="text-xs bg-primary/5 text-primary px-2 py-0.5 rounded font-medium">{prog.code}</span>
-                      <span className="text-xs text-muted-foreground capitalize">{levelLabels[prog.level] ?? prog.level}</span>
-                      <span className="text-xs text-muted-foreground">{prog.duration}</span>
-                    </div>
-                  </div>
-                </Link>
-              ))}
+            {/* Events — 1/3 width */}
+            <div>
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-2xl md:text-3xl font-serif font-bold text-primary">Upcoming Events</h2>
+                <Button variant="ghost" className="text-primary" asChild data-testid="link-all-events">
+                  <Link href="/events">All</Link>
+                </Button>
+              </div>
+              <div className="space-y-4">
+                {eventsLoading
+                  ? Array.from({ length: 4 }).map((_, i) => (
+                      <div key={i} className="h-24 bg-muted rounded-xl animate-pulse" />
+                    ))
+                  : upcomingEvents.map((event) => (
+                      <div
+                        key={event.id}
+                        className="group p-4 rounded-xl border bg-card hover:border-primary/50 hover:shadow-sm transition-all flex gap-4"
+                        data-testid={`card-event-${event.id}`}
+                      >
+                        <div className="flex flex-col items-center justify-center min-w-[3rem] p-2 bg-primary/5 rounded-lg group-hover:bg-primary group-hover:text-white transition-colors text-primary">
+                          <span className="text-[10px] font-bold uppercase">
+                            {new Date(event.date).toLocaleDateString("en-US", { month: "short" })}
+                          </span>
+                          <span className="text-xl font-bold font-serif">{new Date(event.date).getDate()}</span>
+                        </div>
+                        <div className="min-w-0">
+                          <h4 className="font-semibold text-sm font-serif text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                            {event.title}
+                          </h4>
+                          <div className="flex flex-col gap-0.5 mt-1.5 text-xs text-muted-foreground">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3 shrink-0" /> {event.time}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-3 h-3 shrink-0" /> {event.location}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+              </div>
             </div>
-          ) : (
-            <div className="text-center py-12 text-muted-foreground max-w-sm mx-auto">
-              <Search className="w-10 h-10 mx-auto mb-3 opacity-30" />
-              <p className="font-medium">No programmes found</p>
-              <p className="text-sm mt-1">Try adjusting your search or filters</p>
-            </div>
-          )}
-
-          <div className="text-center">
-            <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white" asChild data-testid="link-view-all-programmes">
-              <Link href="/programmes">
-                View Full Programme Catalogue <ArrowRight className="ml-2 w-4 h-4" />
-              </Link>
-            </Button>
           </div>
         </div>
       </section>
@@ -679,96 +710,95 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── NEWS, EVENTS & ANNOUNCEMENTS ─── */}
-      <section className="py-20 bg-secondary/40 border-y">
+      {/* ─── PROGRAMME DISCOVERY ─── */}
+      <section className="py-20 bg-background" id="programmes">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary mb-4">Find Your Programme</h2>
+            <p className="text-muted-foreground max-w-xl mx-auto">
+              Search across 38+ programmes spanning Education, Business, Computing, Science, and Health Sciences.
+            </p>
+          </div>
 
-            {/* News — 2/3 width */}
-            <div className="lg:col-span-2">
-              <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl md:text-3xl font-serif font-bold text-primary">University News</h2>
-                <Button variant="ghost" className="text-primary" asChild data-testid="link-all-news">
-                  <Link href="/news">
-                    All News <ArrowRight className="ml-1 w-4 h-4" />
-                  </Link>
-                </Button>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                {newsLoading
-                  ? Array.from({ length: 4 }).map((_, i) => (
-                      <div key={i} className="h-56 bg-muted rounded-xl animate-pulse" />
-                    ))
-                  : latestNews.map((article) => (
-                      <Link key={article.id} href="/news" data-testid={`card-news-${article.id}`}>
-                        <div className="group rounded-xl overflow-hidden bg-card border hover:shadow-md hover:border-primary/30 transition-all h-full flex flex-col">
-                          <div className="p-5 flex flex-col flex-1">
-                            <div className="flex items-center gap-3 mb-3">
-                              <span className="text-xs font-semibold text-accent uppercase tracking-wider bg-accent/10 px-2 py-0.5 rounded">
-                                {article.category}
-                              </span>
-                              <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {new Date(article.date).toLocaleDateString("en-GB", {
-                                  day: "numeric",
-                                  month: "short",
-                                  year: "numeric",
-                                })}
-                              </span>
-                            </div>
-                            <h3 className="text-base font-bold mb-2 font-serif group-hover:text-primary transition-colors line-clamp-3 flex-1">
-                              {article.title}
-                            </h3>
-                            <p className="text-xs text-muted-foreground line-clamp-2">{article.excerpt}</p>
-                          </div>
-                        </div>
-                      </Link>
-                    ))}
-              </div>
+          {/* Search & Filters */}
+          <div className="flex flex-col md:flex-row gap-3 mb-8 max-w-4xl mx-auto">
+            <div className="relative flex-1">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type="text"
+                value={progSearch}
+                onChange={(e) => setProgSearch(e.target.value)}
+                placeholder="Search programmes or codes..."
+                className="w-full pl-10 pr-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                data-testid="input-programme-search"
+              />
             </div>
+            <select
+              value={progLevel}
+              onChange={(e) => setProgLevel(e.target.value)}
+              className="px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white min-w-[160px]"
+              data-testid="select-programme-level"
+            >
+              <option value="">All Levels</option>
+              <option value="undergraduate">Undergraduate</option>
+              <option value="postgraduate">Postgraduate</option>
+              <option value="doctoral">Doctoral</option>
+            </select>
+            <select
+              value={progSchool}
+              onChange={(e) => setProgSchool(e.target.value)}
+              className="px-4 py-3 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white min-w-[160px]"
+              data-testid="select-programme-school"
+            >
+              <option value="">All Schools</option>
+              <option value="SESS">SESS — Education</option>
+              <option value="SBE">SBE — Business</option>
+              <option value="SCIT">SCIT — Computing</option>
+              <option value="SOS">SOS — Science</option>
+              <option value="SHS">SHS — Health Sciences</option>
+            </select>
+          </div>
 
-            {/* Events — 1/3 width */}
-            <div>
-              <div className="flex justify-between items-center mb-8">
-                <h2 className="text-2xl md:text-3xl font-serif font-bold text-primary">Upcoming Events</h2>
-                <Button variant="ghost" className="text-primary" asChild data-testid="link-all-events">
-                  <Link href="/events">All</Link>
-                </Button>
-              </div>
-              <div className="space-y-4">
-                {eventsLoading
-                  ? Array.from({ length: 4 }).map((_, i) => (
-                      <div key={i} className="h-24 bg-muted rounded-xl animate-pulse" />
-                    ))
-                  : upcomingEvents.map((event) => (
-                      <div
-                        key={event.id}
-                        className="group p-4 rounded-xl border bg-card hover:border-primary/50 hover:shadow-sm transition-all flex gap-4"
-                        data-testid={`card-event-${event.id}`}
-                      >
-                        <div className="flex flex-col items-center justify-center min-w-[3rem] p-2 bg-primary/5 rounded-lg group-hover:bg-primary group-hover:text-white transition-colors text-primary">
-                          <span className="text-[10px] font-bold uppercase">
-                            {new Date(event.date).toLocaleDateString("en-US", { month: "short" })}
-                          </span>
-                          <span className="text-xl font-bold font-serif">{new Date(event.date).getDate()}</span>
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="font-semibold text-sm font-serif text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                            {event.title}
-                          </h4>
-                          <div className="flex flex-col gap-0.5 mt-1.5 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <Calendar className="w-3 h-3 shrink-0" /> {event.time}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-3 h-3 shrink-0" /> {event.location}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-              </div>
+          {/* Programme Cards */}
+          {filteredProgrammes.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto mb-8">
+              {filteredProgrammes.map((prog, i) => (
+                <Link
+                  key={i}
+                  href={`/programmes`}
+                  className="group flex items-start gap-4 p-5 rounded-xl border bg-card hover:border-primary hover:shadow-md transition-all"
+                  data-testid={`card-programme-${prog.code.replace(/\s+/g, "-")}`}
+                >
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
+                    <GraduationCap className="w-5 h-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+                      {prog.name}
+                    </p>
+                    <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                      <span className="text-xs bg-primary/5 text-primary px-2 py-0.5 rounded font-medium">{prog.code}</span>
+                      <span className="text-xs text-muted-foreground capitalize">{levelLabels[prog.level] ?? prog.level}</span>
+                      <span className="text-xs text-muted-foreground">{prog.duration}</span>
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
+          ) : (
+            <div className="text-center py-12 text-muted-foreground max-w-sm mx-auto">
+              <Search className="w-10 h-10 mx-auto mb-3 opacity-30" />
+              <p className="font-medium">No programmes found</p>
+              <p className="text-sm mt-1">Try adjusting your search or filters</p>
+            </div>
+          )}
+
+          <div className="text-center">
+            <Button variant="outline" className="border-primary text-primary hover:bg-primary hover:text-white" asChild data-testid="link-view-all-programmes">
+              <Link href="/programmes">
+                View Full Programme Catalogue <ArrowRight className="ml-2 w-4 h-4" />
+              </Link>
+            </Button>
           </div>
         </div>
       </section>
