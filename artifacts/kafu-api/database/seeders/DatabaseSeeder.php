@@ -22,5 +22,6 @@ class DatabaseSeeder extends Seeder
         $this->call(InternationalSeeder::class);
         $this->call(RepositorySeeder::class);
         $this->call(AdmissionsModuleSeeder::class);
+        $this->call(KuccpsModuleSeeder::class);
     }
 }

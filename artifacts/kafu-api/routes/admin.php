@@ -1663,6 +1663,79 @@ Route::prefix('admin')->group(function () {
         });
     });
 
+    // =========================================================================
+    // KUCCPS IMPORT MODULE
+    // =========================================================================
+    Route::prefix('kuccps')->middleware('auth:sanctum')->group(function () {
+        $ic = \App\Http\Controllers\Admin\KuccpsImportController::class;
+
+        Route::post('/import-batches/upload',                     [$ic, 'upload']);
+        Route::get('/import-batches',                             [$ic, 'index']);
+        Route::get('/import-batches/{batch}',                     [$ic, 'show']);
+        Route::get('/import-batches/{batch}/sheets',              [$ic, 'sheets']);
+        Route::post('/import-batches/{batch}/select-sheet',       [$ic, 'selectSheet']);
+        Route::get('/import-batches/{batch}/preview',             [$ic, 'preview']);
+        Route::post('/import-batches/{batch}/map-columns',        [$ic, 'mapColumns']);
+        Route::post('/import-batches/{batch}/validate',           [$ic, 'validate']);
+        Route::get('/import-batches/{batch}/validation-report',   [$ic, 'validationReport']);
+        Route::post('/import-batches/{batch}/resolve-programme',  [$ic, 'resolveProgramme']);
+        Route::post('/import-batches/{batch}/approve',            [$ic, 'approve']);
+        Route::post('/import-batches/{batch}/import',             [$ic, 'import']);
+        Route::post('/import-batches/{batch}/rollback',           [$ic, 'rollback']);
+        Route::post('/import-batches/{batch}/generate-letters',   [$ic, 'generateLetters']);
+        Route::get('/import-batches/{batch}/placements',          [$ic, 'placements']);
+
+        // Mapping templates
+        $mt = \App\Http\Controllers\Admin\KuccpsMappingTemplateController::class;
+        Route::get('/mapping-templates',          [$mt, 'index']);
+        Route::post('/mapping-templates',         [$mt, 'store']);
+        Route::patch('/mapping-templates/{template}', [$mt, 'update']);
+        Route::delete('/mapping-templates/{template}', [$mt, 'destroy']);
+    });
+
+    // Programme aliases
+    Route::prefix('programme-aliases')->middleware('auth:sanctum')->group(function () {
+        $pa = \App\Http\Controllers\Admin\ProgrammeAliasController::class;
+        Route::get('/',            [$pa, 'index']);
+        Route::post('/',           [$pa, 'store']);
+        Route::patch('/{alias}',   [$pa, 'update']);
+        Route::delete('/{alias}',  [$pa, 'destroy']);
+    });
+
+    // Admission letter templates + admin letter actions
+    Route::prefix('admission-letter-templates')->middleware('auth:sanctum')->group(function () {
+        $al = \App\Http\Controllers\Admin\AdmissionLetterAdminController::class;
+        Route::get('/',                [$al, 'templates']);
+        Route::post('/',               [$al, 'storeTemplate']);
+        Route::patch('/{template}',    [$al, 'updateTemplate']);
+    });
+    Route::prefix('admission-letters')->middleware('auth:sanctum')->group(function () {
+        $al = \App\Http\Controllers\Admin\AdmissionLetterAdminController::class;
+        Route::post('/generate/{placement}',   [$al, 'generateForPlacement']);
+        Route::get('/{letter}',                [$al, 'show']);
+        Route::post('/{letter}/revoke',        [$al, 'revoke']);
+        Route::get('/{letter}/download',       [$al, 'download']);
+    });
+
+    // Admin programmes listing (for resolving unmatched)
+    Route::get('/programmes/catalogue', function () {
+        return response()->json(
+            \App\Models\AdmissionProgramme::where('is_active', true)
+                ->select('id','programme_code','programme_name','school_code','level','department')
+                ->orderBy('school_code')->orderBy('programme_name')
+                ->get()
+        );
+    })->middleware('auth:sanctum');
+
+    // Admin intakes listing
+    Route::get('/admissions/intakes', function () {
+        return response()->json(
+            \App\Models\AdmissionIntake::orderByDesc('created_at')
+                ->select('id','name','academic_year','intake_period','status')
+                ->get()
+        );
+    })->middleware('auth:sanctum');
+
 });
 
 function updateApplicationStatus(string $ref, string $toStatus, ?string $reason, int $userId, array $extra = []) {

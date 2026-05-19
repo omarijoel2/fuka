@@ -4350,42 +4350,11 @@ Route::prefix('admissions-app')->group(function () {
         return response()->json(['data' => $programmes]);
     });
 
-    // ── KUCCPS Verification ───────────────────────────────────────────────────
-    Route::post('/kuccps/verify', function (Illuminate\Http\Request $request) {
-        $data = $request->validate([
-            'kcse_index_number' => 'required|string',
-            'kcse_year'         => 'required|string',
-            'id_document_number' => 'required|string',
-        ]);
-
-        $placement = \Illuminate\Support\Facades\DB::table('kuccps_placements')
-            ->where('kcse_index_number', $data['kcse_index_number'])
-            ->where('kcse_year',         $data['kcse_year'])
-            ->where(function ($q) use ($data) {
-                $q->where('id_document_number', $data['id_document_number'])
-                  ->orWhereNull('id_document_number');
-            })
-            ->whereIn('status', ['unverified', 'verified'])
-            ->first();
-
-        if (!$placement) {
-            return response()->json([
-                'verified' => false,
-                'message'  => 'We could not verify your KUCCPS placement. Please check your details or contact Admissions Office.',
-            ]);
-        }
-
-        $programme = \Illuminate\Support\Facades\DB::table('admission_programmes')
-            ->where('programme_code', $placement->programme_code)
-            ->first();
-
-        return response()->json([
-            'verified'      => true,
-            'placement_id'  => $placement->id,
-            'programme'     => $programme,
-            'placement'     => $placement,
-        ]);
-    });
+    // ── KUCCPS Student Verification Portal ───────────────────────────────────
+    $kv = \App\Http\Controllers\KuccpsVerificationController::class;
+    Route::post('/kuccps/verify-placement',                              [$kv, 'verify'])->middleware('throttle:10,1');
+    Route::get('/kuccps/placement/{token}',                              [$kv, 'placementDetails']);
+    Route::get('/kuccps/admission-letter/{token}/download',              [$kv, 'downloadLetter']);
 });
 
 // =============================================================================

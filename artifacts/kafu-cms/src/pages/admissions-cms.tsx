@@ -757,156 +757,150 @@ function ApplicationsTab() {
 }
 
 // ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
-// ── Tab: KUCCPS Import ────────────────────────────────────────────────────────
+// ── Tab: KUCCPS Import (Dashboard + Wizard launcher) ─────────────────────────
 // ── ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ ──
 
+const KUCCPS_STATUS: Record<string, { label: string; cls: string }> = {
+  uploaded:                 { label: "Uploaded",            cls: "bg-gray-100 text-gray-700" },
+  mapping_in_progress:      { label: "Mapping",             cls: "bg-blue-100 text-blue-700" },
+  mapped:                   { label: "Mapped",              cls: "bg-blue-100 text-blue-700" },
+  validation_failed:        { label: "Validation Failed",   cls: "bg-red-100 text-red-700" },
+  validation_passed:        { label: "Validated",           cls: "bg-amber-100 text-amber-800" },
+  awaiting_approval:        { label: "Awaiting Approval",   cls: "bg-yellow-100 text-yellow-800" },
+  approved:                 { label: "Approved",            cls: "bg-emerald-100 text-emerald-700" },
+  import_queued:            { label: "Import Queued",       cls: "bg-cyan-100 text-cyan-700" },
+  importing:                { label: "Importing",           cls: "bg-cyan-100 text-cyan-700" },
+  imported:                 { label: "Imported",            cls: "bg-emerald-100 text-emerald-700" },
+  imported_with_exceptions: { label: "Imported (Exceptions)", cls: "bg-orange-100 text-orange-700" },
+  rolled_back:              { label: "Rolled Back",         cls: "bg-red-100 text-red-700" },
+  cancelled:                { label: "Cancelled",           cls: "bg-gray-100 text-gray-500" },
+};
+
+interface KuccpsBatchFull {
+  id: number;
+  batch_reference: string;
+  original_filename: string;
+  status: string;
+  academic_year?: string;
+  total_rows: number;
+  valid_rows: number;
+  invalid_rows: number;
+  imported_rows: number;
+  created_at: string;
+  approved_at?: string;
+}
+
 function KuccpsTab() {
-  const [batches, setBatches] = useState<KuccpsBatch[]>([]);
+  const [, navigate] = useLocation();
+  const [batches, setBatches] = useState<KuccpsBatchFull[]>([]);
   const [loading, setLoading] = useState(true);
-  const [uploading, setUploading] = useState(false);
-  const [uploadError, setUploadError] = useState("");
-  const [uploadSuccess, setUploadSuccess] = useState("");
-  const [academicYear, setAcademicYear] = useState("2025/2026");
-  const [intakePeriod, setIntakePeriod] = useState("September");
-  const fileRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await apiFetch("/admin/admissions/kuccps/batches");
-      setBatches(data.data ?? []);
+      const data = await apiFetch("/kuccps/import-batches");
+      setBatches(data.batches ?? data.data ?? []);
     } finally { setLoading(false); }
   }, []);
 
   useEffect(() => { load(); }, [load]);
 
-  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.name.endsWith(".csv")) { setUploadError("Only CSV files are accepted."); return; }
-    setUploading(true); setUploadError(""); setUploadSuccess("");
-    try {
-      const fd = new FormData();
-      fd.append("file", file);
-      fd.append("academic_year", academicYear);
-      fd.append("intake_period", intakePeriod);
-      const res = await fetch("/api/admin/admissions/kuccps/import", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${localStorage.getItem("kafu_cms_token") ?? ""}` },
-        body: fd,
-      });
-      const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Upload failed");
-      setUploadSuccess(`Import started: ${json.total_rows} rows queued for processing. Batch ID: ${json.batch_id}`);
-      await load();
-    } catch (err: unknown) {
-      setUploadError(err instanceof Error ? err.message : "Upload failed");
-    } finally {
-      setUploading(false);
-      if (fileRef.current) fileRef.current.value = "";
-    }
-  }
-
-  const BATCH_STATUS_CONFIG: Record<string, { label: string; cls: string }> = {
-    pending:    { label: "Pending",    cls: "bg-gray-100 text-gray-600" },
-    processing: { label: "Processing", cls: "bg-blue-100 text-blue-700" },
-    completed:  { label: "Completed",  cls: "bg-emerald-100 text-emerald-700" },
-    failed:     { label: "Failed",     cls: "bg-red-100 text-red-700" },
-  };
+  const resumableStatuses = new Set(["uploaded","mapping_in_progress","mapped","validation_failed","validation_passed","awaiting_approval","approved","import_queued"]);
 
   return (
-    <div className="max-w-3xl space-y-6">
-      {/* Upload card */}
-      <div className="border border-gray-200 rounded-xl overflow-hidden">
-        <div className="bg-gray-50 px-5 py-3 border-b flex items-center gap-2">
-          <FileUp className="w-4 h-4 text-[#1A5C38]" />
-          <span className="font-semibold text-sm text-gray-800">Import KUCCPS Placement Data (CSV)</span>
+    <div className="max-w-4xl space-y-6">
+      {/* Action bar */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h3 className="font-semibold text-gray-800">KUCCPS Placement Import</h3>
+          <p className="text-sm text-gray-500 mt-0.5">Upload, map, validate, and import KUCCPS placement data using the guided wizard</p>
         </div>
-        <div className="p-5 space-y-4">
-          <div className="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm text-amber-800">
-            Upload a CSV file exported from the KUCCPS portal. Required columns: <code className="font-mono text-xs bg-amber-100 px-1 rounded">kcse_index_number, student_name, institution_code, programme_code, cluster_points</code>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <FormField label="Academic Year">
-              <input value={academicYear} onChange={(e) => setAcademicYear(e.target.value)}
-                placeholder="e.g. 2025/2026"
-                className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="kuccps-year" />
-            </FormField>
-            <FormField label="Intake Period">
-              <select value={intakePeriod} onChange={(e) => setIntakePeriod(e.target.value)}
-                className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="kuccps-period">
-                {["January","May","September"].map(p => <option key={p}>{p}</option>)}
-              </select>
-            </FormField>
-          </div>
-
-          {uploadError && <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg p-3"><AlertCircle className="w-4 h-4" />{uploadError}</div>}
-          {uploadSuccess && <div className="flex items-center gap-2 text-sm text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg p-3"><CheckCircle2 className="w-4 h-4" />{uploadSuccess}</div>}
-
-          <input ref={fileRef} type="file" accept=".csv" className="hidden" onChange={handleFileUpload} data-testid="kuccps-file-input" />
-          <button onClick={() => fileRef.current?.click()} disabled={uploading}
-            className="flex items-center gap-2 px-5 py-2.5 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90 disabled:opacity-50"
-            data-testid="btn-upload-kuccps">
-            {uploading ? <><RefreshCw className="w-4 h-4 animate-spin" />Uploading…</> : <><Upload className="w-4 h-4" />Choose CSV File & Upload</>}
+        <div className="flex gap-2">
+          <button
+            data-testid="btn-refresh-kuccps-batches"
+            onClick={load}
+            className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 border border-gray-200 rounded-lg px-3 py-1.5"
+          >
+            <RefreshCw className="w-3.5 h-3.5" /> Refresh
           </button>
-
-          <div className="border rounded-lg p-3 bg-gray-50 text-xs text-gray-500 space-y-1">
-            <p className="font-medium text-gray-700">CSV Format Guide</p>
-            <p>Row 1: Header row (column names exactly as listed above)</p>
-            <p>Row 2+: One applicant per row. institution_code must be <code className="font-mono bg-gray-200 px-1 rounded">04300</code> (KAFU's TCU code)</p>
-            <p>cluster_points: numeric, e.g. <code className="font-mono bg-gray-200 px-1 rounded">37.5</code></p>
-          </div>
+          <button
+            data-testid="btn-start-kuccps-import"
+            onClick={() => navigate("/admissions/kuccps/wizard")}
+            className="flex items-center gap-2 px-4 py-2 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90"
+          >
+            <Upload className="w-4 h-4" /> Start New Import
+          </button>
         </div>
       </div>
 
-      {/* Batch history */}
+      {/* Info notice */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-sm text-blue-800">
+        The import wizard supports Excel (.xlsx/.xls) and CSV files with automatic column mapping, programme matching, duplicate detection, manager approval workflow, and PDF admission letter generation.
+      </div>
+
+      {/* Batch list */}
       <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold text-sm text-gray-800">Import History</h3>
-          <button onClick={load} className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700" data-testid="btn-refresh-batches">
-            <RefreshCw className="w-3.5 h-3.5" /> Refresh
-          </button>
-        </div>
+        <h4 className="text-sm font-semibold text-gray-700 mb-3">Import History</h4>
         {loading ? (
-          <div className="text-center py-8 text-gray-400 text-sm">Loading…</div>
+          <div className="text-center py-10 text-gray-400 text-sm">Loading batches…</div>
         ) : batches.length === 0 ? (
-          <div className="text-center py-8 text-gray-400 text-sm border border-dashed border-gray-200 rounded-xl">
-            No import batches yet
+          <div className="text-center py-12 text-gray-400 text-sm border border-dashed border-gray-200 rounded-xl">
+            <FileUp className="w-8 h-8 mx-auto mb-3 text-gray-300" />
+            <p>No import batches yet.</p>
+            <button
+              data-testid="btn-first-import"
+              onClick={() => navigate("/admissions/kuccps/wizard")}
+              className="mt-3 text-[#1A5C38] underline text-sm"
+            >
+              Start your first import
+            </button>
           </div>
         ) : (
           <div className="space-y-2">
             {batches.map((batch) => {
-              const cfg = BATCH_STATUS_CONFIG[batch.status] ?? { label: batch.status, cls: "bg-gray-100 text-gray-600" };
-              const pct = batch.total_rows > 0 ? Math.round((batch.processed_rows / batch.total_rows) * 100) : 0;
+              const cfg = KUCCPS_STATUS[batch.status] ?? { label: batch.status, cls: "bg-gray-100 text-gray-600" };
+              const canResume = resumableStatuses.has(batch.status);
               return (
-                <div key={batch.id} className="border border-gray-200 rounded-xl p-4" data-testid={`batch-row-${batch.id}`}>
-                  <div className="flex items-start justify-between gap-4 mb-2">
+                <div key={batch.id} className="border border-gray-200 rounded-xl p-4 hover:border-gray-300 transition-colors" data-testid={`kuccps-batch-${batch.id}`}>
+                  <div className="flex items-start justify-between gap-3">
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-medium text-sm text-gray-800 truncate">{batch.filename}</span>
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
+                        <span className="font-medium text-sm text-gray-800 truncate">{batch.original_filename}</span>
                         <Badge label={cfg.label} cls={cfg.cls} />
                       </div>
-                      <div className="text-xs text-gray-500 mt-0.5">{batch.academic_year} · {batch.intake_period} · Uploaded {fmt(batch.created_at)}</div>
-                    </div>
-                    <div className="text-right shrink-0 text-xs text-gray-600">
-                      <div>{batch.successful_rows}/{batch.total_rows} rows OK</div>
-                      {batch.failed_rows > 0 && <div className="text-red-600">{batch.failed_rows} failed</div>}
-                    </div>
-                  </div>
-                  {batch.status === "processing" && (
-                    <div className="mt-2">
-                      <div className="flex justify-between text-xs text-gray-500 mb-1"><span>Progress</span><span>{pct}%</span></div>
-                      <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                        <div className="h-full bg-[#1A5C38] transition-all" style={{ width: `${pct}%` }} />
+                      <div className="flex flex-wrap gap-3 text-xs text-gray-500">
+                        <span>Ref: {batch.batch_reference}</span>
+                        {batch.academic_year && <span>{batch.academic_year}</span>}
+                        <span>Uploaded: {fmt(batch.created_at)}</span>
+                      </div>
+                      <div className="flex gap-4 mt-2 text-xs">
+                        <span className="text-gray-600">Total: <strong>{batch.total_rows}</strong></span>
+                        <span className="text-emerald-700">Valid: <strong>{batch.valid_rows}</strong></span>
+                        {batch.invalid_rows > 0 && <span className="text-red-600">Invalid: <strong>{batch.invalid_rows}</strong></span>}
+                        {batch.imported_rows > 0 && <span className="text-emerald-700">Imported: <strong>{batch.imported_rows}</strong></span>}
                       </div>
                     </div>
-                  )}
-                  {batch.error_log && (
-                    <details className="mt-2">
-                      <summary className="text-xs text-red-600 cursor-pointer">View error log</summary>
-                      <pre className="text-xs bg-red-50 p-2 rounded mt-1 overflow-x-auto max-h-32">{batch.error_log}</pre>
-                    </details>
-                  )}
+                    <div className="flex gap-2 shrink-0">
+                      {canResume && (
+                        <button
+                          data-testid={`btn-resume-batch-${batch.id}`}
+                          onClick={() => navigate(`/admissions/kuccps/wizard/${batch.id}`)}
+                          className="px-3 py-1.5 text-xs bg-[#1A5C38] text-white rounded-lg font-medium hover:bg-[#1A5C38]/90"
+                        >
+                          Resume
+                        </button>
+                      )}
+                      {!canResume && (
+                        <button
+                          data-testid={`btn-view-batch-${batch.id}`}
+                          onClick={() => navigate(`/admissions/kuccps/wizard/${batch.id}`)}
+                          className="px-3 py-1.5 text-xs border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50"
+                        >
+                          View
+                        </button>
+                      )}
+                    </div>
+                  </div>
                 </div>
               );
             })}

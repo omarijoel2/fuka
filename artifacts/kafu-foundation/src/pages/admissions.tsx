@@ -201,8 +201,8 @@ export default function Admissions() {
                 asChild
                 data-testid="hero-btn-kuccps"
               >
-                <a href="https://students.kuccps.net/" target="_blank" rel="noreferrer">
-                  KUCCPS Portal <ExternalLink className="ml-2 w-4 h-4" />
+                <a href="/kuccps-verify">
+                  Verify KUCCPS Placement <ExternalLink className="ml-2 w-4 h-4" />
                 </a>
               </Button>
             </div>
@@ -532,8 +532,8 @@ export default function Admissions() {
                   asChild
                   data-testid="sidebar-btn-kuccps"
                 >
-                  <a href="https://students.kuccps.net/" target="_blank" rel="noreferrer">
-                    KUCCPS Portal
+                  <a href="/kuccps-verify">
+                    Verify KUCCPS Placement
                   </a>
                 </Button>
               </div>

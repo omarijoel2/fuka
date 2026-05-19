@@ -33,6 +33,7 @@ import RedirectsCmsPage from "@/pages/redirects-cms";
 import ContentHealthPage from "@/pages/content-health";
 import WorkflowConsolePage from "@/pages/workflow-console";
 import AdmissionsCmsPage from "@/pages/admissions-cms";
+import KuccpsImportWizard from "@/pages/kuccps-import-wizard";
 
 // ─── Role constants ───────────────────────────────────────────────────────────
 const ADMIN_ROLES    = ["super_admin", "ict_admin", "communications_admin"];
@@ -300,6 +301,13 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <AdmissionsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/admissions/kuccps/wizard/:batchId?">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <KuccpsImportWizard />
             </RequireRole>
           )}
         </Route>
