@@ -90,7 +90,7 @@ export default function KuccpsVerifyPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#f8fdf9", fontFamily: "Inter, sans-serif" }}>
       {/* Hero banner */}
-      <div style={{ background: "linear-gradient(135deg, #1A5C38 0%, #0e3a24 100%)", color: "#fff", padding: "48px 24px", textAlign: "center" }}>
+      <div style={{ background: "linear-gradient(135deg, #228B22 0%, #0e3a24 100%)", color: "#fff", padding: "48px 24px", textAlign: "center" }}>
         <img
           src="https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png"
           alt="KAFU Logo"
@@ -111,7 +111,7 @@ export default function KuccpsVerifyPage() {
         {/* Verification Form */}
         {!result && (
           <div style={{ background: "#fff", borderRadius: 12, padding: "32px 28px", boxShadow: "0 2px 16px rgba(0,0,0,0.06)", border: "1px solid #e5e7eb" }}>
-            <h2 style={{ margin: "0 0 20px", fontSize: 18, color: "#1A5C38", fontFamily: "Playfair Display, serif" }}>
+            <h2 style={{ margin: "0 0 20px", fontSize: 18, color: "#228B22", fontFamily: "Playfair Display, serif" }}>
               Verify Your Placement
             </h2>
             <form onSubmit={handleVerify}>
@@ -171,7 +171,7 @@ export default function KuccpsVerifyPage() {
                 type="submit"
                 disabled={loading}
                 style={{
-                  width: "100%", padding: "12px", background: "#1A5C38", color: "#fff",
+                  width: "100%", padding: "12px", background: "#228B22", color: "#fff",
                   border: "none", borderRadius: 8, fontSize: 15, fontWeight: 600,
                   cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.7 : 1,
                 }}
@@ -181,7 +181,7 @@ export default function KuccpsVerifyPage() {
             </form>
 
             <div style={{ marginTop: 20, padding: "12px 16px", background: "#f0f7f3", borderRadius: 6, fontSize: 12, color: "#555" }}>
-              <strong style={{ color: "#1A5C38" }}>Privacy Notice:</strong> Your details are only used to match your placement record.
+              <strong style={{ color: "#228B22" }}>Privacy Notice:</strong> Your details are only used to match your placement record.
               No personal data is displayed until verification is successful.
             </div>
           </div>
@@ -204,12 +204,12 @@ export default function KuccpsVerifyPage() {
                 <button
                   data-testid="btn-try-again"
                   onClick={() => setResult(null)}
-                  style={{ padding: "10px 24px", background: "#1A5C38", color: "#fff", border: "none", borderRadius: 6, fontSize: 14, cursor: "pointer" }}
+                  style={{ padding: "10px 24px", background: "#228B22", color: "#fff", border: "none", borderRadius: 6, fontSize: 14, cursor: "pointer" }}
                 >
                   Try Again
                 </button>
                 <div style={{ marginTop: 16, fontSize: 12, color: "#888" }}>
-                  Need help? Contact Admissions: <a href="mailto:admissions@kafu.ac.ke" style={{ color: "#1A5C38" }}>admissions@kafu.ac.ke</a> | +254 777 373 633
+                  Need help? Contact Admissions: <a href="mailto:admissions@kafu.ac.ke" style={{ color: "#228B22" }}>admissions@kafu.ac.ke</a> | +254 777 373 633
                 </div>
               </div>
             )}
@@ -217,7 +217,7 @@ export default function KuccpsVerifyPage() {
             {/* Verified */}
             {result.verified && result.student && (
               <div style={{ background: "#fff", border: "1px solid #c3e6cb", borderRadius: 12, overflow: "hidden", boxShadow: "0 2px 16px rgba(0,0,0,0.06)" }}>
-                <div style={{ background: "#1A5C38", padding: "20px 24px", color: "#fff" }}>
+                <div style={{ background: "#228B22", padding: "20px 24px", color: "#fff" }}>
                   <div style={{ fontSize: 12, color: "#a8d5b8", marginBottom: 4 }}>Placement Verified</div>
                   <h2 style={{ margin: 0, fontFamily: "Playfair Display, serif", fontSize: 20 }}>
                     {result.student.full_name}
@@ -229,7 +229,7 @@ export default function KuccpsVerifyPage() {
                     <tbody>
                       {[
                         { label: "KCSE Index", value: result.student.index_number_masked },
-                        { label: "Programme Offered", value: result.student.programme_name, bold: true, color: "#1A5C38" },
+                        { label: "Programme Offered", value: result.student.programme_name, bold: true, color: "#228B22" },
                         { label: "School / Faculty", value: schoolLabels[result.student.school_name] ?? result.student.school_name },
                         { label: "Academic Year", value: result.student.academic_year },
                         { label: "Admission Status", value: result.student.admission_status },
@@ -259,7 +259,7 @@ export default function KuccpsVerifyPage() {
                           onClick={handleDownloadLetter}
                           disabled={downloading}
                           style={{
-                            padding: "11px 24px", background: "#1A5C38", color: "#fff",
+                            padding: "11px 24px", background: "#228B22", color: "#fff",
                             border: "none", borderRadius: 8, fontSize: 14, fontWeight: 600,
                             cursor: downloading ? "not-allowed" : "pointer", opacity: downloading ? 0.7 : 1,
                           }}
@@ -271,7 +271,7 @@ export default function KuccpsVerifyPage() {
                           href="https://portal.kafu.ac.ke/joining-instructions"
                           target="_blank"
                           rel="noopener noreferrer"
-                          style={{ padding: "11px 20px", background: "#fff", border: "1px solid #1A5C38", color: "#1A5C38", borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: "none" }}
+                          style={{ padding: "11px 20px", background: "#fff", border: "1px solid #228B22", color: "#228B22", borderRadius: 8, fontSize: 14, fontWeight: 600, textDecoration: "none" }}
                         >
                           Joining Instructions
                         </a>
@@ -288,12 +288,12 @@ export default function KuccpsVerifyPage() {
                     <button
                       data-testid="btn-verify-new"
                       onClick={() => { setResult(null); setIndexNumber(""); setKcseYear(""); setIdNumber(""); }}
-                      style={{ background: "none", border: "none", color: "#1A5C38", fontSize: 13, cursor: "pointer", textDecoration: "underline" }}
+                      style={{ background: "none", border: "none", color: "#228B22", fontSize: 13, cursor: "pointer", textDecoration: "underline" }}
                     >
                       Verify another student
                     </button>
                     <span style={{ color: "#ccc", margin: "0 10px" }}>|</span>
-                    <a href="/admissions" style={{ color: "#1A5C38", fontSize: 13 }}>Admissions Home</a>
+                    <a href="/admissions" style={{ color: "#228B22", fontSize: 13 }}>Admissions Home</a>
                   </div>
                 </div>
               </div>
@@ -303,11 +303,11 @@ export default function KuccpsVerifyPage() {
 
         {/* Help section */}
         <div style={{ marginTop: 32, background: "#fff", border: "1px solid #e5e7eb", borderRadius: 8, padding: "20px 24px" }}>
-          <h3 style={{ margin: "0 0 12px", fontSize: 15, color: "#1A5C38" }}>Need Help?</h3>
+          <h3 style={{ margin: "0 0 12px", fontSize: 15, color: "#228B22" }}>Need Help?</h3>
           <ul style={{ margin: 0, padding: "0 0 0 20px", fontSize: 13, color: "#555", lineHeight: 2 }}>
             <li>Your KCSE index number is found on your KCSE statement of results or KUCCPS placement letter</li>
             <li>If you were recently placed, your data may take 24-48 hours to appear</li>
-            <li>Contact Admissions: <a href="mailto:admissions@kafu.ac.ke" style={{ color: "#1A5C38" }}>admissions@kafu.ac.ke</a></li>
+            <li>Contact Admissions: <a href="mailto:admissions@kafu.ac.ke" style={{ color: "#228B22" }}>admissions@kafu.ac.ke</a></li>
             <li>Phone: +254 777 373 633</li>
             <li>Visit: P.O. Box 385-50309, Kaimosi, Kenya</li>
           </ul>

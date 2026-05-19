@@ -26,7 +26,7 @@ export function StaffLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex bg-background">
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-30 w-60 bg-[#1A5C38] text-white flex flex-col transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+      <aside className={`fixed inset-y-0 left-0 z-30 w-60 bg-[#228B22] text-white flex flex-col transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
         {/* Logo */}
         <div className="px-5 py-5 border-b border-white/10">
           <p className="text-[11px] font-bold tracking-wider uppercase text-white/50">Kaimosi Friends University</p>

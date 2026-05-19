@@ -49,7 +49,7 @@ export function CampusMap({ center, zoom = 14, markers = [], className = "", hei
 
       markers.forEach((m) => {
         const campusIcon = L.divIcon({
-          html: `<div style="background:${m.type === "office" ? "#C9A227" : "#1A5C38"};width:12px;height:12px;border-radius:50%;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4);"></div>`,
+          html: `<div style="background:${m.type === "office" ? "#DAA520" : "#228B22"};width:12px;height:12px;border-radius:50%;border:2px solid white;box-shadow:0 1px 4px rgba(0,0,0,0.4);"></div>`,
           className: "",
           iconSize: [12, 12],
           iconAnchor: [6, 6],

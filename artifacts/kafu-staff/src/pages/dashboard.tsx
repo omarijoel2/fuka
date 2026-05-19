@@ -67,7 +67,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* Welcome banner */}
-      <div className="bg-gradient-to-r from-[#1A5C38] to-[#2d7a52] rounded-2xl p-6 text-white">
+      <div className="bg-gradient-to-r from-[#228B22] to-[#2d7a52] rounded-2xl p-6 text-white">
         <p className="text-sm text-white/70">Welcome back,</p>
         <h1 className="text-2xl font-bold mt-0.5">{user?.name}</h1>
         <p className="text-sm text-white/70 mt-1">{user?.job_title ?? ""}{user?.department ? ` · ${user.department}` : ""}</p>

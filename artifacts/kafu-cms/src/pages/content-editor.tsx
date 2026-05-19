@@ -659,8 +659,8 @@ export default function ContentEditorPage({ id }: { id?: string }) {
                 <div>
                   <label className="block text-xs font-medium text-muted-foreground mb-1">School Colour (hex)</label>
                   <div className="flex gap-2">
-                    <input type="color" value={sdField(sd, "colour") || "#1A5C38"} onChange={(e) => setSd("colour", e.target.value)} className="w-12 h-9 rounded border border-border cursor-pointer" data-testid="input-school-colour-picker" />
-                    <input type="text" value={sdField(sd, "colour") || "#1A5C38"} onChange={(e) => setSd("colour", e.target.value)} placeholder="#1A5C38" className="flex-1 px-3 py-2 rounded-lg border border-border text-sm font-mono focus:outline-none" data-testid="input-school-colour" />
+                    <input type="color" value={sdField(sd, "colour") || "#228B22"} onChange={(e) => setSd("colour", e.target.value)} className="w-12 h-9 rounded border border-border cursor-pointer" data-testid="input-school-colour-picker" />
+                    <input type="text" value={sdField(sd, "colour") || "#228B22"} onChange={(e) => setSd("colour", e.target.value)} placeholder="#228B22" className="flex-1 px-3 py-2 rounded-lg border border-border text-sm font-mono focus:outline-none" data-testid="input-school-colour" />
                   </div>
                 </div>
               </div>

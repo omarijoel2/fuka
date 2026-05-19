@@ -46,7 +46,7 @@ const SCHOOL_COLORS: Record<string, string> = {
 };
 
 const GRADIENTS = [
-  "from-[#1a5c38] to-[#0d3320]",
+  "from-[#228b22] to-[#0d3320]",
   "from-primary to-primary/80",
   "from-purple-700 to-purple-900",
   "from-teal-700 to-teal-900",
@@ -270,7 +270,7 @@ export default function StaffProfilePage() {
       <div className="bg-primary text-primary-foreground relative overflow-hidden">
         <div
           className="absolute inset-0 opacity-10"
-          style={{ backgroundImage: "radial-gradient(ellipse at 75% 40%, #C9A227 0%, transparent 50%)" }}
+          style={{ backgroundImage: "radial-gradient(ellipse at 75% 40%, #DAA520 0%, transparent 50%)" }}
         />
         <div className="container mx-auto px-4 py-10 relative z-10">
           {/* Breadcrumb */}

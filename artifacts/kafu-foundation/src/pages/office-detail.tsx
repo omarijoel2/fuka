@@ -31,7 +31,7 @@ export default function OfficeDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="h-52 animate-pulse" style={{ backgroundColor: "#1A5C38" }} />
+        <div className="h-52 animate-pulse" style={{ backgroundColor: "#228B22" }} />
         <div className="max-w-4xl mx-auto px-4 py-12 space-y-5">
           {[1,2,3].map(i => <div key={i} className="h-20 animate-pulse bg-gray-200 rounded-xl" />)}
         </div>
@@ -93,7 +93,7 @@ export default function OfficeDetailPage() {
       />
 
       {/* Hero */}
-      <section className="text-white py-14" style={{ backgroundColor: "#1A5C38" }}>
+      <section className="text-white py-14" style={{ backgroundColor: "#228B22" }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center gap-2 text-sm text-white/60 mb-6">
             <Link to="/" className="hover:text-white">Home</Link><span>/</span>
@@ -156,7 +156,7 @@ export default function OfficeDetailPage() {
                 <CampusMap center={mapCenter} zoom={15} markers={mapMarker} height="280px" />
                 <a href={`https://www.google.com/maps/dir/?api=1&destination=${mapCenter[0]},${mapCenter[1]}`}
                   target="_blank" rel="noopener noreferrer" data-testid="office-directions-btn"
-                  className="inline-flex items-center gap-2 mt-3 text-sm font-medium hover:underline" style={{ color: "#1A5C38" }}>
+                  className="inline-flex items-center gap-2 mt-3 text-sm font-medium hover:underline" style={{ color: "#228B22" }}>
                   <MapPin className="w-4 h-4" /> Get Directions
                 </a>
               </section>
@@ -170,7 +170,7 @@ export default function OfficeDetailPage() {
                   {(office.related_links ?? []).map((link, i) => (
                     <li key={i}>
                       <a href={link.url} target="_blank" rel="noopener noreferrer" data-testid={`related-link-${i}`}
-                        className="inline-flex items-center gap-2 text-sm font-medium hover:underline" style={{ color: "#1A5C38" }}>
+                        className="inline-flex items-center gap-2 text-sm font-medium hover:underline" style={{ color: "#228B22" }}>
                         <ExternalLink className="w-3.5 h-3.5" />{link.label}
                       </a>
                     </li>
@@ -190,7 +190,7 @@ export default function OfficeDetailPage() {
                   <p className="text-xs text-gray-500 mb-1 font-medium">Phone</p>
                   <a href={`tel:${office.public_phone}`} data-testid="office-phone"
                     className="flex items-center gap-2 text-sm font-semibold text-gray-900 hover:text-primary transition-colors">
-                    <Phone className="w-4 h-4" style={{ color: "#1A5C38" }} />{office.public_phone}
+                    <Phone className="w-4 h-4" style={{ color: "#228B22" }} />{office.public_phone}
                   </a>
                 </div>
               )}
@@ -199,7 +199,7 @@ export default function OfficeDetailPage() {
                   <p className="text-xs text-gray-500 mb-1 font-medium">Email</p>
                   <a href={`mailto:${office.public_email}`} data-testid="office-email"
                     className="flex items-center gap-2 text-sm font-semibold text-gray-900 hover:text-primary transition-colors break-all">
-                    <Mail className="w-4 h-4 flex-shrink-0" style={{ color: "#1A5C38" }} />{office.public_email}
+                    <Mail className="w-4 h-4 flex-shrink-0" style={{ color: "#228B22" }} />{office.public_email}
                   </a>
                 </div>
               )}
@@ -225,7 +225,7 @@ export default function OfficeDetailPage() {
                 <Link to={`/campuses/${office.campus.slug}`} data-testid="office-campus-link"
                   className="group flex items-center justify-between gap-2 hover:text-primary transition-colors">
                   <div className="flex items-center gap-2 text-sm text-gray-700">
-                    <Building2 className="w-4 h-4" style={{ color: "#1A5C38" }} />
+                    <Building2 className="w-4 h-4" style={{ color: "#228B22" }} />
                     <span className="font-medium group-hover:text-primary">{office.campus.name}</span>
                   </div>
                   <ChevronRight className="w-4 h-4 text-gray-300 group-hover:text-primary" />
@@ -236,7 +236,7 @@ export default function OfficeDetailPage() {
             {/* Office directory link */}
             <Link to="/offices" data-testid="back-to-offices-btn"
               className="block text-center py-3 px-4 rounded-xl border-2 text-sm font-semibold hover:bg-primary/5 transition-colors"
-              style={{ borderColor: "#1A5C38", color: "#1A5C38" }}>
+              style={{ borderColor: "#228B22", color: "#228B22" }}>
               ← Back to Office Directory
             </Link>
           </aside>

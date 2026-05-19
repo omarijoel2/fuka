@@ -72,7 +72,7 @@ function HealthScoreRing({ score }: { score: number }) {
   const radius = 32;
   const circ = 2 * Math.PI * radius;
   const fill = (score / 100) * circ;
-  const color = score >= 80 ? "#1A5C38" : score >= 60 ? "#C9A227" : "#dc2626";
+  const color = score >= 80 ? "#228B22" : score >= 60 ? "#DAA520" : "#dc2626";
   return (
     <svg width="90" height="90" viewBox="0 0 90 90">
       <circle cx="45" cy="45" r={radius} fill="none" stroke="#e5e7eb" strokeWidth="8" />

@@ -97,7 +97,7 @@ export default function RepositoryBrowsePage() {
         breadcrumbs={[{ name: "Repository", path: "/repository" }, { name: "Browse", path: "/repository/browse" }]}
       />
       {/* Header */}
-      <section className="text-white py-10" style={{ backgroundColor: "#1A5C38" }}>
+      <section className="text-white py-10" style={{ backgroundColor: "#228B22" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center gap-2 text-sm text-white/60 mb-4">
             <Link to="/" className="hover:text-white">Home</Link>
@@ -130,7 +130,7 @@ export default function RepositoryBrowsePage() {
                   placeholder="Keywords, title, author..."
                   className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-300"
                 />
-                <button data-testid="browse-search-btn" type="submit" className="px-3 py-2 rounded-lg text-white text-sm" style={{ backgroundColor: "#1A5C38" }}>
+                <button data-testid="browse-search-btn" type="submit" className="px-3 py-2 rounded-lg text-white text-sm" style={{ backgroundColor: "#228B22" }}>
                   <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
                   </svg>
@@ -146,7 +146,7 @@ export default function RepositoryBrowsePage() {
                   data-testid="type-filter-all"
                   onClick={() => { setType(""); setPage(1); }}
                   className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${!type ? "text-white font-medium" : "text-gray-700 hover:bg-gray-100"}`}
-                  style={!type ? { backgroundColor: "#1A5C38" } : {}}
+                  style={!type ? { backgroundColor: "#228B22" } : {}}
                 >
                   All Types
                 </button>
@@ -156,7 +156,7 @@ export default function RepositoryBrowsePage() {
                     data-testid={`type-filter-${t.type}`}
                     onClick={() => { setType(t.type); setPage(1); }}
                     className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors flex items-center justify-between ${type === t.type ? "text-white font-medium" : "text-gray-700 hover:bg-gray-100"}`}
-                    style={type === t.type ? { backgroundColor: "#1A5C38" } : {}}
+                    style={type === t.type ? { backgroundColor: "#228B22" } : {}}
                   >
                     <span>{TYPE_LABELS[t.type] ?? t.type}</span>
                     <span className={`text-xs ml-2 ${type === t.type ? "text-white/70" : "text-gray-400"}`}>{t.count}</span>
@@ -209,7 +209,7 @@ export default function RepositoryBrowsePage() {
                     data-testid={`access-filter-${a.v || "all"}`}
                     onClick={() => { setAccess(a.v); setPage(1); }}
                     className={`w-full text-left px-3 py-1.5 rounded-lg text-sm transition-colors ${access === a.v ? "text-white font-medium" : "text-gray-700 hover:bg-gray-100"}`}
-                    style={access === a.v ? { backgroundColor: "#1A5C38" } : {}}
+                    style={access === a.v ? { backgroundColor: "#228B22" } : {}}
                   >
                     {a.l}
                   </button>

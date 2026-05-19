@@ -85,7 +85,7 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   mapped:                      { label: "Mapped",             color: "#0d6efd" },
   validation_failed:           { label: "Validation Failed",  color: "#dc3545" },
   validation_passed:           { label: "Passed w/ Warnings", color: "#fd7e14" },
-  awaiting_approval:           { label: "Awaiting Approval",  color: "#C9A227" },
+  awaiting_approval:           { label: "Awaiting Approval",  color: "#DAA520" },
   approved:                    { label: "Approved",           color: "#198754" },
   import_queued:               { label: "Import Queued",      color: "#0dcaf0" },
   importing:                   { label: "Importing…",         color: "#0dcaf0" },
@@ -378,11 +378,11 @@ export default function KuccpsImportWizard() {
           <button
             data-testid="btn-back-to-admissions"
             onClick={() => navigate("/admissions/kuccps")}
-            style={{ background: "none", border: "none", color: "#1A5C38", cursor: "pointer", fontSize: 14, padding: 0, marginBottom: 8 }}
+            style={{ background: "none", border: "none", color: "#228B22", cursor: "pointer", fontSize: 14, padding: 0, marginBottom: 8 }}
           >
             &larr; Back to KUCCPS Dashboard
           </button>
-          <h1 style={{ margin: 0, fontSize: 22, color: "#1A5C38", fontFamily: "Playfair Display, serif" }}>
+          <h1 style={{ margin: 0, fontSize: 22, color: "#228B22", fontFamily: "Playfair Display, serif" }}>
             KUCCPS Placement Import Wizard
           </h1>
           <p style={{ margin: "4px 0 0", color: "#666", fontSize: 13 }}>
@@ -417,13 +417,13 @@ export default function KuccpsImportWizard() {
             onClick={() => fileRef.current?.click()}
             data-testid="kuccps-upload-dropzone"
             style={{
-              border: "2px dashed #1A5C38", borderRadius: 10, padding: "60px 40px",
+              border: "2px dashed #228B22", borderRadius: 10, padding: "60px 40px",
               textAlign: "center", cursor: "pointer", background: "#f8fdf9",
               transition: "background 0.2s",
             }}
           >
             <div style={{ fontSize: 36, marginBottom: 12 }}>&#8659;</div>
-            <div style={{ fontSize: 16, color: "#1A5C38", fontWeight: 600 }}>
+            <div style={{ fontSize: 16, color: "#228B22", fontWeight: 600 }}>
               Drop your KUCCPS Excel or CSV file here
             </div>
             <div style={{ fontSize: 13, color: "#888", marginTop: 8 }}>
@@ -432,7 +432,7 @@ export default function KuccpsImportWizard() {
             <button
               data-testid="btn-browse-file"
               onClick={(e) => { e.stopPropagation(); fileRef.current?.click(); }}
-              style={{ marginTop: 20, padding: "8px 24px", background: "#1A5C38", color: "#fff", border: "none", borderRadius: 6, fontSize: 14, cursor: "pointer" }}
+              style={{ marginTop: 20, padding: "8px 24px", background: "#228B22", color: "#fff", border: "none", borderRadius: 6, fontSize: 14, cursor: "pointer" }}
             >
               Browse File
             </button>
@@ -492,7 +492,7 @@ export default function KuccpsImportWizard() {
           <div style={{ overflowX: "auto", maxHeight: 380, border: "1px solid #e5e7eb", borderRadius: 6, marginBottom: 16 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
               <thead>
-                <tr style={{ background: "#1A5C38", color: "#fff", position: "sticky", top: 0 }}>
+                <tr style={{ background: "#228B22", color: "#fff", position: "sticky", top: 0 }}>
                   <th style={thStyle}>#</th>
                   {headers.map((h) => <th key={h} style={thStyle}>{h}</th>)}
                 </tr>
@@ -526,11 +526,11 @@ export default function KuccpsImportWizard() {
           <div style={{ overflowX: "auto", marginBottom: 16 }}>
             <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 13 }}>
               <thead>
-                <tr style={{ background: "#f0f7f3", borderBottom: "2px solid #1A5C38" }}>
-                  <th style={{ ...thStyle, color: "#1A5C38", background: "transparent" }}>Column Header</th>
-                  <th style={{ ...thStyle, color: "#1A5C38", background: "transparent" }}>Sample Values</th>
-                  <th style={{ ...thStyle, color: "#1A5C38", background: "transparent", minWidth: 230 }}>Map to Field</th>
-                  <th style={{ ...thStyle, color: "#1A5C38", background: "transparent" }}>Auto-suggestion</th>
+                <tr style={{ background: "#f0f7f3", borderBottom: "2px solid #228B22" }}>
+                  <th style={{ ...thStyle, color: "#228B22", background: "transparent" }}>Column Header</th>
+                  <th style={{ ...thStyle, color: "#228B22", background: "transparent" }}>Sample Values</th>
+                  <th style={{ ...thStyle, color: "#228B22", background: "transparent", minWidth: 230 }}>Map to Field</th>
+                  <th style={{ ...thStyle, color: "#228B22", background: "transparent" }}>Auto-suggestion</th>
                 </tr>
               </thead>
               <tbody>
@@ -702,7 +702,7 @@ export default function KuccpsImportWizard() {
           {validationReport && <ValidationSummary summary={validationReport.summary} />}
           {batch && (
             <div style={{ background: "#f0f7f3", border: "1px solid #c3e6cb", borderRadius: 6, padding: "16px", marginBottom: 20 }}>
-              <div style={{ fontWeight: 600, marginBottom: 8, color: "#1A5C38" }}>Batch Summary</div>
+              <div style={{ fontWeight: 600, marginBottom: 8, color: "#228B22" }}>Batch Summary</div>
               <table style={{ fontSize: 13 }}>
                 <tbody>
                   <tr><td style={{ paddingRight: 20 }}>Total Rows:</td><td><strong>{batch.total_rows}</strong></td></tr>
@@ -728,7 +728,7 @@ export default function KuccpsImportWizard() {
             By approving this batch, you authorize the official import of {(batch?.valid_rows ?? 0) + (batch?.warning_rows ?? 0)} placement records into the admissions database.
           </div>
           <div style={{ display: "flex", gap: 10 }}>
-            <WizardBtn onClick={handleApprove} loading={loading} testId="btn-approve-batch" style={{ background: "#C9A227", color: "#fff" }}>
+            <WizardBtn onClick={handleApprove} loading={loading} testId="btn-approve-batch" style={{ background: "#DAA520", color: "#fff" }}>
               Approve for Import
             </WizardBtn>
             <WizardBtn variant="secondary" onClick={() => setStep(5)} testId="btn-back-to-exceptions">Back</WizardBtn>
@@ -782,8 +782,8 @@ export default function KuccpsImportWizard() {
       {step === 9 && (
         <WizardCard title="Import Complete">
           <div style={{ textAlign: "center", padding: "40px 20px" }}>
-            <div style={{ fontSize: 56, color: "#1A5C38", marginBottom: 16 }}>&#10003;</div>
-            <h2 style={{ color: "#1A5C38", fontFamily: "Playfair Display, serif", marginBottom: 8 }}>
+            <div style={{ fontSize: 56, color: "#228B22", marginBottom: 16 }}>&#10003;</div>
+            <h2 style={{ color: "#228B22", fontFamily: "Playfair Display, serif", marginBottom: 8 }}>
               KUCCPS Import Successful
             </h2>
             <p style={{ fontSize: 14, color: "#666", maxWidth: 440, margin: "0 auto 24px" }}>
@@ -817,15 +817,15 @@ function StepProgressBar({ currentStep, labels }: { currentStep: number; labels:
           <div style={{
             width: 28, height: 28, borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 12, fontWeight: 700, flexShrink: 0,
-            background: i < currentStep ? "#1A5C38" : (i === currentStep ? "#C9A227" : "#e9ecef"),
+            background: i < currentStep ? "#228B22" : (i === currentStep ? "#DAA520" : "#e9ecef"),
             color: i <= currentStep ? "#fff" : "#888",
           }}>
             {i < currentStep ? "✓" : i + 1}
           </div>
-          <span style={{ fontSize: 11, color: i === currentStep ? "#1A5C38" : (i < currentStep ? "#555" : "#aaa"), marginLeft: 4, fontWeight: i === currentStep ? 600 : 400, whiteSpace: "nowrap" }}>
+          <span style={{ fontSize: 11, color: i === currentStep ? "#228B22" : (i < currentStep ? "#555" : "#aaa"), marginLeft: 4, fontWeight: i === currentStep ? 600 : 400, whiteSpace: "nowrap" }}>
             {label}
           </span>
-          {i < labels.length - 1 && <div style={{ width: 20, height: 2, background: i < currentStep ? "#1A5C38" : "#e9ecef", margin: "0 6px" }} />}
+          {i < labels.length - 1 && <div style={{ width: 20, height: 2, background: i < currentStep ? "#228B22" : "#e9ecef", margin: "0 6px" }} />}
         </div>
       ))}
     </div>
@@ -835,7 +835,7 @@ function StepProgressBar({ currentStep, labels }: { currentStep: number; labels:
 function WizardCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div style={{ background: "#fff", border: "1px solid #e5e7eb", borderRadius: 10, padding: "24px 28px" }}>
-      <h2 style={{ margin: "0 0 20px", fontSize: 18, color: "#1A5C38", fontFamily: "Playfair Display, serif", borderBottom: "2px solid #C9A227", paddingBottom: 8 }}>
+      <h2 style={{ margin: "0 0 20px", fontSize: 18, color: "#228B22", fontFamily: "Playfair Display, serif", borderBottom: "2px solid #DAA520", paddingBottom: 8 }}>
         {title}
       </h2>
       {children}
@@ -860,8 +860,8 @@ function WizardBtn({
   testId?: string; variant?: "primary" | "secondary"; style?: React.CSSProperties;
 }) {
   const base: React.CSSProperties = variant === "primary"
-    ? { background: "#1A5C38", color: "#fff" }
-    : { background: "#fff", color: "#1A5C38", border: "1px solid #1A5C38" };
+    ? { background: "#228B22", color: "#fff" }
+    : { background: "#fff", color: "#228B22", border: "1px solid #228B22" };
   return (
     <button
       data-testid={testId}
@@ -879,8 +879,8 @@ function WizardBtn({
 
 function LoadingSpinner({ label }: { label: string }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "16px 0", color: "#1A5C38", fontSize: 14 }}>
-      <div style={{ width: 20, height: 20, border: "3px solid #1A5C38", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
+    <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "16px 0", color: "#228B22", fontSize: 14 }}>
+      <div style={{ width: 20, height: 20, border: "3px solid #228B22", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />
       {label}
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
     </div>
@@ -908,12 +908,12 @@ function ValidationSummary({ summary }: { summary: Record<string, number> }) {
   return (
     <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginBottom: 20 }}>
       {[
-        { key: "total",               label: "Total Rows",   color: "#1A5C38" },
+        { key: "total",               label: "Total Rows",   color: "#228B22" },
         { key: "valid",               label: "Valid",        color: "#198754" },
         { key: "warning",             label: "Warnings",     color: "#fd7e14" },
         { key: "invalid",             label: "Invalid",      color: "#dc3545" },
         { key: "duplicate",           label: "Duplicates",   color: "#6f42c1" },
-        { key: "unmatched_programme", label: "Unmatched Prog", color: "#C9A227" },
+        { key: "unmatched_programme", label: "Unmatched Prog", color: "#DAA520" },
       ].map(({ key, label, color }) => (
         <div key={key} style={{ background: "#fff", border: `2px solid ${color}33`, borderRadius: 8, padding: "10px 18px", textAlign: "center", minWidth: 90 }}>
           <div style={{ fontSize: 22, fontWeight: 700, color }}>{summary[key] ?? 0}</div>
@@ -959,7 +959,7 @@ function ExceptionResolutionPanel({
             onClick={() => setActiveTab(t.key)}
             style={{
               padding: "8px 16px", border: "none", cursor: "pointer", fontSize: 13,
-              background: activeTab === t.key ? "#1A5C38" : "transparent",
+              background: activeTab === t.key ? "#228B22" : "transparent",
               color: activeTab === t.key ? "#fff" : "#555",
               borderRadius: "6px 6px 0 0",
             }}
@@ -1025,7 +1025,7 @@ function ExceptionResolutionPanel({
                             data-testid={`btn-resolve-${row.id}`}
                             onClick={() => onResolve(row.id ?? 0)}
                             disabled={!res.programme_id || loading}
-                            style={{ padding: "4px 12px", background: "#1A5C38", color: "#fff", border: "none", borderRadius: 4, fontSize: 11, cursor: "pointer", opacity: !res.programme_id ? 0.5 : 1 }}
+                            style={{ padding: "4px 12px", background: "#228B22", color: "#fff", border: "none", borderRadius: 4, fontSize: 11, cursor: "pointer", opacity: !res.programme_id ? 0.5 : 1 }}
                           >
                             Resolve
                           </button>

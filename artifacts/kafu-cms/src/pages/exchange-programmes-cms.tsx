@@ -167,7 +167,7 @@ export default function ExchangeProgrammesCmsPage() {
           data-testid="new-programme-btn"
           onClick={openNew}
           className="flex items-center gap-2 px-4 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 transition"
-          style={{ backgroundColor: "#1A5C38" }}
+          style={{ backgroundColor: "#228B22" }}
         >
           <Plus className="w-4 h-4" /> New Programme
         </button>
@@ -498,7 +498,7 @@ export default function ExchangeProgrammesCmsPage() {
                 onClick={save}
                 disabled={saving}
                 className="px-6 py-2 rounded-lg text-white text-sm font-medium hover:opacity-90 disabled:opacity-60 transition"
-                style={{ backgroundColor: "#1A5C38" }}
+                style={{ backgroundColor: "#228B22" }}
               >
                 {saving ? "Saving..." : "Save Programme"}
               </button>

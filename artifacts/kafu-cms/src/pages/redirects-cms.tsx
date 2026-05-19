@@ -123,7 +123,7 @@ export default function RedirectsCmsPage() {
         <button
           data-testid="btn-add-redirect"
           onClick={openCreate}
-          className="px-4 py-2 bg-[#1A5C38] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f]"
+          className="px-4 py-2 bg-[#228B22] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f]"
         >
           + Add Redirect
         </button>
@@ -137,7 +137,7 @@ export default function RedirectsCmsPage() {
           placeholder="Search source or destination..."
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="w-80 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+          className="w-80 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
         />
       </div>
 
@@ -196,7 +196,7 @@ export default function RedirectsCmsPage() {
                       <button
                         data-testid={`btn-edit-redirect-${item.id}`}
                         onClick={() => openEdit(item)}
-                        className="text-[#1A5C38] hover:underline text-xs"
+                        className="text-[#228B22] hover:underline text-xs"
                       >
                         Edit
                       </button>
@@ -272,7 +272,7 @@ export default function RedirectsCmsPage() {
                   value={form.source_path}
                   onChange={(e) => setForm({ ...form, source_path: e.target.value })}
                   placeholder="/old-page-path"
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#228B22]"
                 />
                 <p className="text-xs text-gray-400 mt-1">Must start with /</p>
               </div>
@@ -286,7 +286,7 @@ export default function RedirectsCmsPage() {
                   value={form.destination_url}
                   onChange={(e) => setForm({ ...form, destination_url: e.target.value })}
                   placeholder="/new-page or https://..."
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-[#228B22]"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -296,7 +296,7 @@ export default function RedirectsCmsPage() {
                     data-testid="select-redirect-type"
                     value={form.type}
                     onChange={(e) => setForm({ ...form, type: parseInt(e.target.value) as 301 | 302 })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
                   >
                     <option value={301}>301 Permanent</option>
                     <option value={302}>302 Temporary</option>
@@ -308,7 +308,7 @@ export default function RedirectsCmsPage() {
                     data-testid="select-redirect-status"
                     value={form.is_active ? "1" : "0"}
                     onChange={(e) => setForm({ ...form, is_active: e.target.value === "1" })}
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
                   >
                     <option value="1">Active</option>
                     <option value="0">Inactive</option>
@@ -322,7 +322,7 @@ export default function RedirectsCmsPage() {
                   rows={2}
                   value={form.notes || ""}
                   onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
                   placeholder="Why is this redirect needed?"
                 />
               </div>
@@ -340,7 +340,7 @@ export default function RedirectsCmsPage() {
                 data-testid="btn-confirm-save-redirect"
                 onClick={handleSave}
                 disabled={saving}
-                className="px-4 py-2 bg-[#1A5C38] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f] disabled:opacity-50"
+                className="px-4 py-2 bg-[#228B22] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f] disabled:opacity-50"
               >
                 {saving ? "Saving..." : modal.edit ? "Save Changes" : "Create Redirect"}
               </button>

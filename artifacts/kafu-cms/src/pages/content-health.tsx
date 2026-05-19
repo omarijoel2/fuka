@@ -39,7 +39,7 @@ function ScoreRing({ score }: { score: number }) {
   const radius = 40;
   const circ = 2 * Math.PI * radius;
   const fill = (score / 100) * circ;
-  const color = score >= 80 ? "#1A5C38" : score >= 60 ? "#C9A227" : "#dc2626";
+  const color = score >= 80 ? "#228B22" : score >= 60 ? "#DAA520" : "#dc2626";
   return (
     <div className="flex flex-col items-center">
       <svg width="112" height="112" viewBox="0 0 112 112">
@@ -109,7 +109,7 @@ function ContentList({ items, emptyMsg }: { items: ContentItem[]; emptyMsg: stri
           <div className="min-w-0">
             <Link
               to={`/content/${item.id}`}
-              className="text-sm font-medium text-[#1A5C38] hover:underline truncate block"
+              className="text-sm font-medium text-[#228B22] hover:underline truncate block"
             >
               {item.title}
             </Link>

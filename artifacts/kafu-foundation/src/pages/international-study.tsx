@@ -99,7 +99,7 @@ export default function InternationalStudyPage() {
       {/* Header */}
       <section
         className="text-white py-16"
-        style={{ backgroundColor: "#1A5C38" }}
+        style={{ backgroundColor: "#228B22" }}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center gap-2 text-sm text-white/60 mb-6">
@@ -143,7 +143,7 @@ export default function InternationalStudyPage() {
               data-testid="view-all-programmes-link"
               to="/academics"
               className="font-medium hover:underline text-sm"
-              style={{ color: "#1A5C38" }}
+              style={{ color: "#228B22" }}
             >
               Full programme catalogue →
             </Link>
@@ -167,7 +167,7 @@ export default function InternationalStudyPage() {
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
-              <tr style={{ backgroundColor: "#1A5C38" }} className="text-white">
+              <tr style={{ backgroundColor: "#228B22" }} className="text-white">
                 <th className="text-left px-5 py-3 font-semibold rounded-tl-lg">Level of Study</th>
                 <th className="text-right px-5 py-3 font-semibold">Annual Fees (KES)</th>
                 <th className="text-right px-5 py-3 font-semibold rounded-tr-lg">Annual Fees (USD approx.)</th>
@@ -203,7 +203,7 @@ export default function InternationalStudyPage() {
                 <div key={s.step} className="flex gap-6 items-start">
                   <div
                     className="shrink-0 w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-sm z-10"
-                    style={{ backgroundColor: "#1A5C38" }}
+                    style={{ backgroundColor: "#228B22" }}
                   >
                     {s.step}
                   </div>
@@ -219,7 +219,7 @@ export default function InternationalStudyPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14 text-center" style={{ backgroundColor: "#1A5C38" }}>
+      <section className="py-14 text-center" style={{ backgroundColor: "#228B22" }}>
         <div className="max-w-2xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-white mb-4">Begin Your KAFU Journey</h2>
           <p className="text-white/80 mb-8">Applications for the September 2026 intake are now open.</p>
@@ -228,7 +228,7 @@ export default function InternationalStudyPage() {
               data-testid="study-apply-btn"
               to="/admissions"
               className="px-8 py-3 rounded-lg font-semibold text-green-900 text-lg hover:opacity-90 transition-all"
-              style={{ backgroundColor: "#C9A227" }}
+              style={{ backgroundColor: "#DAA520" }}
             >
               Apply Now
             </Link>

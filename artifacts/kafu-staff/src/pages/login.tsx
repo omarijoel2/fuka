@@ -27,7 +27,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f3823] to-[#1A5C38] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0f3823] to-[#228B22] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Header */}
         <div className="text-center mb-8">
@@ -92,7 +92,7 @@ export default function LoginPage() {
               type="submit"
               disabled={loading}
               data-testid="btn-staff-login"
-              className="w-full py-3 bg-[#1A5C38] text-white rounded-xl font-semibold text-sm hover:bg-[#164d30] disabled:opacity-50 transition-colors"
+              className="w-full py-3 bg-[#228B22] text-white rounded-xl font-semibold text-sm hover:bg-[#164d30] disabled:opacity-50 transition-colors"
             >
               {loading ? "Signing in…" : "Sign In"}
             </button>

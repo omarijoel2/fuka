@@ -58,7 +58,7 @@ export default function ContactPage() {
       />
 
       {/* Hero */}
-      <section className="text-white py-16" style={{ backgroundColor: "#1A5C38" }}>
+      <section className="text-white py-16" style={{ backgroundColor: "#228B22" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center gap-2 text-sm text-white/60 mb-6">
             <Link to="/" className="hover:text-white">Home</Link><span>/</span>
@@ -97,7 +97,7 @@ export default function ContactPage() {
               { icon: <MapPin className="w-5 h-5 text-white" />, label: "Main Campus", value: "Kaimosi, Vihiga County", href: undefined, sub: "P.O. Box 27 — 50309, Kenya" },
             ].map((item, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "#1A5C38" }}>{item.icon}</div>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "#228B22" }}>{item.icon}</div>
                 <div>
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{item.label}</p>
                   {item.href ? (
@@ -118,7 +118,7 @@ export default function ContactPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Find Us on the Map</h2>
-            <Link to="/campuses" className="text-sm font-medium hover:underline" style={{ color: "#1A5C38" }}>All campuses →</Link>
+            <Link to="/campuses" className="text-sm font-medium hover:underline" style={{ color: "#228B22" }}>All campuses →</Link>
           </div>
           {campusLoading ? (
             <div className="h-80 animate-pulse bg-gray-200 rounded-xl" />
@@ -137,7 +137,7 @@ export default function ContactPage() {
               <h2 className="text-2xl font-bold text-gray-900">Our Campuses</h2>
               <p className="text-gray-500 text-sm mt-1">KAFU campuses across Western Kenya</p>
             </div>
-            <Link to="/campuses" data-testid="all-campuses-link" className="text-sm font-semibold hover:underline flex items-center gap-1" style={{ color: "#1A5C38" }}>
+            <Link to="/campuses" data-testid="all-campuses-link" className="text-sm font-semibold hover:underline flex items-center gap-1" style={{ color: "#228B22" }}>
               View all <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -148,7 +148,7 @@ export default function ContactPage() {
                 {campus.hero_image ? (
                   <img src={campus.hero_image} alt={campus.name} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
                 ) : (
-                  <div className="w-full h-48 flex items-center justify-center" style={{ backgroundColor: "#1A5C38" }}>
+                  <div className="w-full h-48 flex items-center justify-center" style={{ backgroundColor: "#228B22" }}>
                     <MapPin className="w-12 h-12 text-white/40" />
                   </div>
                 )}
@@ -156,7 +156,7 @@ export default function ContactPage() {
                   <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors mb-1">{campus.name}</h3>
                   {campus.address && <p className="text-sm text-gray-500 flex items-center gap-1"><MapPin className="w-3 h-3" />{campus.address}</p>}
                   {campus.summary && <p className="text-sm text-gray-600 mt-2 line-clamp-2">{campus.summary}</p>}
-                  <span className="inline-flex items-center gap-1 mt-3 text-xs font-semibold" style={{ color: "#1A5C38" }}>View campus <ChevronRight className="w-3 h-3" /></span>
+                  <span className="inline-flex items-center gap-1 mt-3 text-xs font-semibold" style={{ color: "#228B22" }}>View campus <ChevronRight className="w-3 h-3" /></span>
                 </div>
               </Link>
             ))}
@@ -172,7 +172,7 @@ export default function ContactPage() {
               <h2 className="text-2xl font-bold text-gray-900">Key Offices & Services</h2>
               <p className="text-gray-500 text-sm mt-1">Quick access to essential university offices</p>
             </div>
-            <Link to="/offices" data-testid="all-offices-link" className="text-sm font-semibold hover:underline flex items-center gap-1" style={{ color: "#1A5C38" }}>
+            <Link to="/offices" data-testid="all-offices-link" className="text-sm font-semibold hover:underline flex items-center gap-1" style={{ color: "#228B22" }}>
               View all <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -191,7 +191,7 @@ export default function ContactPage() {
           </div>
           <div className="text-center mt-8">
             <Link to="/offices" data-testid="offices-full-directory-btn"
-              className="inline-flex items-center gap-2 px-6 py-3 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: "#1A5C38" }}>
+              className="inline-flex items-center gap-2 px-6 py-3 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: "#228B22" }}>
               <Building2 className="w-4 h-4" /> Full Office Directory
             </Link>
           </div>
@@ -229,7 +229,7 @@ export default function ContactPage() {
                   <Textarea id="message" required placeholder="Your message…" className="min-h-[100px]" data-testid="input-message" />
                 </div>
                 <Button type="submit" disabled={submitting} data-testid="btn-submit-contact"
-                  className="w-full text-white" style={{ backgroundColor: "#C9A227" }}>
+                  className="w-full text-white" style={{ backgroundColor: "#DAA520" }}>
                   {submitting ? "Sending…" : <><Send className="w-4 h-4 mr-2" /> Send Message</>}
                 </Button>
               </form>
@@ -245,7 +245,7 @@ export default function ContactPage() {
                 ].map((item) => (
                   <a key={item.testId} href={item.href} data-testid={item.testId}
                     className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-primary/30 transition-all group">
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3 text-white" style={{ backgroundColor: "#1A5C38" }}>{item.icon}</div>
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3 text-white" style={{ backgroundColor: "#228B22" }}>{item.icon}</div>
                     <h3 className="font-semibold text-gray-900 group-hover:text-primary transition-colors text-sm">{item.title}</h3>
                     <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
                   </a>

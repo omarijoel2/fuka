@@ -8,7 +8,7 @@ interface Theme {
   projects_count?: number; publications_count?: number;
 }
 
-const COLOUR_PRESETS = ["#1A5C38","#C9A227","#2563EB","#DC2626","#7C3AED","#0891B2","#D97706","#16A34A"];
+const COLOUR_PRESETS = ["#228B22","#DAA520","#2563EB","#DC2626","#7C3AED","#0891B2","#D97706","#16A34A"];
 const SDG_OPTIONS = Array.from({ length: 17 }, (_, i) => i + 1);
 
 function ThemeModal({ theme, onClose, onSaved }: { theme: Partial<Theme> | null; onClose: () => void; onSaved: () => void }) {
@@ -16,7 +16,7 @@ function ThemeModal({ theme, onClose, onSaved }: { theme: Partial<Theme> | null;
   const [form, setForm] = useState({
     name: theme?.name ?? "",
     description: theme?.description ?? "",
-    colour: theme?.colour ?? "#1A5C38",
+    colour: theme?.colour ?? "#228B22",
     icon: theme?.icon ?? "flask",
     sdg_goals: theme?.sdg_goals ?? [] as number[],
   });

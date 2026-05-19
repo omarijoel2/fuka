@@ -196,7 +196,7 @@ function ReviewModal({ upload, onClose, onSaved }: { upload: UploadRecord; onClo
             <div className="flex gap-3">
               {(["pending","verified","rejected"] as const).map((s) => (
                 <button key={s} onClick={() => setStatus(s)}
-                  className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-all ${status === s ? "border-[#1A5C38] bg-[#1A5C38]/5 text-[#1A5C38]" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}
+                  className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-all ${status === s ? "border-[#228B22] bg-[#228B22]/5 text-[#228B22]" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}
                   data-testid={`review-status-${s}`}>
                   {UPLOAD_STATUS_CONFIG[s].label}
                 </button>
@@ -207,7 +207,7 @@ function ReviewModal({ upload, onClose, onSaved }: { upload: UploadRecord; onClo
             <label className="block text-sm font-semibold text-gray-700 mb-1">Reviewer Notes <span className="font-normal text-gray-400">(optional)</span></label>
             <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3}
               placeholder="e.g. Document verified against original. Approved for processing."
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]/30"
               data-testid="review-notes" />
           </div>
           {error && <div className="flex items-center gap-2 text-sm text-red-600"><AlertCircle className="w-4 h-4" />{error}</div>}
@@ -215,7 +215,7 @@ function ReviewModal({ upload, onClose, onSaved }: { upload: UploadRecord; onClo
         <div className="flex items-center justify-end gap-3 px-6 py-4 border-t bg-gray-50">
           <button onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">Cancel</button>
           <button onClick={save} disabled={saving}
-            className="px-5 py-2 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90 disabled:opacity-50 flex items-center gap-2"
+            className="px-5 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium hover:bg-[#228B22]/90 disabled:opacity-50 flex items-center gap-2"
             data-testid="btn-save-review">
             {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save Decision
           </button>
@@ -253,7 +253,7 @@ function UploadsTab() {
         <div className="relative flex-1 min-w-48">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by file or reference…"
-            className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30"
+            className="w-full pl-9 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]/30"
             data-testid="search-uploads" />
         </div>
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}
@@ -290,7 +290,7 @@ function UploadsTab() {
               </div>
               <Badge label={UPLOAD_STATUS_CONFIG[u.status]?.label ?? u.status} cls={UPLOAD_STATUS_CONFIG[u.status]?.cls ?? ""} />
               <button onClick={() => setReviewing(u)}
-                className="flex items-center gap-1.5 px-3 py-1.5 border border-[#1A5C38] text-[#1A5C38] rounded-lg text-xs font-medium hover:bg-[#1A5C38]/5 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 border border-[#228B22] text-[#228B22] rounded-lg text-xs font-medium hover:bg-[#228B22]/5 transition-colors"
                 data-testid={`btn-review-${u.id}`}>
                 <Eye className="w-3.5 h-3.5" /> Review
               </button>
@@ -398,14 +398,14 @@ function IntakeModal({ intake, onClose, onSaved }: { intake: Partial<Intake> | n
           </FormField>
           <label className="flex items-center gap-2 text-sm cursor-pointer">
             <input type="checkbox" checked={form.is_published} onChange={(e) => set("is_published",e.target.checked)}
-              className="accent-[#1A5C38]" data-testid="intake-published" />
+              className="accent-[#228B22]" data-testid="intake-published" />
             Publish intake (visible to applicants)
           </label>
           {error && <div className="flex items-center gap-2 text-sm text-red-600"><AlertCircle className="w-4 h-4" />{error}</div>}
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">Cancel</button>
             <button type="submit" disabled={saving}
-              className="px-5 py-2 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90 disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium hover:bg-[#228B22]/90 disabled:opacity-50 flex items-center gap-2"
               data-testid="btn-save-intake">
               {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} {isNew ? "Create Intake" : "Save Changes"}
             </button>
@@ -470,7 +470,7 @@ function IntakesTab() {
           ))}
         </div>
         <button onClick={() => setEditing({})}
-          className="flex items-center gap-1.5 px-4 py-2 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90"
+          className="flex items-center gap-1.5 px-4 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium hover:bg-[#228B22]/90"
           data-testid="btn-create-intake">
           <Plus className="w-4 h-4" /> Create Intake
         </button>
@@ -493,7 +493,7 @@ function IntakesTab() {
             return (
               <div key={intake.id} className="border border-gray-200 rounded-xl bg-white overflow-hidden" data-testid={`intake-row-${intake.id}`}>
                 <div className="flex items-start gap-4 p-4">
-                  <div className="w-10 h-10 rounded-xl bg-[#1A5C38]/10 text-[#1A5C38] flex items-center justify-center shrink-0">
+                  <div className="w-10 h-10 rounded-xl bg-[#228B22]/10 text-[#228B22] flex items-center justify-center shrink-0">
                     <Calendar className="w-5 h-5" />
                   </div>
                   <div className="flex-1 min-w-0">
@@ -514,7 +514,7 @@ function IntakesTab() {
                   </div>
                   <div className="flex items-center gap-1 shrink-0">
                     <button onClick={() => setEditing(intake)} title="Edit"
-                      className="p-1.5 text-gray-400 hover:text-[#1A5C38] rounded-lg hover:bg-[#1A5C38]/10"
+                      className="p-1.5 text-gray-400 hover:text-[#228B22] rounded-lg hover:bg-[#228B22]/10"
                       data-testid={`btn-edit-intake-${intake.id}`}>
                       <Edit2 className="w-4 h-4" />
                     </button>
@@ -622,7 +622,7 @@ function ApplicationDetailModal({ app, onClose, onRefresh }: { app: Application;
             <label className="block text-sm font-semibold text-gray-700 mb-1">Notes (required for Query / Reject)</label>
             <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3}
               placeholder="Internal review notes or rejection reason…"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30"
+              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]/30"
               data-testid="app-review-notes" />
           </div>
 
@@ -631,7 +631,7 @@ function ApplicationDetailModal({ app, onClose, onRefresh }: { app: Application;
           <div className="grid grid-cols-2 gap-2 pt-1">
             {[
               { action: "mark-eligible", label: "Mark Eligible", icon: <CheckSquare className="w-4 h-4" />, cls: "bg-teal-600 hover:bg-teal-700", show: ["submitted","under_review"].includes(app.status) },
-              { action: "offer",         label: "Send Offer",    icon: <CheckCircle2 className="w-4 h-4" />, cls: "bg-[#1A5C38] hover:bg-[#1A5C38]/90", show: app.status === "eligible" },
+              { action: "offer",         label: "Send Offer",    icon: <CheckCircle2 className="w-4 h-4" />, cls: "bg-[#228B22] hover:bg-[#228B22]/90", show: app.status === "eligible" },
               { action: "query-documents", label: "Query Docs", icon: <MessageSquare className="w-4 h-4" />, cls: "bg-amber-600 hover:bg-amber-700", show: ["submitted","under_review","eligible"].includes(app.status) },
               { action: "reject",        label: "Reject",        icon: <XCircle className="w-4 h-4" />, cls: "bg-red-600 hover:bg-red-700", show: !["draft","rejected","offered"].includes(app.status) },
               { action: "defer",         label: "Defer",         icon: <SkipForward className="w-4 h-4" />, cls: "bg-orange-500 hover:bg-orange-600", show: ["submitted","under_review","eligible"].includes(app.status) },
@@ -683,7 +683,7 @@ function ApplicationsTab() {
       <div className="flex gap-2 flex-wrap mb-5">
         {statusCounts.filter(s => s.count > 0).map(s => (
           <button key={s.status} onClick={() => setStatusFilter(s.status === statusFilter ? "" : s.status)}
-            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${statusFilter === s.status ? "border-[#1A5C38] bg-[#1A5C38]/5 text-[#1A5C38]" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${statusFilter === s.status ? "border-[#228B22] bg-[#228B22]/5 text-[#228B22]" : "border-gray-200 text-gray-600 hover:border-gray-400"}`}
             data-testid={`filter-status-${s.status}`}>
             {s.label} ({s.count})
           </button>
@@ -729,7 +729,7 @@ function ApplicationsTab() {
             return (
               <div key={app.id} className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl hover:border-gray-300 bg-white cursor-pointer"
                 onClick={() => setSelected(app)} data-testid={`app-row-${app.id}`}>
-                <div className="w-9 h-9 rounded-full bg-[#1A5C38]/10 text-[#1A5C38] flex items-center justify-center text-xs font-bold shrink-0">
+                <div className="w-9 h-9 rounded-full bg-[#228B22]/10 text-[#228B22] flex items-center justify-center text-xs font-bold shrink-0">
                   {app.full_name?.charAt(0)?.toUpperCase() ?? "A"}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -826,7 +826,7 @@ function KuccpsTab() {
           <button
             data-testid="btn-start-kuccps-import"
             onClick={() => navigate("/admissions/kuccps/wizard")}
-            className="flex items-center gap-2 px-4 py-2 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90"
+            className="flex items-center gap-2 px-4 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium hover:bg-[#228B22]/90"
           >
             <Upload className="w-4 h-4" /> Start New Import
           </button>
@@ -850,7 +850,7 @@ function KuccpsTab() {
             <button
               data-testid="btn-first-import"
               onClick={() => navigate("/admissions/kuccps/wizard")}
-              className="mt-3 text-[#1A5C38] underline text-sm"
+              className="mt-3 text-[#228B22] underline text-sm"
             >
               Start your first import
             </button>
@@ -885,7 +885,7 @@ function KuccpsTab() {
                         <button
                           data-testid={`btn-resume-batch-${batch.id}`}
                           onClick={() => navigate(`/admissions/kuccps/wizard/${batch.id}`)}
-                          className="px-3 py-1.5 text-xs bg-[#1A5C38] text-white rounded-lg font-medium hover:bg-[#1A5C38]/90"
+                          className="px-3 py-1.5 text-xs bg-[#228B22] text-white rounded-lg font-medium hover:bg-[#228B22]/90"
                         >
                           Resume
                         </button>
@@ -987,14 +987,14 @@ function ProgrammeModal({ prog, onClose, onSaved }: { prog: Partial<PgProgramme>
             </FormField>
           </div>
           <label className="flex items-center gap-2 text-sm cursor-pointer">
-            <input type="checkbox" checked={form.is_active} onChange={(e) => set("is_active",e.target.checked)} className="accent-[#1A5C38]" data-testid="prog-active" />
+            <input type="checkbox" checked={form.is_active} onChange={(e) => set("is_active",e.target.checked)} className="accent-[#228B22]" data-testid="prog-active" />
             Programme is active and visible to applicants
           </label>
           {error && <div className="flex items-center gap-2 text-sm text-red-600"><AlertCircle className="w-4 h-4" />{error}</div>}
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900">Cancel</button>
             <button type="submit" disabled={saving}
-              className="px-5 py-2 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90 disabled:opacity-50 flex items-center gap-2"
+              className="px-5 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium hover:bg-[#228B22]/90 disabled:opacity-50 flex items-center gap-2"
               data-testid="btn-save-prog">
               {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} {isNew ? "Add Programme" : "Save Changes"}
             </button>
@@ -1076,7 +1076,7 @@ function ProgrammesTab() {
             <option value="doctoral">Doctoral (PhD)</option>
           </select>
           <button onClick={() => setEditing({})}
-            className="flex items-center gap-1.5 px-4 py-2 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90"
+            className="flex items-center gap-1.5 px-4 py-2 bg-[#228B22] text-white rounded-lg text-sm font-medium hover:bg-[#228B22]/90"
             data-testid="btn-add-programme">
             <Plus className="w-4 h-4" /> Add Programme
           </button>
@@ -1094,7 +1094,7 @@ function ProgrammesTab() {
           <div className="text-xs mt-1 mb-4">Add programmes manually or import the default set</div>
           {progs.length === 0 && (
             <button onClick={handleSeed} disabled={seeding}
-              className="flex items-center gap-1.5 px-4 py-2 border border-[#1A5C38] text-[#1A5C38] rounded-lg text-sm mx-auto hover:bg-[#1A5C38]/5"
+              className="flex items-center gap-1.5 px-4 py-2 border border-[#228B22] text-[#228B22] rounded-lg text-sm mx-auto hover:bg-[#228B22]/5"
               data-testid="btn-seed-empty">
               <RefreshCw className={`w-4 h-4 ${seeding ? "animate-spin" : ""}`} /> Import Default Programmes
             </button>
@@ -1118,13 +1118,13 @@ function ProgrammesTab() {
                 </div>
                 <div className="text-xs text-gray-500 mt-0.5">{SCHOOL_NAMES[prog.school] ?? prog.school} · {prog.duration} · Min: {DEGREE_CLASSES.find((d) => d.value === prog.min_class)?.label ?? prog.min_class}</div>
                 {prog.career_hint && (
-                  <div className="text-xs text-[#C9A227] flex items-center gap-1 mt-0.5">
+                  <div className="text-xs text-[#DAA520] flex items-center gap-1 mt-0.5">
                     <Briefcase className="w-3 h-3" /> {prog.career_hint}
                   </div>
                 )}
               </div>
               <div className="flex items-center gap-1 shrink-0">
-                <button onClick={() => setEditing(prog)} className="p-1.5 text-gray-400 hover:text-[#1A5C38] rounded-lg hover:bg-[#1A5C38]/10" title="Edit" data-testid={`btn-edit-prog-${prog.id}`}>
+                <button onClick={() => setEditing(prog)} className="p-1.5 text-gray-400 hover:text-[#228B22] rounded-lg hover:bg-[#228B22]/10" title="Edit" data-testid={`btn-edit-prog-${prog.id}`}>
                   <Edit2 className="w-4 h-4" />
                 </button>
                 <button onClick={() => handleDelete(prog.id, prog.name)} disabled={deleting === prog.id} className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50" title="Delete" data-testid={`btn-delete-prog-${prog.id}`}>
@@ -1217,11 +1217,11 @@ function SettingsTab() {
                       </button>
                     ) : setting.type === "date" ? (
                       <input id={`setting-${setting.key}`} type="date" value={setting.value} onChange={(e) => updateValue(setting.key, e.target.value)}
-                        className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30"
+                        className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]/30"
                         data-testid={`input-${setting.key}`} />
                     ) : (
                       <input id={`setting-${setting.key}`} type="text" value={setting.value} onChange={(e) => updateValue(setting.key, e.target.value)}
-                        className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30 w-56"
+                        className="border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]/30 w-56"
                         data-testid={`input-${setting.key}`} />
                     )}
                   </div>
@@ -1234,7 +1234,7 @@ function SettingsTab() {
           {saved && <div className="flex items-center gap-2 text-sm text-emerald-700"><CheckCircle2 className="w-4 h-4" />Settings saved successfully.</div>}
 
           <button onClick={save} disabled={saving}
-            className="flex items-center gap-2 px-6 py-2.5 bg-[#1A5C38] text-white rounded-lg text-sm font-medium hover:bg-[#1A5C38]/90 disabled:opacity-50"
+            className="flex items-center gap-2 px-6 py-2.5 bg-[#228B22] text-white rounded-lg text-sm font-medium hover:bg-[#228B22]/90 disabled:opacity-50"
             data-testid="btn-save-settings">
             {saving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} Save All Settings
           </button>
@@ -1302,8 +1302,8 @@ export default function AdmissionsCmsPage() {
     <div className="p-6 max-w-6xl mx-auto">
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <div className="w-10 h-10 rounded-xl bg-[#1A5C38]/10 flex items-center justify-center">
-          <GraduationCap className="w-5 h-5 text-[#1A5C38]" />
+        <div className="w-10 h-10 rounded-xl bg-[#228B22]/10 flex items-center justify-center">
+          <GraduationCap className="w-5 h-5 text-[#228B22]" />
         </div>
         <div>
           <h1 className="text-xl font-bold text-gray-900">Admissions Management</h1>
@@ -1319,7 +1319,7 @@ export default function AdmissionsCmsPage() {
             onClick={() => switchTab(t.id)}
             className={`flex items-center gap-2 px-4 py-3 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
               tab === t.id
-                ? "border-[#1A5C38] text-[#1A5C38]"
+                ? "border-[#228B22] text-[#228B22]"
                 : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
             }`}
             data-testid={`tab-${t.id}`}

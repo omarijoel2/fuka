@@ -91,7 +91,7 @@ export default function InternationalPage() {
       {/* Hero */}
       <section
         className="relative text-white overflow-hidden"
-        style={{ background: "linear-gradient(135deg, #1A5C38 0%, #0f3d26 40%, #1a3a5c 100%)" }}
+        style={{ background: "linear-gradient(135deg, #228B22 0%, #0f3d26 40%, #1a3a5c 100%)" }}
       >
         <div className="absolute inset-0 opacity-10"
           style={{
@@ -105,7 +105,7 @@ export default function InternationalPage() {
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
             KAFU at the{" "}
-            <span style={{ color: "#C9A227" }}>World Stage</span>
+            <span style={{ color: "#DAA520" }}>World Stage</span>
           </h1>
           <p className="text-xl text-white/85 max-w-3xl mx-auto mb-10 leading-relaxed">
             Kaimosi Friends University bridges Western Kenya with the world through partnerships,
@@ -116,7 +116,7 @@ export default function InternationalPage() {
               data-testid="hero-apply-btn"
               to="/admissions"
               className="px-8 py-3 rounded-lg font-semibold text-white text-lg transition-all hover:opacity-90 active:scale-95"
-              style={{ backgroundColor: "#C9A227" }}
+              style={{ backgroundColor: "#DAA520" }}
             >
               Apply as International Student
             </Link>
@@ -142,7 +142,7 @@ export default function InternationalPage() {
                 ))
               : overview?.stats.map((s) => (
                   <div key={s.label}>
-                    <div className="text-3xl font-bold" style={{ color: "#C9A227" }}>
+                    <div className="text-3xl font-bold" style={{ color: "#DAA520" }}>
                       {typeof s.value === "number" && s.value > 100 ? s.value.toLocaleString() : s.value}
                     </div>
                     <div className="text-sm text-white/70 mt-1">{s.label}</div>
@@ -187,7 +187,7 @@ export default function InternationalPage() {
               data-testid="view-all-partners-link"
               to="/international/partnerships"
               className="font-medium hover:underline"
-              style={{ color: "#1A5C38" }}
+              style={{ color: "#228B22" }}
             >
               View all partners →
             </Link>
@@ -249,7 +249,7 @@ export default function InternationalPage() {
               data-testid="view-all-exchange-link"
               to="/international/exchange"
               className="font-medium hover:underline"
-              style={{ color: "#1A5C38" }}
+              style={{ color: "#228B22" }}
             >
               View all →
             </Link>
@@ -299,7 +299,7 @@ export default function InternationalPage() {
                         data-testid={`programme-detail-${prog.slug}`}
                         to={`/international/exchange`}
                         className="block text-center w-full py-2.5 rounded-lg font-medium text-white text-sm transition-all hover:opacity-90"
-                        style={{ backgroundColor: "#1A5C38" }}
+                        style={{ backgroundColor: "#228B22" }}
                       >
                         View Programme
                       </Link>
@@ -313,7 +313,7 @@ export default function InternationalPage() {
       {/* Why KAFU global CTA */}
       <section
         className="py-16 text-white text-center"
-        style={{ backgroundColor: "#1A5C38" }}
+        style={{ backgroundColor: "#228B22" }}
       >
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-3xl font-bold mb-4">Ready to Join a Global Community?</h2>
@@ -326,7 +326,7 @@ export default function InternationalPage() {
               data-testid="cta-apply-international"
               to="/admissions"
               className="px-8 py-3 rounded-lg font-semibold text-green-900 text-lg transition-all hover:opacity-90"
-              style={{ backgroundColor: "#C9A227" }}
+              style={{ backgroundColor: "#DAA520" }}
             >
               Apply Now
             </Link>

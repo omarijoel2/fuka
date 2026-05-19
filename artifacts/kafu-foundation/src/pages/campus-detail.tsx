@@ -18,7 +18,7 @@ export default function CampusDetailPage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-white">
-        <div className="h-72 animate-pulse" style={{ backgroundColor: "#1A5C38" }} />
+        <div className="h-72 animate-pulse" style={{ backgroundColor: "#228B22" }} />
         <div className="max-w-5xl mx-auto px-4 py-12 space-y-6">
           {[1,2,3].map(i => <div key={i} className="h-24 animate-pulse bg-gray-200 rounded-xl" />)}
         </div>
@@ -93,7 +93,7 @@ export default function CampusDetailPage() {
           </div>
         </div>
       ) : (
-        <section className="text-white py-16" style={{ backgroundColor: "#1A5C38" }}>
+        <section className="text-white py-16" style={{ backgroundColor: "#228B22" }}>
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <nav className="flex items-center gap-2 text-sm text-white/60 mb-6">
               <Link to="/" className="hover:text-white">Home</Link><span>/</span>
@@ -126,7 +126,7 @@ export default function CampusDetailPage() {
                   href={`https://www.google.com/maps/dir/?api=1&destination=${campus.latitude},${campus.longitude}`}
                   target="_blank" rel="noopener noreferrer"
                   data-testid="get-directions-btn"
-                  className="inline-flex items-center gap-2 mt-3 text-sm font-medium hover:underline" style={{ color: "#1A5C38" }}>
+                  className="inline-flex items-center gap-2 mt-3 text-sm font-medium hover:underline" style={{ color: "#228B22" }}>
                   <MapPin className="w-4 h-4" /> Get Directions on Google Maps
                 </a>
               </section>
@@ -181,17 +181,17 @@ export default function CampusDetailPage() {
               <div className="space-y-3">
                 {campus.contact_phone && (
                   <a href={`tel:${campus.contact_phone}`} data-testid="campus-phone" className="flex items-center gap-2 text-sm text-gray-700 hover:text-primary transition-colors">
-                    <Phone className="w-4 h-4 flex-shrink-0" style={{ color: "#1A5C38" }} />{campus.contact_phone}
+                    <Phone className="w-4 h-4 flex-shrink-0" style={{ color: "#228B22" }} />{campus.contact_phone}
                   </a>
                 )}
                 {campus.contact_email && (
                   <a href={`mailto:${campus.contact_email}`} data-testid="campus-email" className="flex items-center gap-2 text-sm text-gray-700 hover:text-primary transition-colors">
-                    <Mail className="w-4 h-4 flex-shrink-0" style={{ color: "#1A5C38" }} />{campus.contact_email}
+                    <Mail className="w-4 h-4 flex-shrink-0" style={{ color: "#228B22" }} />{campus.contact_email}
                   </a>
                 )}
                 {campus.address && (
                   <p className="flex items-start gap-2 text-sm text-gray-600">
-                    <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#1A5C38" }} />{campus.address}
+                    <MapPin className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#228B22" }} />{campus.address}
                   </p>
                 )}
                 {campus.county && (
@@ -213,11 +213,11 @@ export default function CampusDetailPage() {
             )}
 
             {/* CTA */}
-            <div className="rounded-xl p-5 text-white" style={{ backgroundColor: "#1A5C38" }}>
+            <div className="rounded-xl p-5 text-white" style={{ backgroundColor: "#228B22" }}>
               <h3 className="font-bold mb-2">Join KAFU</h3>
               <p className="text-sm text-white/80 mb-4">Start your application and become part of our community.</p>
               <Link to="/admissions" data-testid="campus-sidebar-apply-btn"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: "#C9A227", color: "#1A1A1A" }}>
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: "#DAA520", color: "#1A1A1A" }}>
                 Apply Now <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

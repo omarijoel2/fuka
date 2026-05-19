@@ -107,7 +107,7 @@ export default function HomepageManagerPage() {
             data-testid="btn-save-homepage"
             onClick={handleSave}
             disabled={saving}
-            className="px-4 py-2 bg-[#1A5C38] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f] disabled:opacity-50"
+            className="px-4 py-2 bg-[#228B22] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f] disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
@@ -129,7 +129,7 @@ export default function HomepageManagerPage() {
               type="text"
               value={cfg.hero_title || ""}
               onChange={(e) => setCfg({ ...cfg, hero_title: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
             />
           </div>
           <div>
@@ -141,7 +141,7 @@ export default function HomepageManagerPage() {
               rows={3}
               value={cfg.hero_subtitle || ""}
               onChange={(e) => setCfg({ ...cfg, hero_subtitle: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -154,7 +154,7 @@ export default function HomepageManagerPage() {
                 type="text"
                 value={cfg.hero_cta_primary || ""}
                 onChange={(e) => setCfg({ ...cfg, hero_cta_primary: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
               />
             </div>
             <div>
@@ -166,7 +166,7 @@ export default function HomepageManagerPage() {
                 type="text"
                 value={cfg.hero_cta_secondary || ""}
                 onChange={(e) => setCfg({ ...cfg, hero_cta_secondary: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
               />
             </div>
           </div>
@@ -179,7 +179,7 @@ export default function HomepageManagerPage() {
               type="url"
               value={cfg.hero_image_url || ""}
               onChange={(e) => setCfg({ ...cfg, hero_image_url: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
             />
             {cfg.hero_image_url && (
               <img
@@ -205,7 +205,7 @@ export default function HomepageManagerPage() {
             id="admissions-banner-active"
             checked={!!cfg.show_admissions_banner}
             onChange={(e) => setCfg({ ...cfg, show_admissions_banner: e.target.checked })}
-            className="w-4 h-4 text-[#1A5C38] rounded border-gray-300 focus:ring-[#1A5C38]"
+            className="w-4 h-4 text-[#228B22] rounded border-gray-300 focus:ring-[#228B22]"
           />
           <label htmlFor="admissions-banner-active" className="text-sm font-medium text-gray-700">
             Show admissions banner on homepage
@@ -221,7 +221,7 @@ export default function HomepageManagerPage() {
               type="text"
               value={cfg.admissions_banner_text || ""}
               onChange={(e) => setCfg({ ...cfg, admissions_banner_text: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
             />
           </div>
         )}
@@ -234,7 +234,7 @@ export default function HomepageManagerPage() {
           <button
             data-testid="btn-add-stat"
             onClick={addStat}
-            className="text-sm text-[#1A5C38] font-medium hover:underline"
+            className="text-sm text-[#228B22] font-medium hover:underline"
           >
             + Add Stat
           </button>
@@ -248,7 +248,7 @@ export default function HomepageManagerPage() {
                 placeholder="Value (e.g. 8,500+)"
                 value={stat.value}
                 onChange={(e) => updateStat(i, "value", e.target.value)}
-                className="w-40 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                className="w-40 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
               />
               <input
                 data-testid={`input-stat-label-${i}`}
@@ -256,7 +256,7 @@ export default function HomepageManagerPage() {
                 placeholder="Label (e.g. Students Enrolled)"
                 value={stat.label}
                 onChange={(e) => updateStat(i, "label", e.target.value)}
-                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
               />
               <button
                 data-testid={`btn-remove-stat-${i}`}
@@ -280,7 +280,7 @@ export default function HomepageManagerPage() {
           <button
             data-testid="btn-add-quick-link"
             onClick={addQuickLink}
-            className="text-sm text-[#1A5C38] font-medium hover:underline"
+            className="text-sm text-[#228B22] font-medium hover:underline"
           >
             + Add Link
           </button>
@@ -294,7 +294,7 @@ export default function HomepageManagerPage() {
                 placeholder="Label"
                 value={link.label}
                 onChange={(e) => updateQuickLink(i, "label", e.target.value)}
-                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
               />
               <input
                 data-testid={`input-quicklink-url-${i}`}
@@ -302,7 +302,7 @@ export default function HomepageManagerPage() {
                 placeholder="URL or path"
                 value={link.url}
                 onChange={(e) => updateQuickLink(i, "url", e.target.value)}
-                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
               />
               <button
                 data-testid={`btn-remove-quicklink-${i}`}
@@ -324,7 +324,7 @@ export default function HomepageManagerPage() {
           data-testid="btn-save-homepage-bottom"
           onClick={handleSave}
           disabled={saving}
-          className="px-6 py-2 bg-[#1A5C38] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f] disabled:opacity-50"
+          className="px-6 py-2 bg-[#228B22] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f] disabled:opacity-50"
         >
           {saving ? "Saving..." : "Save All Changes"}
         </button>

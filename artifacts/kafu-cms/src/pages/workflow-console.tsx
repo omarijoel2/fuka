@@ -104,7 +104,7 @@ export default function WorkflowConsolePage() {
           data-testid="filter-all"
           onClick={() => { setStatusFilter(""); setPage(1); }}
           className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
-            statusFilter === "" ? "bg-[#1A5C38] text-white border-[#1A5C38]" : "border-gray-300 text-gray-600 hover:border-[#1A5C38]"
+            statusFilter === "" ? "bg-[#228B22] text-white border-[#228B22]" : "border-gray-300 text-gray-600 hover:border-[#228B22]"
           }`}
         >
           All ({totalInQueue})
@@ -118,8 +118,8 @@ export default function WorkflowConsolePage() {
               onClick={() => { setStatusFilter(key); setPage(1); }}
               className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-colors ${
                 statusFilter === key
-                  ? "bg-[#1A5C38] text-white border-[#1A5C38]"
-                  : "border-gray-300 text-gray-600 hover:border-[#1A5C38]"
+                  ? "bg-[#228B22] text-white border-[#228B22]"
+                  : "border-gray-300 text-gray-600 hover:border-[#228B22]"
               }`}
             >
               {label} ({count})
@@ -136,13 +136,13 @@ export default function WorkflowConsolePage() {
           placeholder="Search title or author..."
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-          className="w-64 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+          className="w-64 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
         />
         <select
           data-testid="select-workflow-type"
           value={typeFilter}
           onChange={(e) => { setTypeFilter(e.target.value); setPage(1); }}
-          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+          className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
         >
           <option value="">All Types</option>
           {Object.entries(TYPE_LABELS).map(([key, label]) => (
@@ -190,7 +190,7 @@ export default function WorkflowConsolePage() {
                     <td className="px-4 py-3">
                       <Link
                         to={`/content/${item.id}`}
-                        className="text-[#1A5C38] hover:underline font-medium line-clamp-1"
+                        className="text-[#228B22] hover:underline font-medium line-clamp-1"
                       >
                         {item.title}
                       </Link>
@@ -225,7 +225,7 @@ export default function WorkflowConsolePage() {
                       <Link
                         to={`/content/${item.id}`}
                         data-testid={`btn-review-${item.id}`}
-                        className="text-xs text-[#1A5C38] hover:underline font-medium"
+                        className="text-xs text-[#228B22] hover:underline font-medium"
                       >
                         Review
                       </Link>

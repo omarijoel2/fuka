@@ -127,7 +127,7 @@ export default function RepositoryPage() {
       {/* Hero */}
       <section
         className="relative text-white overflow-hidden py-20"
-        style={{ background: "linear-gradient(135deg, #1A5C38 0%, #0f3d26 60%, #14344a 100%)" }}
+        style={{ background: "linear-gradient(135deg, #228B22 0%, #0f3d26 60%, #14344a 100%)" }}
       >
         <div className="absolute inset-0 opacity-5"
           style={{ backgroundImage: "radial-gradient(circle at 2px 2px, white 1px, transparent 0)", backgroundSize: "32px 32px" }}
@@ -159,7 +159,7 @@ export default function RepositoryPage() {
               data-testid="repo-search-btn"
               type="submit"
               className="px-6 py-3 rounded-lg font-semibold text-gray-900"
-              style={{ backgroundColor: "#C9A227" }}
+              style={{ backgroundColor: "#DAA520" }}
             >
               Search
             </button>
@@ -184,7 +184,7 @@ export default function RepositoryPage() {
                   { label: "Departments", value: stats?.departments ?? 0 },
                 ].map((s) => (
                   <div key={s.label}>
-                    <div className="text-2xl font-bold" style={{ color: "#1A5C38" }}>{s.value}</div>
+                    <div className="text-2xl font-bold" style={{ color: "#228B22" }}>{s.value}</div>
                     <div className="text-xs text-gray-500 mt-1">{s.label}</div>
                   </div>
                 ))
@@ -224,7 +224,7 @@ export default function RepositoryPage() {
               to="/repository/browse"
               data-testid="view-all-repo-link"
               className="font-medium hover:underline text-sm"
-              style={{ color: "#1A5C38" }}
+              style={{ color: "#228B22" }}
             >
               Browse all →
             </Link>

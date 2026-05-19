@@ -133,8 +133,8 @@ export default function ResearchPublicationDetail({ slug }: { slug: string }) {
                 <Link href={`/research/projects/${pub.project.slug}`}>
                   <div className="flex items-start gap-3 hover:bg-muted/30 rounded-lg p-3 transition-colors cursor-pointer">
                     <div className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: (pub.project.theme?.colour ?? "#1A5C38") + "20" }}>
-                      <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: pub.project.theme?.colour ?? "#1A5C38" }} />
+                      style={{ backgroundColor: (pub.project.theme?.colour ?? "#228B22") + "20" }}>
+                      <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: pub.project.theme?.colour ?? "#228B22" }} />
                     </div>
                     <div>
                       {pub.project.theme && <p className="text-xs font-bold text-muted-foreground mb-0.5">{pub.project.theme.name}</p>}

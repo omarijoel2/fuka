@@ -220,7 +220,7 @@ export default function StaffDirectoryPage() {
       <div className="bg-primary text-primary-foreground relative overflow-hidden">
         <div
           className="absolute inset-0 opacity-10"
-          style={{ backgroundImage: "radial-gradient(ellipse at 20% 60%, #C9A227 0%, transparent 55%)" }}
+          style={{ backgroundImage: "radial-gradient(ellipse at 20% 60%, #DAA520 0%, transparent 55%)" }}
         />
         <div className="container mx-auto px-4 py-14 relative z-10">
           <nav className="flex items-center gap-1.5 text-xs text-primary-foreground/70 mb-6">

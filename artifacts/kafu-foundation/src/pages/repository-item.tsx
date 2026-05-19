@@ -150,7 +150,7 @@ export default function RepositoryItemPage() {
         jsonLd={repoJsonLd}
       />
       {/* Header */}
-      <section className="text-white py-12" style={{ backgroundColor: "#1A5C38" }}>
+      <section className="text-white py-12" style={{ backgroundColor: "#228B22" }}>
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center gap-2 text-sm text-white/60 mb-6">
             <Link to="/" className="hover:text-white">Home</Link>
@@ -232,7 +232,7 @@ export default function RepositoryItemPage() {
                         ? "text-white"
                         : "border border-gray-200 text-gray-600 hover:bg-gray-50"
                     }`}
-                    style={citationFormat === fmt ? { backgroundColor: "#1A5C38" } : {}}
+                    style={citationFormat === fmt ? { backgroundColor: "#228B22" } : {}}
                   >
                     {fmt.toUpperCase()}
                   </button>
@@ -287,7 +287,7 @@ export default function RepositoryItemPage() {
                   rel="noreferrer"
                   data-testid="download-btn"
                   className="flex items-center justify-center gap-2 w-full py-3 rounded-lg text-white font-semibold transition-colors hover:opacity-90"
-                  style={{ backgroundColor: "#1A5C38" }}
+                  style={{ backgroundColor: "#228B22" }}
                   onClick={(e) => {
                     e.preventDefault();
                     fetch(`/api/repository/items/${item.slug}/download`)
@@ -357,7 +357,7 @@ export default function RepositoryItemPage() {
               <div className="space-y-2">
                 {item.authors.map((a, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ backgroundColor: "#1A5C38" }}>
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold text-white shrink-0" style={{ backgroundColor: "#228B22" }}>
                       {a.name.split(",")[0]?.[0] ?? "?"}
                     </div>
                     <div>

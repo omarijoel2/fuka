@@ -34,7 +34,7 @@ export default function CampusesPage() {
       />
 
       {/* Hero */}
-      <section className="text-white py-16" style={{ backgroundColor: "#1A5C38" }}>
+      <section className="text-white py-16" style={{ backgroundColor: "#228B22" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center gap-2 text-sm text-white/60 mb-6">
             <Link to="/" className="hover:text-white">Home</Link><span>/</span>
@@ -76,7 +76,7 @@ export default function CampusesPage() {
                   {campus.hero_image ? (
                     <img src={campus.hero_image} alt={campus.name} className="w-full h-52 object-cover" />
                   ) : (
-                    <div className="w-full h-52 flex items-center justify-center" style={{ backgroundColor: "#1A5C38" }}>
+                    <div className="w-full h-52 flex items-center justify-center" style={{ backgroundColor: "#228B22" }}>
                       <MapPin className="w-14 h-14 text-white/30" />
                     </div>
                   )}
@@ -103,7 +103,7 @@ export default function CampusesPage() {
                     </div>
 
                     <Link to={`/campuses/${campus.slug}`} data-testid={`campus-detail-link-${campus.slug}`}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: "#1A5C38" }}>
+                      className="inline-flex items-center gap-2 px-5 py-2.5 text-white rounded-lg text-sm font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: "#228B22" }}>
                       View Campus <ArrowRight className="w-4 h-4" />
                     </Link>
                   </div>
@@ -115,12 +115,12 @@ export default function CampusesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-14" style={{ backgroundColor: "#1A5C38" }}>
+      <section className="py-14" style={{ backgroundColor: "#228B22" }}>
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-white">
           <h2 className="text-3xl font-bold mb-4">Ready to Join KAFU?</h2>
           <p className="text-white/80 mb-8">Apply today and begin your academic journey at Kaimosi Friends University.</p>
           <Link to="/admissions" data-testid="campus-apply-btn"
-            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: "#C9A227", color: "#1A1A1A" }}>
+            className="inline-flex items-center gap-2 px-8 py-3 rounded-lg font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: "#DAA520", color: "#1A1A1A" }}>
             Apply Now <ChevronRight className="w-4 h-4" />
           </Link>
         </div>

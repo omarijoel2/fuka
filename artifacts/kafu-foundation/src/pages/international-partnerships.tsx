@@ -89,7 +89,7 @@ export default function InternationalPartnershipsPage() {
         breadcrumbs={[{ name: "International", path: "/international" }, { name: "Partnerships", path: "/international/partnerships" }]}
       />
       {/* Header */}
-      <section className="text-white py-16" style={{ backgroundColor: "#1A5C38" }}>
+      <section className="text-white py-16" style={{ backgroundColor: "#228B22" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center gap-2 text-sm text-white/60 mb-6">
             <Link to="/" className="hover:text-white">Home</Link>
@@ -119,7 +119,7 @@ export default function InternationalPartnershipsPage() {
                   ? "text-white border-transparent"
                   : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
               }`}
-              style={typeFilter === f.value ? { backgroundColor: "#1A5C38", borderColor: "#1A5C38" } : {}}
+              style={typeFilter === f.value ? { backgroundColor: "#228B22", borderColor: "#228B22" } : {}}
             >
               {f.label}
             </button>
@@ -201,7 +201,7 @@ export default function InternationalPartnershipsPage() {
                       target="_blank"
                       rel="noreferrer"
                       className="text-sm font-medium hover:underline"
-                      style={{ color: "#1A5C38" }}
+                      style={{ color: "#228B22" }}
                     >
                       Visit website →
                     </a>
@@ -214,7 +214,7 @@ export default function InternationalPartnershipsPage() {
       </div>
 
       {/* Become a partner CTA */}
-      <section className="py-14 text-center" style={{ backgroundColor: "#1A5C38" }}>
+      <section className="py-14 text-center" style={{ backgroundColor: "#228B22" }}>
         <div className="max-w-2xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-white mb-4">Interested in Partnering with KAFU?</h2>
           <p className="text-white/80 mb-8">
@@ -225,7 +225,7 @@ export default function InternationalPartnershipsPage() {
             data-testid="partnership-inquiry-btn"
             href="mailto:international@kafu.ac.ke?subject=Partnership Inquiry"
             className="inline-block px-8 py-3 rounded-lg font-semibold text-green-900 hover:opacity-90 transition-all"
-            style={{ backgroundColor: "#C9A227" }}
+            style={{ backgroundColor: "#DAA520" }}
           >
             Send Partnership Inquiry
           </a>

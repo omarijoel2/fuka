@@ -52,13 +52,13 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0f3823] to-[#1A5C38] flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0f3823] to-[#228B22] flex items-center justify-center p-4">
       <div className="w-full max-w-lg">
         {/* Progress */}
         <div className="flex items-center gap-2 mb-8 justify-center">
           {(["password", "consent", "done"] as Step[]).map((s, i) => (
             <React.Fragment key={s}>
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${s === step ? "bg-white text-[#1A5C38]" : (["password","consent","done"].indexOf(step) > i ? "bg-white/30 text-white" : "bg-white/10 text-white/40")}`}>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${s === step ? "bg-white text-[#228B22]" : (["password","consent","done"].indexOf(step) > i ? "bg-white/30 text-white" : "bg-white/10 text-white/40")}`}>
                 {i + 1}
               </div>
               {i < 2 && <div className="w-12 h-0.5 bg-white/20" />}

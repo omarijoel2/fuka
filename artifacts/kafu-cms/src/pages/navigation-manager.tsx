@@ -37,7 +37,7 @@ function NavItemRow({
         placeholder="Label"
         value={item.label}
         onChange={(e) => onUpdate(index, "label", e.target.value)}
-        className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+        className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
       />
       <input
         data-testid={`nav-url-${index}`}
@@ -45,7 +45,7 @@ function NavItemRow({
         placeholder="URL"
         value={item.url}
         onChange={(e) => onUpdate(index, "url", e.target.value)}
-        className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+        className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
       />
       <button
         data-testid={`btn-remove-nav-${index}`}
@@ -156,7 +156,7 @@ export default function NavigationManagerPage() {
             data-testid="btn-save-navigation"
             onClick={save}
             disabled={saving}
-            className="px-4 py-2 bg-[#1A5C38] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f] disabled:opacity-50"
+            className="px-4 py-2 bg-[#228B22] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f] disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
@@ -172,7 +172,7 @@ export default function NavigationManagerPage() {
             onClick={() => setActiveTab(t.id)}
             className={`px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${
               activeTab === t.id
-                ? "border-[#1A5C38] text-[#1A5C38]"
+                ? "border-[#228B22] text-[#228B22]"
                 : "border-transparent text-gray-500 hover:text-gray-700"
             }`}
           >
@@ -191,7 +191,7 @@ export default function NavigationManagerPage() {
             <button
               data-testid="btn-add-primary-nav"
               onClick={addPrimary}
-              className="text-sm text-[#1A5C38] font-medium hover:underline"
+              className="text-sm text-[#228B22] font-medium hover:underline"
             >
               + Add Item
             </button>
@@ -215,7 +215,7 @@ export default function NavigationManagerPage() {
             <button
               data-testid="btn-add-utility-nav"
               onClick={addUtility}
-              className="text-sm text-[#1A5C38] font-medium hover:underline"
+              className="text-sm text-[#228B22] font-medium hover:underline"
             >
               + Add Item
             </button>
@@ -242,14 +242,14 @@ export default function NavigationManagerPage() {
                     type="text"
                     value={group.group}
                     onChange={(e) => updateFooterGroupName(gi, e.target.value)}
-                    className="border border-gray-300 rounded px-2 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                    className="border border-gray-300 rounded px-2 py-1.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#228B22]"
                   />
                 </div>
                 <div className="flex items-center gap-3">
                   <button
                     data-testid={`btn-add-footer-item-${gi}`}
                     onClick={() => addFooterItem(gi)}
-                    className="text-sm text-[#1A5C38] font-medium hover:underline"
+                    className="text-sm text-[#228B22] font-medium hover:underline"
                   >
                     + Add Link
                   </button>
@@ -270,7 +270,7 @@ export default function NavigationManagerPage() {
                     placeholder="Label"
                     value={item.label}
                     onChange={(e) => updateFooterItem(gi, ii, "label", e.target.value)}
-                    className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                    className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
                   />
                   <input
                     data-testid={`footer-item-url-${gi}-${ii}`}
@@ -278,7 +278,7 @@ export default function NavigationManagerPage() {
                     placeholder="URL"
                     value={item.url}
                     onChange={(e) => updateFooterItem(gi, ii, "url", e.target.value)}
-                    className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                    className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
                   />
                   <button
                     data-testid={`btn-remove-footer-item-${gi}-${ii}`}
@@ -294,7 +294,7 @@ export default function NavigationManagerPage() {
           <button
             data-testid="btn-add-footer-group"
             onClick={addFooterGroup}
-            className="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-sm text-gray-500 hover:border-[#1A5C38] hover:text-[#1A5C38] transition-colors"
+            className="w-full py-3 border-2 border-dashed border-gray-300 rounded-xl text-sm text-gray-500 hover:border-[#228B22] hover:text-[#228B22] transition-colors"
           >
             + Add Footer Group
           </button>
@@ -306,7 +306,7 @@ export default function NavigationManagerPage() {
           data-testid="btn-save-navigation-bottom"
           onClick={save}
           disabled={saving}
-          className="px-6 py-2 bg-[#1A5C38] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f] disabled:opacity-50"
+          className="px-6 py-2 bg-[#228B22] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f] disabled:opacity-50"
         >
           {saving ? "Saving..." : "Save All Changes"}
         </button>

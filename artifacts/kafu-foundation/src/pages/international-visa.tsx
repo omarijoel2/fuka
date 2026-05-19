@@ -126,7 +126,7 @@ export default function InternationalVisaPage() {
         breadcrumbs={[{ name: "International", path: "/international" }, { name: "Visa & Immigration", path: "/international/visa" }]}
       />
       {/* Header */}
-      <section className="text-white py-16" style={{ backgroundColor: "#1A5C38" }}>
+      <section className="text-white py-16" style={{ backgroundColor: "#228B22" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center gap-2 text-sm text-white/60 mb-6">
             <Link to="/" className="hover:text-white">Home</Link>
@@ -184,7 +184,7 @@ export default function InternationalVisaPage() {
                 <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <span
                     className="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs"
-                    style={{ backgroundColor: "#1A5C38" }}
+                    style={{ backgroundColor: "#228B22" }}
                   >
                     ✓
                   </span>
@@ -195,7 +195,7 @@ export default function InternationalVisaPage() {
                     <li key={i} className="flex gap-3 text-sm">
                       <span
                         className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-white text-xs font-bold mt-0.5"
-                        style={{ backgroundColor: "#C9A227" }}
+                        style={{ backgroundColor: "#DAA520" }}
                       >
                         {i + 1}
                       </span>
@@ -209,7 +209,7 @@ export default function InternationalVisaPage() {
                 <h4 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <span
                     className="w-5 h-5 rounded-full flex items-center justify-center text-white text-xs"
-                    style={{ backgroundColor: "#1A5C38" }}
+                    style={{ backgroundColor: "#228B22" }}
                   >
                     <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
                   </span>
@@ -236,7 +236,7 @@ export default function InternationalVisaPage() {
           <div className="overflow-x-auto">
             <table className="w-full border-collapse bg-white rounded-xl overflow-hidden shadow-sm">
               <thead>
-                <tr style={{ backgroundColor: "#1A5C38" }} className="text-white">
+                <tr style={{ backgroundColor: "#228B22" }} className="text-white">
                   <th className="text-left px-5 py-3 font-semibold">Application Type</th>
                   <th className="text-left px-5 py-3 font-semibold">Processing Time</th>
                   <th className="text-left px-5 py-3 font-semibold">Notes</th>
@@ -277,7 +277,7 @@ export default function InternationalVisaPage() {
       </section>
 
       {/* Contact CTA */}
-      <section className="py-12 text-center" style={{ backgroundColor: "#1A5C38" }}>
+      <section className="py-12 text-center" style={{ backgroundColor: "#228B22" }}>
         <div className="max-w-xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-white mb-3">Need Help with Your Visa?</h2>
           <p className="text-white/80 mb-6">Our International Office is available Monday–Friday, 8am–5pm (EAT).</p>
@@ -285,7 +285,7 @@ export default function InternationalVisaPage() {
             data-testid="visa-contact-btn"
             href="mailto:international@kafu.ac.ke"
             className="inline-block px-8 py-3 rounded-lg font-semibold text-green-900 hover:opacity-90 transition-all"
-            style={{ backgroundColor: "#C9A227" }}
+            style={{ backgroundColor: "#DAA520" }}
           >
             Email International Office
           </a>

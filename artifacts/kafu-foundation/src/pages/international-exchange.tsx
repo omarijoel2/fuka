@@ -64,7 +64,7 @@ export default function InternationalExchangePage() {
         breadcrumbs={[{ name: "International", path: "/international" }, { name: "Exchange Programmes", path: "/international/exchange" }]}
       />
       {/* Header */}
-      <section className="text-white py-16" style={{ backgroundColor: "#1A5C38" }}>
+      <section className="text-white py-16" style={{ backgroundColor: "#228B22" }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center gap-2 text-sm text-white/60 mb-6">
             <Link to="/" className="hover:text-white">Home</Link>
@@ -92,7 +92,7 @@ export default function InternationalExchangePage() {
             data-testid="exchange-contact-link"
             href="mailto:international@kafu.ac.ke"
             className="shrink-0 text-sm font-semibold underline"
-            style={{ color: "#1A5C38" }}
+            style={{ color: "#228B22" }}
           >
             Contact International Office
           </a>
@@ -112,7 +112,7 @@ export default function InternationalExchangePage() {
                   ? "text-white border-transparent"
                   : "bg-white text-gray-600 border-gray-200 hover:border-gray-300"
               }`}
-              style={typeFilter === f.value ? { backgroundColor: "#1A5C38", borderColor: "#1A5C38" } : {}}
+              style={typeFilter === f.value ? { backgroundColor: "#228B22", borderColor: "#228B22" } : {}}
             >
               {f.label}
             </button>
@@ -212,7 +212,7 @@ export default function InternationalExchangePage() {
                                 <ul className="space-y-1">
                                   {prog.eligibility.slice(0, 3).map((e, i) => (
                                     <li key={i} className="text-xs text-gray-700 flex gap-1.5">
-                                      <span style={{ color: "#1A5C38" }}>✓</span> {e}
+                                      <span style={{ color: "#228B22" }}>✓</span> {e}
                                     </li>
                                   ))}
                                 </ul>
@@ -223,7 +223,7 @@ export default function InternationalExchangePage() {
                               data-testid={`apply-btn-${prog.slug}`}
                               href="mailto:international@kafu.ac.ke?subject=Exchange Programme Application"
                               className="block text-center w-full py-2.5 rounded-lg font-semibold text-white text-sm transition-all hover:opacity-90"
-                              style={{ backgroundColor: "#1A5C38" }}
+                              style={{ backgroundColor: "#228B22" }}
                             >
                               Apply / Inquire
                             </a>
@@ -277,7 +277,7 @@ export default function InternationalExchangePage() {
       </div>
 
       {/* CTA */}
-      <section className="py-14 text-center" style={{ backgroundColor: "#1A5C38" }}>
+      <section className="py-14 text-center" style={{ backgroundColor: "#228B22" }}>
         <div className="max-w-xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-white mb-3">Don't See What You're Looking For?</h2>
           <p className="text-white/80 mb-6">
@@ -287,7 +287,7 @@ export default function InternationalExchangePage() {
             data-testid="exchange-cta-contact"
             href="mailto:international@kafu.ac.ke"
             className="inline-block px-8 py-3 rounded-lg font-semibold text-green-900 hover:opacity-90 transition-all"
-            style={{ backgroundColor: "#C9A227" }}
+            style={{ backgroundColor: "#DAA520" }}
           >
             Get in Touch
           </a>

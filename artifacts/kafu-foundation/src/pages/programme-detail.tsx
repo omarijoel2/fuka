@@ -329,7 +329,7 @@ export default function ProgrammeDetailPage() {
                       <circle cx="18" cy="18" r="15.9" fill="none" stroke="#e5e7eb" strokeWidth="3" />
                       <circle
                         cx="18" cy="18" r="15.9" fill="none"
-                        stroke="#1A5C38" strokeWidth="3"
+                        stroke="#228B22" strokeWidth="3"
                         strokeDasharray={`${employability.employment_rate} ${100 - employability.employment_rate}`}
                         strokeLinecap="round"
                       />

@@ -51,7 +51,7 @@ export default function OfficesPage() {
       />
 
       {/* Hero */}
-      <section className="text-white py-16" style={{ backgroundColor: "#1A5C38" }}>
+      <section className="text-white py-16" style={{ backgroundColor: "#228B22" }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center gap-2 text-sm text-white/60 mb-6">
             <Link to="/" className="hover:text-white">Home</Link><span>/</span>
@@ -116,7 +116,7 @@ export default function OfficesPage() {
               <Building2 className="w-12 h-12 mx-auto mb-3 opacity-30" />
               <p className="font-medium">No offices found matching your filters.</p>
               <button onClick={() => { setSearch(""); setCategory(""); setCampusFilter(""); }}
-                className="mt-3 text-sm hover:underline" style={{ color: "#1A5C38" }}>Clear filters</button>
+                className="mt-3 text-sm hover:underline" style={{ color: "#228B22" }}>Clear filters</button>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -138,7 +138,7 @@ export default function OfficesPage() {
                   <div className="space-y-1.5 mt-auto pt-3 border-t border-gray-100">
                     {office.public_phone && (
                       <p className="flex items-center gap-1.5 text-xs text-gray-600">
-                        <Phone className="w-3 h-3 flex-shrink-0" style={{ color: "#1A5C38" }} />{office.public_phone}
+                        <Phone className="w-3 h-3 flex-shrink-0" style={{ color: "#228B22" }} />{office.public_phone}
                       </p>
                     )}
                     {office.operating_hours?.mon_fri && (
@@ -153,7 +153,7 @@ export default function OfficesPage() {
                     )}
                   </div>
 
-                  <span className="flex items-center gap-1 text-xs font-semibold mt-3" style={{ color: "#1A5C38" }}>
+                  <span className="flex items-center gap-1 text-xs font-semibold mt-3" style={{ color: "#228B22" }}>
                     View details <ChevronRight className="w-3 h-3" />
                   </span>
                 </Link>

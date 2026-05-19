@@ -68,7 +68,7 @@ export default function SiteControlsPage() {
             data-testid="btn-save-site-controls"
             onClick={save}
             disabled={saving}
-            className="px-4 py-2 bg-[#1A5C38] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f] disabled:opacity-50"
+            className="px-4 py-2 bg-[#228B22] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f] disabled:opacity-50"
           >
             {saving ? "Saving..." : "Save Changes"}
           </button>
@@ -122,7 +122,7 @@ export default function SiteControlsPage() {
                 data-testid="select-emergency-type"
                 value={cfg.emergency_banner_type || "warning"}
                 onChange={(e) => setCfg({ ...cfg, emergency_banner_type: e.target.value })}
-                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
               >
                 <option value="warning">Warning (amber)</option>
                 <option value="danger">Danger (red)</option>
@@ -143,7 +143,7 @@ export default function SiteControlsPage() {
             </p>
           </div>
           {cfg.announcement_bar_active && (
-            <span className="px-2 py-1 text-xs font-semibold bg-[#C9A227]/20 text-[#C9A227] rounded-full">
+            <span className="px-2 py-1 text-xs font-semibold bg-[#DAA520]/20 text-[#DAA520] rounded-full">
               ACTIVE
             </span>
           )}
@@ -155,7 +155,7 @@ export default function SiteControlsPage() {
             id="announcement-active"
             checked={!!cfg.announcement_bar_active}
             onChange={(e) => setCfg({ ...cfg, announcement_bar_active: e.target.checked })}
-            className="w-4 h-4 text-[#1A5C38] rounded border-gray-300"
+            className="w-4 h-4 text-[#228B22] rounded border-gray-300"
           />
           <label htmlFor="announcement-active" className="text-sm font-medium text-gray-700">
             Show announcement bar
@@ -170,7 +170,7 @@ export default function SiteControlsPage() {
                 type="text"
                 value={cfg.announcement_bar_text || ""}
                 onChange={(e) => setCfg({ ...cfg, announcement_bar_text: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
               />
             </div>
             <div>
@@ -180,7 +180,7 @@ export default function SiteControlsPage() {
                 type="text"
                 value={cfg.announcement_bar_url || ""}
                 onChange={(e) => setCfg({ ...cfg, announcement_bar_url: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
               />
             </div>
           </div>
@@ -235,7 +235,7 @@ export default function SiteControlsPage() {
                 type="url"
                 value={(cfg as any)[key] || ""}
                 onChange={(e) => setCfg({ ...cfg, [key]: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
                 placeholder="https://..."
               />
             </div>
@@ -256,7 +256,7 @@ export default function SiteControlsPage() {
               type="text"
               value={cfg.footer_copyright || ""}
               onChange={(e) => setCfg({ ...cfg, footer_copyright: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
             />
           </div>
           <div>
@@ -266,7 +266,7 @@ export default function SiteControlsPage() {
               type="text"
               value={cfg.footer_tagline || ""}
               onChange={(e) => setCfg({ ...cfg, footer_tagline: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
             />
           </div>
         </div>
@@ -277,7 +277,7 @@ export default function SiteControlsPage() {
           data-testid="btn-save-site-controls-bottom"
           onClick={save}
           disabled={saving}
-          className="px-6 py-2 bg-[#1A5C38] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f] disabled:opacity-50"
+          className="px-6 py-2 bg-[#228B22] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f] disabled:opacity-50"
         >
           {saving ? "Saving..." : "Save All Changes"}
         </button>
