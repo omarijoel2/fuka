@@ -1696,7 +1696,7 @@ Route::get('/staff', function (Request $request) {
             'unit' => null,
             'email' => 'dean.scit@kafu.ac.ke',
             'specializations' => ['Artificial Intelligence', 'Machine Learning', 'Data Science', 'Software Engineering'],
-            'photo' => null,
+            'photo' => 'https://kafu.ac.ke/wp-content/uploads/Prof.-Omieno-1.jpg',
             'bio' => 'Prof. Omieno is a Professor of Computer Science and Dean of SCIT. His research spans artificial intelligence, machine learning, and intelligent systems applications in healthcare and agriculture.',
         ],
         [
@@ -2136,7 +2136,7 @@ Route::get('/staff/{slug}', function (string $slug) {
             'email' => 'dean.scit@kafu.ac.ke',
             'phone_visible' => false,
             'specializations' => ['Artificial Intelligence', 'Machine Learning', 'Data Science', 'Software Engineering'],
-            'photo' => null,
+            'photo' => 'https://kafu.ac.ke/wp-content/uploads/Prof.-Omieno-1.jpg',
             'biography' => 'Prof. Kelvin K. Omieno is a Professor of Computer Science and the Dean of the School of Computing and Information Technology. A recognised authority in artificial intelligence and machine learning, Prof. Omieno has published extensively in the application of intelligent systems to healthcare, agriculture, and education in Africa. He leads the KAFU AI and Data Science Research Group, which collaborates with regional universities and international institutions. His teaching and mentorship have inspired a generation of computer scientists and technology entrepreneurs across the Lake Victoria Basin.',
             'qualifications' => [
                 ['year' => '2009', 'qualification' => 'Doctor of Philosophy (Computer Science)', 'institution' => 'University of Nairobi'],

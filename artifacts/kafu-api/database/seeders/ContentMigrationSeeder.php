@@ -561,7 +561,7 @@ class ContentMigrationSeeder extends Seeder
                     'department'  => 'Computer Science',
                     'unit'        => null,
                     'email'       => 'dean.scit@kafu.ac.ke',
-                    'photo'       => null,
+                    'photo'       => 'https://kafu.ac.ke/wp-content/uploads/Prof.-Omieno-1.jpg',
                     'biography'   => 'Prof. Kelvin K. Omieno is a Professor of Computer Science and the Dean of the School of Computing and Information Technology. A recognised authority in artificial intelligence and machine learning, Prof. Omieno has published extensively in the application of intelligent systems to healthcare, agriculture, and education in Africa. He leads the KAFU AI and Data Science Research Group.',
                     'specializations' => ['Artificial Intelligence', 'Machine Learning', 'Data Science', 'Software Engineering'],
                     'qualifications'  => [
