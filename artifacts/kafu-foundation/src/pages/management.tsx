@@ -28,9 +28,9 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 const FALLBACK: ManagementProfile[] = [
   {
-    id: 1, name: "Prof. Peter Nyamuhanga Mwita", title: "Vice Chancellor",
-    photo_url: "https://kafu.ac.ke/wp-content/uploads/Vice-Chancellor-Prof.-Peter-Mwita-addresses-fourth-year-teacher-trainees-during-the-opening-of-the-Competency-Based-Education-CBE-training-at-Kaimosi-Friends-University.jpg",
-    bio: "Prof. Mwita was officially appointed Vice Chancellor of Kaimosi Friends University on 14 May 2025, having served in an acting capacity since February 2024. Under his leadership, KAFU continues to advance its mission of quality education, research, and community engagement.",
+    id: 1, name: "Prof. Peter N. Mwita", title: "Vice Chancellor",
+    photo_url: "https://kafu.ac.ke/wp-content/uploads/2026/02/Prof.-Peter-Mwita-Sec-to-Council.jpg",
+    bio: "Prof. Peter N. Mwita is the Vice Chancellor of Kaimosi Friends University and the Secretary to the University Council. A full Professor with over 29 years in academia and research, he previously served as Deputy Vice-Chancellor (Research, Innovation, and Linkages) at Machakos University for over six years, where he was also a Full Professor of Statistics. He has held positions including Dean of the School of Mathematical Sciences and Chairman of the Department of Statistics and Actuarial Sciences at Jomo Kenyatta University of Agriculture and Technology. Under his leadership, Machakos University established the UNESCO Chair on Cloud Computing for Sustainable Development.",
     email: "vc@kafu.ac.ke", office: "Vice Chancellor's Office, Main Administration Block",
     phone: "+254 777 373 633", category: "vc", position_order: 1,
   },
