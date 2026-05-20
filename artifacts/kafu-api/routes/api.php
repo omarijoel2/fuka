@@ -265,6 +265,28 @@ Route::get('/directorates/{slug}', function (string $slug) {
     return response()->json(['data' => $directorate]);
 });
 
+// ── Gallery ──────────────────────────────────────────────────────────────────
+Route::get('/gallery/albums', function () {
+    $albums = \App\Models\GalleryAlbum::where('is_published', true)
+        ->orderBy('sort_order')
+        ->orderBy('album_date', 'desc')
+        ->withCount(['items as photo_count' => fn($q) => $q->where('type', 'image')->where('is_published', true)])
+        ->withCount(['items as video_count' => fn($q) => $q->where('type', 'video')->where('is_published', true)])
+        ->get();
+    return response()->json(['data' => $albums]);
+});
+
+Route::get('/gallery/albums/{slug}', function (string $slug) {
+    $album = \App\Models\GalleryAlbum::where('slug', $slug)
+        ->where('is_published', true)
+        ->with(['items' => fn($q) => $q->where('is_published', true)->orderBy('sort_order')])
+        ->first();
+    if (!$album) {
+        return response()->json(['error' => 'Album not found.'], 404);
+    }
+    return response()->json(['data' => $album]);
+});
+
 Route::get('/news', function (Request $request) {
     $cmsItems = CmsContent::where('type', 'news')
         ->where('status', 'published')

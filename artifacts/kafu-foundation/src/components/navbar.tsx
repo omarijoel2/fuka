@@ -58,6 +58,7 @@ const navItems = [
       { name: "Latest News",    path: "/news" },
       { name: "Events Calendar", path: "/events" },
       { name: "Announcements",  path: "/announcements" },
+      { name: "Photo Gallery",  path: "/gallery" },
     ],
   },
   {

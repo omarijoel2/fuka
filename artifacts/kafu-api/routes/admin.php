@@ -1230,6 +1230,91 @@ Route::prefix('admin')->group(function () {
             return response()->json(null, 204);
         });
 
+        // ── Gallery CRUD ─────────────────────────────────────────────────────────
+        Route::get('/gallery/albums', function () {
+            $albums = \App\Models\GalleryAlbum::orderBy('sort_order')->orderBy('album_date', 'desc')
+                ->withCount('items')->get();
+            return response()->json(['data' => $albums]);
+        });
+
+        Route::post('/gallery/albums', function (Request $request) {
+            $data = $request->validate([
+                'title'           => 'required|string|max:255',
+                'slug'            => 'required|string|unique:gallery_albums,slug|max:100',
+                'description'     => 'nullable|string',
+                'category'        => 'required|in:graduation,events,campus,sports,research,international,other',
+                'cover_image_url' => 'nullable|string',
+                'album_date'      => 'nullable|date',
+                'is_published'    => 'boolean',
+                'sort_order'      => 'integer',
+            ]);
+            return response()->json(['data' => \App\Models\GalleryAlbum::create($data)], 201);
+        });
+
+        Route::put('/gallery/albums/{id}', function (Request $request, $id) {
+            $album = \App\Models\GalleryAlbum::findOrFail($id);
+            $data = $request->validate([
+                'title'           => 'sometimes|string|max:255',
+                'slug'            => "sometimes|string|unique:gallery_albums,slug,{$id}|max:100",
+                'description'     => 'nullable|string',
+                'category'        => 'sometimes|in:graduation,events,campus,sports,research,international,other',
+                'cover_image_url' => 'nullable|string',
+                'album_date'      => 'nullable|date',
+                'is_published'    => 'boolean',
+                'sort_order'      => 'integer',
+            ]);
+            $album->update($data);
+            return response()->json(['data' => $album]);
+        });
+
+        Route::delete('/gallery/albums/{id}', function ($id) {
+            $album = \App\Models\GalleryAlbum::findOrFail($id);
+            $album->items()->delete();
+            $album->delete();
+            return response()->json(null, 204);
+        });
+
+        Route::get('/gallery/albums/{id}/items', function ($id) {
+            $items = \App\Models\GalleryItem::where('album_id', $id)->orderBy('sort_order')->get();
+            return response()->json(['data' => $items]);
+        });
+
+        Route::post('/gallery/items', function (Request $request) {
+            $data = $request->validate([
+                'album_id'      => 'required|exists:gallery_albums,id',
+                'title'         => 'nullable|string|max:255',
+                'caption'       => 'nullable|string',
+                'type'          => 'required|in:image,video',
+                'media_url'     => 'nullable|string',
+                'thumbnail_url' => 'nullable|string',
+                'youtube_id'    => 'nullable|string|max:20',
+                'sort_order'    => 'integer',
+                'is_published'  => 'boolean',
+            ]);
+            return response()->json(['data' => \App\Models\GalleryItem::create($data)], 201);
+        });
+
+        Route::put('/gallery/items/{id}', function (Request $request, $id) {
+            $item = \App\Models\GalleryItem::findOrFail($id);
+            $data = $request->validate([
+                'title'         => 'nullable|string|max:255',
+                'caption'       => 'nullable|string',
+                'type'          => 'sometimes|in:image,video',
+                'media_url'     => 'nullable|string',
+                'thumbnail_url' => 'nullable|string',
+                'youtube_id'    => 'nullable|string|max:20',
+                'sort_order'    => 'integer',
+                'is_published'  => 'boolean',
+            ]);
+            $item->update($data);
+            return response()->json(['data' => $item]);
+        });
+
+        Route::delete('/gallery/items/{id}', function ($id) {
+            \App\Models\GalleryItem::findOrFail($id)->delete();
+            return response()->json(null, 204);
+        });
+
         // ── Campus CRUD ─────────────────────────────────────────────────────────
         Route::get('/campuses', function (Request $request) {
             $q = \App\Models\Campus::orderBy('sort_order')->orderBy('name');

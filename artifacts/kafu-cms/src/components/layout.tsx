@@ -7,7 +7,7 @@ import {
   ChevronDown, ChevronRight, BookOpen, UserCog, AlertTriangle, Newspaper, SlidersHorizontal,
   FlaskConical, Globe, Banknote, HeartHandshake, MapPin, Building2,
   Home, Navigation, ToggleRight, ArrowRightLeft, Activity, GitBranch, Search, GraduationCap,
-  Landmark
+  Landmark, Camera
 } from "lucide-react";
 
 interface NavItem {
@@ -98,6 +98,14 @@ const navItems: NavItem[] = [
       { label: "University Council", href: "/governance/council" },
       { label: "Management Profiles", href: "/governance/management" },
       { label: "Directorates", href: "/governance/directorates" },
+    ],
+  },
+  {
+    label: "Media",
+    icon: <Camera className="w-4 h-4" />,
+    roles: ADMIN_ROLES,
+    children: [
+      { label: "Photo & Video Gallery", href: "/media/gallery" },
     ],
   },
   {

@@ -53,6 +53,8 @@ import CouncilPage from "@/pages/council";
 import ManagementPage from "@/pages/management";
 import DirectoratesPage from "@/pages/directorates";
 import DirectorateDetail from "@/pages/directorate-detail";
+import GalleryPage from "@/pages/gallery";
+import GalleryAlbumPage from "@/pages/gallery-album";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -124,6 +126,8 @@ function Router() {
           <Route path="/directorates/:slug">
             {(params) => <DirectorateDetail slug={params.slug ?? ""} />}
           </Route>
+          <Route path="/gallery" component={GalleryPage} />
+          <Route path="/gallery/:slug" component={GalleryAlbumPage} />
           <Route component={NotFound} />
         </Switch>
       </main>
