@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
+import { PageHero } from "@/components/ui/page-hero";
 
 interface CouncilMember {
   id: number;
@@ -153,17 +154,18 @@ export default function CouncilPage() {
       </Helmet>
 
       {/* Hero */}
-      <section className="bg-primary text-primary-foreground py-20 md:py-28">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <p className="text-accent text-sm font-medium uppercase tracking-widest mb-3">Governance</p>
-          <h1 className="font-serif text-4xl md:text-5xl font-bold mb-5">University Council</h1>
-          <p className="text-primary-foreground/80 text-lg max-w-3xl mx-auto leading-relaxed">
-            The University Council is the supreme governing body of Kaimosi Friends University,
-            responsible for strategic leadership, financial oversight, and the upholding of institutional
-            integrity in accordance with the Universities Act, 2012.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Governance"
+        title="University Council"
+        subtitle="The University Council is the supreme governing body of Kaimosi Friends University, responsible for strategic leadership, financial oversight, and the upholding of institutional integrity in accordance with the Universities Act, 2012."
+        photo="https://kafu.ac.ke/wp-content/uploads/2025/10/arial-view-e-1.jpg"
+        align="center"
+        breadcrumb={[
+          { label: "Home", href: "/" },
+          { label: "About", href: "/about" },
+          { label: "University Council" },
+        ]}
+      />
 
       {/* Council intro */}
       <section className="bg-accent/5 border-b border-border py-10">

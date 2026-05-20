@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { SeoHead } from "@/components/seo-head";
 import { Camera, Play, ChevronRight, Images } from "lucide-react";
+import { PageHero } from "@/components/ui/page-hero";
 
 interface GalleryItem {
   id: number;
@@ -96,28 +97,27 @@ export default function GalleryPage() {
       />
 
       {/* Hero */}
-      <section className="bg-primary text-primary-foreground py-20">
-        <div className="max-w-6xl mx-auto px-4 text-center">
-          <p className="text-sm font-semibold uppercase tracking-widest text-[#C9A227] mb-3">Media</p>
-          <h1 className="font-serif text-4xl md:text-5xl font-bold mb-4">Photo &amp; Video Gallery</h1>
-          <p className="text-white/80 text-lg max-w-2xl mx-auto">
-            Explore moments from KAFU's campus life, ceremonies, research activities, and community events.
-          </p>
-          {/* Stats */}
-          <div className="flex flex-wrap justify-center gap-8 mt-10">
-            {[
-              { label: "Albums", value: albums.length },
-              { label: "Photos", value: totalPhotos || "100+" },
-              { label: "Videos", value: totalVideos || "12+" },
-            ].map(s => (
-              <div key={s.label} className="text-center">
-                <div className="text-3xl font-bold text-[#C9A227]">{s.value}</div>
-                <div className="text-sm text-white/70 mt-1">{s.label}</div>
-              </div>
-            ))}
-          </div>
+      <PageHero
+        eyebrow="Media"
+        title="Photo & Video Gallery"
+        subtitle="Explore moments from KAFU's campus life, ceremonies, research activities, and community events."
+        photo="https://kafu.ac.ke/wp-content/uploads/2025/10/art-culture.jpg"
+        align="center"
+        breadcrumb={[{ label: "Home", href: "/" }, { label: "Gallery" }]}
+      >
+        <div className="flex flex-wrap justify-center gap-10">
+          {[
+            { label: "Albums", value: albums.length },
+            { label: "Photos", value: totalPhotos || "100+" },
+            { label: "Videos", value: totalVideos || "12+" },
+          ].map(s => (
+            <div key={s.label} className="text-center">
+              <div className="text-3xl font-bold text-[#C9A227]">{s.value}</div>
+              <div className="text-sm text-white/70 mt-1">{s.label}</div>
+            </div>
+          ))}
         </div>
-      </section>
+      </PageHero>
 
       {/* Filters */}
       <section className="bg-white border-b sticky top-[4.5rem] z-10">

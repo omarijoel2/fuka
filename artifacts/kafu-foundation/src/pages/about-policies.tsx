@@ -4,6 +4,7 @@ import { SeoHead } from "@/components/seo-head";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { FileText, Download, Search, ArrowLeft, ChevronRight } from "lucide-react";
+import { PageHero } from "@/components/ui/page-hero";
 
 interface Policy {
   slug: string;
@@ -160,18 +161,17 @@ export default function AboutPolicies() {
       />
 
       {/* Hero */}
-      <section className="py-20 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4">
-          <Button variant="ghost" size="sm" className="text-primary-foreground/70 hover:text-primary-foreground mb-6 -ml-2" asChild>
-            <Link href="/about"><ArrowLeft className="w-4 h-4 mr-1" /> Back to About</Link>
-          </Button>
-          <span className="text-xs font-bold uppercase tracking-widest text-accent mb-3 block">Governance</span>
-          <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">Policies & Regulations</h1>
-          <p className="text-primary-foreground/80 max-w-2xl text-lg">
-            Official policies governing academic, student, research, financial, and administrative operations at Kaimosi Friends University.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Governance"
+        title="Policies & Regulations"
+        subtitle="Official policies governing academic, student, research, financial, and administrative operations at Kaimosi Friends University."
+        photo="https://kafu.ac.ke/wp-content/uploads/2025/10/arial-view-e-1.jpg"
+        breadcrumb={[
+          { label: "Home", href: "/" },
+          { label: "About", href: "/about" },
+          { label: "Policies & Regulations" },
+        ]}
+      />
 
       {/* Filters */}
       <section className="py-8 bg-secondary/30 border-b sticky top-14 z-20">

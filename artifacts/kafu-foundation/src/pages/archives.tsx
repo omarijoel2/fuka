@@ -3,6 +3,7 @@ import { SeoHead } from "@/components/seo-head";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Archive, FileText, Newspaper, Users, Bell, Search, Download, ExternalLink, ChevronRight } from "lucide-react";
+import { PageHero } from "@/components/ui/page-hero";
 
 interface ArchiveRecord {
   id: string;
@@ -68,15 +69,16 @@ export default function Archives() {
       />
 
       {/* Hero */}
-      <section className="py-20 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4">
-          <span className="text-xs font-bold uppercase tracking-widest text-accent mb-3 block">Records & History</span>
-          <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">University Archives</h1>
-          <p className="text-primary-foreground/80 max-w-2xl text-lg">
-            Historical notices, newsletters, leadership records, and official circulars from Kaimosi Friends University since our establishment in 2014.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Records & History"
+        title="University Archives"
+        subtitle="Historical notices, newsletters, leadership records, and official circulars from Kaimosi Friends University since our establishment in 2014."
+        photo="https://kafu.ac.ke/wp-content/uploads/image-82.jpeg"
+        breadcrumb={[
+          { label: "Home", href: "/" },
+          { label: "Archives" },
+        ]}
+      />
 
       {/* Type stats */}
       <section className="py-8 bg-secondary/30 border-b">

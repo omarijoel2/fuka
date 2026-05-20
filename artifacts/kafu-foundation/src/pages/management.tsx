@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import { Mail, Phone, Building2 } from "lucide-react";
+import { PageHero } from "@/components/ui/page-hero";
 
 interface ManagementProfile {
   id: number;
@@ -189,16 +190,18 @@ export default function ManagementPage() {
       </Helmet>
 
       {/* Hero */}
-      <section className="bg-primary text-primary-foreground py-20 md:py-28">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <p className="text-accent text-sm font-medium uppercase tracking-widest mb-3">Leadership</p>
-          <h1 className="font-serif text-4xl md:text-5xl font-bold mb-5">University Management</h1>
-          <p className="text-primary-foreground/80 text-lg max-w-3xl mx-auto leading-relaxed">
-            KAFU is led by a team of experienced academics and administrators committed to advancing the
-            university's mission of quality education, impactful research, and community service.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Leadership"
+        title="University Management"
+        subtitle="KAFU is led by a team of experienced academics and administrators committed to advancing the university's mission of quality education, impactful research, and community service."
+        photo="https://kafu.ac.ke/wp-content/uploads/2026/03/IMG_6424-scaled.jpg"
+        align="center"
+        breadcrumb={[
+          { label: "Home", href: "/" },
+          { label: "About", href: "/about" },
+          { label: "University Management" },
+        ]}
+      />
 
       <div className="max-w-5xl mx-auto px-4 py-16 space-y-14">
 

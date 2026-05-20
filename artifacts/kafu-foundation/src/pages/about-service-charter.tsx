@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { SeoHead } from "@/components/seo-head";
 import { Button } from "@/components/ui/button";
 import { Clock, CheckCircle, AlertCircle, Phone, Mail, ArrowLeft, Download } from "lucide-react";
+import { PageHero } from "@/components/ui/page-hero";
 
 const STANDARDS = [
   {
@@ -78,23 +79,23 @@ export default function ServiceCharter() {
       />
 
       {/* Hero */}
-      <section className="py-20 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4">
-          <Button variant="ghost" size="sm" className="text-primary-foreground/70 hover:text-primary-foreground mb-6 -ml-2" asChild>
-            <Link href="/about"><ArrowLeft className="w-4 h-4 mr-1" /> Back to About</Link>
-          </Button>
-          <span className="text-xs font-bold uppercase tracking-widest text-accent mb-3 block">Governance</span>
-          <h1 className="text-4xl md:text-5xl font-serif font-bold mb-4">Service Charter</h1>
-          <p className="text-primary-foreground/80 max-w-2xl text-lg mb-6">
-            Our commitment to service excellence — the standards students, staff, and the public can expect from every department of Kaimosi Friends University.
-          </p>
-          <Button className="bg-accent text-accent-foreground hover:bg-accent/90" asChild data-testid="button-download-charter">
-            <a href="/documents/kafu-service-charter.pdf" target="_blank" rel="noopener noreferrer">
-              <Download className="w-4 h-4 mr-2" /> Download Service Charter (PDF)
-            </a>
-          </Button>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Governance"
+        title="Service Charter"
+        subtitle="Our commitment to service excellence — the standards students, staff, and the public can expect from every department of Kaimosi Friends University."
+        photo="https://kafu.ac.ke/wp-content/uploads/2026/03/IMG_6424-scaled.jpg"
+        breadcrumb={[
+          { label: "Home", href: "/" },
+          { label: "About", href: "/about" },
+          { label: "Service Charter" },
+        ]}
+      >
+        <Button className="bg-[#C9A227] text-[#1A5C38] hover:bg-[#b8911f] font-semibold" asChild data-testid="button-download-charter">
+          <a href="/documents/kafu-service-charter.pdf" target="_blank" rel="noopener noreferrer">
+            <Download className="w-4 h-4 mr-2" /> Download Service Charter (PDF)
+          </a>
+        </Button>
+      </PageHero>
 
       {/* Our Commitment */}
       <section className="py-12 bg-secondary/30 border-b">

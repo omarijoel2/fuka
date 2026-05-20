@@ -4,6 +4,7 @@ import { SeoHead } from "@/components/seo-head";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search, CheckCircle, Clock, AlertCircle, XCircle, FileText, Loader2, ArrowRight } from "lucide-react";
+import { PageHero } from "@/components/ui/page-hero";
 
 interface AppStatus {
   reference_number: string;
@@ -63,14 +64,18 @@ export default function AdmissionsTrack() {
       />
 
       {/* Hero */}
-      <section className="py-20 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl font-serif font-bold mb-3">Track Your Application</h1>
-          <p className="text-primary-foreground/75 max-w-md mx-auto">
-            Enter your application reference number to check the status of your admissions application.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Admissions"
+        title="Track Your Application"
+        subtitle="Enter your application reference number to check the status of your admissions application."
+        photo="https://kafu.ac.ke/wp-content/uploads/2025/10/apply-now.jpg"
+        align="center"
+        breadcrumb={[
+          { label: "Home", href: "/" },
+          { label: "Admissions", href: "/admissions" },
+          { label: "Track Application" },
+        ]}
+      />
 
       <section className="py-16 bg-background flex-1">
         <div className="container mx-auto px-4 max-w-lg">

@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import { Link } from "wouter";
 import { ArrowRight } from "lucide-react";
+import { PageHero } from "@/components/ui/page-hero";
 
 interface DirectorateListItem {
   id: number;
@@ -42,16 +43,17 @@ export default function DirectoratesPage() {
       </Helmet>
 
       {/* Hero */}
-      <section className="bg-primary text-primary-foreground py-20 md:py-28">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <p className="text-accent text-sm font-medium uppercase tracking-widest mb-3">Administration</p>
-          <h1 className="font-serif text-4xl md:text-5xl font-bold mb-5">University Directorates</h1>
-          <p className="text-primary-foreground/80 text-lg max-w-3xl mx-auto leading-relaxed">
-            KAFU's directorates are specialised administrative units responsible for key functions that
-            support the university's academic mission and operational excellence.
-          </p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Administration"
+        title="University Directorates"
+        subtitle="KAFU's directorates are specialised administrative units responsible for key functions that support the university's academic mission and operational excellence."
+        photo="https://kafu.ac.ke/wp-content/uploads/2026/02/image-8-1.jpeg"
+        align="center"
+        breadcrumb={[
+          { label: "Home", href: "/" },
+          { label: "Directorates" },
+        ]}
+      />
 
       {/* Stats bar */}
       <section className="bg-accent/5 border-b border-border py-8">

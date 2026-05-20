@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import { Link } from "wouter";
 import { Mail, Phone, ArrowLeft, ExternalLink, CheckCircle } from "lucide-react";
+import { PageHero } from "@/components/ui/page-hero";
 
 interface QuickLink {
   label: string;
@@ -94,20 +95,17 @@ export default function DirectorateDetail({ slug }: { slug: string }) {
       </div>
 
       {/* Hero */}
-      <section className="bg-primary text-primary-foreground py-16 md:py-24">
-        <div className="max-w-5xl mx-auto px-4">
-          <Link href="/directorates" data-testid="back-link">
-            <span className="inline-flex items-center gap-1.5 text-primary-foreground/60 hover:text-primary-foreground text-sm mb-6 cursor-pointer transition-colors">
-              <ArrowLeft className="w-4 h-4" /> All Directorates
-            </span>
-          </Link>
-          <p className="text-accent text-sm font-medium uppercase tracking-widest mb-3">Directorate</p>
-          <h1 className="font-serif text-3xl md:text-5xl font-bold mb-4">{d.name}</h1>
-          {d.tagline && (
-            <p className="text-primary-foreground/75 text-lg max-w-2xl leading-relaxed">{d.tagline}</p>
-          )}
-        </div>
-      </section>
+      <PageHero
+        eyebrow="Directorate"
+        title={d.name}
+        subtitle={d.tagline ?? undefined}
+        photo="https://kafu.ac.ke/wp-content/uploads/2026/02/image-8-1.jpeg"
+        breadcrumb={[
+          { label: "Home", href: "/" },
+          { label: "Directorates", href: "/directorates" },
+          { label: d.name },
+        ]}
+      />
 
       {/* Main content */}
       <div className="max-w-5xl mx-auto px-4 py-12">
