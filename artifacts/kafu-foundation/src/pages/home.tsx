@@ -487,7 +487,7 @@ export default function Home() {
 
   const schoolLabels: Record<string, string> = {
     SESS: "SESS",
-    SBE: "SBE",
+    SBE: "SOBE",
     SCIT: "SCIT",
     SOS: "SOS",
     SHS: "SHS",
@@ -730,10 +730,10 @@ export default function Home() {
                             )}
                             <div className="min-w-0">
                               <p className="text-sm font-semibold text-foreground truncate leading-tight">
-                                {school.dean ?? "Position Vacant"}
+                                {school.dean ?? `Dean, ${school.name}`}
                               </p>
                               <p className="text-xs text-muted-foreground">
-                                {school.dean ? "Dean of School" : "Dean not yet appointed"}
+                                Dean of School
                               </p>
                             </div>
                           </div>
@@ -1054,7 +1054,7 @@ export default function Home() {
             >
               <option value="">All Schools</option>
               <option value="SESS">SESS — Education</option>
-              <option value="SBE">SBE — Business</option>
+              <option value="SBE">SOBE — Business</option>
               <option value="SCIT">SCIT — Computing</option>
               <option value="SOS">SOS — Science</option>
               <option value="SHS">SHS — Health Sciences</option>
