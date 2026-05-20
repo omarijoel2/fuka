@@ -273,7 +273,6 @@ const ABOUT_GROUPS = [
   {
     heading: "Our People",
     links: [
-      { name: "Staff Directory",         path: "/staff" },
       { name: "Directorates",            path: "/directorates" },
       { name: "Contact Us",              path: "/contact" },
     ],
