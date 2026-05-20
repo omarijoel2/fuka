@@ -5,8 +5,30 @@ import { SeoHead } from "@/components/seo-head";
 import { Button } from "@/components/ui/button";
 import {
   ArrowLeft, Mail, Phone, MapPin, ChevronRight,
-  User, BookOpen, GraduationCap, ExternalLink, Building2,
+  User, BookOpen, GraduationCap, ExternalLink, Building2, Users,
 } from "lucide-react";
+
+interface StaffMember {
+  slug: string;
+  name: string;
+  designation: string;
+  photo: string | null;
+  email: string | null;
+  department: string | null;
+  school: string | null;
+}
+
+function staffMatchesDept(staffDept: string | null, deptName: string): boolean {
+  if (!staffDept) return false;
+  const s = staffDept.toLowerCase().trim();
+  const d = deptName.toLowerCase().replace(/^department of\s*/i, "").trim();
+  if (s === d) return true;
+  // "social work" matches "social work & community development"
+  if (d.startsWith(s)) return true;
+  // Split by & and , to get the first key term
+  const parts = d.split(/[,&]/).map(p => p.trim());
+  return parts.some(p => p === s || p.startsWith(s) || s.startsWith(p));
+}
 
 interface Department {
   id: number;
@@ -58,6 +80,17 @@ export default function DepartmentDetailPage() {
 
   const dept = data?.data;
   const schoolColour = dept ? (SCHOOL_COLOURS[dept.school_code] ?? "#1A5C38") : "#1A5C38";
+
+  const { data: staffData } = useQuery<{ data: StaffMember[] }>({
+    queryKey: ["dept-staff", dept?.school_code],
+    queryFn: () => fetch(`/api/staff?school=${dept!.school_code}`).then(r => r.json()),
+    enabled: !!dept?.school_code,
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const deptStaff = (staffData?.data ?? []).filter(s =>
+    dept ? staffMatchesDept(s.department, dept.name) : false
+  );
 
   if (isLoading) {
     return (
@@ -216,7 +249,61 @@ export default function DepartmentDetailPage() {
               </div>
             )}
 
-            {/* Links to programmes and staff */}
+            {/* Department Staff */}
+            <div data-testid="dept-staff-section">
+              <h2 className="font-serif text-2xl font-bold text-primary mb-5 flex items-center gap-2">
+                <Users className="w-5 h-5" /> Department Staff
+              </h2>
+              {deptStaff.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {deptStaff.map(s => (
+                    <Link key={s.slug} href={`/staff/${s.slug}`}>
+                      <div
+                        className="group flex items-center gap-4 p-4 bg-card border rounded-xl hover:border-primary hover:shadow-sm transition-all cursor-pointer"
+                        data-testid={`staff-card-${s.slug}`}
+                      >
+                        {s.photo ? (
+                          <img
+                            src={s.photo}
+                            alt={s.name}
+                            className="w-14 h-14 rounded-full object-cover shrink-0 ring-2 ring-border group-hover:ring-primary transition-all"
+                          />
+                        ) : (
+                          <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                            <User className="w-6 h-6 text-primary" />
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <p className="font-semibold text-foreground group-hover:text-primary transition-colors text-sm leading-snug truncate">
+                            {s.name}
+                          </p>
+                          <p className="text-xs text-muted-foreground mt-0.5 leading-snug line-clamp-2">
+                            {s.designation}
+                          </p>
+                          {s.email && (
+                            <p className="text-xs text-primary/70 mt-1 flex items-center gap-1 truncate">
+                              <Mail className="w-3 h-3 shrink-0" />
+                              <span className="truncate">{s.email}</span>
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-secondary/40 rounded-xl p-5 border text-sm text-muted-foreground">
+                  <p className="mb-3">Staff listing for this department is being updated.</p>
+                  <Button asChild variant="outline" className="border-primary text-primary text-xs" data-testid="view-staff-fallback">
+                    <Link href={`/staff?school=${dept.school_code}`}>
+                      <User className="w-3.5 h-3.5 mr-2" /> Browse {dept.school_code} Staff Directory
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </div>
+
+            {/* Academic Programmes */}
             <div>
               <h2 className="font-serif text-2xl font-bold text-primary mb-4 flex items-center gap-2">
                 <GraduationCap className="w-5 h-5" /> Academic Programmes
@@ -225,18 +312,11 @@ export default function DepartmentDetailPage() {
                 <p className="text-muted-foreground text-sm mb-4">
                   Browse all programmes offered under the {dept.school_code} school, which includes this department's offerings.
                 </p>
-                <div className="flex flex-wrap gap-3">
-                  <Button asChild className="bg-primary text-primary-foreground" data-testid="view-programmes">
-                    <Link href={`/programmes?school=${dept.school_code}`}>
-                      View {dept.school_code} Programmes <ChevronRight className="w-4 h-4 ml-1" />
-                    </Link>
-                  </Button>
-                  <Button asChild variant="outline" className="border-primary text-primary" data-testid="view-staff">
-                    <Link href={`/staff?school=${dept.school_code}`}>
-                      <User className="w-4 h-4 mr-2" /> Department Staff
-                    </Link>
-                  </Button>
-                </div>
+                <Button asChild className="bg-primary text-primary-foreground" data-testid="view-programmes">
+                  <Link href={`/programmes?school=${dept.school_code}`}>
+                    View {dept.school_code} Programmes <ChevronRight className="w-4 h-4 ml-1" />
+                  </Link>
+                </Button>
               </div>
             </div>
 

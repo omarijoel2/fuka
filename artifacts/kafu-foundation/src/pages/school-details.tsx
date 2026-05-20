@@ -19,6 +19,15 @@ interface Department {
   description: string | null;
 }
 
+interface StaffMember {
+  slug: string;
+  name: string;
+  designation: string;
+  photo: string | null;
+  email: string | null;
+  school: string | null;
+}
+
 function progSlug(code: string): string {
   return code.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
@@ -41,6 +50,16 @@ export default function SchoolDetails() {
     staleTime: 1000 * 60 * 10,
   });
   const departments = deptsData?.data ?? [];
+
+  const { data: staffData } = useQuery<{ data: StaffMember[] }>({
+    queryKey: ["school-staff-dean", code],
+    queryFn: () => fetch(`/api/staff?school=${code}`).then(r => r.json()),
+    enabled: !!code,
+    staleTime: 1000 * 60 * 10,
+  });
+  const deanStaff = staffData?.data?.find(s =>
+    s.designation?.toLowerCase().includes("dean") && !s.designation?.toLowerCase().includes("sub")
+  ) ?? null;
 
   const undergrad = programmes?.filter((p) => p.level === "undergraduate") ?? [];
   const postgrad = programmes?.filter((p) => p.level === "postgraduate") ?? [];
@@ -71,35 +90,67 @@ export default function SchoolDetails() {
       />
       {/* Hero */}
       {schoolLoading ? (
-        <div className="h-64 bg-muted animate-pulse" />
+        <div className="h-72 bg-muted animate-pulse" />
       ) : (
         <div className="bg-primary text-primary-foreground relative overflow-hidden">
           <div
             className="absolute inset-0 opacity-10"
             style={{ backgroundImage: "radial-gradient(ellipse at 80% 30%, #D4A017 0%, transparent 55%)" }}
           />
-          <div className="container mx-auto px-4 py-14 relative z-10">
-            <div className="flex items-center gap-2 text-sm text-primary-foreground/70 mb-5">
-              <Link href="/" className="hover:underline">Home</Link>
+          <div className="container mx-auto px-4 py-16 relative z-10">
+            {/* Breadcrumb */}
+            <div className="flex items-center gap-2 text-sm text-primary-foreground/60 mb-8">
+              <Link href="/" className="hover:text-primary-foreground transition-colors">Home</Link>
               <ChevronRight className="w-4 h-4 opacity-50" />
-              <Link href="/schools" className="hover:underline">Schools</Link>
+              <Link href="/schools" className="hover:text-primary-foreground transition-colors">Schools</Link>
               <ChevronRight className="w-4 h-4 opacity-50" />
-              <span>{school?.code}</span>
+              <span className="text-primary-foreground/80">{school?.code}</span>
             </div>
-            <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6">
-              <div>
-                <span className="inline-block py-1 px-3 rounded-full bg-accent/20 text-accent border border-accent/30 font-bold text-sm mb-4 tracking-wider">
-                  {school?.code}
-                </span>
-                <h1 className="text-3xl md:text-5xl font-serif font-bold max-w-4xl leading-tight">
-                  {school?.name}
+
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+              {/* Title block */}
+              <div className="flex-1">
+                <p className="text-primary-foreground/55 text-xl md:text-2xl font-light tracking-wide mb-1">
+                  The School of
+                </p>
+                <h1 className="text-4xl md:text-6xl font-serif font-bold leading-tight text-primary-foreground">
+                  {(school?.name ?? "").replace(/^School of\s*/i, "")}
                 </h1>
+                <div className="flex items-center gap-2 mt-4">
+                  <span className="py-1 px-3 rounded-full bg-accent/25 text-accent border border-accent/40 font-bold text-xs tracking-widest uppercase">
+                    {school?.code}
+                  </span>
+                </div>
               </div>
-              <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm p-4 rounded-xl shrink-0">
-                <User className="w-8 h-8 text-accent" />
-                <div>
-                  <span className="block text-xs uppercase tracking-wider text-primary-foreground/70">Dean of School</span>
-                  <span className="block font-semibold">{school?.dean ?? "Position Vacant"}</span>
+
+              {/* Dean card */}
+              <div
+                className="flex items-center gap-4 bg-white/10 backdrop-blur-sm px-5 py-4 rounded-2xl shrink-0 border border-white/15 min-w-[240px]"
+                data-testid="dean-card"
+              >
+                {deanStaff?.photo ? (
+                  <img
+                    src={deanStaff.photo}
+                    alt={school?.dean ?? "Dean"}
+                    className="w-16 h-16 rounded-full object-cover shrink-0 ring-2 ring-accent/50"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-white/15 border border-white/20 flex items-center justify-center shrink-0">
+                    <User className="w-7 h-7 text-primary-foreground/60" />
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <span className="block text-[10px] font-bold uppercase tracking-widest text-primary-foreground/55 mb-0.5">
+                    Dean of School
+                  </span>
+                  <span className="block font-semibold text-primary-foreground leading-snug">
+                    {school?.dean ?? "Position Vacant"}
+                  </span>
+                  {school?.dean && (
+                    <span className="block text-xs text-primary-foreground/55 mt-0.5">
+                      {school?.code}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
