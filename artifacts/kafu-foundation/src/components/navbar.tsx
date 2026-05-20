@@ -4,6 +4,61 @@ import { Menu, X, ChevronDown, ChevronRight, MapPin, Phone, ExternalLink, Search
 import { Button } from "./ui/button";
 import { SearchModal } from "./search-bar";
 
+// ─── Departments mega-menu data (grouped by school) ──────────────────────────
+const DEPARTMENTS_BY_SCHOOL = [
+  {
+    school: "Education & Social Sciences",
+    code: "SESS",
+    path: "/schools/SESS",
+    depts: [
+      { name: "Arts & Social Sciences Education",  slug: "arts-social-sciences-education" },
+      { name: "Science & Technical Education",     slug: "science-technical-education" },
+      { name: "Social Work & Community Dev.",      slug: "social-work-community-development" },
+      { name: "Criminology, Security & Peace",     slug: "criminology-security-peace-studies" },
+    ],
+  },
+  {
+    school: "Business & Economics",
+    code: "SBE",
+    path: "/schools/SBE",
+    depts: [
+      { name: "Business Administration & Mgmt",   slug: "business-administration-management" },
+      { name: "Accounting & Finance",              slug: "accounting-finance" },
+      { name: "Economics",                         slug: "economics" },
+    ],
+  },
+  {
+    school: "Computing & IT",
+    code: "SCIT",
+    path: "/schools/SCIT",
+    depts: [
+      { name: "Computer Science",                  slug: "computer-science" },
+      { name: "Information Technology",            slug: "information-technology" },
+    ],
+  },
+  {
+    school: "Science",
+    code: "SOS",
+    path: "/schools/SOS",
+    depts: [
+      { name: "Biological Sciences",               slug: "biological-sciences" },
+      { name: "Physical & Chemical Sciences",      slug: "physical-chemical-sciences" },
+      { name: "Mathematics & Statistics",          slug: "mathematics-statistics" },
+      { name: "Agricultural Economics & Rural Dev.", slug: "agricultural-economics-rural-development" },
+    ],
+  },
+  {
+    school: "Health Sciences",
+    code: "SHS",
+    path: "/schools/SHS",
+    depts: [
+      { name: "Optometry & Vision Sciences",       slug: "optometry-vision-sciences" },
+      { name: "Public & Community Health",         slug: "public-community-health" },
+      { name: "Medical Laboratory Sciences",       slug: "medical-laboratory-sciences" },
+    ],
+  },
+];
+
 // ─── Original 10-item nav structure ──────────────────────────────────────────
 const navItems = [
   { name: "Home", path: "/" },
@@ -34,6 +89,11 @@ const navItems = [
       { name: "SOS — Science",                        path: "/schools/SOS" },
       { name: "SHS — Health Sciences",                path: "/schools/SHS" },
     ],
+  },
+  {
+    name: "Departments",
+    path: "/schools",
+    mega: true,
   },
   {
     name: "Admissions",
@@ -117,7 +177,7 @@ const navItems = [
 ];
 
 type Child   = { name: string; path: string; external?: boolean };
-type NavItem = { name: string; path: string; children?: Child[] };
+type NavItem = { name: string; path: string; children?: Child[]; mega?: boolean };
 
 // ─── Desktop Dropdown ────────────────────────────────────────────────────────
 function DropdownPanel({ item, onClose }: { item: NavItem; onClose: () => void }) {
@@ -152,11 +212,101 @@ function DropdownPanel({ item, onClose }: { item: NavItem; onClose: () => void }
   );
 }
 
+// ─── Departments Mega Panel ───────────────────────────────────────────────────
+function DepartmentsMegaPanel({ onClose }: { onClose: () => void }) {
+  return (
+    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 z-50 bg-white shadow-2xl border-t-2 border-accent rounded-b-xl"
+      style={{ width: "780px" }}>
+      <div className="grid grid-cols-3 gap-0 divide-x divide-gray-100 p-4">
+        {DEPARTMENTS_BY_SCHOOL.map((group) => (
+          <div key={group.code} className="px-4 first:pl-0 last:pr-0">
+            <Link
+              href={group.path}
+              onClick={onClose}
+              className="block text-xs font-bold uppercase tracking-widest text-primary/60 hover:text-primary mb-2 pb-1 border-b border-gray-100"
+              data-testid={`nav-dept-school-${group.code.toLowerCase()}`}
+            >
+              {group.school}
+            </Link>
+            {group.depts.map((dept) => (
+              <Link
+                key={dept.slug}
+                href={`/departments/${dept.slug}`}
+                onClick={onClose}
+                className="block py-1.5 text-xs text-foreground/75 hover:text-primary hover:bg-primary/5 rounded px-1 -ml-1 transition-colors leading-snug"
+                data-testid={`nav-dept-${dept.slug}`}
+              >
+                {dept.name}
+              </Link>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="border-t border-gray-100 px-4 py-2 flex items-center justify-between bg-gray-50 rounded-b-xl">
+        <span className="text-xs text-gray-400">16 departments across 5 schools</span>
+        <Link
+          href="/schools"
+          onClick={onClose}
+          className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+          data-testid="nav-dept-view-schools"
+        >
+          View all schools <ChevronRight className="w-3 h-3" />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 // ─── Mobile Accordion Item ────────────────────────────────────────────────────
 function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }) {
   const [open, setOpen] = React.useState(false);
   const [location]      = useLocation();
   const isActive        = item.path === "/" ? location === "/" : location.startsWith(item.path);
+
+  // Departments mega item — accordion grouped by school
+  if (item.mega) {
+    return (
+      <div className="border-b border-gray-100">
+        <button
+          onClick={() => setOpen((o) => !o)}
+          className={`w-full flex items-center justify-between px-5 py-4 text-sm font-semibold transition-colors ${
+            isActive ? "text-accent" : "text-foreground hover:bg-gray-50"
+          }`}
+          data-testid="mobile-nav-departments"
+        >
+          Departments
+          <ChevronRight className={`w-4 h-4 transition-transform duration-200 ${open ? "rotate-90" : ""}`} />
+        </button>
+        {open && (
+          <div className="bg-gray-50 border-t border-gray-100 pb-2">
+            {DEPARTMENTS_BY_SCHOOL.map((group) => (
+              <div key={group.code} className="mt-2">
+                <Link
+                  href={group.path}
+                  onClick={onClose}
+                  className="block pl-5 pr-5 py-1.5 text-xs font-bold uppercase tracking-wider text-primary/60 hover:text-primary"
+                  data-testid={`mobile-dept-school-${group.code.toLowerCase()}`}
+                >
+                  {group.school}
+                </Link>
+                {group.depts.map((dept) => (
+                  <Link
+                    key={dept.slug}
+                    href={`/departments/${dept.slug}`}
+                    onClick={onClose}
+                    className="block pl-8 pr-5 py-2 text-sm text-muted-foreground hover:text-primary"
+                    data-testid={`mobile-dept-${dept.slug}`}
+                  >
+                    {dept.name}
+                  </Link>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   if (!item.children) {
     return (
@@ -325,7 +475,28 @@ export function Navbar() {
         <nav className="container mx-auto px-4 flex items-center justify-center gap-0">
           {navItems.map((item) => (
             <div key={item.name} className="relative">
-              {item.children ? (
+              {item.mega ? (
+                <div
+                  onMouseEnter={() => setOpenDropdown(item.name)}
+                  onMouseLeave={() => setOpenDropdown(null)}
+                >
+                  <button
+                    onClick={() => setOpenDropdown(openDropdown === item.name ? null : item.name)}
+                    className={`flex items-center gap-0.5 px-3 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
+                      isActive(item.path)
+                        ? "border-accent text-accent"
+                        : "border-transparent text-foreground hover:text-primary hover:border-primary/30"
+                    }`}
+                    data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
+                  >
+                    {item.name}
+                    <ChevronDown className={`w-3 h-3 transition-transform ${openDropdown === item.name ? "rotate-180" : ""}`} />
+                  </button>
+                  {openDropdown === item.name && (
+                    <DepartmentsMegaPanel onClose={() => setOpenDropdown(null)} />
+                  )}
+                </div>
+              ) : item.children ? (
                 <div
                   onMouseEnter={() => setOpenDropdown(item.name)}
                   onMouseLeave={() => setOpenDropdown(null)}
