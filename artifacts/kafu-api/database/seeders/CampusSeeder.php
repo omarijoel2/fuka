@@ -48,6 +48,25 @@ class CampusSeeder extends Seeder
             'status'          => 'active',
         ]);
 
+        Campus::firstOrCreate(['slug' => 'kobujoi-campus'], [
+            'name'            => 'Kobujoi Campus',
+            'summary'         => 'KAFU\'s newest campus, officially opened on 8th September 2025 in Aldai Constituency, Nandi County — focused on STEM, teacher education, and agricultural innovation.',
+            'description'     => "Kobujoi Campus is the newest addition to Kaimosi Friends University, officially opened on 8th September 2025 in Aldai Constituency, Nandi County. The campus was inspired by a visit by H.E. President William Samoei Ruto on 24th August 2024, and is housed on the former grounds of Aldai High School and Ressio Comprehensive Primary School. The pioneer programme is the Bachelor of Education (Arts), with a strategic focus on STEM education, teacher training, agricultural innovation, and industrial crop development. The campus is directed by Prof. Remmy Shiundu and aims to bring quality university education closer to communities in Nandi County and the wider Rift Valley region.",
+            'address'         => 'Aldai Constituency, Nandi County, Kenya',
+            'county'          => 'Nandi',
+            'region'          => 'Rift Valley',
+            'latitude'        => 0.3400,
+            'longitude'       => 35.3000,
+            'hero_image'      => null,
+            'gallery_images'  => [],
+            'contact_email'   => 'kobujoi@kafu.ac.ke',
+            'contact_phone'   => '+254 700 000 002',
+            'visitor_notes'   => 'Please contact the campus office in advance to arrange visits. The campus is located on the former Aldai High School grounds.',
+            'transport_notes' => 'From Eldoret: Take a matatu towards Kapsabet or Nandi Hills and alight at Aldai Junction (~1 hr). From Kapsabet Town: Direct matatus run to Aldai (~30 min).',
+            'sort_order'      => 3,
+            'status'          => 'active',
+        ]);
+
         $offices = [
             [
                 'name'              => 'Admissions Office',

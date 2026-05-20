@@ -128,9 +128,9 @@ export default function SchoolDetails() {
                 className="flex items-center gap-4 bg-white/10 backdrop-blur-sm px-5 py-4 rounded-2xl shrink-0 border border-white/15 min-w-[240px]"
                 data-testid="dean-card"
               >
-                {deanStaff?.photo ? (
+                {(deanStaff?.photo || school?.dean_photo) ? (
                   <img
-                    src={deanStaff.photo}
+                    src={deanStaff?.photo ?? school?.dean_photo ?? ""}
                     alt={school?.dean ?? "Dean"}
                     className="w-16 h-16 rounded-full object-cover shrink-0 ring-2 ring-accent/50"
                   />
