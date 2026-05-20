@@ -266,8 +266,6 @@ const ABOUT_GROUPS = [
       { name: "University Council",      path: "/about/council" },
       { name: "Vice-Chancellor",         path: "/about/management" },
       { name: "University Management",   path: "/about/management" },
-      { name: "University Senate",       path: "/about/senate" },
-      { name: "University Organogram",   path: "/about/organogram" },
     ],
   },
   {
