@@ -1898,6 +1898,21 @@ Route::get('/staff', function (Request $request) {
         }));
     }
 
+    // Overlay photos from users table (portal-uploaded photos) by matching email
+    $emailToPhoto = \Illuminate\Support\Facades\DB::table('users')
+        ->whereNotNull('avatar_url')
+        ->pluck('avatar_url', 'email')
+        ->toArray();
+    if (!empty($emailToPhoto)) {
+        $staff = array_map(function ($s) use ($emailToPhoto) {
+            $email = $s['email'] ?? null;
+            if ($email && isset($emailToPhoto[$email]) && !$s['photo']) {
+                $s['photo'] = $emailToPhoto[$email];
+            }
+            return $s;
+        }, $staff);
+    }
+
     return response()->json(['data' => $staff]);
 });
 
@@ -1920,6 +1935,7 @@ Route::prefix('staff')->middleware(['auth:sanctum'])->group(function () {
     Route::get('/profile/submissions',        [\App\Http\Controllers\StaffProfileController::class, 'getSubmissions']);
     Route::post('/upload-photo',              [\App\Http\Controllers\StaffProfileController::class, 'uploadPhoto']);
     Route::post('/upload-cv',                 [\App\Http\Controllers\StaffProfileController::class, 'uploadCv']);
+    Route::post('/cv-extract',                [\App\Http\Controllers\StaffProfileController::class, 'extractCv']);
     Route::post('/consent/accept',            [\App\Http\Controllers\StaffProfileController::class, 'acceptConsent']);
 });
 Route::prefix('reviewer')->middleware(['auth:sanctum'])->group(function () {

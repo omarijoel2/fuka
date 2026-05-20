@@ -9,6 +9,7 @@ use App\Models\StaffConsentRecord;
 use App\Models\StaffSecurityEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Http;
 
 class StaffProfileController extends Controller
 {
@@ -172,6 +173,112 @@ class StaffProfileController extends Controller
         $submission->update(['profile_data' => $profileData]);
 
         return response()->json(['url' => $url]);
+    }
+
+    public function extractCv(Request $request)
+    {
+        $request->validate(['cv' => 'required|file|mimes:pdf|max:10240']);
+
+        // Extract raw text from PDF
+        $pdfFile = $request->file('cv');
+        $text = '';
+        try {
+            $parser = new \Smalot\PdfParser\Parser();
+            $pdf    = $parser->parseFile($pdfFile->getRealPath());
+            $text   = $pdf->getText();
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Could not read PDF: ' . $e->getMessage()], 422);
+        }
+
+        if (strlen(trim($text)) < 50) {
+            return response()->json(['error' => 'PDF appears to be image-based or empty. Please supply a text-based PDF.'], 422);
+        }
+
+        // Truncate to avoid exceeding token limits (~12 000 chars ≈ 3 000 tokens)
+        $textSnippet = mb_substr($text, 0, 12000);
+
+        $baseUrl = env('AI_INTEGRATIONS_OPENAI_BASE_URL');
+        $apiKey  = env('AI_INTEGRATIONS_OPENAI_API_KEY');
+
+        if (!$baseUrl || !$apiKey) {
+            return response()->json(['error' => 'AI extraction service not configured.'], 503);
+        }
+
+        $systemPrompt = <<<PROMPT
+You are a CV parser for a Kenyan university staff profile system. Extract structured information from the provided CV text.
+
+Return ONLY valid JSON with these exact keys (omit keys you cannot find):
+{
+  "personal": {
+    "title": "Dr./Prof./Mr./Mrs./Ms./Rev.",
+    "name": "Full name",
+    "job_title": "Current designation at the university",
+    "department": "Department or School name",
+    "staff_number": "Staff/Employee ID if present",
+    "orcid": "ORCID iD if present (format: 0000-0000-0000-0000)"
+  },
+  "bio": {
+    "biography": "Professional biography paragraph (200-400 words, third person)",
+    "tagline": "One-line professional tagline"
+  },
+  "qualifications": {
+    "qualifications": "Academic qualifications, one per line, format: Degree — Institution, Year",
+    "certifications": "Professional certifications or short courses, one per line",
+    "memberships": "Professional body memberships, one per line"
+  },
+  "teaching": {
+    "teaching_areas": "Teaching subjects/areas, one per line",
+    "supervision": "Postgraduate supervision summary",
+    "awards": "Academic awards and recognition, one per line"
+  },
+  "research": {
+    "research_interests": "Research interest areas, one per line",
+    "publications": "Selected publications in APA format, one per line (max 10)",
+    "scholar_url": "Google Scholar URL if present",
+    "researchgate_url": "ResearchGate URL if present"
+  },
+  "contact": {
+    "contact_email": "Institutional email address",
+    "office_phone": "Office phone number",
+    "office_location": "Office building and room number",
+    "website": "Personal or institutional website URL"
+  }
+}
+
+Do not include markdown fences. Return only the JSON object.
+PROMPT;
+
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $apiKey,
+                'Content-Type'  => 'application/json',
+            ])->timeout(60)->post(rtrim($baseUrl, '/') . '/chat/completions', [
+                'model'                => 'gpt-5-mini',
+                'max_completion_tokens' => 2048,
+                'messages' => [
+                    ['role' => 'system', 'content' => $systemPrompt],
+                    ['role' => 'user',   'content' => "Here is the CV text:\n\n" . $textSnippet],
+                ],
+            ]);
+
+            if (!$response->successful()) {
+                return response()->json(['error' => 'AI service error: ' . $response->status()], 502);
+            }
+
+            $content = $response->json('choices.0.message.content', '');
+            // Strip any accidental markdown fences
+            $content = preg_replace('/^```json\s*/i', '', trim($content));
+            $content = preg_replace('/```\s*$/', '', $content);
+
+            $extracted = json_decode($content, true);
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json(['error' => 'AI returned invalid JSON.', 'raw' => $content], 502);
+            }
+
+            return response()->json(['extracted' => $extracted]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Extraction failed: ' . $e->getMessage()], 500);
+        }
     }
 
     // --- Internal helpers ---

@@ -3,7 +3,8 @@ import { useAuth } from "@/lib/auth";
 import { staffGet, staffPut, staffPost, staffPostForm, STATUS_COLORS, STATUS_LABELS } from "@/lib/api";
 import {
   User, BookOpen, Briefcase, FlaskConical, Phone, Upload,
-  Save, Send, CheckCircle, AlertCircle, RotateCcw, Camera
+  Save, Send, CheckCircle, AlertCircle, RotateCcw, Camera,
+  Sparkles, FileText, ChevronDown, ChevronUp, X,
 } from "lucide-react";
 
 interface Submission {
@@ -28,6 +29,8 @@ const TABS: { key: Section; label: string; icon: React.ReactNode }[] = [
   { key: "uploads",        label: "Uploads",         icon: <Upload className="w-4 h-4" /> },
 ];
 
+type ExtractedData = Record<string, Record<string, string>>;
+
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
   return (
     <div>
@@ -41,6 +44,108 @@ function Field({ label, required, children }: { label: string; required?: boolea
 const INPUT = "w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors";
 const TEXTAREA = INPUT + " resize-none";
 
+const SECTION_LABELS: Record<string, string> = {
+  personal: "Personal Details",
+  bio: "Biography",
+  qualifications: "Qualifications",
+  teaching: "Teaching",
+  research: "Research",
+  contact: "Contact",
+};
+
+const FIELD_LABELS: Record<string, Record<string, string>> = {
+  personal: { title: "Title", name: "Full Name", job_title: "Job Title", department: "Department/School", staff_number: "Staff Number", orcid: "ORCID iD" },
+  bio: { biography: "Biography", tagline: "Tagline" },
+  qualifications: { qualifications: "Academic Qualifications", certifications: "Certifications", memberships: "Professional Memberships" },
+  teaching: { teaching_areas: "Teaching Areas", supervision: "Postgraduate Supervision", awards: "Awards" },
+  research: { research_interests: "Research Interests", publications: "Selected Publications", scholar_url: "Google Scholar URL", researchgate_url: "ResearchGate URL" },
+  contact: { contact_email: "Institutional Email", office_phone: "Office Phone", office_location: "Office Location", website: "Website" },
+};
+
+interface ExtractionPreviewProps {
+  extracted: ExtractedData;
+  onApply: (extracted: ExtractedData) => void;
+  onDismiss: () => void;
+}
+
+function ExtractionPreview({ extracted, onApply, onDismiss }: ExtractionPreviewProps) {
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const sections = Object.keys(extracted).filter(k => extracted[k] && Object.keys(extracted[k]).length > 0);
+
+  function toggleSection(sec: string) {
+    setExpanded(prev => ({ ...prev, [sec]: !prev[sec] }));
+  }
+
+  const fieldCount = sections.reduce((n, s) => n + Object.keys(extracted[s]).filter(k => extracted[s][k]).length, 0);
+
+  return (
+    <div className="border-2 border-primary/20 bg-primary/5 rounded-xl overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between px-5 py-4 border-b border-primary/10 bg-white">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-primary" />
+          <span className="text-sm font-semibold text-gray-900">
+            Extracted {fieldCount} fields across {sections.length} sections
+          </span>
+        </div>
+        <button onClick={onDismiss} data-testid="btn-dismiss-extraction" className="text-gray-400 hover:text-gray-600 transition-colors">
+          <X className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Sections */}
+      <div className="divide-y divide-primary/10">
+        {sections.map(sec => {
+          const fields = Object.entries(extracted[sec]).filter(([, v]) => v);
+          if (!fields.length) return null;
+          const isOpen = expanded[sec] ?? (sec === "personal" || sec === "bio");
+          return (
+            <div key={sec} className="bg-white">
+              <button
+                onClick={() => toggleSection(sec)}
+                data-testid={`extraction-toggle-${sec}`}
+                className="w-full flex items-center justify-between px-5 py-3 text-left hover:bg-gray-50 transition-colors"
+              >
+                <span className="text-xs font-bold text-gray-700 uppercase tracking-wide">
+                  {SECTION_LABELS[sec] ?? sec} <span className="text-primary ml-1 normal-case font-normal">({fields.length} fields)</span>
+                </span>
+                {isOpen ? <ChevronUp className="w-4 h-4 text-gray-400" /> : <ChevronDown className="w-4 h-4 text-gray-400" />}
+              </button>
+              {isOpen && (
+                <div className="px-5 pb-4 space-y-3">
+                  {fields.map(([key, val]) => (
+                    <div key={key}>
+                      <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-0.5">
+                        {FIELD_LABELS[sec]?.[key] ?? key}
+                      </p>
+                      <p className="text-sm text-gray-800 whitespace-pre-wrap leading-relaxed">
+                        {String(val).slice(0, 400)}{String(val).length > 400 ? "…" : ""}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Actions */}
+      <div className="flex items-center justify-between px-5 py-4 bg-white border-t border-primary/10">
+        <p className="text-xs text-gray-500">Review and apply extracted data to your profile. You can edit any field after applying.</p>
+        <button
+          onClick={() => onApply(extracted)}
+          data-testid="btn-apply-extraction"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary/90 transition-colors"
+        >
+          <CheckCircle className="w-4 h-4" />
+          Apply to Profile
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function ProfileEditorPage() {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<Section>("personal");
@@ -50,12 +155,24 @@ export default function ProfileEditorPage() {
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  // Photo & CV upload state
   const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [uploadedPhotoUrl, setUploadedPhotoUrl] = useState<string | null>(null);
+
   const [cvFile, setCvFile] = useState<File | null>(null);
+  const [uploadingCv, setUploadingCv] = useState(false);
+  const [uploadedCvUrl, setUploadedCvUrl] = useState<string | null>(null);
+
+  // CV extraction state
+  const [extracting, setExtracting] = useState(false);
+  const [extracted, setExtracted] = useState<ExtractedData | null>(null);
 
   const showToast = (type: "success" | "error", text: string) => {
     setToast({ type, text });
-    setTimeout(() => setToast(null), 3000);
+    setTimeout(() => setToast(null), 4000);
   };
 
   const loadProfile = useCallback(async () => {
@@ -81,6 +198,10 @@ export default function ProfileEditorPage() {
       if (!initialForm.personal.job_title) initialForm.personal.job_title = user?.job_title ?? "";
       if (!initialForm.personal.department) initialForm.personal.department = user?.department ?? "";
       setForm(initialForm);
+      // Restore saved photo/cv URLs
+      const uploads = pd.uploads ?? {};
+      if (uploads.photo_url) setUploadedPhotoUrl(String(uploads.photo_url));
+      if (uploads.cv_url) setUploadedCvUrl(String(uploads.cv_url));
     } catch {
       showToast("error", "Failed to load profile.");
     } finally {
@@ -89,6 +210,14 @@ export default function ProfileEditorPage() {
   }, [user]);
 
   useEffect(() => { loadProfile(); }, [loadProfile]);
+
+  // Local photo preview
+  useEffect(() => {
+    if (!photoFile) { setPhotoPreview(null); return; }
+    const url = URL.createObjectURL(photoFile);
+    setPhotoPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [photoFile]);
 
   function setField(section: Section, field: string, value: string) {
     setForm(prev => ({ ...prev, [section]: { ...prev[section], [field]: value } }));
@@ -134,39 +263,86 @@ export default function ProfileEditorPage() {
 
   async function uploadPhoto() {
     if (!photoFile) return;
+    setUploadingPhoto(true);
     const fd = new FormData();
     fd.append("photo", photoFile);
     try {
-      await staffPostForm("/upload-photo", fd);
-      showToast("success", "Photo uploaded.");
+      const res = await staffPostForm("/upload-photo", fd);
+      setUploadedPhotoUrl(res.url);
       setPhotoFile(null);
+      showToast("success", "Photo uploaded successfully. It will appear on the public staff directory once your profile is approved.");
     } catch (err: unknown) {
       showToast("error", err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setUploadingPhoto(false);
     }
   }
 
   async function uploadCv() {
     if (!cvFile) return;
+    setUploadingCv(true);
     const fd = new FormData();
     fd.append("cv", cvFile);
     try {
-      await staffPostForm("/upload-cv", fd);
-      showToast("success", "CV uploaded.");
+      const res = await staffPostForm("/upload-cv", fd);
+      setUploadedCvUrl(res.url);
       setCvFile(null);
+      showToast("success", "CV uploaded.");
     } catch (err: unknown) {
       showToast("error", err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setUploadingCv(false);
     }
+  }
+
+  async function extractFromCv() {
+    if (!cvFile) return;
+    setExtracting(true);
+    const fd = new FormData();
+    fd.append("cv", cvFile);
+    try {
+      const res = await staffPostForm("/cv-extract", fd);
+      if (res.error) throw new Error(res.error);
+      setExtracted(res.extracted);
+      showToast("success", "CV analysed. Review the extracted data below and apply it to your profile.");
+    } catch (err: unknown) {
+      showToast("error", err instanceof Error ? err.message : "Extraction failed. Please try a text-based PDF.");
+    } finally {
+      setExtracting(false);
+    }
+  }
+
+  function applyExtraction(data: ExtractedData) {
+    setForm(prev => {
+      const next = { ...prev };
+      for (const [section, fields] of Object.entries(data)) {
+        if (!fields || typeof fields !== "object") continue;
+        next[section] = { ...(next[section] ?? {}) };
+        for (const [key, val] of Object.entries(fields)) {
+          if (val && !next[section][key]) {
+            // Only prefill empty fields; never overwrite existing data
+            next[section][key] = String(val);
+          }
+        }
+      }
+      return next;
+    });
+    setExtracted(null);
+    setActiveTab("personal");
+    showToast("success", "Profile pre-filled from CV. Review each section and save.");
   }
 
   const canEdit = !submission || ["draft", "revision_requested"].includes(submission.workflow_status);
   const canSubmit = canEdit && (submission?.completeness_score ?? 0) >= 40 && user?.has_consent;
   const isSubmitted = submission && !["draft", "revision_requested"].includes(submission.workflow_status);
 
+  const displayPhoto = photoPreview ?? uploadedPhotoUrl ?? user?.avatar_url ?? null;
+
   return (
     <div className="space-y-6">
       {/* Toast */}
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white ${toast.type === "success" ? "bg-green-600" : "bg-red-600"}`}>
+        <div className={`fixed top-4 right-4 z-50 px-4 py-3 rounded-xl shadow-lg text-sm font-medium text-white max-w-sm ${toast.type === "success" ? "bg-green-600" : "bg-red-600"}`}>
           {toast.text}
         </div>
       )}
@@ -400,27 +576,38 @@ export default function ProfileEditorPage() {
               {/* UPLOADS */}
               {activeTab === "uploads" && (
                 <div className="space-y-6">
-                  <h3 className="text-sm font-bold text-gray-700 mb-3">Photo & CV Uploads</h3>
-                  {/* Photo */}
+                  <h3 className="text-sm font-bold text-gray-700 mb-1">Photo & CV Uploads</h3>
+
+                  {/* Photo upload */}
                   <div className="border-2 border-dashed border-gray-200 rounded-xl p-6">
-                    <div className="flex items-start gap-4">
-                      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-                        {user?.avatar_url
-                          ? <img src={user.avatar_url} alt="Profile" className="w-16 h-16 rounded-full object-cover" />
-                          : <Camera className="w-7 h-7 text-gray-400" />
-                        }
+                    <div className="flex items-start gap-5">
+                      {/* Avatar preview */}
+                      <div className="shrink-0">
+                        {displayPhoto ? (
+                          <img src={displayPhoto} alt="Profile photo" className="w-20 h-20 rounded-full object-cover ring-2 ring-primary/30" />
+                        ) : (
+                          <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center">
+                            <Camera className="w-8 h-8 text-gray-400" />
+                          </div>
+                        )}
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-semibold text-gray-900">Profile Photo</p>
-                        <p className="text-xs text-gray-500 mt-0.5">JPG or PNG, max 3 MB. Professional headshot required.</p>
-                        <div className="mt-3 flex items-center gap-3">
-                          <input type="file" accept="image/*" onChange={e => setPhotoFile(e.target.files?.[0] ?? null)}
+                        <p className="text-xs text-gray-500 mt-0.5">JPG or PNG, max 3 MB. Professional headshot required. Once approved, this photo will appear on the public staff directory.</p>
+                        {uploadedPhotoUrl && !photoFile && (
+                          <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" /> Photo uploaded — will appear publicly after profile approval
+                          </p>
+                        )}
+                        <div className="mt-3 flex items-center gap-3 flex-wrap">
+                          <input type="file" accept="image/*"
+                            onChange={e => setPhotoFile(e.target.files?.[0] ?? null)}
                             data-testid="input-photo-upload"
-                            className="text-xs text-gray-600 file:mr-3 file:text-xs file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-gray-100 file:text-gray-700 file:cursor-pointer" />
+                            className="text-xs text-gray-600 file:mr-3 file:text-xs file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-gray-100 file:text-gray-700 file:cursor-pointer hover:file:bg-gray-200" />
                           {photoFile && (
-                            <button onClick={uploadPhoto} data-testid="btn-upload-photo"
-                              className="px-3 py-1.5 bg-primary text-white text-xs rounded-lg hover:bg-primary/90 transition-colors">
-                              Upload
+                            <button onClick={uploadPhoto} disabled={uploadingPhoto} data-testid="btn-upload-photo"
+                              className="px-3 py-1.5 bg-primary text-white text-xs rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors">
+                              {uploadingPhoto ? "Uploading…" : "Upload Photo"}
                             </button>
                           )}
                         </div>
@@ -428,22 +615,77 @@ export default function ProfileEditorPage() {
                     </div>
                   </div>
 
-                  {/* CV */}
+                  {/* CV upload + extraction */}
                   <div className="border-2 border-dashed border-gray-200 rounded-xl p-6">
-                    <p className="text-sm font-semibold text-gray-900">Curriculum Vitae (CV)</p>
-                    <p className="text-xs text-gray-500 mt-0.5">PDF only, max 10 MB.</p>
-                    <div className="mt-3 flex items-center gap-3">
-                      <input type="file" accept=".pdf" onChange={e => setCvFile(e.target.files?.[0] ?? null)}
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shrink-0">
+                        <FileText className="w-5 h-5 text-primary" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-gray-900">Curriculum Vitae (CV)</p>
+                        <p className="text-xs text-gray-500 mt-0.5">PDF only, max 10 MB. Use a text-based PDF for AI extraction to work.</p>
+                        {uploadedCvUrl && !cvFile && (
+                          <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" /> CV on file
+                          </p>
+                        )}
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <input type="file" accept=".pdf"
+                        onChange={e => { setCvFile(e.target.files?.[0] ?? null); setExtracted(null); }}
                         data-testid="input-cv-upload"
-                        className="text-xs text-gray-600 file:mr-3 file:text-xs file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-gray-100 file:text-gray-700 file:cursor-pointer" />
+                        className="text-xs text-gray-600 file:mr-3 file:text-xs file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-gray-100 file:text-gray-700 file:cursor-pointer hover:file:bg-gray-200" />
                       {cvFile && (
-                        <button onClick={uploadCv} data-testid="btn-upload-cv"
-                          className="px-3 py-1.5 bg-primary text-white text-xs rounded-lg hover:bg-primary/90 transition-colors">
-                          Upload
-                        </button>
+                        <>
+                          <button onClick={uploadCv} disabled={uploadingCv || extracting} data-testid="btn-upload-cv"
+                            className="px-3 py-1.5 bg-gray-700 text-white text-xs rounded-lg hover:bg-gray-800 disabled:opacity-50 transition-colors">
+                            {uploadingCv ? "Uploading…" : "Upload CV"}
+                          </button>
+                          {canEdit && (
+                            <button onClick={extractFromCv} disabled={extracting || uploadingCv} data-testid="btn-extract-cv"
+                              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors">
+                              <Sparkles className="w-3.5 h-3.5" />
+                              {extracting ? "Analysing CV…" : "Extract & Auto-fill Profile"}
+                            </button>
+                          )}
+                        </>
                       )}
                     </div>
+
+                    {/* Extraction loading state */}
+                    {extracting && (
+                      <div className="mt-4 p-4 bg-primary/5 rounded-xl border border-primary/20 flex items-center gap-3">
+                        <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin shrink-0" />
+                        <div>
+                          <p className="text-sm font-medium text-gray-800">Analysing your CV…</p>
+                          <p className="text-xs text-gray-500">Extracting qualifications, publications, research interests, and more. This takes 10–20 seconds.</p>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Hint when no file selected */}
+                    {!cvFile && !extracting && (
+                      <div className="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-100">
+                        <p className="text-xs text-amber-700 flex items-start gap-2">
+                          <Sparkles className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                          <span>
+                            <strong>AI Auto-fill:</strong> Select your CV (PDF) above, then click <em>Extract & Auto-fill Profile</em> to automatically populate all sections — qualifications, biography, research interests, publications, and contact details.
+                          </span>
+                        </p>
+                      </div>
+                    )}
                   </div>
+
+                  {/* Extraction preview */}
+                  {extracted && !extracting && (
+                    <ExtractionPreview
+                      extracted={extracted}
+                      onApply={applyExtraction}
+                      onDismiss={() => setExtracted(null)}
+                    />
+                  )}
                 </div>
               )}
 
