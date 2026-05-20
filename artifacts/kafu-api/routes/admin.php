@@ -375,6 +375,40 @@ Route::prefix('admin')->group(function () {
         });
 
         // -------------------------------------------------------------------------
+        // Force Publish (admin shortcut — bypasses intermediate workflow states)
+        // -------------------------------------------------------------------------
+        Route::post('/content/{id}/force-publish', function (Request $request, $id) {
+            $user = $request->user();
+
+            if (!$user->isCentralAdmin()) {
+                return response()->json(['message' => 'Only central admins can force-publish content.'], 403);
+            }
+
+            $content = CmsContent::where('is_deleted', false)->findOrFail($id);
+
+            if ($content->status === 'published') {
+                return response()->json(['message' => 'Content is already published.', 'data' => $content]);
+            }
+
+            $fromStatus = $content->status;
+            $content->update([
+                'status'       => 'published',
+                'published_at' => $content->published_at ?? now(),
+                'approved_at'  => $content->approved_at ?? now(),
+                'approver_id'  => $content->approver_id ?? $user->id,
+            ]);
+
+            AuditLog::record($user, 'content.force_publish', $content->type, $content->id,
+                $content->title, ['status' => $fromStatus], ['status' => 'published'],
+                'Force-published by central admin');
+
+            return response()->json([
+                'message' => 'Content published.',
+                'data'    => $content->fresh(),
+            ]);
+        });
+
+        // -------------------------------------------------------------------------
         // Revisions
         // -------------------------------------------------------------------------
         Route::get('/content/{id}/revisions', function (Request $request, $id) {

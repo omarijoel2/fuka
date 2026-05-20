@@ -2,7 +2,8 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Link, useSearch, useLocation } from "wouter";
 import { apiGet, apiPost, CONTENT_TYPE_LABELS, CONTENT_TYPES, STATUS_LABELS, formatDate } from "@/lib/api";
 import { StatusBadge } from "@/components/status-badge";
-import { Plus, Search, Filter, Trash2, Edit2, Eye } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { Plus, Search, Filter, Edit2, Upload } from "lucide-react";
 
 interface ContentItem {
   id: number;
@@ -22,10 +23,13 @@ interface Meta {
   current_page: number; last_page: number; total: number; per_page: number;
 }
 
+const ADMIN_ROLES = ["super_admin", "ict_admin", "communications_admin"];
+
 export default function ContentLibraryPage() {
   const searchStr = useSearch();
   const params = new URLSearchParams(searchStr);
   const initialType = params.get("type") ?? "";
+  const { user } = useAuth();
 
   const [items, setItems] = useState<ContentItem[]>([]);
   const [meta, setMeta] = useState<Meta | null>(null);
@@ -35,7 +39,10 @@ export default function ContentLibraryPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [publishing, setPublishing] = useState<number | null>(null);
   const [, navigate] = useLocation();
+
+  const isAdmin = user && ADMIN_ROLES.includes(user.role);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -73,6 +80,20 @@ export default function ContentLibraryPage() {
     e.preventDefault();
     setPage(1);
     load();
+  };
+
+  const handleForcePublish = async (item: ContentItem) => {
+    if (!window.confirm(`Publish "${item.title}" now? This will make it visible on the website immediately.`)) return;
+    setPublishing(item.id);
+    setError("");
+    try {
+      await apiPost(`/content/${item.id}/force-publish`);
+      await load();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Failed to publish content.");
+    } finally {
+      setPublishing(null);
+    }
   };
 
   const statuses = Object.entries(STATUS_LABELS);
@@ -153,6 +174,13 @@ export default function ContentLibraryPage() {
         <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">{error}</div>
       )}
 
+      {/* Admin notice for unpublished content */}
+      {isAdmin && items.some(i => !["published", "archived"].includes(i.status)) && (
+        <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+          Some items below are not yet published and will not appear on the website. Use the Publish button to make them live immediately.
+        </div>
+      )}
+
       {/* Table */}
       <div className="bg-white rounded-xl border border-border shadow-sm overflow-hidden">
         {loading ? (
@@ -208,6 +236,18 @@ export default function ContentLibraryPage() {
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
                         </Link>
+                        {isAdmin && !["published", "archived"].includes(item.status) && (
+                          <button
+                            onClick={() => handleForcePublish(item)}
+                            disabled={publishing === item.id}
+                            className="flex items-center gap-1 px-2 py-1 rounded bg-emerald-600 text-white text-xs font-semibold hover:bg-emerald-700 transition disabled:opacity-60"
+                            data-testid={`btn-publish-${item.id}`}
+                            title="Publish now — makes visible on the website immediately"
+                          >
+                            <Upload className="w-3 h-3" />
+                            {publishing === item.id ? "..." : "Publish"}
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

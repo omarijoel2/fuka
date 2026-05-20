@@ -2,7 +2,10 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useLocation } from "wouter";
 import { apiGet, apiPost, apiPut, apiDelete, CONTENT_TYPE_LABELS, CONTENT_TYPES, WORKFLOW_TRANSITIONS, STATUS_LABELS, formatDateTime, type WorkflowStatus } from "@/lib/api";
 import { StatusBadge } from "@/components/status-badge";
-import { Save, Trash2, Clock, ArrowLeft, RotateCcw, ChevronDown, ChevronUp, Plus, X } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { Save, Trash2, Clock, ArrowLeft, RotateCcw, ChevronDown, ChevronUp, Plus, X, Upload } from "lucide-react";
+
+const ADMIN_ROLES = ["super_admin", "ict_admin", "communications_admin"];
 
 interface ContentItem {
   id?: number;
@@ -56,6 +59,8 @@ function sdObjField(sd: Record<string, unknown>, key: string): Record<string, st
 export default function ContentEditorPage({ id }: { id?: string }) {
   const isNew = !id || id === "new";
   const [, navigate] = useLocation();
+  const { user } = useAuth();
+  const isAdmin = user && ADMIN_ROLES.includes(user.role);
 
   const [form, setForm] = useState<ContentItem>({
     title: "", slug: "", type: "news", status: "draft",
@@ -66,6 +71,7 @@ export default function ContentEditorPage({ id }: { id?: string }) {
   const [showRevisions, setShowRevisions] = useState(false);
   const [saving, setSaving] = useState(false);
   const [transitioning, setTransitioning] = useState<string | null>(null);
+  const [forcePublishing, setForcePublishing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [loading, setLoading] = useState(!isNew);
   const [error, setError] = useState("");
@@ -178,6 +184,21 @@ export default function ContentEditorPage({ id }: { id?: string }) {
     }
   };
 
+  const forcePublish = async () => {
+    if (!window.confirm(`Publish "${form.title}" now? This will make it visible on the website immediately, bypassing the review workflow.`)) return;
+    setForcePublishing(true);
+    setError(""); setSuccess("");
+    try {
+      await apiPost(`/content/${id}/force-publish`);
+      setSuccess("Content published and is now live on the website.");
+      await load();
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Publish failed.");
+    } finally {
+      setForcePublishing(false);
+    }
+  };
+
   const deleteItem = async () => {
     if (!window.confirm("Delete this content item? This action cannot be undone.")) return;
     setDeleting(true);
@@ -239,6 +260,17 @@ export default function ContentEditorPage({ id }: { id?: string }) {
           >
             <Save className="w-3.5 h-3.5" /> {saving ? "Saving..." : "Save"}
           </button>
+          {!isNew && isAdmin && form.status !== "published" && form.status !== "archived" && (
+            <button
+              onClick={forcePublish}
+              disabled={forcePublishing}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 transition disabled:opacity-60"
+              data-testid="btn-force-publish"
+              title="Publish now — makes this content visible on the website immediately"
+            >
+              <Upload className="w-3.5 h-3.5" /> {forcePublishing ? "Publishing..." : "Publish Now"}
+            </button>
+          )}
         </div>
       </div>
 
