@@ -70,15 +70,7 @@ const navItems = [
   {
     name: "Academics",
     path: "/schools",
-    children: [
-      { name: "Schools & Faculties",                  path: "/schools" },
-      { name: "Programme Catalogue",                  path: "/programmes" },
-      { name: "SESS — Education & Social Sciences",   path: "/schools/SESS" },
-      { name: "SBE — Business & Economics",           path: "/schools/SBE" },
-      { name: "SCIT — Computing & IT",                path: "/schools/SCIT" },
-      { name: "SOS — Science",                        path: "/schools/SOS" },
-      { name: "SHS — Health Sciences",                path: "/schools/SHS" },
-    ],
+    megaType: "academics",
   },
   {
     name: "Departments",
@@ -88,21 +80,7 @@ const navItems = [
   {
     name: "Admissions",
     path: "/admissions",
-    children: [
-      { name: "Admissions Overview",    path: "/admissions" },
-      { name: "Apply Online",           path: "/admissions/apply" },
-      { name: "Track Application",      path: "/admissions/track" },
-      { name: "Intake Calendar",        path: "/admissions/calendar" },
-      { name: "Undergraduate (KUCCPS)", path: "/admissions#undergraduate" },
-      { name: "Postgraduate",           path: "/admissions#postgraduate" },
-      { name: "International Students", path: "/admissions#international" },
-      { name: "Self-Sponsored",         path: "/admissions#self-sponsored" },
-      { name: "International Overview", path: "/international" },
-      { name: "Study at KAFU",          path: "/international/study" },
-      { name: "Visa & Immigration",     path: "/international/visa" },
-      { name: "Exchange Programmes",    path: "/international/exchange" },
-      { name: "Our Partners",           path: "/international/partnerships" },
-    ],
+    megaType: "admissions",
   },
   {
     name: "Students",
@@ -167,7 +145,7 @@ const navItems = [
 ];
 
 type Child   = { name: string; path: string; external?: boolean };
-type NavItem = { name: string; path: string; children?: Child[]; mega?: boolean; megaType?: "departments" | "about" };
+type NavItem = { name: string; path: string; children?: Child[]; mega?: boolean; megaType?: "departments" | "about" | "academics" | "admissions" };
 
 // ─── Desktop Dropdown ────────────────────────────────────────────────────────
 function DropdownPanel({ item, onClose }: { item: NavItem; onClose: () => void }) {
@@ -310,6 +288,158 @@ function AboutMegaPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
+// ─── Academics Mega Panel ─────────────────────────────────────────────────────
+const ACADEMICS_GROUPS = [
+  {
+    heading: "Schools & Faculties",
+    links: [
+      { name: "All Schools",                         path: "/schools" },
+      { name: "SESS — Education & Social Sciences",  path: "/schools/SESS" },
+      { name: "SBE — Business & Economics",          path: "/schools/SBE" },
+      { name: "SCIT — Computing & IT",               path: "/schools/SCIT" },
+      { name: "SOS — Science",                       path: "/schools/SOS" },
+      { name: "SHS — Health Sciences",               path: "/schools/SHS" },
+    ],
+  },
+  {
+    heading: "Programmes",
+    links: [
+      { name: "Programme Catalogue",  path: "/programmes" },
+      { name: "Compare Programmes",   path: "/programmes/compare" },
+    ],
+  },
+  {
+    heading: "Research & Knowledge",
+    links: [
+      { name: "Research Overview",         path: "/research" },
+      { name: "Research Projects",         path: "/research/projects" },
+      { name: "Publications",              path: "/research/publications" },
+      { name: "Institutional Repository",  path: "/repository" },
+    ],
+  },
+];
+
+function AcademicsMegaPanel({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      className="absolute top-full left-1/2 -translate-x-1/2 mt-0 z-50 bg-white shadow-2xl border-t-2 border-accent rounded-b-xl"
+      style={{ width: "620px" }}
+    >
+      <div className="grid grid-cols-3 gap-0 divide-x divide-gray-100 p-4">
+        {ACADEMICS_GROUPS.map((group) => (
+          <div key={group.heading} className="px-4 first:pl-0 last:pr-0">
+            <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2 pb-1 border-b border-gray-100">
+              {group.heading}
+            </p>
+            {group.links.map((link) => (
+              <Link
+                key={link.path + link.name}
+                href={link.path}
+                onClick={onClose}
+                className="block py-1.5 text-xs text-foreground/75 hover:text-primary hover:bg-primary/5 rounded px-1 -ml-1 transition-colors leading-snug"
+                data-testid={`nav-academics-${link.name.toLowerCase().replace(/[\s&—]+/g, "-")}`}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="border-t border-gray-100 px-4 py-2 flex items-center justify-between bg-gray-50 rounded-b-xl">
+        <Link
+          href="/schools"
+          onClick={onClose}
+          className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+          data-testid="nav-academics-schools-overview"
+        >
+          Schools overview <ChevronRight className="w-3 h-3" />
+        </Link>
+        <Link
+          href="/programmes"
+          onClick={onClose}
+          className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+          data-testid="nav-academics-programmes-overview"
+        >
+          All programmes <ChevronRight className="w-3 h-3" />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+// ─── Admissions Mega Panel ────────────────────────────────────────────────────
+const ADMISSIONS_GROUPS = [
+  {
+    heading: "Apply",
+    links: [
+      { name: "Admissions Overview",  path: "/admissions" },
+      { name: "Apply Online",         path: "/admissions/apply" },
+      { name: "Track Application",    path: "/admissions/track" },
+      { name: "Intake Calendar",      path: "/admissions/calendar" },
+    ],
+  },
+  {
+    heading: "Entry Requirements",
+    links: [
+      { name: "Undergraduate (KUCCPS)",  path: "/admissions#undergraduate" },
+      { name: "Postgraduate",            path: "/admissions#postgraduate" },
+      { name: "Self-Sponsored",          path: "/admissions#self-sponsored" },
+      { name: "Fees & Financing",        path: "/admissions/fees" },
+      { name: "Eligibility",             path: "/admissions/eligibility" },
+    ],
+  },
+  {
+    heading: "International",
+    links: [
+      { name: "International Overview",  path: "/international" },
+      { name: "Study at KAFU",           path: "/international/study" },
+      { name: "Visa & Immigration",      path: "/international/visa" },
+      { name: "Exchange Programmes",     path: "/international/exchange" },
+      { name: "Our Partners",            path: "/international/partnerships" },
+    ],
+  },
+];
+
+function AdmissionsMegaPanel({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      className="absolute top-full left-1/2 -translate-x-1/2 mt-0 z-50 bg-white shadow-2xl border-t-2 border-accent rounded-b-xl"
+      style={{ width: "620px" }}
+    >
+      <div className="grid grid-cols-3 gap-0 divide-x divide-gray-100 p-4">
+        {ADMISSIONS_GROUPS.map((group) => (
+          <div key={group.heading} className="px-4 first:pl-0 last:pr-0">
+            <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2 pb-1 border-b border-gray-100">
+              {group.heading}
+            </p>
+            {group.links.map((link) => (
+              <Link
+                key={link.path + link.name}
+                href={link.path}
+                onClick={onClose}
+                className="block py-1.5 text-xs text-foreground/75 hover:text-primary hover:bg-primary/5 rounded px-1 -ml-1 transition-colors leading-snug"
+                data-testid={`nav-admissions-${link.name.toLowerCase().replace(/[\s&()]+/g, "-")}`}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="border-t border-gray-100 px-4 py-2 flex items-center justify-end bg-gray-50 rounded-b-xl">
+        <Link
+          href="/admissions/apply"
+          onClick={onClose}
+          className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+          data-testid="nav-admissions-apply-cta"
+        >
+          Apply now <ChevronRight className="w-3 h-3" />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 // ─── Mobile Accordion Item ────────────────────────────────────────────────────
 function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }) {
   const [open, setOpen] = React.useState(false);
@@ -392,6 +522,48 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
                     data-testid={`mobile-dept-${dept.slug}`}
                   >
                     {dept.name}
+                  </Link>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Academics & Admissions mega items — reuse the same grouped accordion pattern
+  if (item.megaType === "academics" || item.megaType === "admissions") {
+    const groups     = item.megaType === "academics" ? ACADEMICS_GROUPS : ADMISSIONS_GROUPS;
+    const testPrefix = item.megaType;
+    return (
+      <div className="border-b border-gray-100">
+        <button
+          onClick={() => setOpen((o) => !o)}
+          className={`w-full flex items-center justify-between px-5 py-4 text-sm font-semibold transition-colors ${
+            isActive ? "text-accent" : "text-foreground hover:bg-gray-50"
+          }`}
+          data-testid={`mobile-nav-${testPrefix}`}
+        >
+          {item.name}
+          <ChevronRight className={`w-4 h-4 transition-transform duration-200 ${open ? "rotate-90" : ""}`} />
+        </button>
+        {open && (
+          <div className="bg-gray-50 border-t border-gray-100 pb-2">
+            {groups.map((group) => (
+              <div key={group.heading} className="mt-2">
+                <p className="pl-5 py-1.5 text-xs font-bold uppercase tracking-wider text-primary/60">
+                  {group.heading}
+                </p>
+                {group.links.map((link) => (
+                  <Link
+                    key={link.path + link.name}
+                    href={link.path}
+                    onClick={onClose}
+                    className="block pl-8 pr-5 py-2 text-sm text-muted-foreground hover:text-primary"
+                    data-testid={`mobile-${testPrefix}-${link.name.toLowerCase().replace(/[\s&()—]+/g, "-")}`}
+                  >
+                    {link.name}
                   </Link>
                 ))}
               </div>
@@ -587,9 +759,10 @@ export function Navbar() {
                     <ChevronDown className={`w-3 h-3 transition-transform ${openDropdown === item.name ? "rotate-180" : ""}`} />
                   </button>
                   {openDropdown === item.name && (
-                    item.megaType === "about"
-                      ? <AboutMegaPanel onClose={() => setOpenDropdown(null)} />
-                      : <DepartmentsMegaPanel onClose={() => setOpenDropdown(null)} />
+                    item.megaType === "about"       ? <AboutMegaPanel       onClose={() => setOpenDropdown(null)} /> :
+                    item.megaType === "academics"   ? <AcademicsMegaPanel   onClose={() => setOpenDropdown(null)} /> :
+                    item.megaType === "admissions"  ? <AdmissionsMegaPanel  onClose={() => setOpenDropdown(null)} /> :
+                                                     <DepartmentsMegaPanel  onClose={() => setOpenDropdown(null)} />
                   )}
                 </div>
               ) : item.children ? (
