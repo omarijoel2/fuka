@@ -31,30 +31,30 @@
 }
 
 :root {
-  /* KAFU brand: Forest Green #228B22 + Gold #DAA520 */
+  /* KAFU brand: Forest Green #1A5C38 + Gold #C9A227 */
   --background: 0 0% 97%;
   --foreground: 210 12% 16%;
   --border: 214 10% 88%;
   --input: 214 10% 88%;
-  --ring: 120 61% 34%;
+  --ring: 147 56% 23%;
 
   --card: 0 0% 100%;
   --card-foreground: 210 12% 16%;
   --card-border: 214 10% 90%;
 
-  /* Forest green #228B22 → hsl(120, 61%, 34%) */
-  --primary: 120 61% 34%;
+  /* Forest Green #1A5C38 → hsl(147, 56%, 23%) */
+  --primary: 147 56% 23%;
   --primary-foreground: 0 0% 100%;
 
-  /* Gold #DAA520 → secondary */
-  --secondary: 43 74% 49%;
+  /* Gold #C9A227 → secondary */
+  --secondary: 43 68% 47%;
   --secondary-foreground: 0 0% 100%;
 
   --muted: 210 10% 94%;
   --muted-foreground: 215 10% 45%;
 
-  --accent: 120 40% 90%;
-  --accent-foreground: 120 61% 20%;
+  --accent: 147 40% 90%;
+  --accent-foreground: 147 56% 18%;
 
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
