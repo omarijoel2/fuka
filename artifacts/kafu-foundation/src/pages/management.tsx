@@ -194,7 +194,7 @@ export default function ManagementPage() {
         eyebrow="Leadership"
         title="University Management"
         subtitle="KAFU is led by a team of experienced academics and administrators committed to advancing the university's mission of quality education, impactful research, and community service."
-        photo="https://kafu.ac.ke/wp-content/uploads/2026/03/IMG_6424-scaled.jpg"
+        photo="https://kafu.ac.ke/wp-content/uploads/2025/10/arial-view-e-1.jpg"
         align="center"
         breadcrumb={[
           { label: "Home", href: "/" },
