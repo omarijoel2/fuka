@@ -268,22 +268,15 @@ const ABOUT_GROUPS = [
       { name: "University Management",   path: "/about/management" },
     ],
   },
-  {
-    heading: "Our People",
-    links: [
-      { name: "Directorates",            path: "/directorates" },
-      { name: "Contact Us",              path: "/contact" },
-    ],
-  },
 ];
 
 function AboutMegaPanel({ onClose }: { onClose: () => void }) {
   return (
     <div
       className="absolute top-full left-1/2 -translate-x-1/2 mt-0 z-50 bg-white shadow-2xl border-t-2 border-accent rounded-b-xl"
-      style={{ width: "560px" }}
+      style={{ width: "420px" }}
     >
-      <div className="grid grid-cols-3 gap-0 divide-x divide-gray-100 p-4">
+      <div className="grid grid-cols-2 gap-0 divide-x divide-gray-100 p-4">
         {ABOUT_GROUPS.map((group) => (
           <div key={group.heading} className="px-4 first:pl-0 last:pr-0">
             <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2 pb-1 border-b border-gray-100">
