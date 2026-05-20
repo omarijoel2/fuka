@@ -36,6 +36,7 @@ import CouncilMembersCmsPage from "@/pages/council-members-cms";
 import ManagementProfilesCmsPage from "@/pages/management-profiles-cms";
 import DirectoratesCmsPage from "@/pages/directorates-cms";
 import GalleryCmsPage from "@/pages/gallery-cms";
+import DepartmentsCmsPage from "@/pages/departments-cms";
 import ContentHealthPage from "@/pages/content-health";
 import WorkflowConsolePage from "@/pages/workflow-console";
 import AdmissionsCmsPage from "@/pages/admissions-cms";
@@ -296,6 +297,13 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <GalleryCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/departments">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <DepartmentsCmsPage />
             </RequireRole>
           )}
         </Route>

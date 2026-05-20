@@ -1,9 +1,23 @@
 import { useRoute, Link } from "wouter";
 import { useSchool, useProgrammes } from "@/lib/api-hooks";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SeoHead } from "@/components/seo-head";
-import { ArrowLeft, BookOpen, User, GraduationCap, ChevronRight, Clock, ExternalLink } from "lucide-react";
+import { ArrowLeft, BookOpen, User, GraduationCap, ChevronRight, Clock, ExternalLink, Building2, Mail, Phone } from "lucide-react";
+
+interface Department {
+  id: number;
+  slug: string;
+  name: string;
+  hod_name: string | null;
+  hod_title: string;
+  hod_email: string | null;
+  hod_photo_url: string | null;
+  email: string | null;
+  phone: string | null;
+  description: string | null;
+}
 
 function progSlug(code: string): string {
   return code.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -20,6 +34,13 @@ export default function SchoolDetails() {
 
   const { data: school, isLoading: schoolLoading, error } = useSchool(code);
   const { data: programmes, isLoading: progsLoading } = useProgrammes(code);
+  const { data: deptsData, isLoading: deptsLoading } = useQuery<{ data: Department[] }>({
+    queryKey: ["school-departments", code],
+    queryFn: () => fetch(`/api/schools/${code}/departments`).then(r => r.json()),
+    enabled: !!code,
+    staleTime: 1000 * 60 * 10,
+  });
+  const departments = deptsData?.data ?? [];
 
   const undergrad = programmes?.filter((p) => p.level === "undergraduate") ?? [];
   const postgrad = programmes?.filter((p) => p.level === "postgraduate") ?? [];
@@ -38,7 +59,7 @@ export default function SchoolDetails() {
     );
   }
 
-  const defaultTab = undergrad.length > 0 ? "ug" : postgrad.length > 0 ? "pg" : "doc";
+  const defaultTab = departments.length > 0 ? "depts" : undergrad.length > 0 ? "ug" : postgrad.length > 0 ? "pg" : "doc";
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -164,13 +185,9 @@ export default function SchoolDetails() {
             )}
           </div>
 
-          {/* Programme Tabs */}
+          {/* Tabs: Departments + Programmes */}
           <div className="lg:col-span-2">
-            <h2 className="text-2xl font-serif font-bold text-primary mb-6 flex items-center gap-2">
-              <GraduationCap className="w-6 h-6" /> Academic Programmes
-            </h2>
-
-            {progsLoading ? (
+            {(progsLoading || deptsLoading) ? (
               <div className="space-y-4">
                 {Array.from({ length: 4 }).map((_, i) => (
                   <div key={i} className="h-24 bg-muted rounded-xl animate-pulse" />
@@ -179,6 +196,12 @@ export default function SchoolDetails() {
             ) : (
               <Tabs defaultValue={defaultTab}>
                 <TabsList className="mb-6 bg-muted p-1 rounded-lg flex flex-wrap gap-1 h-auto">
+                  {departments.length > 0 && (
+                    <TabsTrigger value="depts" data-testid="tab-depts">
+                      <Building2 className="w-3.5 h-3.5 mr-1.5" />
+                      Departments ({departments.length})
+                    </TabsTrigger>
+                  )}
                   {undergrad.length > 0 && (
                     <TabsTrigger value="ug" data-testid="tab-ug">
                       Undergraduate ({undergrad.length})
@@ -195,6 +218,56 @@ export default function SchoolDetails() {
                     </TabsTrigger>
                   )}
                 </TabsList>
+
+                {/* Departments Tab */}
+                {departments.length > 0 && (
+                  <TabsContent value="depts" className="space-y-3">
+                    {departments.map((dept) => (
+                      <Link key={dept.id} href={`/departments/${dept.slug}`}>
+                        <div
+                          className="group flex items-center gap-4 p-5 bg-card border rounded-xl hover:border-primary hover:shadow-sm transition-all cursor-pointer"
+                          data-testid={`dept-${dept.slug}`}
+                        >
+                          {dept.hod_photo_url ? (
+                            <img
+                              src={dept.hod_photo_url}
+                              alt={dept.hod_name ?? ""}
+                              className="w-12 h-12 rounded-full object-cover shrink-0 ring-2 ring-border group-hover:ring-primary transition-all"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                              <Building2 className="w-6 h-6 text-primary" />
+                            </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors leading-snug">
+                              {dept.name}
+                            </h3>
+                            {dept.hod_name && (
+                              <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
+                                <User className="w-3 h-3" />
+                                {dept.hod_title}: {dept.hod_name}
+                              </p>
+                            )}
+                            <div className="flex flex-wrap gap-3 mt-1.5">
+                              {dept.email && (
+                                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                  <Mail className="w-3 h-3" /> {dept.email}
+                                </span>
+                              )}
+                              {dept.phone && (
+                                <span className="text-xs text-muted-foreground flex items-center gap-1">
+                                  <Phone className="w-3 h-3" /> {dept.phone}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-primary shrink-0 transition-colors" />
+                        </div>
+                      </Link>
+                    ))}
+                  </TabsContent>
+                )}
 
                 {[
                   { value: "ug", items: undergrad },

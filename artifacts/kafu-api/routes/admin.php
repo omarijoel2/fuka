@@ -2017,6 +2017,66 @@ Route::prefix('admin')->group(function () {
         );
     })->middleware('auth:sanctum');
 
+    // ── Departments CRUD ─────────────────────────────────────────────────────
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/departments', function () {
+            $depts = \App\Models\Department::orderBy('school_code')->orderBy('sort_order')->orderBy('name')->get();
+            return response()->json(['data' => $depts]);
+        });
+
+        Route::post('/departments', function (\Illuminate\Http\Request $request) {
+            $data = $request->validate([
+                'school_code'    => 'required|string|in:SESS,SBE,SCIT,SOS,SHS',
+                'name'           => 'required|string|max:255',
+                'slug'           => 'required|string|unique:departments,slug|max:255',
+                'description'    => 'nullable|string',
+                'vision'         => 'nullable|string|max:500',
+                'hod_name'       => 'nullable|string|max:255',
+                'hod_title'      => 'nullable|string|max:255',
+                'hod_email'      => 'nullable|email|max:255',
+                'hod_phone'      => 'nullable|string|max:50',
+                'hod_photo_url'  => 'nullable|url|max:500',
+                'hod_bio'        => 'nullable|string',
+                'office_location'=> 'nullable|string|max:255',
+                'email'          => 'nullable|email|max:255',
+                'phone'          => 'nullable|string|max:50',
+                'is_active'      => 'boolean',
+                'sort_order'     => 'integer',
+            ]);
+            $dept = \App\Models\Department::create($data);
+            return response()->json(['data' => $dept], 201);
+        });
+
+        Route::put('/departments/{id}', function (\Illuminate\Http\Request $request, int $id) {
+            $dept = \App\Models\Department::findOrFail($id);
+            $data = $request->validate([
+                'school_code'    => 'sometimes|string|in:SESS,SBE,SCIT,SOS,SHS',
+                'name'           => 'sometimes|string|max:255',
+                'slug'           => "sometimes|string|unique:departments,slug,{$id}|max:255",
+                'description'    => 'nullable|string',
+                'vision'         => 'nullable|string|max:500',
+                'hod_name'       => 'nullable|string|max:255',
+                'hod_title'      => 'nullable|string|max:255',
+                'hod_email'      => 'nullable|email|max:255',
+                'hod_phone'      => 'nullable|string|max:50',
+                'hod_photo_url'  => 'nullable|max:500',
+                'hod_bio'        => 'nullable|string',
+                'office_location'=> 'nullable|string|max:255',
+                'email'          => 'nullable|email|max:255',
+                'phone'          => 'nullable|string|max:50',
+                'is_active'      => 'boolean',
+                'sort_order'     => 'integer',
+            ]);
+            $dept->update($data);
+            return response()->json(['data' => $dept]);
+        });
+
+        Route::delete('/departments/{id}', function (int $id) {
+            \App\Models\Department::findOrFail($id)->delete();
+            return response()->json(['message' => 'Deleted.']);
+        });
+    });
+
 });
 
 function updateApplicationStatus(string $ref, string $toStatus, ?string $reason, int $userId, array $extra = []) {

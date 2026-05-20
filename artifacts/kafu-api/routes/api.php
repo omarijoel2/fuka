@@ -4966,3 +4966,30 @@ Route::prefix('applications')->group(function () {
         ]);
     });
 });
+
+// ─── Departments (public) ──────────────────────────────────────────────────
+use App\Models\Department;
+
+Route::get('/departments', function () {
+    $depts = Department::where('is_active', true)
+        ->orderBy('school_code')
+        ->orderBy('sort_order')
+        ->orderBy('name')
+        ->get();
+    return response()->json(['data' => $depts]);
+});
+
+Route::get('/departments/{slug}', function (string $slug) {
+    $dept = Department::where('slug', $slug)->where('is_active', true)->first();
+    if (!$dept) return response()->json(['error' => 'Not found.'], 404);
+    return response()->json(['data' => $dept]);
+});
+
+Route::get('/schools/{code}/departments', function (string $code) {
+    $depts = Department::where('school_code', strtoupper($code))
+        ->where('is_active', true)
+        ->orderBy('sort_order')
+        ->orderBy('name')
+        ->get();
+    return response()->json(['data' => $depts]);
+});

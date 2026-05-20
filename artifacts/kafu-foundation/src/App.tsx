@@ -55,6 +55,7 @@ import DirectoratesPage from "@/pages/directorates";
 import DirectorateDetail from "@/pages/directorate-detail";
 import GalleryPage from "@/pages/gallery";
 import GalleryAlbumPage from "@/pages/gallery-album";
+import DepartmentDetail from "@/pages/department-detail";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -128,6 +129,7 @@ function Router() {
           </Route>
           <Route path="/gallery" component={GalleryPage} />
           <Route path="/gallery/:slug" component={GalleryAlbumPage} />
+          <Route path="/departments/:slug" component={DepartmentDetail} />
           <Route component={NotFound} />
         </Switch>
       </main>

@@ -25,5 +25,6 @@ class DatabaseSeeder extends Seeder
         $this->call(KuccpsModuleSeeder::class);
         $this->call(GovernanceSeeder::class);
         $this->call(GallerySeeder::class);
+        $this->call(DepartmentSeeder::class);
     }
 }

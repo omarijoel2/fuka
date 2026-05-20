@@ -98,6 +98,7 @@ const navItems: NavItem[] = [
       { label: "University Council", href: "/governance/council" },
       { label: "Management Profiles", href: "/governance/management" },
       { label: "Directorates", href: "/governance/directorates" },
+      { label: "Departments", href: "/departments" },
     ],
   },
   {
