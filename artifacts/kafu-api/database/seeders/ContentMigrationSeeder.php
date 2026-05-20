@@ -49,6 +49,8 @@ class ContentMigrationSeeder extends Seeder
                 'code'  => 'SBE',
                 'name'  => 'School of Business and Economics',
                 'dean'  => 'Dr. Atieno Margaret Omondi',
+                'dean_title' => 'Dean, School of Business & Economics',
+                'dean_photo' => 'https://kafu.ac.ke/wp-content/uploads/Dr.-Margaret-Atieno-1-300x300.jpg',
                 'colour' => '#D4A017',
                 'description' => 'SBE empowers students to become transformative leaders and responsible professionals.',
                 'vision'  => 'To be a centre of excellence in teaching professional and market driven courses.',
