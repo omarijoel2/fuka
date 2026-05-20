@@ -46,6 +46,11 @@ const navItems = [
       { name: "Postgraduate",           path: "/admissions#postgraduate" },
       { name: "International Students", path: "/admissions#international" },
       { name: "Self-Sponsored",         path: "/admissions#self-sponsored" },
+      { name: "International Overview", path: "/international" },
+      { name: "Study at KAFU",          path: "/international/study" },
+      { name: "Visa & Immigration",     path: "/international/visa" },
+      { name: "Exchange Programmes",    path: "/international/exchange" },
+      { name: "Our Partners",           path: "/international/partnerships" },
     ],
   },
   {
@@ -89,17 +94,6 @@ const navItems = [
       { name: "Publications",             path: "/research/publications" },
       { name: "Partnerships & Grants",    path: "/research/partnerships" },
       { name: "Institutional Repository", path: "/repository" },
-    ],
-  },
-  {
-    name: "International",
-    path: "/international",
-    children: [
-      { name: "Global Overview",     path: "/international" },
-      { name: "Study at KAFU",       path: "/international/study" },
-      { name: "Visa & Immigration",  path: "/international/visa" },
-      { name: "Exchange Programmes", path: "/international/exchange" },
-      { name: "Our Partners",        path: "/international/partnerships" },
     ],
   },
   {
