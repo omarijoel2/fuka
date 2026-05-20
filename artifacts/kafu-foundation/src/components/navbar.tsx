@@ -65,17 +65,7 @@ const navItems = [
   {
     name: "About",
     path: "/about",
-    children: [
-      { name: "About KAFU",        path: "/about" },
-      { name: "Vision & Mission",  path: "/about#vision" },
-      { name: "University Council", path: "/about/council" },
-      { name: "Management",        path: "/about/management" },
-      { name: "Strategic Plan",    path: "/about/strategic-plan" },
-      { name: "Policies & Regulations", path: "/about/policies" },
-      { name: "Service Charter",   path: "/about/service-charter" },
-      { name: "Staff Directory",   path: "/staff" },
-      { name: "Contact Us",        path: "/contact" },
-    ],
+    megaType: "about",
   },
   {
     name: "Academics",
@@ -93,7 +83,7 @@ const navItems = [
   {
     name: "Departments",
     path: "/schools",
-    mega: true,
+    megaType: "departments",
   },
   {
     name: "Admissions",
@@ -177,7 +167,7 @@ const navItems = [
 ];
 
 type Child   = { name: string; path: string; external?: boolean };
-type NavItem = { name: string; path: string; children?: Child[]; mega?: boolean };
+type NavItem = { name: string; path: string; children?: Child[]; mega?: boolean; megaType?: "departments" | "about" };
 
 // ─── Desktop Dropdown ────────────────────────────────────────────────────────
 function DropdownPanel({ item, onClose }: { item: NavItem; onClose: () => void }) {
@@ -257,14 +247,128 @@ function DepartmentsMegaPanel({ onClose }: { onClose: () => void }) {
   );
 }
 
+// ─── About Mega Panel ────────────────────────────────────────────────────────
+const ABOUT_GROUPS = [
+  {
+    heading: "The University",
+    links: [
+      { name: "About KAFU",              path: "/about" },
+      { name: "Vision & Mission",        path: "/about#vision" },
+      { name: "Strategic Plan",          path: "/about/strategic-plan" },
+      { name: "Policies & Regulations",  path: "/about/policies" },
+      { name: "Service Charter",         path: "/about/service-charter" },
+      { name: "Our Campuses",            path: "/campuses" },
+    ],
+  },
+  {
+    heading: "Governance",
+    links: [
+      { name: "University Council",      path: "/about/council" },
+      { name: "Vice-Chancellor",         path: "/about/management" },
+      { name: "University Management",   path: "/about/management" },
+      { name: "University Senate",       path: "/about/senate" },
+      { name: "University Organogram",   path: "/about/organogram" },
+    ],
+  },
+  {
+    heading: "Our People",
+    links: [
+      { name: "Staff Directory",         path: "/staff" },
+      { name: "Directorates",            path: "/directorates" },
+      { name: "Contact Us",              path: "/contact" },
+    ],
+  },
+];
+
+function AboutMegaPanel({ onClose }: { onClose: () => void }) {
+  return (
+    <div
+      className="absolute top-full left-1/2 -translate-x-1/2 mt-0 z-50 bg-white shadow-2xl border-t-2 border-accent rounded-b-xl"
+      style={{ width: "560px" }}
+    >
+      <div className="grid grid-cols-3 gap-0 divide-x divide-gray-100 p-4">
+        {ABOUT_GROUPS.map((group) => (
+          <div key={group.heading} className="px-4 first:pl-0 last:pr-0">
+            <p className="text-xs font-bold uppercase tracking-widest text-primary/60 mb-2 pb-1 border-b border-gray-100">
+              {group.heading}
+            </p>
+            {group.links.map((link) => (
+              <Link
+                key={link.path + link.name}
+                href={link.path}
+                onClick={onClose}
+                className="block py-1.5 text-xs text-foreground/75 hover:text-primary hover:bg-primary/5 rounded px-1 -ml-1 transition-colors leading-snug"
+                data-testid={`nav-about-${link.name.toLowerCase().replace(/[\s&]+/g, "-")}`}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+        ))}
+      </div>
+      <div className="border-t border-gray-100 px-4 py-2 flex items-center justify-end bg-gray-50 rounded-b-xl">
+        <Link
+          href="/about"
+          onClick={onClose}
+          className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+          data-testid="nav-about-overview"
+        >
+          University overview <ChevronRight className="w-3 h-3" />
+        </Link>
+      </div>
+    </div>
+  );
+}
+
 // ─── Mobile Accordion Item ────────────────────────────────────────────────────
 function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }) {
   const [open, setOpen] = React.useState(false);
   const [location]      = useLocation();
   const isActive        = item.path === "/" ? location === "/" : location.startsWith(item.path);
 
+  // About mega item — accordion grouped by section
+  if (item.megaType === "about") {
+    return (
+      <div className="border-b border-gray-100">
+        <button
+          onClick={() => setOpen((o) => !o)}
+          className={`w-full flex items-center justify-between px-5 py-4 text-sm font-semibold transition-colors ${
+            isActive ? "text-accent" : "text-foreground hover:bg-gray-50"
+          }`}
+          data-testid="mobile-nav-about"
+        >
+          About
+          <ChevronRight className={`w-4 h-4 transition-transform duration-200 ${open ? "rotate-90" : ""}`} />
+        </button>
+        {open && (
+          <div className="bg-gray-50 border-t border-gray-100 pb-2">
+            {ABOUT_GROUPS.map((group) => (
+              <div key={group.heading} className="mt-2">
+                <p className="pl-5 py-1.5 text-xs font-bold uppercase tracking-wider text-primary/60">
+                  {group.heading}
+                </p>
+                {group.links.map((link) => (
+                  <Link
+                    key={link.path + link.name}
+                    href={link.path}
+                    onClick={onClose}
+                    className="block pl-8 pr-5 py-2 text-sm text-muted-foreground hover:text-primary"
+                    data-testid={`mobile-about-${link.name.toLowerCase().replace(/[\s&]+/g, "-")}`}
+                  >
+                    {link.name}
+                  </Link>
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
   // Departments mega item — accordion grouped by school
-  if (item.mega) {
+  if (item.megaType === "departments") {
+
     return (
       <div className="border-b border-gray-100">
         <button
@@ -475,7 +579,7 @@ export function Navbar() {
         <nav className="container mx-auto px-4 flex items-center justify-center gap-0">
           {navItems.map((item) => (
             <div key={item.name} className="relative">
-              {item.mega ? (
+              {item.megaType ? (
                 <div
                   onMouseEnter={() => setOpenDropdown(item.name)}
                   onMouseLeave={() => setOpenDropdown(null)}
@@ -493,7 +597,9 @@ export function Navbar() {
                     <ChevronDown className={`w-3 h-3 transition-transform ${openDropdown === item.name ? "rotate-180" : ""}`} />
                   </button>
                   {openDropdown === item.name && (
-                    <DepartmentsMegaPanel onClose={() => setOpenDropdown(null)} />
+                    item.megaType === "about"
+                      ? <AboutMegaPanel onClose={() => setOpenDropdown(null)} />
+                      : <DepartmentsMegaPanel onClose={() => setOpenDropdown(null)} />
                   )}
                 </div>
               ) : item.children ? (
