@@ -83,7 +83,7 @@ export default function ContactPage() {
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Contact &amp; Campuses</h1>
           <p className="text-lg text-white/80 max-w-2xl">Find our campuses, offices, and service points. We're here to support you.</p>
           <div className="flex flex-wrap gap-3 mt-8">
-            <a href="tel:+254700000000" data-testid="quick-call-btn"
+            <a href="tel:+254777373633" data-testid="quick-call-btn"
               className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 border border-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
               <Phone className="w-4 h-4" /> Call Us
             </a>
@@ -108,7 +108,7 @@ export default function ContactPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
-              { icon: <Phone className="w-5 h-5 text-white" />, label: "Main Switchboard", value: "+254 700 000 000", href: "tel:+254700000000", sub: "Mon–Fri, 8:00 AM – 5:00 PM" },
+              { icon: <Phone className="w-5 h-5 text-white" />, label: "Main Switchboard", value: "+254 777 373 633", href: "tel:+254777373633", sub: "Mon–Fri, 8:00 AM – 5:00 PM" },
               { icon: <Mail className="w-5 h-5 text-white" />, label: "General Enquiries", value: "info@kafu.ac.ke", href: "mailto:info@kafu.ac.ke", sub: "Response within 2 business days" },
               { icon: <MapPin className="w-5 h-5 text-white" />, label: "Main Campus", value: "Kaimosi, Vihiga County", href: undefined, sub: "P.O. Box 27 — 50309, Kenya" },
             ].map((item, i) => (
