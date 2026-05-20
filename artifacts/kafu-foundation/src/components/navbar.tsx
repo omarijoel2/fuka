@@ -61,11 +61,23 @@ const navItems = [
     name: "News",
     path: "/news",
     children: [
-      { name: "Latest News",    path: "/news" },
+      { name: "Latest News",     path: "/news" },
       { name: "Events Calendar", path: "/events" },
-      { name: "Announcements",  path: "/announcements" },
-      { name: "Photo Gallery",  path: "/gallery" },
-      { name: "Archives",       path: "/archives" },
+      { name: "Announcements",   path: "/announcements" },
+      { name: "Archives",        path: "/archives" },
+    ],
+  },
+  {
+    name: "Media",
+    path: "/media",
+    children: [
+      { name: "Media Overview",     path: "/media" },
+      { name: "Photo Gallery",      path: "/gallery" },
+      { name: "Video Gallery",      path: "/media/videos" },
+      { name: "Press Releases",     path: "/media/press-releases" },
+      { name: "Publications",       path: "/media/publications" },
+      { name: "Downloads",          path: "/media/downloads" },
+      { name: "Branding Resources", path: "/media/branding" },
     ],
   },
   {
