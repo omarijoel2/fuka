@@ -18,7 +18,7 @@
   --color-warning: #F59E0B;
   --color-error: #EF4444;
 
-  --font-display: 'Playfair Display', serif;
+  --font-display: 'Oswald', sans-serif;
   --font-body: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 }
@@ -42,4 +42,9 @@ body {
   font-family: var(--font-body);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.text-stroke {
+  -webkit-text-stroke: 2px rgba(255,255,255,0.15);
+  color: transparent;
 }

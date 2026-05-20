@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion';
 import { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { sceneTransitions } from '@/lib/video/animations';
 
 export function Scene1() {
@@ -8,50 +8,67 @@ export function Scene1() {
   useEffect(() => {
     const timers = [
       setTimeout(() => setPhase(1), 500),
-      setTimeout(() => setPhase(2), 1500),
-      setTimeout(() => setPhase(3), 3500),
+      setTimeout(() => setPhase(2), 1200),
+      setTimeout(() => setPhase(3), 2500),
     ];
     return () => timers.forEach(t => clearTimeout(t));
   }, []);
 
   return (
-    <motion.div className="absolute inset-0 w-full h-full" {...sceneTransitions.fadeBlur}>
-      {/* Background Image */}
+    <motion.div 
+      className="absolute inset-0 flex items-center justify-center overflow-hidden bg-black"
+      {...sceneTransitions.fadeBlur}
+    >
+      {/* Background Aerial Video/Image */}
       <motion.div 
         className="absolute inset-0 z-0"
         initial={{ scale: 1.1 }}
         animate={{ scale: 1 }}
         transition={{ duration: 6, ease: 'easeOut' }}
       >
-        <div className="absolute inset-0 bg-black/40 z-10" />
+        <div className="absolute inset-0 bg-black/40 z-10 mix-blend-multiply" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg-dark)]/80 via-transparent to-[var(--color-bg-dark)]/40 z-10" />
         <img 
           src="https://kafu.ac.ke/wp-content/uploads/arial-view-e-1.jpg" 
-          className="w-full h-full object-cover object-center"
           alt="Campus Aerial" 
+          className="w-full h-full object-cover object-center"
         />
       </motion.div>
 
-      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center text-center px-8">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={phase >= 1 ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-          className="overflow-hidden"
+      {/* Foreground Typography */}
+      <div className="relative z-20 flex flex-col items-center w-full px-12 mt-12">
+        <div className="overflow-hidden">
+          <motion.h1 
+            className="text-[8vw] font-display font-bold uppercase tracking-tight text-white leading-[0.9] text-center drop-shadow-2xl"
+            initial={{ y: "100%" }}
+            animate={phase >= 1 ? { y: 0 } : { y: "100%" }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          >
+            Kaimosi Friends
+          </motion.h1>
+        </div>
+        <div className="overflow-hidden">
+          <motion.h1 
+            className="text-[8vw] font-display font-bold uppercase tracking-tight text-[var(--color-accent)] leading-[0.9] text-center drop-shadow-2xl"
+            initial={{ y: "100%" }}
+            animate={phase >= 2 ? { y: 0 } : { y: "100%" }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          >
+            University
+          </motion.h1>
+        </div>
+        
+        <motion.div 
+          className="mt-8 h-[2px] bg-white/50 relative overflow-hidden"
+          initial={{ width: 0 }}
+          animate={phase >= 3 ? { width: "40%" } : { width: 0 }}
+          transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
         >
-          <h1 className="text-[5vw] font-display text-white leading-tight font-bold drop-shadow-2xl">
-            Kaimosi Friends University
-          </h1>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
-          animate={phase >= 2 ? { opacity: 1, scale: 1, filter: 'blur(0px)' } : { opacity: 0, scale: 0.9, filter: 'blur(10px)' }}
-          transition={{ duration: 1.2, ease: "easeOut" }}
-          className="mt-6 border-b border-t border-[var(--color-accent)] py-3 px-8"
-        >
-          <p className="text-[2vw] font-body text-[var(--color-accent)] uppercase tracking-[0.3em] font-medium">
-            Spring of Knowledge
-          </p>
+          <motion.div 
+            className="absolute inset-0 bg-[var(--color-accent)]"
+            animate={{ x: ["-100%", "100%"] }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          />
         </motion.div>
       </div>
     </motion.div>

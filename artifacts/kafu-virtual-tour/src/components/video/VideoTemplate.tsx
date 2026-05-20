@@ -10,19 +10,19 @@ import { Scene6 } from './video_scenes/Scene6';
 
 export const SCENE_DURATIONS: Record<string, number> = {
   intro: 4500,
-  library: 4000,
-  mainBuilding: 4000,
-  studentLife: 4000,
-  graduation: 4500,
-  outro: 5000,
+  campus: 4000,
+  stats: 5000,
+  academics: 4500,
+  community: 4500,
+  outro: 4000,
 };
 
 const SCENE_COMPONENTS: Record<string, React.ComponentType> = {
   intro: Scene1,
-  library: Scene2,
-  mainBuilding: Scene3,
-  studentLife: Scene4,
-  graduation: Scene5,
+  campus: Scene2,
+  stats: Scene3,
+  academics: Scene4,
+  community: Scene5,
   outro: Scene6,
 };
 
@@ -46,37 +46,50 @@ export default function VideoTemplate({
   const SceneComponent = SCENE_COMPONENTS[baseSceneKey];
 
   return (
-    <div className="w-full h-screen overflow-hidden relative bg-[var(--color-bg-dark)]">
+    <div className="w-full h-screen overflow-hidden relative bg-[var(--color-bg-dark)] font-body">
       {/* Persistent Background Elements */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <motion.div
-          className="absolute w-[80vw] h-[80vw] rounded-full opacity-10 blur-[100px]"
+          className="absolute w-[120vw] h-[120vw] rounded-full opacity-20 blur-[120px]"
           style={{ background: 'radial-gradient(circle, var(--color-primary), transparent)' }}
           animate={{
-            x: ['-20%', '20%', '-10%'],
-            y: ['-20%', '10%', '-30%'],
-            scale: [1, 1.2, 0.9],
+            x: ['-30%', '10%', '-20%'],
+            y: ['-10%', '20%', '-10%'],
+            scale: [1, 1.1, 0.9],
           }}
-          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+          transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
-          className="absolute w-[60vw] h-[60vw] rounded-full opacity-10 blur-[80px] bottom-0 right-0"
+          className="absolute w-[80vw] h-[80vw] rounded-full opacity-20 blur-[100px] bottom-0 right-0"
           style={{ background: 'radial-gradient(circle, var(--color-accent), transparent)' }}
           animate={{
-            x: ['20%', '-10%', '30%'],
-            y: ['20%', '-20%', '10%'],
-            scale: [1, 1.1, 0.95],
+            x: ['10%', '-20%', '10%'],
+            y: ['20%', '-10%', '0%'],
+            scale: [1, 1.2, 0.95],
           }}
-          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <div
-          className="absolute inset-0 opacity-[0.03] pointer-events-none"
-          style={{
-            backgroundImage:
-              'url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E")',
-          }}
+          transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
         />
       </div>
+
+      {/* Persistent Brand Logo - Top Right */}
+      <motion.div 
+        className="absolute top-10 right-12 z-50 origin-right"
+        initial={{ opacity: 0, scale: 0.8, x: 20 }}
+        animate={{ 
+          opacity: currentScene === 5 ? 0 : 1, // Hide on outro when logo is centered
+          scale: currentScene === 5 ? 0.8 : 1,
+          x: currentScene === 5 ? 20 : 0
+        }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      >
+        <div className="bg-white/90 backdrop-blur-sm p-4 rounded-xl shadow-2xl border border-white/20">
+          <img 
+            src="https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png" 
+            alt="KAFU Logo" 
+            className="h-10 object-contain"
+          />
+        </div>
+      </motion.div>
 
       <AnimatePresence mode="popLayout">
         {SceneComponent && <SceneComponent key={currentSceneKey} />}
