@@ -42,6 +42,7 @@ const navItems = [
       { name: "Admissions Overview",    path: "/admissions" },
       { name: "Apply Online",           path: "/admissions/apply" },
       { name: "Track Application",      path: "/admissions/track" },
+      { name: "Intake Calendar",        path: "/admissions/calendar" },
       { name: "Undergraduate (KUCCPS)", path: "/admissions#undergraduate" },
       { name: "Postgraduate",           path: "/admissions#postgraduate" },
       { name: "International Students", path: "/admissions#international" },

@@ -57,6 +57,7 @@ import ServiceCharter from "@/pages/about-service-charter";
 import Archives from "@/pages/archives";
 import AdmissionsApply from "@/pages/admissions-apply";
 import AdmissionsTrack from "@/pages/admissions-track";
+import AdmissionsCalendar from "@/pages/admissions-calendar";
 import SearchPage from "@/pages/search";
 import DirectoratesPage from "@/pages/directorates";
 import DirectorateDetail from "@/pages/directorate-detail";
@@ -136,6 +137,7 @@ function Router() {
           <Route path="/archives" component={Archives} />
           <Route path="/admissions/apply" component={AdmissionsApply} />
           <Route path="/admissions/track" component={AdmissionsTrack} />
+          <Route path="/admissions/calendar" component={AdmissionsCalendar} />
           <Route path="/search" component={SearchPage} />
           <Route path="/directorates" component={DirectoratesPage} />
           <Route path="/directorates/:slug">

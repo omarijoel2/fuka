@@ -4439,6 +4439,191 @@ Route::prefix('admissions-app')->group(function () {
     Route::post('/kuccps/verify-placement',                              [$kv, 'verify'])->middleware('throttle:10,1');
     Route::get('/kuccps/placement/{token}',                              [$kv, 'placementDetails']);
     Route::get('/kuccps/admission-letter/{token}/download',              [$kv, 'downloadLetter']);
+
+    // ── Intake Calendar (all published) ───────────────────────────────────────
+    Route::get('/calendar', function () {
+        $intakes = \Illuminate\Support\Facades\DB::table('admissions_intakes')
+            ->where('is_published', true)
+            ->orderBy('open_at', 'asc')
+            ->get();
+        return response()->json(['data' => $intakes]);
+    });
+
+    // ── Admissions Analytics ───────────────────────────────────────────────────
+    Route::get('/analytics', function () {
+        $total     = \Illuminate\Support\Facades\DB::table('admissions_online_applications')->count();
+        $submitted = \Illuminate\Support\Facades\DB::table('admissions_online_applications')->where('status', 'submitted')->count();
+        $reviewing = \Illuminate\Support\Facades\DB::table('admissions_online_applications')->where('status', 'under_review')->count();
+        $offered   = \Illuminate\Support\Facades\DB::table('admissions_online_applications')->where('status', 'offered')->count();
+        $rejected  = \Illuminate\Support\Facades\DB::table('admissions_online_applications')->where('status', 'rejected')->count();
+        $paid      = \Illuminate\Support\Facades\DB::table('admissions_online_applications')->where('payment_status', 'paid')->count();
+
+        $byType   = \Illuminate\Support\Facades\DB::table('admissions_online_applications')
+            ->selectRaw('applicant_type, COUNT(*) as count')
+            ->groupBy('applicant_type')->get();
+        $bySchool = \Illuminate\Support\Facades\DB::table('admissions_online_applications')
+            ->selectRaw('school_code, COUNT(*) as count')
+            ->groupBy('school_code')->get();
+        $openIntakes = \Illuminate\Support\Facades\DB::table('admissions_intakes')
+            ->where('is_published', true)
+            ->whereIn('status', ['open', 'closing_soon', 'extended'])
+            ->get();
+
+        return response()->json(['data' => [
+            'totals'       => compact('total', 'submitted', 'reviewing', 'offered', 'rejected', 'paid'),
+            'by_type'      => $byType,
+            'by_school'    => $bySchool,
+            'open_intakes' => $openIntakes,
+        ]]);
+    });
+
+    // ── Submit Online Application (flat, no auth required) ────────────────────
+    Route::post('/apply', function (Illuminate\Http\Request $request) {
+        $data = $request->validate([
+            'intake_id'           => 'required|integer',
+            'pathway_code'        => 'required|string',
+            'first_name'          => 'required|string|max:100',
+            'last_name'           => 'required|string|max:100',
+            'other_names'         => 'nullable|string|max:100',
+            'gender'              => 'nullable|string|max:10',
+            'date_of_birth'       => 'nullable|string',
+            'nationality'         => 'nullable|string|max:80',
+            'id_passport_number'  => 'nullable|string|max:40',
+            'phone'               => 'required|string|max:20',
+            'email'               => 'required|email|max:150',
+            'postal_address'      => 'nullable|string|max:300',
+            'county'              => 'nullable|string|max:80',
+            'kcse_index_number'   => 'nullable|string|max:30',
+            'kcse_year'           => 'nullable|string|max:4',
+            'mean_grade'          => 'nullable|string|max:5',
+            'degree_institution'  => 'nullable|string|max:200',
+            'degree_class'        => 'nullable|string|max:80',
+            'degree_year'         => 'nullable|string|max:4',
+            'degree_field'        => 'nullable|string|max:150',
+            'school_code'         => 'nullable|string|max:10',
+            'programme_code'      => 'nullable|string|max:30',
+            'programme_name'      => 'nullable|string|max:200',
+            'second_choice_code'  => 'nullable|string|max:30',
+            'second_choice_name'  => 'nullable|string|max:200',
+            'payment_phone'       => 'nullable|string|max:20',
+            'docs_declared'       => 'nullable|array',
+        ]);
+
+        // Validate intake exists and is open
+        $intake = \Illuminate\Support\Facades\DB::table('admissions_intakes')
+            ->where('id', $data['intake_id'])
+            ->where('is_published', true)
+            ->first();
+        if (!$intake) {
+            return response()->json(['error' => 'Selected intake is not available.'], 422);
+        }
+
+        // Generate reference: KAFU-YYYY-XXXXXX
+        $year  = now()->format('Y');
+        $count = \Illuminate\Support\Facades\DB::table('admissions_online_applications')->count() + 1;
+        $ref   = 'KAFU-' . $year . '-' . str_pad($count, 6, '0', STR_PAD_LEFT);
+
+        $applicantType = match($data['pathway_code']) {
+            'kuccps'   => 'kuccps',
+            'ug_self'  => 'self_sponsored',
+            'masters'  => 'masters',
+            'phd'      => 'phd',
+            default    => 'self_sponsored',
+        };
+
+        \Illuminate\Support\Facades\DB::table('admissions_online_applications')->insert([
+            'reference_number'    => $ref,
+            'applicant_type'      => $applicantType,
+            'status'              => 'submitted',
+            'first_name'          => $data['first_name'],
+            'last_name'           => $data['last_name'],
+            'other_names'         => $data['other_names'] ?? null,
+            'gender'              => $data['gender'] ?? null,
+            'date_of_birth'       => $data['date_of_birth'] ?? null,
+            'nationality'         => $data['nationality'] ?? 'Kenyan',
+            'id_passport_number'  => $data['id_passport_number'] ?? null,
+            'phone'               => $data['phone'],
+            'email'               => $data['email'],
+            'postal_address'      => $data['postal_address'] ?? null,
+            'county'              => $data['county'] ?? null,
+            'kcse_index_number'   => $data['kcse_index_number'] ?? null,
+            'kcse_year'           => $data['kcse_year'] ?? null,
+            'mean_grade'          => $data['mean_grade'] ?? null,
+            'degree_institution'  => $data['degree_institution'] ?? null,
+            'degree_class'        => $data['degree_class'] ?? null,
+            'degree_year'         => $data['degree_year'] ?? null,
+            'degree_field'        => $data['degree_field'] ?? null,
+            'school_code'         => $data['school_code'] ?? null,
+            'programme_code'      => $data['programme_code'] ?? null,
+            'programme_name'      => $data['programme_name'] ?? null,
+            'second_choice_code'  => $data['second_choice_code'] ?? null,
+            'second_choice_name'  => $data['second_choice_name'] ?? null,
+            'payment_status'      => 'pending',
+            'payment_phone'       => $data['payment_phone'] ?? null,
+            'extra_data'          => json_encode(['docs_declared' => $data['docs_declared'] ?? [], 'intake_name' => $intake->name]),
+            'submitted_at'        => now(),
+            'created_at'          => now(),
+            'updated_at'          => now(),
+        ]);
+
+        return response()->json(['data' => ['reference_number' => $ref, 'message' => 'Application submitted successfully.']]);
+    })->middleware('throttle:20,1');
+
+    // ── Simulate M-Pesa STK Push ───────────────────────────────────────────────
+    Route::post('/apply/{ref}/pay', function (Illuminate\Http\Request $request, string $ref) {
+        $app = \Illuminate\Support\Facades\DB::table('admissions_online_applications')
+            ->where('reference_number', $ref)->first();
+        if (!$app) return response()->json(['error' => 'Application not found.'], 404);
+
+        $data    = $request->validate(['phone' => 'required|string|max:20']);
+        $payRef  = 'MPESA-' . strtoupper(\Illuminate\Support\Str::random(10));
+
+        \Illuminate\Support\Facades\DB::table('admissions_online_applications')
+            ->where('reference_number', $ref)
+            ->update(['payment_status' => 'initiated', 'payment_phone' => $data['phone'], 'payment_reference' => $payRef, 'updated_at' => now()]);
+
+        return response()->json(['payment_reference' => $payRef, 'message' => "M-Pesa STK Push sent to {$data['phone']}. Enter your M-Pesa PIN to complete payment."]);
+    });
+
+    // ── Confirm Payment (sandbox simulation) ──────────────────────────────────
+    Route::post('/apply/{ref}/pay/confirm', function (string $ref) {
+        $app = \Illuminate\Support\Facades\DB::table('admissions_online_applications')
+            ->where('reference_number', $ref)->first();
+        if (!$app) return response()->json(['error' => 'Application not found.'], 404);
+
+        \Illuminate\Support\Facades\DB::table('admissions_online_applications')
+            ->where('reference_number', $ref)
+            ->update(['payment_status' => 'paid', 'payment_at' => now(), 'updated_at' => now()]);
+
+        return response()->json(['message' => 'Payment confirmed.', 'status' => 'paid']);
+    });
+
+    // ── Public Application Tracking ────────────────────────────────────────────
+    Route::get('/track/{ref}', function (string $ref) {
+        $app = \Illuminate\Support\Facades\DB::table('admissions_online_applications')
+            ->where('reference_number', $ref)->first();
+        if (!$app) return response()->json(['error' => 'Application not found.'], 404);
+
+        $messages = [
+            'submitted'    => 'Your application has been received and is being processed by the Admissions Office.',
+            'under_review' => 'Your application is currently under review by the Admissions Committee.',
+            'offered'      => 'Congratulations! An admission offer has been issued. Please check your email for further instructions.',
+            'rejected'     => 'We regret that your application was unsuccessful at this time.',
+            'draft'        => 'Your application is saved as a draft and has not yet been submitted.',
+        ];
+
+        return response()->json(['data' => [
+            'reference_number' => $app->reference_number,
+            'applicant_name'   => trim($app->first_name . ' ' . ($app->other_names ? $app->other_names . ' ' : '') . $app->last_name),
+            'applicant_type'   => $app->applicant_type,
+            'programme_name'   => $app->programme_name,
+            'school_code'      => $app->school_code,
+            'status'           => $app->status,
+            'payment_status'   => $app->payment_status,
+            'submitted_at'     => $app->submitted_at,
+            'status_message'   => $messages[$app->status] ?? $messages['submitted'],
+        ]]);
+    });
 });
 
 // =============================================================================
