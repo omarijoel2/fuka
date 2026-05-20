@@ -233,6 +233,38 @@ Route::get('/student-services', function () {
     return response()->json(['data' => $data]);
 });
 
+// ── Governance: Council, Management, Directorates ─────────────────────────────
+Route::get('/council', function () {
+    $members = \App\Models\CouncilMember::where('is_active', true)
+        ->orderBy('position_order')
+        ->get();
+    return response()->json(['data' => $members]);
+});
+
+Route::get('/management', function () {
+    $profiles = \App\Models\ManagementProfile::where('is_active', true)
+        ->orderBy('position_order')
+        ->get();
+    return response()->json(['data' => $profiles]);
+});
+
+Route::get('/directorates', function () {
+    $directorates = \App\Models\Directorate::where('is_active', true)
+        ->orderBy('position_order')
+        ->get(['id', 'name', 'slug', 'tagline', 'description', 'director_name', 'director_title', 'position_order']);
+    return response()->json(['data' => $directorates]);
+});
+
+Route::get('/directorates/{slug}', function (string $slug) {
+    $directorate = \App\Models\Directorate::where('slug', $slug)
+        ->where('is_active', true)
+        ->first();
+    if (!$directorate) {
+        return response()->json(['error' => 'Directorate not found.'], 404);
+    }
+    return response()->json(['data' => $directorate]);
+});
+
 Route::get('/news', function (Request $request) {
     $cmsItems = CmsContent::where('type', 'news')
         ->where('status', 'published')

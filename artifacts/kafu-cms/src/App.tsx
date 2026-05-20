@@ -32,6 +32,9 @@ import SiteControlsPage from "@/pages/site-controls";
 import RedirectsCmsPage from "@/pages/redirects-cms";
 import AboutCmsPage from "@/pages/about-cms";
 import StudentServicesCmsPage from "@/pages/student-services-cms";
+import CouncilMembersCmsPage from "@/pages/council-members-cms";
+import ManagementProfilesCmsPage from "@/pages/management-profiles-cms";
+import DirectoratesCmsPage from "@/pages/directorates-cms";
 import ContentHealthPage from "@/pages/content-health";
 import WorkflowConsolePage from "@/pages/workflow-console";
 import AdmissionsCmsPage from "@/pages/admissions-cms";
@@ -264,6 +267,27 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <StudentServicesCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/governance/council">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <CouncilMembersCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/governance/management">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <ManagementProfilesCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/governance/directorates">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <DirectoratesCmsPage />
             </RequireRole>
           )}
         </Route>

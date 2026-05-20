@@ -23,5 +23,6 @@ class DatabaseSeeder extends Seeder
         $this->call(RepositorySeeder::class);
         $this->call(AdmissionsModuleSeeder::class);
         $this->call(KuccpsModuleSeeder::class);
+        $this->call(GovernanceSeeder::class);
     }
 }

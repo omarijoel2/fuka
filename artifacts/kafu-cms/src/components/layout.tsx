@@ -6,7 +6,8 @@ import {
   Image, Tag, ClipboardList, Settings, LogOut, Menu, X,
   ChevronDown, ChevronRight, BookOpen, UserCog, AlertTriangle, Newspaper, SlidersHorizontal,
   FlaskConical, Globe, Banknote, HeartHandshake, MapPin, Building2,
-  Home, Navigation, ToggleRight, ArrowRightLeft, Activity, GitBranch, Search, GraduationCap
+  Home, Navigation, ToggleRight, ArrowRightLeft, Activity, GitBranch, Search, GraduationCap,
+  Landmark
 } from "lucide-react";
 
 interface NavItem {
@@ -87,6 +88,16 @@ const navItems: NavItem[] = [
       { label: "Document Uploads", href: "/admissions" },
       { label: "Postgraduate Programmes", href: "/admissions/programmes" },
       { label: "Eligibility Settings", href: "/admissions/settings" },
+    ],
+  },
+  {
+    label: "Governance",
+    icon: <Landmark className="w-4 h-4" />,
+    roles: ADMIN_ROLES,
+    children: [
+      { label: "University Council", href: "/governance/council" },
+      { label: "Management Profiles", href: "/governance/management" },
+      { label: "Directorates", href: "/governance/directorates" },
     ],
   },
   {

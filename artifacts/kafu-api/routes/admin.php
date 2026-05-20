@@ -1083,6 +1083,153 @@ Route::prefix('admin')->group(function () {
             return response()->json(['message' => 'Partner deleted.']);
         });
 
+        // ── Governance: Council Members ──────────────────────────────────────────
+        Route::get('/council-members', function () {
+            return response()->json(['data' => \App\Models\CouncilMember::orderBy('position_order')->get()]);
+        });
+
+        Route::post('/council-members', function (Request $request) {
+            $data = $request->validate([
+                'name'           => 'required|string|max:255',
+                'title'          => 'required|string|max:255',
+                'photo_url'      => 'nullable|string|max:500',
+                'bio'            => 'nullable|string',
+                'credentials'    => 'nullable|array',
+                'credentials.*'  => 'string|max:255',
+                'category'       => 'required|string|max:50',
+                'position_order' => 'integer|min:0',
+                'is_active'      => 'boolean',
+            ]);
+            $member = \App\Models\CouncilMember::create($data);
+            return response()->json(['data' => $member], 201);
+        });
+
+        Route::put('/council-members/{id}', function (Request $request, $id) {
+            $member = \App\Models\CouncilMember::findOrFail($id);
+            $data = $request->validate([
+                'name'           => 'sometimes|string|max:255',
+                'title'          => 'sometimes|string|max:255',
+                'photo_url'      => 'nullable|string|max:500',
+                'bio'            => 'nullable|string',
+                'credentials'    => 'nullable|array',
+                'credentials.*'  => 'string|max:255',
+                'category'       => 'sometimes|string|max:50',
+                'position_order' => 'integer|min:0',
+                'is_active'      => 'boolean',
+            ]);
+            $member->update($data);
+            return response()->json(['data' => $member]);
+        });
+
+        Route::delete('/council-members/{id}', function ($id) {
+            \App\Models\CouncilMember::findOrFail($id)->delete();
+            return response()->json(null, 204);
+        });
+
+        // ── Governance: Management Profiles ──────────────────────────────────────
+        Route::get('/management-profiles', function () {
+            return response()->json(['data' => \App\Models\ManagementProfile::orderBy('position_order')->get()]);
+        });
+
+        Route::post('/management-profiles', function (Request $request) {
+            $data = $request->validate([
+                'name'           => 'required|string|max:255',
+                'title'          => 'required|string|max:255',
+                'photo_url'      => 'nullable|string|max:500',
+                'bio'            => 'nullable|string',
+                'email'          => 'nullable|email|max:255',
+                'office'         => 'nullable|string|max:255',
+                'phone'          => 'nullable|string|max:50',
+                'category'       => 'required|string|in:vc,dvc,registrar,finance,library,ict,other',
+                'position_order' => 'integer|min:0',
+                'is_active'      => 'boolean',
+            ]);
+            $profile = \App\Models\ManagementProfile::create($data);
+            return response()->json(['data' => $profile], 201);
+        });
+
+        Route::put('/management-profiles/{id}', function (Request $request, $id) {
+            $profile = \App\Models\ManagementProfile::findOrFail($id);
+            $data = $request->validate([
+                'name'           => 'sometimes|string|max:255',
+                'title'          => 'sometimes|string|max:255',
+                'photo_url'      => 'nullable|string|max:500',
+                'bio'            => 'nullable|string',
+                'email'          => 'nullable|email|max:255',
+                'office'         => 'nullable|string|max:255',
+                'phone'          => 'nullable|string|max:50',
+                'category'       => 'sometimes|string|in:vc,dvc,registrar,finance,library,ict,other',
+                'position_order' => 'integer|min:0',
+                'is_active'      => 'boolean',
+            ]);
+            $profile->update($data);
+            return response()->json(['data' => $profile]);
+        });
+
+        Route::delete('/management-profiles/{id}', function ($id) {
+            \App\Models\ManagementProfile::findOrFail($id)->delete();
+            return response()->json(null, 204);
+        });
+
+        // ── Governance: Directorates ─────────────────────────────────────────────
+        Route::get('/directorates', function () {
+            return response()->json(['data' => \App\Models\Directorate::orderBy('position_order')->get()]);
+        });
+
+        Route::post('/directorates', function (Request $request) {
+            $data = $request->validate([
+                'name'                => 'required|string|max:255',
+                'slug'                => 'required|string|unique:directorates,slug|max:100',
+                'tagline'             => 'nullable|string|max:255',
+                'description'         => 'nullable|string',
+                'director_name'       => 'nullable|string|max:255',
+                'director_title'      => 'nullable|string|max:255',
+                'director_photo_url'  => 'nullable|string|max:500',
+                'director_bio'        => 'nullable|string',
+                'director_email'      => 'nullable|email|max:255',
+                'director_phone'      => 'nullable|string|max:50',
+                'functions'           => 'nullable|array',
+                'functions.*'         => 'string',
+                'services'            => 'nullable|array',
+                'services.*'          => 'string',
+                'quick_links'         => 'nullable|array',
+                'position_order'      => 'integer|min:0',
+                'is_active'           => 'boolean',
+            ]);
+            $directorate = \App\Models\Directorate::create($data);
+            return response()->json(['data' => $directorate], 201);
+        });
+
+        Route::put('/directorates/{id}', function (Request $request, $id) {
+            $directorate = \App\Models\Directorate::findOrFail($id);
+            $data = $request->validate([
+                'name'                => 'sometimes|string|max:255',
+                'slug'                => "sometimes|string|unique:directorates,slug,{$id}|max:100",
+                'tagline'             => 'nullable|string|max:255',
+                'description'         => 'nullable|string',
+                'director_name'       => 'nullable|string|max:255',
+                'director_title'      => 'nullable|string|max:255',
+                'director_photo_url'  => 'nullable|string|max:500',
+                'director_bio'        => 'nullable|string',
+                'director_email'      => 'nullable|email|max:255',
+                'director_phone'      => 'nullable|string|max:50',
+                'functions'           => 'nullable|array',
+                'functions.*'         => 'string',
+                'services'            => 'nullable|array',
+                'services.*'          => 'string',
+                'quick_links'         => 'nullable|array',
+                'position_order'      => 'integer|min:0',
+                'is_active'           => 'boolean',
+            ]);
+            $directorate->update($data);
+            return response()->json(['data' => $directorate]);
+        });
+
+        Route::delete('/directorates/{id}', function ($id) {
+            \App\Models\Directorate::findOrFail($id)->delete();
+            return response()->json(null, 204);
+        });
+
         // ── Campus CRUD ─────────────────────────────────────────────────────────
         Route::get('/campuses', function (Request $request) {
             $q = \App\Models\Campus::orderBy('sort_order')->orderBy('name');

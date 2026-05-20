@@ -49,6 +49,10 @@ import InternationalExchange from "@/pages/international-exchange";
 import RepositoryPage from "@/pages/repository";
 import RepositoryBrowse from "@/pages/repository-browse";
 import RepositoryItem from "@/pages/repository-item";
+import CouncilPage from "@/pages/council";
+import ManagementPage from "@/pages/management";
+import DirectoratesPage from "@/pages/directorates";
+import DirectorateDetail from "@/pages/directorate-detail";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -113,6 +117,12 @@ function Router() {
           <Route path="/repository/browse" component={RepositoryBrowse} />
           <Route path="/repository/items/:slug">
             {(params) => <RepositoryItem slug={params.slug ?? ""} />}
+          </Route>
+          <Route path="/about/council" component={CouncilPage} />
+          <Route path="/about/management" component={ManagementPage} />
+          <Route path="/directorates" component={DirectoratesPage} />
+          <Route path="/directorates/:slug">
+            {(params) => <DirectorateDetail slug={params.slug ?? ""} />}
           </Route>
           <Route component={NotFound} />
         </Switch>
