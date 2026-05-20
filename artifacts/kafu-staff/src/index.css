@@ -59,7 +59,7 @@
   --destructive: 0 72% 51%;
   --destructive-foreground: 0 0% 100%;
 
-  --app-font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --app-font-sans: 'Roboto', 'Segoe UI', system-ui, sans-serif;
   --radius: 0.5rem;
 }
 
