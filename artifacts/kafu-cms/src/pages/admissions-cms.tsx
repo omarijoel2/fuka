@@ -332,7 +332,7 @@ function IntakeModal({ intake, onClose, onSaved }: { intake: Partial<Intake> | n
       if (!form.name || !form.academic_year || !form.open_at || !form.close_at) {
         setError("Please fill all required fields."); setSaving(false); return;
       }
-      const endpoint = isNew ? "/admin/admissions/intakes" : `/admin/admissions/intakes/${intake!.id}`;
+      const endpoint = isNew ? "/admissions/intakes" : `/admissions/intakes/${intake!.id}`;
       const method = isNew ? "POST" : "PUT";
       await apiFetch(endpoint, { method, body: JSON.stringify(form) });
       onSaved();
@@ -426,7 +426,7 @@ function IntakesTab() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await apiFetch("/admin/admissions/intakes");
+      const data = await apiFetch("/admissions/intakes");
       setIntakes(data.data ?? []);
     } finally { setLoading(false); }
   }, []);
@@ -436,7 +436,7 @@ function IntakesTab() {
   async function doAction(id: number, action: "publish" | "open" | "close" | "archive") {
     setActioning(id); setError("");
     try {
-      await apiFetch(`/admin/admissions/intakes/${id}/${action}`, { method: "POST" });
+      await apiFetch(`/admissions/intakes/${id}/${action}`, { method: "POST" });
       await load();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Action failed");
@@ -447,7 +447,7 @@ function IntakesTab() {
     if (!confirm(`Delete intake "${name}"? This cannot be undone.`)) return;
     setError("");
     try {
-      await apiFetch(`/admin/admissions/intakes/${id}`, { method: "DELETE" });
+      await apiFetch(`/admissions/intakes/${id}`, { method: "DELETE" });
       await load();
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Delete failed");
