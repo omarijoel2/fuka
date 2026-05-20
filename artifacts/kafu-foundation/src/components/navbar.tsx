@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, ChevronDown, ChevronRight, MapPin, Phone, ExternalLink } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronRight, MapPin, Phone, ExternalLink, Search } from "lucide-react";
 import { Button } from "./ui/button";
+import { SearchModal } from "./search-bar";
 
 // ─── Original 10-item nav structure ──────────────────────────────────────────
 const navItems = [
@@ -14,6 +15,9 @@ const navItems = [
       { name: "Vision & Mission",  path: "/about#vision" },
       { name: "University Council", path: "/about/council" },
       { name: "Management",        path: "/about/management" },
+      { name: "Strategic Plan",    path: "/about/strategic-plan" },
+      { name: "Policies & Regulations", path: "/about/policies" },
+      { name: "Service Charter",   path: "/about/service-charter" },
       { name: "Staff Directory",   path: "/staff" },
       { name: "Contact Us",        path: "/contact" },
     ],
@@ -36,6 +40,8 @@ const navItems = [
     path: "/admissions",
     children: [
       { name: "Admissions Overview",    path: "/admissions" },
+      { name: "Apply Online",           path: "/admissions/apply" },
+      { name: "Track Application",      path: "/admissions/track" },
       { name: "Undergraduate (KUCCPS)", path: "/admissions#undergraduate" },
       { name: "Postgraduate",           path: "/admissions#postgraduate" },
       { name: "International Students", path: "/admissions#international" },
@@ -59,6 +65,7 @@ const navItems = [
       { name: "Events Calendar", path: "/events" },
       { name: "Announcements",  path: "/announcements" },
       { name: "Photo Gallery",  path: "/gallery" },
+      { name: "Archives",       path: "/archives" },
     ],
   },
   {
@@ -219,6 +226,7 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
 export function Navbar() {
   const [mobileOpen,   setMobileOpen]   = React.useState(false);
   const [openDropdown, setOpenDropdown] = React.useState<string | null>(null);
+  const [searchOpen,   setSearchOpen]   = useState(false);
   const [location]                      = useLocation();
   const navRowRef                       = React.useRef<HTMLDivElement>(null);
 
@@ -288,7 +296,15 @@ export function Navbar() {
           />
         </Link>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
+          <button
+            className="flex items-center justify-center w-9 h-9 rounded-md text-foreground hover:bg-muted transition-colors"
+            onClick={() => setSearchOpen(true)}
+            aria-label="Open search"
+            data-testid="button-open-search"
+          >
+            <Search className="w-4 h-4" />
+          </button>
           <Button
             asChild
             size="sm"
@@ -385,6 +401,7 @@ export function Navbar() {
           </div>
         </div>
       )}
+      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
     </header>
   );
 }

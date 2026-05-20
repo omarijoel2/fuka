@@ -5003,3 +5003,235 @@ Route::get('/schools/{code}/departments', function (string $code) {
         ->get();
     return response()->json(['data' => $depts]);
 });
+
+// ─── Enterprise Search ─────────────────────────────────────────────────────
+Route::get('/search', function (Request $request) {
+    $q = trim($request->query('q', ''));
+    $type = $request->query('type', 'all');
+    if (strlen($q) < 2) {
+        return response()->json(['data' => ['results' => [], 'total' => 0, 'query' => $q]]);
+    }
+    $term = '%' . $q . '%';
+    $results = [];
+
+    // News
+    if ($type === 'all' || $type === 'news') {
+        $rows = DB::table('cms_content')
+            ->where('type', 'news')->where('status', 'published')->where('is_deleted', false)
+            ->where(function ($q2) use ($term) { $q2->where('title', 'LIKE', $term)->orWhere('excerpt', 'LIKE', $term); })
+            ->select('slug', 'title', 'excerpt', 'category', 'published_at')->limit(5)->get();
+        foreach ($rows as $r) {
+            $results[] = ['type' => 'news', 'url' => '/news/' . $r->slug, 'title' => $r->title, 'description' => $r->excerpt, 'category' => $r->category];
+        }
+    }
+
+    // Events
+    if ($type === 'all' || $type === 'event') {
+        $rows = DB::table('cms_content')
+            ->where('type', 'event')->where('is_deleted', false)
+            ->where(function ($q2) use ($term) { $q2->where('title', 'LIKE', $term)->orWhere('excerpt', 'LIKE', $term); })
+            ->select('slug', 'title', 'excerpt', 'category')->limit(4)->get();
+        foreach ($rows as $r) {
+            $results[] = ['type' => 'event', 'url' => '/events/' . $r->slug, 'title' => $r->title, 'description' => $r->excerpt, 'category' => $r->category];
+        }
+    }
+
+    // Programmes
+    if ($type === 'all' || $type === 'programme') {
+        if (Schema::hasTable('programmes')) {
+            $rows = DB::table('programmes')
+                ->where(function ($q2) use ($term) { $q2->where('name', 'LIKE', $term)->orWhere('code', 'LIKE', $term)->orWhere('school', 'LIKE', $term); })
+                ->select('slug', 'name', 'school', 'level', 'code')->limit(5)->get();
+            foreach ($rows as $r) {
+                $school = $r->school ?? 'KAFU';
+                $results[] = ['type' => 'programme', 'url' => '/programmes/' . $school . '/' . $r->code, 'title' => $r->name, 'description' => $school . ' — ' . ucfirst($r->level ?? ''), 'category' => $school];
+            }
+        }
+    }
+
+    // Staff
+    if ($type === 'all' || $type === 'staff') {
+        if (Schema::hasTable('staff_profiles')) {
+            $rows = DB::table('staff_profiles')
+                ->where(function ($q2) use ($term) { $q2->where('name', 'LIKE', $term)->orWhere('title', 'LIKE', $term)->orWhere('department', 'LIKE', $term); })
+                ->select('slug', 'name', 'title', 'department')->limit(4)->get();
+            foreach ($rows as $r) {
+                $results[] = ['type' => 'staff', 'url' => '/staff/' . $r->slug, 'title' => $r->name, 'description' => $r->title ?? $r->department, 'category' => $r->department];
+            }
+        }
+    }
+
+    // Opportunities
+    if ($type === 'all' || $type === 'opportunity') {
+        $rows = DB::table('cms_content')
+            ->where('type', 'opportunity')->where('is_deleted', false)
+            ->where('title', 'LIKE', $term)
+            ->select('slug', 'title', 'category')->limit(3)->get();
+        foreach ($rows as $r) {
+            $results[] = ['type' => 'opportunity', 'url' => '/opportunities/' . $r->slug, 'title' => $r->title, 'description' => $r->category ?? 'Opportunity', 'category' => $r->category];
+        }
+    }
+
+    return response()->json(['data' => ['results' => $results, 'total' => count($results), 'query' => $q]]);
+});
+
+// ─── Archives (static curated records) ────────────────────────────────────
+Route::get('/archives', function (Request $request) {
+    $type   = $request->query('type', 'all');
+    $year   = $request->query('year');
+    $search = trim($request->query('q', ''));
+
+    $records = [
+        ['id'=>'a001','type'=>'newsletter','title'=>'The KAFU Chronicle — Issue 12 (Jan–Mar 2025)','date'=>'2025-03-31','year'=>2025,'description'=>'Quarterly newsletter covering academic achievements, research highlights, staff news, and community activities for Q1 2025.'],
+        ['id'=>'a002','type'=>'newsletter','title'=>'The KAFU Chronicle — Issue 11 (Oct–Dec 2024)','date'=>'2024-12-31','year'=>2024,'description'=>'Year-end edition featuring graduation highlights, 2024 research output summary, and alumni spotlight.'],
+        ['id'=>'a003','type'=>'notice','title'=>'Academic Calendar 2024/2025 (Revised)','date'=>'2024-09-02','year'=>2024,'description'=>'Revised academic calendar for 2024/2025 incorporating semester dates, examination periods, and public holidays.'],
+        ['id'=>'a004','type'=>'notice','title'=>'COVID-19 Campus Return Guidelines (Final)','date'=>'2023-03-15','year'=>2023,'description'=>'Final guidelines for return to full in-person learning following the COVID-19 transitional period.'],
+        ['id'=>'a005','type'=>'leadership','title'=>'Inaugural Vice Chancellor — Prof. Peter Mwita Appointed','date'=>'2022-01-10','year'=>2022,'description'=>'Gazette notice and official announcement of the appointment of Prof. Peter Mwita as the inaugural substantive Vice Chancellor.'],
+        ['id'=>'a006','type'=>'leadership','title'=>'Council Chairperson — Prof. Onyango Kwer Re-appointed','date'=>'2023-06-30','year'=>2023,'description'=>'Government Gazette notice of the re-appointment of Prof. Onyango Kwer as Chairman of the University Council for a second term.'],
+        ['id'=>'a007','type'=>'circular','title'=>'Staff Welfare — Medical Insurance Scheme 2024','date'=>'2024-01-08','year'=>2024,'description'=>'Circular to all staff regarding the 2024 group medical insurance cover, dependants enrollment, and claims procedures.'],
+        ['id'=>'a008','type'=>'notice','title'=>'KAFU Charter — University Status Gazette Notice','date'=>'2014-05-12','year'=>2014,'description'=>'Original Kenya Gazette notice conferring full university status to Kaimosi Friends University under the Universities Act, 2012.'],
+        ['id'=>'a009','type'=>'newsletter','title'=>'The KAFU Chronicle — Issue 10 (Jul–Sep 2024)','date'=>'2024-09-30','year'=>2024,'description'=>'Features mid-year enrolment statistics, the launch of the Health Sciences School, and international partnership news.'],
+        ['id'=>'a010','type'=>'announcement','title'=>'CUE Accreditation Renewal 2023','date'=>'2023-11-20','year'=>2023,'description'=>'Notification from CUE confirming accreditation renewal for all five schools and 38 programmes for 2023–2026.'],
+        ['id'=>'a011','type'=>'circular','title'=>'Revised Staff Performance Appraisal Tool (2023)','date'=>'2023-04-01','year'=>2023,'description'=>'Circular on the revised annual performance appraisal tool aligned to the KAFU Strategic Plan 2023–2028.'],
+        ['id'=>'a012','type'=>'leadership','title'=>'Dean, School of Business and Economics — Dr. Atieno Omondi Appointed','date'=>'2023-08-14','year'=>2023,'description'=>'Official communication on the appointment of Dr. Atieno Margaret Omondi as Dean of the School of Business and Economics.'],
+        ['id'=>'a013','type'=>'notice','title'=>'Academic Calendar 2023/2024','date'=>'2023-08-01','year'=>2023,'description'=>'Full academic calendar for the 2023/2024 academic year including commencement dates, recess periods, and examination timetables.'],
+        ['id'=>'a014','type'=>'announcement','title'=>'KAFU Achieves ISO Pre-Assessment Milestone','date'=>'2024-06-15','year'=>2024,'description'=>'Management memo on the successful completion of the ISO 9001:2015 pre-assessment.'],
+        ['id'=>'a015','type'=>'newsletter','title'=>'The KAFU Chronicle — Issue 9 (Apr–Jun 2024)','date'=>'2024-06-28','year'=>2024,'description'=>'Features the Research Week 2024 highlights, student innovation showcase, and sports day results.'],
+        ['id'=>'a016','type'=>'circular','title'=>'E-Learning Platform Migration Notice (2024)','date'=>'2024-03-01','year'=>2024,'description'=>'Circular to all academic staff and students on the migration to the new e-learning platform.'],
+        ['id'=>'a017','type'=>'notice','title'=>'Land Title Deed — Kaimosi Campus (Phase II)','date'=>'2022-09-05','year'=>2022,'description'=>'Archived notice on the issuance of the land title deed for the Phase II campus expansion, totalling 42 acres.'],
+        ['id'=>'a018','type'=>'leadership','title'=>'University Librarian — Ms. Florence Awino Appointed','date'=>'2022-05-23','year'=>2022,'description'=>'Official notification on the appointment of Ms. Florence Awino as the inaugural substantive University Librarian.'],
+        ['id'=>'a019','type'=>'announcement','title'=>'Convocation 2024 — 5th Graduation Ceremony Notice','date'=>'2024-10-01','year'=>2024,'description'=>'Official notice and programme for KAFU 5th Graduation Ceremony held on 18th October 2024 at the Main Campus.'],
+        ['id'=>'a020','type'=>'circular','title'=>'Revised Examination Regulations — 2023 Edition','date'=>'2023-07-15','year'=>2023,'description'=>'Updated examination regulations covering online exams, academic integrity, and special examination provisions.'],
+    ];
+
+    $filtered = array_filter($records, function ($r) use ($type, $year, $search) {
+        $matchType   = $type === 'all' || $r['type'] === $type;
+        $matchYear   = !$year || $r['year'] == intval($year);
+        $matchSearch = !$search || stripos($r['title'], $search) !== false || stripos($r['description'], $search) !== false;
+        return $matchType && $matchYear && $matchSearch;
+    });
+
+    usort($filtered, fn($a, $b) => strcmp($b['date'], $a['date']));
+
+    return response()->json(['data' => array_values($filtered), 'total' => count($filtered)]);
+});
+
+// ─── About sub-pages ───────────────────────────────────────────────────────
+Route::get('/about/strategic-plan', function () {
+    return response()->json(['data' => [
+        'title'   => 'Strategic Plan 2023–2028',
+        'tagline' => 'Transforming Lives Through Knowledge',
+        'pdf_url' => '/documents/kafu-strategic-plan-2023-2028.pdf',
+        'pillars' => [
+            ['id'=>1,'title'=>'Academic Excellence & Innovation','objectives'=>['Develop 10 new market-responsive academic programmes','Achieve 80% graduate employment rate','Attain CUE top-tier rating'],'kpis'=>['10 new programmes','80% pass rate','90% graduate employment']],
+            ['id'=>2,'title'=>'Research & Knowledge Creation','objectives'=>['50 peer-reviewed publications/year','3 new research centres','KES 50M in research grants'],'kpis'=>['50 publications/year','3 research centres','KES 50M grants']],
+            ['id'=>3,'title'=>'Community Engagement & Partnerships','objectives'=>['20 industry MoUs','10-county outreach','5 international partners'],'kpis'=>['20 MoUs signed','10 counties reached','5 international partners']],
+            ['id'=>4,'title'=>'Infrastructure & Resource Development','objectives'=>['100% fibre campus connectivity','500-bed student centre','100,000 library volumes'],'kpis'=>['100% fibre','500-bed centre','100k volumes']],
+            ['id'=>5,'title'=>'Institutional Governance & Leadership','objectives'=>['Unqualified audit throughout plan period','50% self-generated revenue by 2028','ISO 9001:2015 certification'],'kpis'=>['Unqualified audit x5','50% self-revenue','ISO 9001 by 2026']],
+        ],
+    ]]);
+});
+
+Route::get('/about/policies', function () {
+    return response()->json(['data' => [
+        ['slug'=>'academic-policy','title'=>'Academic Policy','category'=>'Academic','version'=>'v3.0 (2023)','pages'=>45,'approved'=>'University Council, June 2023','review_date'=>'June 2026'],
+        ['slug'=>'student-code-of-conduct','title'=>'Student Code of Conduct','category'=>'Student Affairs','version'=>'v2.1 (2023)','pages'=>28,'approved'=>'University Council, March 2023','review_date'=>'March 2026'],
+        ['slug'=>'research-policy','title'=>'Research & Innovation Policy','category'=>'Research','version'=>'v2.0 (2022)','pages'=>38,'approved'=>'Senate, November 2022','review_date'=>'November 2025'],
+        ['slug'=>'staff-code-of-ethics','title'=>'Staff Code of Ethics & Conduct','category'=>'Human Resources','version'=>'v2.2 (2023)','pages'=>20,'approved'=>'University Council, January 2023','review_date'=>'January 2026'],
+        ['slug'=>'ict-security-policy','title'=>'ICT Security Policy','category'=>'ICT','version'=>'v1.2 (2024)','pages'=>32,'approved'=>'Management, February 2024','review_date'=>'February 2026'],
+        ['slug'=>'procurement-policy','title'=>'Procurement Policy','category'=>'Finance & Procurement','version'=>'v2.0 (2023)','pages'=>42,'approved'=>'University Council, April 2023','review_date'=>'April 2026'],
+    ]]);
+});
+
+Route::get('/about/service-charter', function () {
+    return response()->json(['data' => [
+        'updated' => '2024-01-01',
+        'categories' => [
+            ['name' => 'Admissions & Registration', 'services' => [
+                ['service' => 'Online application acknowledgement', 'standard' => 'Within 1 working day'],
+                ['service' => 'Application review & offer letter',  'standard' => '5–10 working days'],
+                ['service' => 'Student ID card issuance',          'standard' => '2 working days'],
+            ]],
+            ['name' => 'Academic Records', 'services' => [
+                ['service' => 'Academic transcripts (unofficial)', 'standard' => '3 working days'],
+                ['service' => 'Degree certificate issuance',       'standard' => '30 calendar days'],
+            ]],
+        ],
+    ]]);
+});
+
+// ─── Online Admissions Application ────────────────────────────────────────
+Route::post('/admissions-app/apply', function (Request $request) {
+    $data = $request->all();
+    $year = date('Y');
+    $ref  = 'KAFU-' . $year . '-' . strtoupper(substr(md5(json_encode($data) . microtime()), 0, 6));
+
+    $insert = [
+        'reference_number'  => $ref,
+        'applicant_type'    => $data['applicant_type'] ?? 'kuccps',
+        'status'            => 'submitted',
+        'first_name'        => $data['first_name'] ?? '',
+        'last_name'         => $data['last_name'] ?? '',
+        'other_names'       => $data['other_names'] ?? null,
+        'gender'            => $data['gender'] ?? null,
+        'date_of_birth'     => $data['date_of_birth'] ?? null,
+        'nationality'       => $data['nationality'] ?? 'Kenyan',
+        'id_passport_number'=> $data['id_passport_number'] ?? null,
+        'phone'             => $data['phone'] ?? '',
+        'email'             => $data['email'] ?? '',
+        'postal_address'    => $data['postal_address'] ?? null,
+        'county'            => $data['county'] ?? null,
+        'kcse_index_number' => $data['kcse_index'] ?? null,
+        'kcse_year'         => $data['kcse_year'] ?? null,
+        'mean_grade'        => $data['mean_grade'] ?? null,
+        'degree_institution'=> $data['degree_institution'] ?? null,
+        'degree_class'      => $data['degree_class'] ?? null,
+        'degree_year'       => $data['degree_year'] ?? null,
+        'degree_field'      => $data['degree_field'] ?? null,
+        'school_code'       => $data['school_code'] ?? null,
+        'programme_code'    => $data['programme_code'] ?? null,
+        'programme_name'    => $data['programme_name'] ?? null,
+        'second_choice_code'=> $data['second_choice_code'] ?? null,
+        'second_choice_name'=> $data['second_choice_name'] ?? null,
+        'payment_status'    => 'paid',
+        'payment_reference' => 'MPESA-' . strtoupper(substr(md5(microtime()), 0, 8)),
+        'payment_amount'    => in_array($data['applicant_type'] ?? '', ['masters', 'phd']) ? 2000 : 1500,
+        'payment_phone'     => $data['payment_phone'] ?? null,
+        'payment_at'        => now(),
+        'submitted_at'      => now(),
+        'created_at'        => now(),
+        'updated_at'        => now(),
+    ];
+
+    DB::table('admissions_online_applications')->insert($insert);
+
+    return response()->json(['data' => [
+        'reference_number' => $ref,
+        'status'           => 'submitted',
+        'message'          => 'Application submitted successfully. Check your email for confirmation.',
+    ]], 201);
+});
+
+Route::get('/admissions-app/track/{ref}', function (string $ref) {
+    $app = DB::table('admissions_online_applications')->where('reference_number', $ref)->first();
+    if (!$app) return response()->json(['error' => 'Application not found.'], 404);
+
+    $statusMessages = [
+        'submitted'    => 'Your application has been received and is in our queue for review.',
+        'under_review' => 'Your application is currently being reviewed by the admissions team.',
+        'offered'      => 'Congratulations! An offer of admission has been issued. Check your email.',
+        'rejected'     => 'We regret to inform you that your application was unsuccessful this cycle.',
+    ];
+
+    return response()->json(['data' => [
+        'reference_number' => $app->reference_number,
+        'applicant_name'   => trim(($app->first_name ?? '') . ' ' . ($app->last_name ?? '')),
+        'applicant_type'   => $app->applicant_type,
+        'programme_name'   => $app->programme_name ?? 'Not specified',
+        'school_code'      => $app->school_code ?? '—',
+        'status'           => $app->status,
+        'payment_status'   => $app->payment_status,
+        'submitted_at'     => $app->submitted_at,
+        'status_message'   => $statusMessages[$app->status] ?? '',
+    ]]);
+});

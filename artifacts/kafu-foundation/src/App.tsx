@@ -51,6 +51,13 @@ import RepositoryBrowse from "@/pages/repository-browse";
 import RepositoryItem from "@/pages/repository-item";
 import CouncilPage from "@/pages/council";
 import ManagementPage from "@/pages/management";
+import StrategicPlan from "@/pages/about-strategic-plan";
+import AboutPolicies from "@/pages/about-policies";
+import ServiceCharter from "@/pages/about-service-charter";
+import Archives from "@/pages/archives";
+import AdmissionsApply from "@/pages/admissions-apply";
+import AdmissionsTrack from "@/pages/admissions-track";
+import SearchPage from "@/pages/search";
 import DirectoratesPage from "@/pages/directorates";
 import DirectorateDetail from "@/pages/directorate-detail";
 import GalleryPage from "@/pages/gallery";
@@ -123,6 +130,13 @@ function Router() {
           </Route>
           <Route path="/about/council" component={CouncilPage} />
           <Route path="/about/management" component={ManagementPage} />
+          <Route path="/about/strategic-plan" component={StrategicPlan} />
+          <Route path="/about/policies" component={AboutPolicies} />
+          <Route path="/about/service-charter" component={ServiceCharter} />
+          <Route path="/archives" component={Archives} />
+          <Route path="/admissions/apply" component={AdmissionsApply} />
+          <Route path="/admissions/track" component={AdmissionsTrack} />
+          <Route path="/search" component={SearchPage} />
           <Route path="/directorates" component={DirectoratesPage} />
           <Route path="/directorates/:slug">
             {(params) => <DirectorateDetail slug={params.slug ?? ""} />}
