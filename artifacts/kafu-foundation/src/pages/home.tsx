@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useStats, useNews, useSchools, useEvents, useOpportunities, useProgrammes } from "@/lib/api-hooks";
+import { IntakeBanner } from "@/components/intake-banner";
 import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import {
   Calendar,
@@ -519,6 +520,9 @@ export default function Home() {
       {/* ─── HERO CAROUSEL ─── */}
       <HeroCarousel stats={stats} statsLoading={statsLoading} />
 
+      {/* ─── INTAKE STATUS BANNER ─── */}
+      <IntakeBanner />
+
       {/* ─── NEWS, EVENTS & ANNOUNCEMENTS ─── */}
       <section className="py-20 bg-secondary/40 border-y">
         <div className="container mx-auto px-4">
@@ -653,14 +657,15 @@ export default function Home() {
       </section>
 
       {/* ─── SCHOOLS & FACULTIES ─── */}
-      <section className="py-20 bg-background">
+      <section className="py-20 bg-secondary/30">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
             <div className="max-w-2xl">
+              <span className="text-xs font-bold uppercase tracking-widest text-accent mb-3 block">Our Schools</span>
               <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary mb-4">Schools & Faculties</h2>
               <p className="text-muted-foreground text-lg">
-                Five distinct schools, each with a unique academic identity, world-class faculty, and programmes
-                aligned to national development priorities.
+                Five distinct schools, each led by accomplished academics committed to excellence, research, and
+                service to the community.
               </p>
             </div>
             <Button
@@ -675,42 +680,114 @@ export default function Home() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             {schoolsLoading
               ? Array.from({ length: 5 }).map((_, i) => (
-                  <div key={i} className="h-64 bg-muted rounded-xl animate-pulse" />
+                  <div key={i} className="h-80 bg-muted rounded-2xl animate-pulse" />
                 ))
-              : schools?.map((school) => (
-                  <Link
-                    key={school.code}
-                    href={`/schools/${school.code}`}
-                    data-testid={`card-school-${school.code}`}
-                  >
-                    <div className="group h-full flex flex-col justify-between p-8 rounded-xl border bg-card hover:border-primary hover:shadow-lg transition-all duration-300">
-                      <div>
-                        <div className="flex items-center gap-3 mb-5">
-                          <div className="w-11 h-11 rounded-lg bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all">
-                            <BookOpen className="w-5 h-5" />
+              : schools?.map((school, idx) => {
+                  const pc =
+                    typeof school.programmes_count === "object"
+                      ? (school.programmes_count as Record<string, number>)
+                      : null;
+                  const initials = school.dean
+                    ? school.dean
+                        .split(" ")
+                        .filter((w) => /^[A-Z]/.test(w))
+                        .slice(0, 2)
+                        .join("")
+                    : null;
+                  return (
+                    <Link
+                      key={school.code}
+                      href={`/schools/${school.code}`}
+                      data-testid={`card-school-${school.code}`}
+                      className={idx === 4 ? "sm:col-span-2 lg:col-span-1" : ""}
+                    >
+                      <div className="group h-full flex flex-col rounded-2xl border bg-card overflow-hidden hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">
+                        {/* School colour accent bar */}
+                        <div
+                          className="h-1.5 w-full shrink-0"
+                          style={{ backgroundColor: school.colour ?? "hsl(var(--primary))" }}
+                        />
+
+                        <div className="p-6 flex flex-col flex-1">
+                          {/* Dean row */}
+                          <div className="flex items-center gap-3 mb-5">
+                            {school.dean_photo ? (
+                              <img
+                                src={school.dean_photo}
+                                alt={school.dean ?? "Dean"}
+                                className="w-12 h-12 rounded-full object-cover ring-2 ring-border group-hover:ring-primary/40 transition-all shrink-0"
+                              />
+                            ) : (
+                              <div
+                                className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
+                                style={{ backgroundColor: school.colour ?? "hsl(var(--primary))" }}
+                              >
+                                {initials ?? "?"}
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <p className="text-sm font-semibold text-foreground truncate leading-tight">
+                                {school.dean ?? "Position Vacant"}
+                              </p>
+                              <p className="text-xs text-muted-foreground">
+                                {school.dean ? "Dean of School" : "Dean not yet appointed"}
+                              </p>
+                            </div>
                           </div>
-                          <span className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{school.code}</span>
+
+                          {/* School code badge */}
+                          <div className="mb-2">
+                            <span
+                              className="text-xs font-bold uppercase tracking-widest px-2 py-0.5 rounded"
+                              style={{
+                                backgroundColor: `${school.colour ?? "#1A5C38"}22`,
+                                color: school.colour ?? "hsl(var(--primary))",
+                              }}
+                            >
+                              {school.code}
+                            </span>
+                          </div>
+
+                          <h3 className="font-serif text-base font-bold text-foreground mb-2 leading-snug group-hover:text-primary transition-colors">
+                            {school.name}
+                          </h3>
+                          <p className="text-muted-foreground text-sm line-clamp-3 flex-1">{school.description}</p>
+
+                          {/* Programme level pills */}
+                          <div className="mt-4 pt-4 border-t flex items-center justify-between">
+                            {pc ? (
+                              <div className="flex items-center gap-2 flex-wrap">
+                                {pc.undergraduate > 0 && (
+                                  <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
+                                    {pc.undergraduate} UG
+                                  </span>
+                                )}
+                                {pc.postgraduate > 0 && (
+                                  <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
+                                    {pc.postgraduate} PG
+                                  </span>
+                                )}
+                                {(pc.doctoral ?? 0) > 0 && (
+                                  <span className="text-xs bg-muted px-2 py-0.5 rounded-full text-muted-foreground">
+                                    {pc.doctoral} PhD
+                                  </span>
+                                )}
+                              </div>
+                            ) : (
+                              <span className="text-xs text-muted-foreground">
+                                {Number(school.programmes_count)} Programmes
+                              </span>
+                            )}
+                            <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all shrink-0" />
+                          </div>
                         </div>
-                        <h3 className="text-lg font-bold text-foreground mb-3 font-serif line-clamp-2 group-hover:text-primary transition-colors">
-                          {school.name}
-                        </h3>
-                        <p className="text-muted-foreground text-sm line-clamp-3">{school.description}</p>
                       </div>
-                      <div className="flex items-center justify-between mt-6 pt-4 border-t">
-                        <span className="text-xs font-medium text-primary">
-                          {typeof school.programmes_count === "object"
-                            ? Object.values(school.programmes_count as Record<string, number>).reduce((a, b) => a + b, 0)
-                            : school.programmes_count}{" "}
-                          Programmes
-                        </span>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                      </div>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  );
+                })}
           </div>
         </div>
       </section>
@@ -736,6 +813,108 @@ export default function Home() {
               </div>
             </div>
           ))}
+        </div>
+      </section>
+
+      {/* ─── VIRTUAL CAMPUS TOUR ─── */}
+      <section className="py-20 bg-primary text-primary-foreground overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <span className="text-xs font-bold uppercase tracking-widest text-accent mb-3 block">Discover Our Campus</span>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">Life at Kaimosi</h2>
+            <p className="text-primary-foreground/75 max-w-xl mx-auto">
+              Set in the serene highlands of Western Kenya, Kaimosi Friends University offers a campus environment
+              designed to inspire learning, growth, and community.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
+            {/* Main aerial campus image */}
+            <div
+              className="relative rounded-2xl overflow-hidden shadow-2xl"
+              style={{ minHeight: "20rem" }}
+              data-testid="virtual-tour-main-image"
+            >
+              <img
+                src="https://kafu.ac.ke/wp-content/uploads/2025/10/arial-view-e-1.jpg"
+                alt="Aerial view of Kaimosi Friends University campus"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
+              <div className="absolute bottom-0 left-0 p-6">
+                <p className="text-white font-serif text-xl font-bold leading-snug mb-1">Kaimosi, Western Kenya</p>
+                <p className="text-white/70 text-sm">Altitude 1,600 m — Cool, green highlands</p>
+              </div>
+            </div>
+
+            {/* 2×2 campus feature tiles */}
+            <div className="grid grid-cols-2 gap-4">
+              {[
+                {
+                  image: "https://kafu.ac.ke/wp-content/uploads/2025/10/img8696.jpg",
+                  label: "Library & Digital Resources",
+                  desc: "50,000+ volumes and online research databases",
+                  testid: "tour-tile-library",
+                },
+                {
+                  image: "https://kafu.ac.ke/wp-content/uploads/2021/01/1.-Student-visual-acuity.jpg",
+                  label: "Science & Health Labs",
+                  desc: "State-of-the-art optometry, computing and science labs",
+                  testid: "tour-tile-labs",
+                },
+                {
+                  image: "https://kafu.ac.ke/wp-content/uploads/2025/10/undergraduate-fin.jpg",
+                  label: "Student Residences",
+                  desc: "On-campus accommodation in a safe, serene environment",
+                  testid: "tour-tile-residences",
+                },
+                {
+                  image: "https://kafu.ac.ke/wp-content/uploads/2025/10/sports.jpg",
+                  label: "Sports & Recreation",
+                  desc: "Football, basketball, athletics and fitness facilities",
+                  testid: "tour-tile-sports",
+                },
+              ].map((tile) => (
+                <div
+                  key={tile.testid}
+                  data-testid={tile.testid}
+                  className="relative rounded-xl overflow-hidden group"
+                >
+                  <img
+                    src={tile.image}
+                    alt={tile.label}
+                    className="w-full h-32 lg:h-36 object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/50 group-hover:bg-black/35 transition-colors" />
+                  <div className="absolute inset-0 flex flex-col justify-end p-3">
+                    <p className="text-white text-xs font-bold leading-tight">{tile.label}</p>
+                    <p className="text-white/65 text-xs mt-0.5 line-clamp-1 hidden sm:block">{tile.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button
+              className="bg-accent text-accent-foreground hover:bg-accent/90 px-8"
+              asChild
+              data-testid="button-plan-visit"
+            >
+              <Link href="/contact">Plan a Campus Visit</Link>
+            </Button>
+            <Button
+              variant="outline"
+              className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 px-8"
+              asChild
+              data-testid="button-kafu-youtube"
+            >
+              <a href="https://www.youtube.com/@KaimosiUniversity" target="_blank" rel="noopener noreferrer">
+                Watch Campus Tour on YouTube
+              </a>
+            </Button>
+          </div>
         </div>
       </section>
 

@@ -36,6 +36,8 @@ export interface School {
   code: string;
   name: string;
   dean: string | null;
+  dean_title?: string | null;
+  dean_photo?: string | null;
   description: string;
   programmes_count: ProgrammeCount | number;
   colour?: string;
