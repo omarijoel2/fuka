@@ -49,7 +49,7 @@ const SLIDES = [
     testid: "hero-slide-1",
   },
   {
-    image: "https://kafu.ac.ke/wp-content/uploads/2025/10/arial-view-e-1.jpg",
+    image: "https://kafu.ac.ke/wp-content/uploads/image-94.jpeg",
     badge: "Modern Infrastructure · Kaimosi Highlands",
     headline: "Built for",
     accent: "Excellence",
@@ -59,7 +59,7 @@ const SLIDES = [
     testid: "hero-slide-2",
   },
   {
-    image: "https://kafu.ac.ke/wp-content/uploads/health.jpg",
+    image: "https://kafu.ac.ke/wp-content/uploads/image-93.jpeg",
     badge: "Research · Innovation · Community Impact",
     headline: "Advancing",
     accent: "Research",
@@ -150,7 +150,7 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
       {/* Slide backgrounds — crossfade */}
       {SLIDES.map((s, i) => (
         <img
-          key={s.image}
+          key={s.testid}
           src={s.image}
           alt=""
           aria-hidden="true"
@@ -325,7 +325,7 @@ export default function Home() {
 
   const whyKafuSlides = [
     {
-      image: "https://kafu.ac.ke/wp-content/uploads/2025/10/img8696.jpg",
+      image: "https://kafu.ac.ke/wp-content/uploads/image-99.jpeg",
       category: "Accreditation",
       title: "Accredited Quality",
       body: "Fully accredited by the Commission for University Education (CUE) with programmes meeting national and international standards.",
@@ -836,7 +836,7 @@ export default function Home() {
               data-testid="virtual-tour-main-image"
             >
               <img
-                src="https://kafu.ac.ke/wp-content/uploads/2025/10/arial-view-e-1.jpg"
+                src="https://kafu.ac.ke/wp-content/uploads/image-94.jpeg"
                 alt="Aerial view of Kaimosi Friends University campus"
                 className="absolute inset-0 w-full h-full object-cover"
               />
@@ -851,7 +851,7 @@ export default function Home() {
             <div className="grid grid-cols-2 gap-4">
               {[
                 {
-                  image: "https://kafu.ac.ke/wp-content/uploads/2025/10/img8696.jpg",
+                  image: "https://kafu.ac.ke/wp-content/uploads/image-99.jpeg",
                   label: "Library & Digital Resources",
                   desc: "50,000+ volumes and online research databases",
                   testid: "tour-tile-library",
@@ -938,7 +938,7 @@ export default function Home() {
                 {/* Duplicate slides at end for seamless looping feel */}
                 {[...whyKafuSlides, ...whyKafuSlides.slice(0, 3)].map((slide, i) => (
                   <div
-                    key={i}
+                    key={`why-card-${i}`}
                     className="shrink-0 w-full md:w-1/2 lg:w-1/3 px-3"
                   >
                     <Link
