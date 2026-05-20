@@ -1,0 +1,31 @@
+kind = "video"
+previewPath = "/kafu-virtual-tour/"
+title = "KAFU Virtual Tour"
+version = "1.0.0"
+id = "artifacts/kafu-virtual-tour"
+router = "path"
+
+[[integratedSkills]]
+name = "video-js"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/kafu-virtual-tour/" ]
+localPort = 19181
+
+[services.development]
+run = "pnpm --filter @workspace/kafu-virtual-tour run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/kafu-virtual-tour", "run", "build" ]
+publicDir = "artifacts/kafu-virtual-tour/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19181"
+BASE_PATH = "/kafu-virtual-tour/"
