@@ -2,19 +2,35 @@ import { Link } from "wouter";
 import { useCampuses, useServicePoints } from "@/lib/api-hooks";
 import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import { CampusMap } from "@/components/campus-map";
-import { MapPin, Phone, Mail, Clock, Building2, ChevronRight, Wifi, Heart, BookOpen, Globe, Send } from "lucide-react";
+import {
+  MapPin, Phone, Mail, Clock, Building2, ChevronRight, Wifi, Heart,
+  BookOpen, Globe, Send, GraduationCap, ClipboardList, CreditCard,
+  Users, Monitor, FlaskConical, Package, Home, HelpCircle,
+} from "lucide-react";
 import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
+import type { JSX } from "react";
 
-const CATEGORY_ICONS: Record<string, string> = {
-  admissions: "🎓", registrar: "📋", finance: "💳",
-  student_affairs: "🤝", ict: "💻", library: "📚",
-  health: "🏥", international: "🌍", research: "🔬",
-  procurement: "📦", accommodation: "🏠", other: "📌",
+const BRAND_GREEN = "#1A5C38";
+const BRAND_GOLD  = "#C9A227";
+
+const CATEGORY_ICONS: Record<string, JSX.Element> = {
+  admissions:     <GraduationCap className="w-4 h-4" />,
+  registrar:      <ClipboardList className="w-4 h-4" />,
+  finance:        <CreditCard className="w-4 h-4" />,
+  student_affairs:<Users className="w-4 h-4" />,
+  ict:            <Monitor className="w-4 h-4" />,
+  library:        <BookOpen className="w-4 h-4" />,
+  health:         <Heart className="w-4 h-4" />,
+  international:  <Globe className="w-4 h-4" />,
+  research:       <FlaskConical className="w-4 h-4" />,
+  procurement:    <Package className="w-4 h-4" />,
+  accommodation:  <Home className="w-4 h-4" />,
+  other:          <HelpCircle className="w-4 h-4" />,
 };
 
 const seoJsonLd = {
@@ -58,13 +74,13 @@ export default function ContactPage() {
       />
 
       {/* Hero */}
-      <section className="text-white py-16" style={{ backgroundColor: "#228B22" }}>
+      <section className="text-white py-16" style={{ backgroundColor: BRAND_GREEN }}>
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex items-center gap-2 text-sm text-white/60 mb-6">
             <Link to="/" className="hover:text-white">Home</Link><span>/</span>
-            <span className="text-white">Contact & Campuses</span>
+            <span className="text-white">Contact &amp; Campuses</span>
           </nav>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Contact & Campuses</h1>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Contact &amp; Campuses</h1>
           <p className="text-lg text-white/80 max-w-2xl">Find our campuses, offices, and service points. We're here to support you.</p>
           <div className="flex flex-wrap gap-3 mt-8">
             <a href="tel:+254700000000" data-testid="quick-call-btn"
@@ -97,7 +113,7 @@ export default function ContactPage() {
               { icon: <MapPin className="w-5 h-5 text-white" />, label: "Main Campus", value: "Kaimosi, Vihiga County", href: undefined, sub: "P.O. Box 27 — 50309, Kenya" },
             ].map((item, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 flex items-start gap-4">
-                <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: "#228B22" }}>{item.icon}</div>
+                <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ backgroundColor: BRAND_GREEN }}>{item.icon}</div>
                 <div>
                   <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">{item.label}</p>
                   {item.href ? (
@@ -118,14 +134,14 @@ export default function ContactPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Find Us on the Map</h2>
-            <Link to="/campuses" className="text-sm font-medium hover:underline" style={{ color: "#228B22" }}>All campuses →</Link>
+            <Link to="/campuses" className="text-sm font-medium hover:underline" style={{ color: BRAND_GREEN }}>All campuses &rarr;</Link>
           </div>
           {campusLoading ? (
             <div className="h-80 animate-pulse bg-gray-200 rounded-xl" />
           ) : mainCampus ? (
             <CampusMap center={[mainCampus.latitude ?? 0.1295, mainCampus.longitude ?? 34.9085]} zoom={13} markers={mapMarkers} height="380px" />
           ) : null}
-          <p className="text-xs text-gray-400 mt-2">Map data © OpenStreetMap contributors.</p>
+          <p className="text-xs text-gray-400 mt-2">Map data &copy; OpenStreetMap contributors.</p>
         </div>
       </section>
 
@@ -137,7 +153,7 @@ export default function ContactPage() {
               <h2 className="text-2xl font-bold text-gray-900">Our Campuses</h2>
               <p className="text-gray-500 text-sm mt-1">KAFU campuses across Western Kenya</p>
             </div>
-            <Link to="/campuses" data-testid="all-campuses-link" className="text-sm font-semibold hover:underline flex items-center gap-1" style={{ color: "#228B22" }}>
+            <Link to="/campuses" data-testid="all-campuses-link" className="text-sm font-semibold hover:underline flex items-center gap-1" style={{ color: BRAND_GREEN }}>
               View all <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -148,7 +164,7 @@ export default function ContactPage() {
                 {campus.hero_image ? (
                   <img src={campus.hero_image} alt={campus.name} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300" />
                 ) : (
-                  <div className="w-full h-48 flex items-center justify-center" style={{ backgroundColor: "#228B22" }}>
+                  <div className="w-full h-48 flex items-center justify-center" style={{ backgroundColor: BRAND_GREEN }}>
                     <MapPin className="w-12 h-12 text-white/40" />
                   </div>
                 )}
@@ -156,7 +172,7 @@ export default function ContactPage() {
                   <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors mb-1">{campus.name}</h3>
                   {campus.address && <p className="text-sm text-gray-500 flex items-center gap-1"><MapPin className="w-3 h-3" />{campus.address}</p>}
                   {campus.summary && <p className="text-sm text-gray-600 mt-2 line-clamp-2">{campus.summary}</p>}
-                  <span className="inline-flex items-center gap-1 mt-3 text-xs font-semibold" style={{ color: "#228B22" }}>View campus <ChevronRight className="w-3 h-3" /></span>
+                  <span className="inline-flex items-center gap-1 mt-3 text-xs font-semibold" style={{ color: BRAND_GREEN }}>View campus <ChevronRight className="w-3 h-3" /></span>
                 </div>
               </Link>
             ))}
@@ -169,10 +185,10 @@ export default function ContactPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Key Offices & Services</h2>
+              <h2 className="text-2xl font-bold text-gray-900">Key Offices &amp; Services</h2>
               <p className="text-gray-500 text-sm mt-1">Quick access to essential university offices</p>
             </div>
-            <Link to="/offices" data-testid="all-offices-link" className="text-sm font-semibold hover:underline flex items-center gap-1" style={{ color: "#228B22" }}>
+            <Link to="/offices" data-testid="all-offices-link" className="text-sm font-semibold hover:underline flex items-center gap-1" style={{ color: BRAND_GREEN }}>
               View all <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -180,7 +196,9 @@ export default function ContactPage() {
             {offices.slice(0, 6).map((office) => (
               <Link key={office.id} to={`/offices/${office.slug}`} data-testid={`office-card-${office.slug}`}
                 className="group bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-primary/30 transition-all flex items-start gap-4">
-                <span className="text-2xl">{CATEGORY_ICONS[office.category] ?? "📌"}</span>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 text-white" style={{ backgroundColor: BRAND_GREEN }}>
+                  {CATEGORY_ICONS[office.category] ?? <HelpCircle className="w-4 h-4" />}
+                </div>
                 <div className="min-w-0">
                   <h3 className="font-semibold text-gray-900 group-hover:text-primary transition-colors text-sm leading-snug">{office.name}</h3>
                   {office.public_phone && <p className="text-xs text-gray-500 flex items-center gap-1 mt-1"><Phone className="w-3 h-3" />{office.public_phone}</p>}
@@ -191,7 +209,7 @@ export default function ContactPage() {
           </div>
           <div className="text-center mt-8">
             <Link to="/offices" data-testid="offices-full-directory-btn"
-              className="inline-flex items-center gap-2 px-6 py-3 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: "#228B22" }}>
+              className="inline-flex items-center gap-2 px-6 py-3 text-white rounded-lg font-semibold hover:opacity-90 transition-opacity" style={{ backgroundColor: BRAND_GREEN }}>
               <Building2 className="w-4 h-4" /> Full Office Directory
             </Link>
           </div>
@@ -226,11 +244,11 @@ export default function ContactPage() {
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="message">Message</Label>
-                  <Textarea id="message" required placeholder="Your message…" className="min-h-[100px]" data-testid="input-message" />
+                  <Textarea id="message" required placeholder="Your message..." className="min-h-[100px]" data-testid="input-message" />
                 </div>
                 <Button type="submit" disabled={submitting} data-testid="btn-submit-contact"
-                  className="w-full text-white" style={{ backgroundColor: "#DAA520" }}>
-                  {submitting ? "Sending…" : <><Send className="w-4 h-4 mr-2" /> Send Message</>}
+                  className="w-full text-white font-semibold" style={{ backgroundColor: BRAND_GOLD }}>
+                  {submitting ? "Sending..." : <><Send className="w-4 h-4 mr-2" /> Send Message</>}
                 </Button>
               </form>
             </div>
@@ -245,7 +263,7 @@ export default function ContactPage() {
                 ].map((item) => (
                   <a key={item.testId} href={item.href} data-testid={item.testId}
                     className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm hover:shadow-md hover:border-primary/30 transition-all group">
-                    <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3 text-white" style={{ backgroundColor: "#228B22" }}>{item.icon}</div>
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center mb-3 text-white" style={{ backgroundColor: BRAND_GREEN }}>{item.icon}</div>
                     <h3 className="font-semibold text-gray-900 group-hover:text-primary transition-colors text-sm">{item.title}</h3>
                     <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
                   </a>
