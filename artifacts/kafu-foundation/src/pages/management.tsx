@@ -77,88 +77,100 @@ const FALLBACK: ManagementProfile[] = [
   },
 ];
 
-function ProfileAvatar({ profile, size = "md" }: { profile: ManagementProfile; size?: "sm" | "md" | "lg" }) {
-  const sizes = { sm: "w-16 h-16 text-lg", md: "w-24 h-24 text-2xl", lg: "w-32 h-32 text-3xl" };
-  const cls = sizes[size];
-  const initials = profile.name.split(" ").filter(w => /^[A-Z]/.test(w)).slice(0, 2).join("");
-  if (profile.photo_url) {
-    return (
-      <img
-        src={profile.photo_url} alt={profile.name}
-        className={`${cls} rounded-full object-cover object-top border-4 border-white shadow-md shrink-0`}
-      />
-    );
-  }
-  return (
-    <div className={`${cls} rounded-full bg-primary/10 border-4 border-white shadow-md flex items-center justify-center shrink-0`}>
-      <span className={`font-bold text-primary font-serif`}>{initials}</span>
-    </div>
-  );
-}
-
 function VCCard({ profile }: { profile: ManagementProfile }) {
+  const initials = profile.name.split(" ").filter(w => /^[A-Z]/.test(w)).slice(0, 2).join("");
   return (
-    <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-md">
-      <div className="bg-primary/5 px-8 py-8 flex flex-col md:flex-row gap-8 items-center md:items-start">
-        <ProfileAvatar profile={profile} size="lg" />
-        <div className="text-center md:text-left">
-          <span className="inline-block text-xs font-semibold bg-primary text-primary-foreground px-3 py-1 rounded-full mb-3">
-            {CATEGORY_LABELS[profile.category]}
-          </span>
-          <h3 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-1">{profile.name}</h3>
-          <p className="text-muted-foreground mb-4">{profile.title}</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center md:justify-start text-sm text-muted-foreground">
-            {profile.email && (
-              <a href={`mailto:${profile.email}`} data-testid="vc-email-link"
-                className="flex items-center gap-1.5 hover:text-primary transition-colors">
-                <Mail className="w-4 h-4" />{profile.email}
-              </a>
-            )}
-            {profile.phone && (
-              <a href={`tel:${profile.phone}`} data-testid="vc-phone-link"
-                className="flex items-center gap-1.5 hover:text-primary transition-colors">
-                <Phone className="w-4 h-4" />{profile.phone}
-              </a>
-            )}
+    <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-md flex flex-col md:flex-row">
+      {/* Portrait photo */}
+      <div className="relative md:w-60 shrink-0 bg-primary/5 overflow-hidden" style={{ minHeight: 300 }}>
+        {profile.photo_url ? (
+          <img
+            src={profile.photo_url}
+            alt={profile.name}
+            className="absolute inset-0 w-full h-full object-cover object-top"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-6xl font-bold text-primary/20 font-serif">{initials}</span>
           </div>
-        </div>
+        )}
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent md:bg-gradient-to-t from-primary/40 via-transparent to-transparent" />
       </div>
-      {profile.bio && (
-        <div className="px-8 py-6 border-t border-border">
-          {profile.office && (
-            <p className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-              <Building2 className="w-4 h-4 shrink-0" />{profile.office}
-            </p>
+      {/* Content */}
+      <div className="flex-1 p-7 md:p-9 flex flex-col justify-center">
+        <span className="inline-block text-xs font-bold bg-primary text-primary-foreground px-3 py-1 rounded-full mb-4 self-start">
+          {CATEGORY_LABELS[profile.category]}
+        </span>
+        <h3 className="font-serif text-2xl md:text-3xl font-bold text-foreground mb-1">{profile.name}</h3>
+        <p className="text-muted-foreground mb-5 text-sm">{profile.title}</p>
+        <div className="flex flex-col sm:flex-row gap-3 text-sm text-muted-foreground mb-5">
+          {profile.email && (
+            <a href={`mailto:${profile.email}`} data-testid="vc-email-link"
+              className="flex items-center gap-1.5 hover:text-primary transition-colors">
+              <Mail className="w-4 h-4" />{profile.email}
+            </a>
           )}
-          <p className="text-muted-foreground leading-relaxed text-sm">{profile.bio}</p>
+          {profile.phone && (
+            <a href={`tel:${profile.phone}`} data-testid="vc-phone-link"
+              className="flex items-center gap-1.5 hover:text-primary transition-colors">
+              <Phone className="w-4 h-4" />{profile.phone}
+            </a>
+          )}
         </div>
-      )}
+        {profile.office && (
+          <p className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
+            <Building2 className="w-4 h-4 shrink-0" />{profile.office}
+          </p>
+        )}
+        {profile.bio && (
+          <p className="text-muted-foreground leading-relaxed text-sm border-t border-border pt-4">{profile.bio}</p>
+        )}
+      </div>
     </div>
   );
 }
 
 function ProfileCard({ profile }: { profile: ManagementProfile }) {
+  const initials = profile.name.split(" ").filter(w => /^[A-Z]/.test(w)).slice(0, 2).join("");
   return (
-    <div className="bg-white border border-border rounded-xl p-5 shadow-sm hover:shadow-md transition-shadow flex gap-4">
-      <ProfileAvatar profile={profile} size="sm" />
-      <div className="min-w-0 flex-1">
+    <div className="bg-white border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+      {/* Portrait photo — tall aspect ratio */}
+      <div className="relative aspect-[4/3] overflow-hidden bg-primary/5">
+        {profile.photo_url ? (
+          <img
+            src={profile.photo_url}
+            alt={profile.name}
+            className="absolute inset-0 w-full h-full object-cover object-top"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-5xl font-bold text-primary/20 font-serif">{initials}</span>
+          </div>
+        )}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary/75 via-primary/20 to-transparent pt-12 pb-2 px-3">
+          <span className="text-xs font-bold text-[#C9A227] uppercase tracking-wider">
+            {CATEGORY_LABELS[profile.category]}
+          </span>
+        </div>
+      </div>
+      {/* Content */}
+      <div className="p-4 flex flex-col flex-1">
         <h3 className="font-serif text-base font-bold text-foreground leading-snug mb-0.5">{profile.name}</h3>
-        <p className="text-xs text-primary font-medium mb-2">{profile.title}</p>
-        {profile.bio && <p className="text-sm text-muted-foreground line-clamp-2 mb-3 leading-relaxed">{profile.bio}</p>}
-        <div className="flex flex-col gap-1 text-xs text-muted-foreground">
-          {profile.office && (
-            <span className="flex items-center gap-1"><Building2 className="w-3 h-3" />{profile.office}</span>
-          )}
+        <p className="text-xs text-primary font-medium mb-3 leading-snug">{profile.title}</p>
+        {profile.bio && (
+          <p className="text-xs text-muted-foreground line-clamp-3 mb-3 leading-relaxed">{profile.bio}</p>
+        )}
+        <div className="flex flex-col gap-1 text-xs text-muted-foreground mt-auto pt-2 border-t border-border">
           {profile.email && (
             <a href={`mailto:${profile.email}`} data-testid={`management-email-${profile.id}`}
-              className="flex items-center gap-1 hover:text-primary transition-colors">
-              <Mail className="w-3 h-3" />{profile.email}
+              className="flex items-center gap-1 hover:text-primary transition-colors truncate">
+              <Mail className="w-3 h-3 shrink-0" />{profile.email}
             </a>
           )}
           {profile.phone && (
             <a href={`tel:${profile.phone}`} data-testid={`management-phone-${profile.id}`}
               className="flex items-center gap-1 hover:text-primary transition-colors">
-              <Phone className="w-3 h-3" />{profile.phone}
+              <Phone className="w-3 h-3 shrink-0" />{profile.phone}
             </a>
           )}
         </div>
@@ -221,7 +233,7 @@ export default function ManagementPage() {
             <h2 className="font-serif text-2xl font-bold text-primary mb-6 pb-3 border-b border-border">
               {CATEGORY_LABELS[cat]}
             </h2>
-            <div className="grid md:grid-cols-2 gap-5">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {grouped[cat].map(profile => (
                 <ProfileCard key={profile.id} profile={profile} />
               ))}

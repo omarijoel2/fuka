@@ -115,20 +115,42 @@ const FALLBACK: CouncilMember[] = [
   },
 ];
 
-function MemberAvatar({ member }: { member: CouncilMember }) {
-  if (member.photo_url) {
-    return (
-      <img
-        src={member.photo_url}
-        alt={member.name}
-        className="w-24 h-24 rounded-full object-cover object-top border-4 border-white shadow-md"
-      />
-    );
-  }
+function MemberCard({ member, featured = false }: { member: CouncilMember; featured?: boolean }) {
   const initials = member.name.split(" ").filter(w => /^[A-Z]/.test(w)).slice(0, 2).join("");
   return (
-    <div className="w-24 h-24 rounded-full bg-primary/10 border-4 border-white shadow-md flex items-center justify-center">
-      <span className="text-2xl font-bold text-primary font-serif">{initials}</span>
+    <div className="bg-white border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
+      <div className={`relative overflow-hidden bg-primary/5 ${featured ? "aspect-[3/4]" : "aspect-square"}`}>
+        {member.photo_url ? (
+          <img
+            src={member.photo_url}
+            alt={member.name}
+            className="absolute inset-0 w-full h-full object-cover object-top"
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-5xl font-bold text-primary/20 font-serif">{initials}</span>
+          </div>
+        )}
+        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary/75 via-primary/20 to-transparent pt-12 pb-2 px-3 text-center">
+          <span className="text-xs font-bold text-[#C9A227] uppercase tracking-wider">
+            {CATEGORY_LABELS[member.category] ?? "Member"}
+          </span>
+        </div>
+      </div>
+      <div className="p-4 text-center flex flex-col flex-1">
+        <h3 className="font-serif font-bold text-foreground leading-snug mb-1 text-sm md:text-base">{member.name}</h3>
+        <p className="text-xs text-muted-foreground leading-snug">{member.title}</p>
+        {member.credentials && member.credentials.length > 0 && (
+          <div className="flex flex-wrap gap-1 justify-center mt-2">
+            {member.credentials.map((c, i) => (
+              <span key={i} className="text-xs bg-accent/10 text-foreground/60 px-2 py-0.5 rounded border border-border">{c}</span>
+            ))}
+          </div>
+        )}
+        {featured && member.bio && (
+          <p className="text-xs text-muted-foreground mt-3 leading-relaxed line-clamp-4">{member.bio}</p>
+        )}
+      </div>
     </div>
   );
 }
@@ -189,62 +211,28 @@ export default function CouncilPage() {
 
       <div className="max-w-5xl mx-auto px-4 py-16 space-y-16">
 
-        {/* Leadership */}
-        {(chairperson || viceChair) && (
+        {/* Chairperson — featured portrait card */}
+        {chairperson && (
           <section>
             <h2 className="font-serif text-2xl font-bold text-primary mb-8 pb-3 border-b border-border">
               Council Leadership
             </h2>
-            <div className="grid md:grid-cols-2 gap-6">
-              {[chairperson, viceChair].filter(Boolean).map(m => m && (
-                <div key={m.id} className="flex gap-5 bg-white border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                  <MemberAvatar member={m} />
-                  <div className="min-w-0">
-                    <span className="inline-block text-xs font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded mb-2">
-                      {CATEGORY_LABELS[m.category] ?? m.category}
-                    </span>
-                    <h3 className="font-serif text-lg font-bold text-foreground leading-snug mb-1">{m.name}</h3>
-                    <p className="text-sm text-muted-foreground mb-3">{m.title}</p>
-                    {m.credentials && m.credentials.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {m.credentials.map((c, i) => (
-                          <span key={i} className="text-xs bg-accent/10 text-foreground/70 px-2 py-0.5 rounded border border-border">{c}</span>
-                        ))}
-                      </div>
-                    )}
-                    {m.bio && <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">{m.bio}</p>}
-                  </div>
-                </div>
-              ))}
+            <div className="flex justify-center">
+              <div className="w-full max-w-xs">
+                <MemberCard member={chairperson} featured />
+              </div>
             </div>
           </section>
         )}
 
-        {/* All other members */}
+        {/* All other members — portrait grid */}
         <section>
           <h2 className="font-serif text-2xl font-bold text-primary mb-8 pb-3 border-b border-border">
             Council Members
           </h2>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
             {rest.map(member => (
-              <div key={member.id} className="flex gap-5 bg-white border border-border rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
-                <MemberAvatar member={member} />
-                <div className="min-w-0">
-                  <span className="inline-block text-xs font-semibold bg-muted text-muted-foreground px-2 py-0.5 rounded mb-2">
-                    {CATEGORY_LABELS[member.category] ?? "Member"}
-                  </span>
-                  <h3 className="font-serif text-lg font-bold text-foreground leading-snug mb-1">{member.name}</h3>
-                  <p className="text-sm text-muted-foreground mb-3">{member.title}</p>
-                  {member.credentials && member.credentials.length > 0 && (
-                    <div className="flex flex-wrap gap-1 mb-3">
-                      {member.credentials.map((c, i) => (
-                        <span key={i} className="text-xs bg-accent/10 text-foreground/70 px-2 py-0.5 rounded border border-border">{c}</span>
-                      ))}
-                    </div>
-                  )}
-                  {member.bio && <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">{member.bio}</p>}
-                </div>
-              </div>
+              <MemberCard key={member.id} member={member} />
             ))}
           </div>
         </section>
