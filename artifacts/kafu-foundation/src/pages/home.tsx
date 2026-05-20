@@ -820,79 +820,73 @@ export default function Home() {
       <section className="py-20 bg-primary text-primary-foreground overflow-hidden">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <span className="text-xs font-bold uppercase tracking-widest text-accent mb-3 block">Discover Our Campus</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-accent mb-3 block">Virtual Campus Tour</span>
             <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">Life at Kaimosi</h2>
             <p className="text-primary-foreground/75 max-w-xl mx-auto">
-              Set in the serene highlands of Western Kenya, Kaimosi Friends University offers a campus environment
-              designed to inspire learning, growth, and community.
+              Take a virtual walk through our campus — set in the serene highlands of Western Kenya, designed to inspire learning, growth, and community.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-10">
-            {/* Main aerial campus image */}
-            <div
-              className="relative rounded-2xl overflow-hidden shadow-2xl"
-              style={{ minHeight: "20rem" }}
-              data-testid="virtual-tour-main-image"
-            >
-              <img
-                src="https://kafu.ac.ke/wp-content/uploads/image-94.jpeg"
-                alt="Aerial view of Kaimosi Friends University campus"
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-black/10 to-transparent" />
-              <div className="absolute bottom-0 left-0 p-6">
-                <p className="text-white font-serif text-xl font-bold leading-snug mb-1">Kaimosi, Western Kenya</p>
-                <p className="text-white/70 text-sm">Altitude 1,600 m — Cool, green highlands</p>
-              </div>
-            </div>
+          {/* YouTube Virtual Tour Embed */}
+          <div
+            className="relative w-full rounded-2xl overflow-hidden shadow-2xl mb-8 bg-black"
+            style={{ paddingBottom: "56.25%" }}
+            data-testid="virtual-tour-video"
+          >
+            <iframe
+              className="absolute inset-0 w-full h-full"
+              src="https://www.youtube.com/embed/JtZa1TFGdkU?rel=0&modestbranding=1"
+              title="Kaimosi Friends University Virtual Campus Tour"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
 
-            {/* 2×2 campus feature tiles */}
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                {
-                  image: "https://kafu.ac.ke/wp-content/uploads/image-99.jpeg",
-                  label: "Library & Digital Resources",
-                  desc: "50,000+ volumes and online research databases",
-                  testid: "tour-tile-library",
-                },
-                {
-                  image: "https://kafu.ac.ke/wp-content/uploads/2021/01/1.-Student-visual-acuity.jpg",
-                  label: "Science & Health Labs",
-                  desc: "State-of-the-art optometry, computing and science labs",
-                  testid: "tour-tile-labs",
-                },
-                {
-                  image: "https://kafu.ac.ke/wp-content/uploads/2025/10/undergraduate-fin.jpg",
-                  label: "Student Residences",
-                  desc: "On-campus accommodation in a safe, serene environment",
-                  testid: "tour-tile-residences",
-                },
-                {
-                  image: "https://kafu.ac.ke/wp-content/uploads/2025/10/sports.jpg",
-                  label: "Sports & Recreation",
-                  desc: "Football, basketball, athletics and fitness facilities",
-                  testid: "tour-tile-sports",
-                },
-              ].map((tile) => (
-                <div
-                  key={tile.testid}
-                  data-testid={tile.testid}
-                  className="relative rounded-xl overflow-hidden group"
-                >
-                  <img
-                    src={tile.image}
-                    alt={tile.label}
-                    className="w-full h-32 lg:h-36 object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-black/50 group-hover:bg-black/35 transition-colors" />
-                  <div className="absolute inset-0 flex flex-col justify-end p-3">
-                    <p className="text-white text-xs font-bold leading-tight">{tile.label}</p>
-                    <p className="text-white/65 text-xs mt-0.5 line-clamp-1 hidden sm:block">{tile.desc}</p>
-                  </div>
+          {/* 4-column campus feature tiles */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            {[
+              {
+                image: "https://kafu.ac.ke/wp-content/uploads/image-99.jpeg",
+                label: "Library & Digital Resources",
+                desc: "50,000+ volumes and online research databases",
+                testid: "tour-tile-library",
+              },
+              {
+                image: "https://kafu.ac.ke/wp-content/uploads/2021/01/1.-Student-visual-acuity.jpg",
+                label: "Science & Health Labs",
+                desc: "State-of-the-art optometry, computing and science labs",
+                testid: "tour-tile-labs",
+              },
+              {
+                image: "https://kafu.ac.ke/wp-content/uploads/2025/10/undergraduate-fin.jpg",
+                label: "Student Residences",
+                desc: "On-campus accommodation in a safe, serene environment",
+                testid: "tour-tile-residences",
+              },
+              {
+                image: "https://kafu.ac.ke/wp-content/uploads/2025/10/sports.jpg",
+                label: "Sports & Recreation",
+                desc: "Football, basketball, athletics and fitness facilities",
+                testid: "tour-tile-sports",
+              },
+            ].map((tile) => (
+              <div
+                key={tile.testid}
+                data-testid={tile.testid}
+                className="relative rounded-xl overflow-hidden group"
+              >
+                <img
+                  src={tile.image}
+                  alt={tile.label}
+                  className="w-full h-32 lg:h-36 object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-black/50 group-hover:bg-black/35 transition-colors" />
+                <div className="absolute inset-0 flex flex-col justify-end p-3">
+                  <p className="text-white text-xs font-bold leading-tight">{tile.label}</p>
+                  <p className="text-white/65 text-xs mt-0.5 line-clamp-1 hidden sm:block">{tile.desc}</p>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
 
           {/* CTAs */}
@@ -910,8 +904,8 @@ export default function Home() {
               asChild
               data-testid="button-kafu-youtube"
             >
-              <a href="https://www.youtube.com/@KaimosiUniversity" target="_blank" rel="noopener noreferrer">
-                Watch Campus Tour on YouTube
+              <a href="https://www.youtube.com/watch?v=JtZa1TFGdkU" target="_blank" rel="noopener noreferrer">
+                Watch on YouTube
               </a>
             </Button>
           </div>
