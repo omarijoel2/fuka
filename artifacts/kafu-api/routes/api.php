@@ -213,6 +213,26 @@ Route::get('/healthz', function () {
     return response()->json(['status' => 'ok', 'service' => 'KAFU API']);
 });
 
+// ── Public site-config (read-only) ────────────────────────────────────────────
+Route::get('/site-config/{group}', function (string $group) {
+    $allowed = ['homepage', 'about', 'contact', 'site', 'seo', 'navigation', 'student-services'];
+    if (!in_array($group, $allowed)) {
+        return response()->json(['error' => 'Config group not found.'], 404);
+    }
+    $config = \App\Models\SiteConfig::getGroup($group);
+    return response()->json(['group' => $group, 'data' => $config]);
+});
+
+Route::get('/about', function () {
+    $data = \App\Models\SiteConfig::getGroup('about');
+    return response()->json(['data' => $data]);
+});
+
+Route::get('/student-services', function () {
+    $data = \App\Models\SiteConfig::getGroup('student-services');
+    return response()->json(['data' => $data]);
+});
+
 Route::get('/news', function (Request $request) {
     $cmsItems = CmsContent::where('type', 'news')
         ->where('status', 'published')

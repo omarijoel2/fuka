@@ -10,6 +10,8 @@ use App\Models\CmsRevision;
 use App\Models\MediaFile;
 use App\Models\AuditLog;
 use App\Models\TaxonomyTerm;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 /*
 |--------------------------------------------------------------------------
@@ -56,6 +58,53 @@ Route::prefix('admin')->group(function () {
             ],
         ]);
     })->middleware('throttle:10,1');
+
+    // ── Password Reset (public, no auth required) ─────────────────────────────
+    Route::post('/auth/forgot-password', function (Request $request) {
+        $request->validate(['email' => 'required|email']);
+        $user = User::where('email', $request->email)->where('status', 'active')->first();
+        $response = ['message' => 'If that email is registered, a password reset link has been sent.'];
+        if ($user) {
+            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+            $token = Str::random(64);
+            DB::table('password_reset_tokens')->insert([
+                'email'      => $request->email,
+                'token'      => Hash::make($token),
+                'created_at' => now(),
+            ]);
+            AuditLog::record($user, 'password_reset_request', 'user', $user->id, $user->email);
+            if (app()->environment('local')) {
+                $response['dev_token'] = $token;
+                $response['dev_note'] = 'Token returned because APP_ENV=local. In production, this is sent by email only.';
+            }
+        }
+        return response()->json($response);
+    })->middleware('throttle:5,1');
+
+    Route::post('/auth/reset-password', function (Request $request) {
+        $request->validate([
+            'email'                 => 'required|email',
+            'token'                 => 'required|string',
+            'password'              => 'required|string|min:8',
+            'password_confirmation' => 'required|same:password',
+        ]);
+        $record = DB::table('password_reset_tokens')->where('email', $request->email)->first();
+        if (!$record || !Hash::check($request->token, $record->token)) {
+            return response()->json(['message' => 'Invalid or expired reset token. Please request a new one.'], 422);
+        }
+        if (now()->diffInMinutes(\Carbon\Carbon::parse($record->created_at)) > 60) {
+            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+            return response()->json(['message' => 'This reset link has expired. Please request a new one.'], 422);
+        }
+        $user = User::where('email', $request->email)->where('status', 'active')->first();
+        if (!$user) {
+            return response()->json(['message' => 'Account not found or inactive.'], 404);
+        }
+        $user->update(['password' => Hash::make($request->password)]);
+        DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+        AuditLog::record($user, 'password_reset_complete', 'user', $user->id, $user->email);
+        return response()->json(['message' => 'Password reset successfully. You may now log in.']);
+    })->middleware('throttle:5,1');
 
     Route::middleware('auth:sanctum')->group(function () {
 

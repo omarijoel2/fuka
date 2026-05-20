@@ -139,5 +139,51 @@ class SiteConfigSeeder extends Seeder
             'main_campus_lat' => '0.1295',
             'main_campus_lng' => '34.9085',
         ]);
+
+        // About page content
+        SiteConfig::setGroup('about', [
+            'hero_heading'      => 'About KAFU',
+            'hero_description'  => 'Discover the history, mission, and vision of Kaimosi Friends University — a Quaker-founded institution at the heart of Western Kenya.',
+            'hero_image_url'    => 'https://kafu.ac.ke/wp-content/uploads/IMG_8696.jpg',
+            'campus_photo_url'  => 'https://kafu.ac.ke/wp-content/uploads/PIC1.jpg',
+            'history_heading'   => 'Our History',
+            'history_p1'        => 'Kaimosi Friends University (KAFU) was established in 2014, rooted deeply in the Quaker heritage of truth and service. What began as a constituent college has rapidly grown into a fully-fledged, independent public university in Western Kenya.',
+            'history_p2'        => 'The university stands as a testament to the pioneering educational efforts of the Friends Church (Quakers) in the region. Since its inception, KAFU has been dedicated to providing quality higher education, fostering research, and promoting innovation that addresses societal needs.',
+            'history_p3'        => 'Today, KAFU serves thousands of students across its five distinct schools, offering over 38 academic programmes ranging from certificates to doctoral degrees.',
+            'vision'            => 'To be a premier university in training, research, innovation and community service.',
+            'mission'           => 'To provide quality education and training, promote research and innovation for sustainable development.',
+            'quaker_heritage'   => 'KAFU draws from the rich Quaker tradition of Friends Church East Africa, which established the first school at Kaimosi in 1902. This heritage of service, integrity, and education without discrimination remains at the core of every programme, policy, and partnership the university pursues.',
+            'vc_name'           => 'Prof. Peter Nyamuhanga Mwita',
+            'vc_title'          => 'Vice-Chancellor',
+            'vc_bio'            => 'Prof. Mwita was officially appointed Vice-Chancellor of Kaimosi Friends University on 14 May 2025, having served in an acting capacity since February 2024. Under his leadership, KAFU continues to advance its mission of quality education, research, and community engagement.',
+            'vc_email'          => 'vc@kafu.ac.ke',
+            'vc_photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/Vice-Chancellor-Prof.-Peter-Mwita-addresses-fourth-year-teacher-trainees-during-the-opening-of-the-Competency-Based-Education-CBE-training-at-Kaimosi-Friends-University.jpg',
+            'core_values'       => ['Integrity and Professionalism', 'Quality and Excellence', 'Equity and Inclusivity', 'Innovation and Creativity', 'Teamwork and Collaboration'],
+            'sidebar_stats'     => [
+                ['label' => 'Location',        'value' => 'Kaimosi, Western Kenya'],
+                ['label' => 'Academic Breadth', 'value' => '5 Schools, 38+ Programmes'],
+                ['label' => 'Founded',          'value' => '2014'],
+                ['label' => 'Programmes',       'value' => 'Certificate to PhD level'],
+                ['label' => 'Unique Offering',  'value' => 'One of 2 universities in Kenya offering Optometry to PhD'],
+            ],
+        ]);
+
+        // Student services page content
+        SiteConfig::setGroup('student-services', [
+            'hero_heading'        => 'Student Life & Services',
+            'hero_description'    => 'We are committed to providing a holistic university experience that nurtures the mind, body, and spirit.',
+            'intro_text'          => 'At Kaimosi Friends University, learning goes beyond the classroom. Since our establishment in 2014, we have continuously developed support systems and extracurricular facilities to ensure our students thrive academically and personally.',
+            'digital_title'       => 'Digital Services',
+            'digital_description' => 'Access your timetables, exam results, and online classes through our centralized portals.',
+            'portal_url'          => 'https://portal.kafu.ac.ke',
+            'elearning_url'       => 'https://elearning.kafu.ac.ke',
+            'services'            => [
+                ['icon' => 'Activity',      'title' => 'Games & Sports',      'description' => 'Established alongside the university in 2014, our sports department offers football, basketball, athletics, and indoor games. We actively participate in regional university leagues.'],
+                ['icon' => 'Library',       'title' => 'University Library',  'description' => 'A quiet, resourceful environment with extensive physical collections and access to thousands of e-journals and academic databases for research.'],
+                ['icon' => 'ShieldCheck',   'title' => 'Accommodation',       'description' => 'Secure, affordable on-campus hostels for students. Off-campus private hostels around Kaimosi are also vetted by our accommodation office.'],
+                ['icon' => 'HeartHandshake','title' => 'Counselling Services','description' => 'Professional, confidential psychological support and mentorship to help students navigate academic stress and personal challenges.'],
+                ['icon' => 'Users',         'title' => 'Student Government',  'description' => 'The KAFU Students Organization advocates for student welfare, organizes cultural events, and provides leadership development opportunities.'],
+            ],
+        ]);
     }
 }
