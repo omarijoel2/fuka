@@ -2113,6 +2113,7 @@ Route::prefix('admin')->group(function () {
 
 });
 
+if (!function_exists('updateApplicationStatus')) {
 function updateApplicationStatus(string $ref, string $toStatus, ?string $reason, int $userId, array $extra = []) {
     $app = \Illuminate\Support\Facades\DB::table('applications')->where('reference', $ref)->first();
     if (!$app) return response()->json(['error' => 'Application not found.'], 404);
@@ -2132,4 +2133,5 @@ function updateApplicationStatus(string $ref, string $toStatus, ?string $reason,
     ]);
 
     return response()->json(['message' => 'Application status updated to ' . $toStatus . '.']);
+}
 }
