@@ -34,7 +34,7 @@ title = "kafu-api-src.zip — Laravel API source (upload alongside public_html/)
 id = "ivroJ9V7jWdYfcBFvZeFA"
 uri = "file://kafu-foundation-dist.zip"
 type = "unspecified"
-title = "kafu-foundation-dist.zip — Full site with all images bundled (17.7 MB)"
+title = "kafu-foundation-dist.zip — Full frontend (JS + images, replaces public_html/)"
 
 [[outputs]]
 id = "0wJBAk8AI_G1C9XhG-Mx1"
@@ -59,3 +59,15 @@ id = "StkW9DHZriQASLvb6YLm9"
 uri = "file://kafu-api-update.zip"
 type = "unspecified"
 title = "kafu-api-update.zip — API routes + migration + seeders (86 KB)"
+
+[[outputs]]
+id = "myEyrf2rrksNMHJtlelr6"
+uri = "file://kafu-imgs.zip"
+type = "unspecified"
+title = "kafu-imgs.zip — Images only, upload to public_html/ (17 MB)"
+
+[[outputs]]
+id = "SWLJSep-MqRAv9t4zg5iW"
+uri = "file://kafu-api-complete.zip"
+type = "unspecified"
+title = "kafu-api-complete.zip — API fix bundle + server-deploy.sh (111 KB)"

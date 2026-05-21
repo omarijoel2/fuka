@@ -45,17 +45,29 @@ export default function SchoolDetails() {
   const { data: programmes, isLoading: progsLoading } = useProgrammes(code);
   const { data: deptsData, isLoading: deptsLoading } = useQuery<{ data: Department[] }>({
     queryKey: ["school-departments", code],
-    queryFn: () => fetch(`/api/schools/${code}/departments`).then(r => r.json()),
+    queryFn: async () => {
+      const r = await fetch(`/api/schools/${code}/departments`);
+      const ct = r.headers.get("content-type") ?? "";
+      if (!ct.includes("application/json")) throw new Error("non-json");
+      return r.json();
+    },
     enabled: !!code,
     staleTime: 1000 * 60 * 10,
+    retry: 1,
   });
   const departments = deptsData?.data ?? [];
 
   const { data: staffData } = useQuery<{ data: StaffMember[] }>({
     queryKey: ["school-staff-dean", code],
-    queryFn: () => fetch(`/api/staff?school=${code}`).then(r => r.json()),
+    queryFn: async () => {
+      const r = await fetch(`/api/staff?school=${code}`);
+      const ct = r.headers.get("content-type") ?? "";
+      if (!ct.includes("application/json")) throw new Error("non-json");
+      return r.json();
+    },
     enabled: !!code,
     staleTime: 1000 * 60 * 10,
+    retry: 1,
   });
   const deanStaff = staffData?.data?.find(s =>
     s.designation?.toLowerCase().includes("dean") && !s.designation?.toLowerCase().includes("sub")
