@@ -109,7 +109,7 @@ class ResearchSeeder extends Seeder
                 'budget' => 4500000,
                 'currency' => 'KES',
                 'sdg_goals' => [9, 11, 16],
-                'featured_image_url' => '/imgs/campus-1.jpg',
+                'featured_image_url' => 'https://kafu.ac.ke/wp-content/uploads/2025/10/campus-1-scaled.jpg',
                 'is_featured' => true,
             ],
             [
