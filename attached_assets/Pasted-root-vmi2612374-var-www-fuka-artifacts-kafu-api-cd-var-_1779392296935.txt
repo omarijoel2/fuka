@@ -1,0 +1,44 @@
+root@vmi2612374:/var/www/fuka/artifacts/kafu-api# cd /var/www/fuka
+git pull
+
+cd /var/www/fuka/artifacts/kafu-api
+php artisan route:cache
+php artisan config:cache
+
+curl -s https://kafu.difbac.com/api/schools/SBE/departments | head -c 150
+Already up to date.
+PHP Fatal error:  Cannot redeclare updateApplicationStatus() (previously declared in /var/www/fuka/artifacts/kafu-api/routes/admin.php:2116) in /var/www/fuka/artifacts/kafu-api/routes/admin.php on line 2116
+
+In admin.php line 2116:
+                                                                               
+  Cannot redeclare updateApplicationStatus() (previously declared in /var/www  
+  /fuka/artifacts/kafu-api/routes/admin.php:2116)                              
+                                                                               
+
+
+In admin.php line 2116:
+                                                                               
+  Cannot redeclare updateApplicationStatus() (previously declared in /var/www  
+  /fuka/artifacts/kafu-api/routes/admin.php:2116)                              
+                                                                               
+
+PHP Fatal error:  Cannot redeclare updateApplicationStatus() (previously declared in /var/www/fuka/artifacts/kafu-api/routes/admin.php:2116) in /var/www/fuka/artifacts/kafu-api/routes/admin.php on line 2116
+
+In admin.php line 2116:
+                                                                               
+  Cannot redeclare updateApplicationStatus() (previously declared in /var/www  
+  /fuka/artifacts/kafu-api/routes/admin.php:2116)                              
+                                                                               
+
+
+In admin.php line 2116:
+                                                                               
+  Cannot redeclare updateApplicationStatus() (previously declared in /var/www  
+  /fuka/artifacts/kafu-api/routes/admin.php:2116)                              
+                                                                               
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1"root@vmi2612374:/var/www/fuka/artifacts/kafu-api# 
