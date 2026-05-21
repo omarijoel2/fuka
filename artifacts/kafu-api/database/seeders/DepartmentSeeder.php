@@ -55,7 +55,7 @@ class DepartmentSeeder extends Seeder
                 'hod_title'       => 'Chair, Languages & Literature Department',
                 'hod_email'       => 'm.thangwa@kafu.ac.ke',
                 'hod_phone'       => '+254 700 100 221',
-                'hod_photo_url'   => null,
+                'hod_photo_url'   => '/staff/thangwa.jpg',
                 'hod_bio'         => 'Ms. Margaret Thang\'wa chairs the Department of Languages and Literature at Kaimosi Friends University. Her leadership continues to strengthen academic excellence and student growth within the discipline.',
                 'office_location' => 'Humanities Block, Room 115, KAFU Main Campus',
                 'email'           => 'dept.languages@kafu.ac.ke',
