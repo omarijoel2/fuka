@@ -72,7 +72,7 @@ class DepartmentSeeder extends Seeder
                 'hod_title'       => 'Chair, Social Sciences Department',
                 'hod_email'       => 'a.wangara@kafu.ac.ke',
                 'hod_phone'       => '+254 700 100 231',
-                'hod_photo_url'   => 'https://kafu.ac.ke/wp-content/uploads/AHMED-WANGARA-COD-SOCIAL-SCIENCES-300x300.jpg',
+                'hod_photo_url'   => '/staff/wangara.jpg',
                 'hod_bio'         => 'Mr. Ahmed K. Wangara chairs the Department of Social Sciences at the School of Education and Social Sciences, Kaimosi Friends University.',
                 'office_location' => 'Social Sciences Block, Room 118, KAFU Main Campus',
                 'email'           => 'dept.socialsciences@kafu.ac.ke',
