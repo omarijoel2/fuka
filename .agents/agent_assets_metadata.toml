@@ -16,16 +16,22 @@ title = "KAFU Website (kafu.difbac.com) — React build"
 id = "0gTWElafuEvuDRsDCzfLA"
 uri = "file://kafu-cms-dist.zip"
 type = "unspecified"
-title = "KAFU CMS Admin — React build"
+title = "kafu-cms-dist.zip — CMS Admin (upload to cms subdirectory)"
 
 [[outputs]]
 id = "5XRiVCbmoQIeGny9sdbDv"
 uri = "file://kafu-staff-dist.zip"
 type = "unspecified"
-title = "KAFU Staff Portal — React build"
+title = "kafu-staff-dist.zip — Staff Portal (upload to staff subdirectory)"
 
 [[outputs]]
 id = "BrQgXt8Mx981KUbGCcjZY"
 uri = "file://kafu-api-src.zip"
 type = "unspecified"
-title = "kafu-api-src.zip — Full Laravel API source (0.9 MB)"
+title = "kafu-api-src.zip — Laravel API source (upload alongside public_html/)"
+
+[[outputs]]
+id = "ivroJ9V7jWdYfcBFvZeFA"
+uri = "file://kafu-foundation-dist.zip"
+type = "unspecified"
+title = "kafu-foundation-dist.zip — Main website (upload to public_html/)"
