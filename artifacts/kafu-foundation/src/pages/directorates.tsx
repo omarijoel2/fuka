@@ -48,7 +48,7 @@ export default function DirectoratesPage() {
         eyebrow="Administration"
         title="University Directorates"
         subtitle="KAFU's directorates are specialised administrative units responsible for key functions that support the university's academic mission and operational excellence."
-        photo="https://kafu.ac.ke/wp-content/uploads/2026/02/image-8-1.jpeg"
+        photo="/imgs/staff/image-8-1.jpeg"
         align="center"
         breadcrumb={[
           { label: "Home", href: "/" },

@@ -73,7 +73,7 @@ export default function Archives() {
         eyebrow="Records & History"
         title="University Archives"
         subtitle="Historical notices, newsletters, leadership records, and official circulars from Kaimosi Friends University since our establishment in 2014."
-        photo="https://kafu.ac.ke/wp-content/uploads/image-82.jpeg"
+        photo="/imgs/image-82.jpeg"
         breadcrumb={[
           { label: "Home", href: "/" },
           { label: "Archives" },

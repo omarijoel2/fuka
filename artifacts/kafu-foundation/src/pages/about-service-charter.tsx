@@ -83,7 +83,7 @@ export default function ServiceCharter() {
         eyebrow="Governance"
         title="Service Charter"
         subtitle="Our commitment to service excellence — the standards students, staff, and the public can expect from every department of Kaimosi Friends University."
-        photo="https://kafu.ac.ke/wp-content/uploads/2026/03/IMG_6424-scaled.jpg"
+        photo="/imgs/campus-main.jpg"
         breadcrumb={[
           { label: "Home", href: "/" },
           { label: "About", href: "/about" },

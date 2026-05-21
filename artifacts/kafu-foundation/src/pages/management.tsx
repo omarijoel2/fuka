@@ -28,49 +28,49 @@ const CATEGORY_LABELS: Record<string, string> = {
 const FALLBACK: ManagementProfile[] = [
   {
     id: 1, name: "Prof. Peter N. Mwita", title: "Vice Chancellor",
-    photo_url: "https://kafu.ac.ke/wp-content/uploads/2026/02/Prof.-Peter-Mwita-Sec-to-Council.jpg",
+    photo_url: "/imgs/staff/Prof.-Mwita-council.jpg",
     bio: "Prof. Peter N. Mwita (born 15 July 1968) is the Vice Chancellor of Kaimosi Friends University and Secretary to the University Council. He is a Full Professor of Statistics and holds a PhD. He previously served as Deputy Vice-Chancellor (Research, Innovation & Linkages) at Machakos University, where he also served as Acting Vice Chancellor. He has served as Dean of the School of Mathematical Sciences and Chairman of the Department of Statistics and Actuarial Sciences at JKUAT. He played a key role in restructuring the Kenya National Bureau of Statistics (KNBS) and currently chairs the Board of Governors of Kendege Technical and Vocational College.",
     email: "vc@kafu.ac.ke", office: "Vice Chancellor's Office, Main Administration Block",
     phone: "+254 777 373 633", category: "vc", position_order: 1,
   },
   {
     id: 2, name: "Prof. Fred. A. Amimo", title: "Deputy Vice Chancellor — Academic, Student Affairs & Research",
-    photo_url: "https://kafu.ac.ke/wp-content/uploads/2026/02/Prof.-Amimo.jpg",
+    photo_url: "/imgs/staff/Prof.-Amimo.jpg",
     bio: "Prof. Fred. A. Amimo serves as the Deputy Vice Chancellor responsible for Academic Affairs, Student Affairs, and Research (DVC ASA&R) at Kaimosi Friends University. He oversees all academic programmes, student welfare, curriculum development, quality assurance, and the university's research agenda across the five schools.",
     email: "dvc-asar@kafu.ac.ke", office: "DVC Academic Office, Administration Block", phone: "+254 777 373 640",
     category: "dvc", position_order: 2,
   },
   {
     id: 3, name: "Prof. Thomas Kipkurgat", title: "Deputy Vice Chancellor — Administration, Finance, Planning & Development",
-    photo_url: "https://kafu.ac.ke/wp-content/uploads/2026/02/Kipkurgat.jpg",
+    photo_url: "/imgs/staff/Kipkurgat.jpg",
     bio: "Prof. Thomas Kipkurgat serves as the Deputy Vice Chancellor responsible for Administration, Finance, Planning and Development (DVC AFP&D) at Kaimosi Friends University. He oversees the university's administrative operations, financial management, strategic planning, and campus infrastructure development.",
     email: "dvc-afpd@kafu.ac.ke", office: "DVC Administration Office, Administration Block", phone: "+254 777 373 642",
     category: "dvc", position_order: 3,
   },
   {
     id: 4, name: "Dr. Samuel Munda", title: "Senior Assistant Registrar — Academic Affairs",
-    photo_url: "https://kafu.ac.ke/wp-content/uploads/Dr.-Munda-1.jpg",
+    photo_url: "/imgs/Dr.-Munda-1.jpg",
     bio: "Dr. Samuel Munda serves as the Senior Assistant Registrar for Academic Affairs at Kaimosi Friends University. He is responsible for academic registration, examinations management, student records, and compliance with Commission for University Education (CUE) standards.",
     email: "registrar-aa@kafu.ac.ke", office: "Academic Registrar's Office, Administration Block", phone: "+254 777 373 650",
     category: "registrar", position_order: 4,
   },
   {
     id: 5, name: "Dr. Patrick Agesa", title: "Acting Deputy Registrar",
-    photo_url: "https://kafu.ac.ke/wp-content/uploads/2026/02/Dr.-Agesa.jpg",
+    photo_url: "/imgs/staff/Dr.-Agesa.jpg",
     bio: "Dr. Patrick Agesa serves as the Acting Deputy Registrar at Kaimosi Friends University, supporting the overall registry functions including student admissions, records management, academic governance, and institutional compliance.",
     email: "registrar@kafu.ac.ke", office: "Registry, Administration Block", phone: "+254 777 373 651",
     category: "registrar", position_order: 5,
   },
   {
     id: 6, name: "CPA Emmanuel M. Momanyi", title: "Finance Officer",
-    photo_url: "https://kafu.ac.ke/wp-content/uploads/IMGPSP_001.png",
+    photo_url: "/imgs/IMGPSP_001.png",
     bio: "CPA Emmanuel M. Momanyi is the Finance Officer of Kaimosi Friends University, responsible for financial governance, budgeting, financial reporting, fee collection, procurement oversight, and compliance with the Public Finance Management Act.",
     email: "finance@kafu.ac.ke", office: "Finance Department, Administration Block", phone: "+254 777 373 660",
     category: "finance", position_order: 6,
   },
   {
     id: 7, name: "Dr. Fredrick M. Nyambane", title: "Dean of Students",
-    photo_url: "https://kafu.ac.ke/wp-content/uploads/2026/02/Monanti.jpg",
+    photo_url: "/imgs/staff/Monanti.jpg",
     bio: "Dr. Fredrick M. Nyambane serves as the Dean of Students at Kaimosi Friends University, overseeing student welfare, counselling services, accommodation, clubs and societies, and the general wellbeing of the student body.",
     email: "dean.students@kafu.ac.ke", office: "Dean of Students Office, Student Centre", phone: "+254 777 373 670",
     category: "other", position_order: 7,
@@ -206,7 +206,7 @@ export default function ManagementPage() {
         eyebrow="Leadership"
         title="University Management"
         subtitle="KAFU is led by a team of experienced academics and administrators committed to advancing the university's mission of quality education, impactful research, and community service."
-        photo="https://kafu.ac.ke/wp-content/uploads/2025/10/arial-view-e-1.jpg"
+        photo="/imgs/aerial-1.jpg"
         align="center"
         breadcrumb={[
           { label: "Home", href: "/" },

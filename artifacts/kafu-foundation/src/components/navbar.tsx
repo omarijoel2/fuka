@@ -669,7 +669,7 @@ export function Navbar() {
       <div className="container mx-auto px-4 h-[68px] flex items-center justify-between">
         <Link href="/" className="flex items-center shrink-0" data-testid="link-home-logo">
           <img
-            src="https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png"
+            src="/imgs/logo-updated.png"
             alt="Kaimosi Friends University"
             className="h-11 object-contain"
             onError={(e) => {

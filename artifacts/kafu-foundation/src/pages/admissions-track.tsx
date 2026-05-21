@@ -75,7 +75,7 @@ export default function AdmissionsTrack() {
         eyebrow="Admissions"
         title="Track Your Application"
         subtitle="Enter your application reference number to check the status of your admissions application."
-        photo="https://kafu.ac.ke/wp-content/uploads/2025/10/apply-now.jpg"
+        photo="/imgs/apply-now.jpg"
         align="center"
         breadcrumb={[
           { label: "Home", href: "/" },

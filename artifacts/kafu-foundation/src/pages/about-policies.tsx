@@ -165,7 +165,7 @@ export default function AboutPolicies() {
         eyebrow="Governance"
         title="Policies & Regulations"
         subtitle="Official policies governing academic, student, research, financial, and administrative operations at Kaimosi Friends University."
-        photo="https://kafu.ac.ke/wp-content/uploads/2025/10/arial-view-e-1.jpg"
+        photo="/imgs/aerial-1.jpg"
         breadcrumb={[
           { label: "Home", href: "/" },
           { label: "About", href: "/about" },

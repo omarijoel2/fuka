@@ -4,7 +4,7 @@ import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const DEFAULT_PHOTO =
-  "https://kafu.ac.ke/wp-content/uploads/2026/03/IMG_6424-scaled.jpg";
+  "/imgs/campus-main.jpg";
 
 interface Crumb {
   label: string;

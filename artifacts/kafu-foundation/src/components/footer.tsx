@@ -10,7 +10,7 @@ export function Footer() {
           {/* Col 1 — Brand */}
           <div className="lg:col-span-1">
             <img
-              src="https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png"
+              src="/imgs/logo-updated.png"
               alt="Kaimosi Friends University"
               className="h-10 object-contain mb-4 brightness-0 invert"
               onError={(e) => {

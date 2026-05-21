@@ -28,8 +28,8 @@ interface AboutData {
 const DEFAULTS: Required<AboutData> = {
   hero_heading: "About KAFU",
   hero_description: "Discover the history, mission, and vision of Kaimosi Friends University — a public-spirited institution at the heart of Western Kenya.",
-  hero_image_url: "https://kafu.ac.ke/wp-content/uploads/2025/10/arial-view-e-1.jpg",
-  campus_photo_url: "https://kafu.ac.ke/wp-content/uploads/2025/10/arial-view-e-2-602x400.jpg",
+  hero_image_url: "/imgs/aerial-1.jpg",
+  campus_photo_url: "/imgs/aerial-2.jpg",
   history_heading: "Our History",
   history_p1: "Kaimosi Friends University (KAFU) was formally awarded its University Charter on August 2, 2022. This landmark event, presided over by the Government of Kenya, marked the institution's elevation to a fully autonomous public university — one of the chartered public universities in Kenya operating under the Universities Act, 2012, guidelines issued by the Commission for University Education (CUE), its own University Charter, and Statutes.",
   history_p2: "KAFU, formerly Kaimosi Friends University College (KAFUCO), was established in 2014 through Legal Notice Number 87 of May 22, 2015, as a Constituent College of Masinde Muliro University of Science and Technology (MMUST). KAFUCO itself was a successor institution to the educational infrastructure previously occupied by the Kaimosi Teachers Training College (KTTC), building upon the rich academic heritage of the larger Kaimosi Complex.",
@@ -41,7 +41,7 @@ const DEFAULTS: Required<AboutData> = {
   vc_title: "Vice Chancellor",
   vc_bio: "Prof. Peter N. Mwita is the Vice Chancellor of Kaimosi Friends University and the Secretary to the Council. A full Professor and esteemed academic leader with a distinguished career spanning over 29 years in academia and research, he previously served as Deputy Vice-Chancellor (Research, Innovation, and Linkages) at Machakos University. Under his leadership, KAFU continues to advance its mission of quality education, research, and community engagement.",
   vc_email: "vc@kafu.ac.ke",
-  vc_photo_url: "https://kafu.ac.ke/wp-content/uploads/2026/02/Prof.-Peter-Mwita-Sec-to-Council.jpg",
+  vc_photo_url: "/imgs/staff/Prof.-Mwita-council.jpg",
   core_values: ["Integrity and Professionalism", "Quality and Excellence", "Equity and Inclusivity", "Innovation and Creativity", "Teamwork and Collaboration"],
   sidebar_stats: [
     { label: "Location", value: "Kaimosi Complex, Vihiga County, Western Kenya" },
@@ -159,7 +159,7 @@ export default function About() {
             <section className="relative rounded-2xl overflow-hidden">
               <div className="absolute inset-0 bg-primary/90" />
               <img
-                src="https://kafu.ac.ke/wp-content/uploads/2025/10/art-culture.jpg"
+                src="/imgs/art-culture.jpg"
                 alt=""
                 aria-hidden="true"
                 className="absolute inset-0 w-full h-full object-cover"

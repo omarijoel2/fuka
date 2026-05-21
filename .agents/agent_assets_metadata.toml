@@ -34,7 +34,7 @@ title = "kafu-api-src.zip — Laravel API source (upload alongside public_html/)
 id = "ivroJ9V7jWdYfcBFvZeFA"
 uri = "file://kafu-foundation-dist.zip"
 type = "unspecified"
-title = "kafu-foundation-dist.zip — Updated main website (responsive)"
+title = "kafu-foundation-dist.zip — Full site with all images bundled (17.7 MB)"
 
 [[outputs]]
 id = "0wJBAk8AI_G1C9XhG-Mx1"
@@ -47,3 +47,9 @@ id = "KUlsRzhIdVyHuitW7MThc"
 uri = "file://FixPhotoPathsSeeder.zip"
 type = "unspecified"
 title = "FixPhotoPathsSeeder.zip — Upload to database/seeders/ on your server"
+
+[[outputs]]
+id = "HpjuNVzmLfcaO1E0BhwsK"
+uri = "file://UpdateImageUrlsSeeder.zip"
+type = "unspecified"
+title = "UpdateImageUrlsSeeder.zip — Run on server to fix existing DB records"

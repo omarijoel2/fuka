@@ -99,7 +99,7 @@ export default function DirectorateDetail({ slug }: { slug: string }) {
         eyebrow="Directorate"
         title={d.name}
         subtitle={d.tagline ?? undefined}
-        photo="https://kafu.ac.ke/wp-content/uploads/2026/02/image-8-1.jpeg"
+        photo="/imgs/staff/image-8-1.jpeg"
         breadcrumb={[
           { label: "Home", href: "/" },
           { label: "Directorates", href: "/directorates" },

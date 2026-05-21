@@ -102,7 +102,7 @@ export default function Events() {
       {/* Header */}
       <div className="relative bg-primary text-primary-foreground py-16 md:py-20 overflow-hidden">
         <img
-          src="https://kafu.ac.ke/wp-content/uploads/2025/10/sports.jpg"
+          src="/imgs/sports.jpg"
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover object-center"

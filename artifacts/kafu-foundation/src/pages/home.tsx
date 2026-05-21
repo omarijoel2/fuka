@@ -29,7 +29,7 @@ import {
 // ─── Hero Carousel ─────────────────────────────────────────────────────────────
 const SLIDES = [
   {
-    image: "https://kafu.ac.ke/wp-content/uploads/2026/03/IMG_6424-scaled.jpg",
+    image: "/imgs/campus-main.jpg",
     badge: "Est. 2014 · Kaimosi, Western Kenya · Quaker Heritage",
     headline: "Spring of",
     accent: "Knowledge",
@@ -39,7 +39,7 @@ const SLIDES = [
     testid: "hero-slide-0",
   },
   {
-    image: "https://kafu.ac.ke/wp-content/uploads/2025/10/posgraduate.jpg",
+    image: "/imgs/posgraduate.jpg",
     badge: "5 Schools · 60+ Programmes · All Levels",
     headline: "World-Class",
     accent: "Programmes",
@@ -49,7 +49,7 @@ const SLIDES = [
     testid: "hero-slide-1",
   },
   {
-    image: "https://kafu.ac.ke/wp-content/uploads/image-94.jpeg",
+    image: "/imgs/image-94.jpeg",
     badge: "Modern Infrastructure · Kaimosi Highlands",
     headline: "Built for",
     accent: "Excellence",
@@ -59,7 +59,7 @@ const SLIDES = [
     testid: "hero-slide-2",
   },
   {
-    image: "https://kafu.ac.ke/wp-content/uploads/image-93.jpeg",
+    image: "/imgs/image-93.jpeg",
     badge: "Research · Innovation · Community Impact",
     headline: "Advancing",
     accent: "Research",
@@ -69,7 +69,7 @@ const SLIDES = [
     testid: "hero-slide-3",
   },
   {
-    image: "https://kafu.ac.ke/wp-content/uploads/2025/10/undergraduate-fin.jpg",
+    image: "/imgs/undergraduate.jpg",
     badge: "Student Life · Clubs · Community",
     headline: "Shaping",
     accent: "Tomorrow's Leaders",
@@ -79,7 +79,7 @@ const SLIDES = [
     testid: "hero-slide-4",
   },
   {
-    image: "https://kafu.ac.ke/wp-content/uploads/Vice-Chancellor-Prof.-Peter-Mwita-addresses-fourth-year-teacher-trainees-during-the-opening-of-the-Competency-Based-Education-CBE-training-at-Kaimosi-Friends-University.jpg",
+    image: "/imgs/vc-lecture.jpg",
     badge: "Strong Leadership · Visionary Direction · Academic Excellence",
     headline: "Led by",
     accent: "Vision",
@@ -89,7 +89,7 @@ const SLIDES = [
     testid: "hero-slide-5",
   },
   {
-    image: "https://kafu.ac.ke/wp-content/uploads/2025/10/sports.jpg",
+    image: "/imgs/sports.jpg",
     badge: "Sports · Recreation · Student Wellness",
     headline: "Compete,",
     accent: "Grow, Excel",
@@ -99,7 +99,7 @@ const SLIDES = [
     testid: "hero-slide-6",
   },
   {
-    image: "https://kafu.ac.ke/wp-content/uploads/2025/10/art-culture.jpg",
+    image: "/imgs/art-culture.jpg",
     badge: "Vibrant Campus Life · Western Kenya Highlands",
     headline: "A Community",
     accent: "That Inspires",
@@ -432,7 +432,7 @@ export default function Home() {
 
   const whyKafuSlides = [
     {
-      image: "https://kafu.ac.ke/wp-content/uploads/image-99.jpeg",
+      image: "/imgs/image-99.jpeg",
       category: "Accreditation",
       title: "Accredited Quality",
       body: "Fully accredited by the Commission for University Education (CUE) with programmes meeting national and international standards.",
@@ -440,7 +440,7 @@ export default function Home() {
       testid: "why-slide-accredited",
     },
     {
-      image: "https://kafu.ac.ke/wp-content/uploads/2025/10/posgraduate.jpg",
+      image: "/imgs/posgraduate.jpg",
       category: "Programmes",
       title: "Unique Programmes",
       body: "Home to rare and high-demand offerings — including one of only two institutions in Kenya offering Optometry up to PhD level.",
@@ -448,7 +448,7 @@ export default function Home() {
       testid: "why-slide-programmes",
     },
     {
-      image: "https://kafu.ac.ke/wp-content/uploads/2021/01/1.-Student-visual-acuity.jpg",
+      image: "/imgs/visual-acuity.jpg",
       category: "Research",
       title: "Research & Innovation",
       body: "Driving solutions in health, environment, and development across Kenya — supported by national and international partnerships.",
@@ -456,7 +456,7 @@ export default function Home() {
       testid: "why-slide-research",
     },
     {
-      image: "https://kafu.ac.ke/wp-content/uploads/2025/10/art-culture.jpg",
+      image: "/imgs/art-culture.jpg",
       category: "Campus Life",
       title: "Quaker Values",
       body: "Founded on principles of truth, integrity, and service to humanity — shaping leaders of character since 2014.",
@@ -464,7 +464,7 @@ export default function Home() {
       testid: "why-slide-values",
     },
     {
-      image: "https://kafu.ac.ke/wp-content/uploads/2026/03/IMG_6424-scaled.jpg",
+      image: "/imgs/campus-main.jpg",
       category: "Community",
       title: "Community Impact",
       body: "Deeply rooted in Western Kenya, KAFU actively engages 47 counties through research, outreach, and partnerships.",
@@ -472,7 +472,7 @@ export default function Home() {
       testid: "why-slide-community",
     },
     {
-      image: "https://kafu.ac.ke/wp-content/uploads/2025/10/undergraduate-fin.jpg",
+      image: "/imgs/undergraduate.jpg",
       category: "Students",
       title: "Student Life",
       body: "Thousands of students discovering their potential through rigorous academics, hands-on learning, and vibrant campus community.",
@@ -480,7 +480,7 @@ export default function Home() {
       testid: "why-slide-students",
     },
     {
-      image: "https://kafu.ac.ke/wp-content/uploads/2025/10/sports.jpg",
+      image: "/imgs/sports.jpg",
       category: "Sports",
       title: "Sports & Recreation",
       body: "From inter-university tournaments to fitness and wellness, KAFU nurtures the whole student beyond the classroom.",
@@ -488,7 +488,7 @@ export default function Home() {
       testid: "why-slide-sports",
     },
     {
-      image: "https://kafu.ac.ke/wp-content/uploads/Vice-Chancellor-Prof.-Peter-Mwita-addresses-fourth-year-teacher-trainees-during-the-opening-of-the-Competency-Based-Education-CBE-training-at-Kaimosi-Friends-University.jpg",
+      image: "/imgs/vc-lecture.jpg",
       category: "Leadership",
       title: "Visionary Leadership",
       body: "Under Vice-Chancellor Prof. Peter Mwita, KAFU is transforming into a globally competitive university driven by innovation and integrity.",
@@ -906,10 +906,10 @@ export default function Home() {
       <section className="py-0 bg-background">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-0 h-56 md:h-72">
           {[
-            { src: "https://kafu.ac.ke/wp-content/uploads/2025/10/undergraduate-fin.jpg", label: "Undergraduate Life" },
-            { src: "https://kafu.ac.ke/wp-content/uploads/2025/10/posgraduate.jpg", label: "Postgraduate Research" },
-            { src: "https://kafu.ac.ke/wp-content/uploads/2025/10/art-culture.jpg", label: "Arts & Culture" },
-            { src: "https://kafu.ac.ke/wp-content/uploads/2025/10/sports.jpg", label: "Sports & Recreation" },
+            { src: "/imgs/undergraduate.jpg", label: "Undergraduate Life" },
+            { src: "/imgs/posgraduate.jpg", label: "Postgraduate Research" },
+            { src: "/imgs/art-culture.jpg", label: "Arts & Culture" },
+            { src: "/imgs/sports.jpg", label: "Sports & Recreation" },
           ].map(({ src, label }, i) => (
             <div key={i} className="relative overflow-hidden group">
               <img
@@ -956,25 +956,25 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {[
               {
-                image: "https://kafu.ac.ke/wp-content/uploads/image-99.jpeg",
+                image: "/imgs/image-99.jpeg",
                 label: "Library & Digital Resources",
                 desc: "50,000+ volumes and online research databases",
                 testid: "tour-tile-library",
               },
               {
-                image: "https://kafu.ac.ke/wp-content/uploads/2021/01/1.-Student-visual-acuity.jpg",
+                image: "/imgs/visual-acuity.jpg",
                 label: "Science & Health Labs",
                 desc: "State-of-the-art optometry, computing and science labs",
                 testid: "tour-tile-labs",
               },
               {
-                image: "https://kafu.ac.ke/wp-content/uploads/2025/10/undergraduate-fin.jpg",
+                image: "/imgs/undergraduate.jpg",
                 label: "Student Residences",
                 desc: "On-campus accommodation in a safe, serene environment",
                 testid: "tour-tile-residences",
               },
               {
-                image: "https://kafu.ac.ke/wp-content/uploads/2025/10/sports.jpg",
+                image: "/imgs/sports.jpg",
                 label: "Sports & Recreation",
                 desc: "Football, basketball, athletics and fitness facilities",
                 testid: "tour-tile-sports",
@@ -1306,7 +1306,7 @@ export default function Home() {
       {/* ─── CTA ─── */}
       <section className="relative py-16 md:py-24 overflow-hidden">
         <img
-          src="https://kafu.ac.ke/wp-content/uploads/2025/10/apply-now.jpg"
+          src="/imgs/apply-now.jpg"
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover object-center"
