@@ -76,7 +76,7 @@ class ContentMigrationSeeder extends Seeder
                 'name'  => 'School of Science',
                 'dean'  => 'Dr. Annette O. Busula',
                 'colour' => '#198754',
-                'description' => 'SOS offers rigorous science programmes spanning physics, chemistry, biology, mathematics, statistics, and agricultural economics.',
+                'description' => 'SOS offers rigorous science programmes spanning physics, chemistry, biology, mathematics, and statistics.',
                 'vision'  => 'To be a centre of excellence in scientific research and education.',
                 'mission' => 'To provide quality science education through teaching, research, and innovation.',
                 'undergrad_count' => 7,

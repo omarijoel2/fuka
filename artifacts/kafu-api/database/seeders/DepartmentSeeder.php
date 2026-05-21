@@ -215,23 +215,6 @@ class DepartmentSeeder extends Seeder
                 'phone'           => '+254 700 100 520',
                 'sort_order'      => 3,
             ],
-            [
-                'school_code'     => 'SOS',
-                'name'            => 'Department of Agricultural Economics & Rural Development',
-                'slug'            => 'agricultural-economics-rural-development',
-                'description'     => 'The Department of Agricultural Economics & Rural Development trains students in farm management, agricultural policy, rural finance, value chain analysis, and food systems. The department runs an active research farm and partners with county governments and NGOs on food security initiatives in Western Kenya.',
-                'hod_name'        => 'Dr. Faith Mumbua Mutuku',
-                'hod_title'       => 'Head of Department',
-                'hod_email'       => 'f.mutuku@kafu.ac.ke',
-                'hod_phone'       => '+254 700 100 531',
-                'hod_photo_url'   => 'https://kafu.ac.ke/wp-content/uploads/IMG_8696.jpg',
-                'hod_bio'         => 'Dr. Faith Mumbua Mutuku holds a PhD in Agricultural Economics from the University of Ghana. Her research centres on smallholder farmer livelihoods, climate-smart agriculture, and food market integration in East Africa. She has collaborated with the FAO, IFAD, and the Kenyan Ministry of Agriculture on food security projects.',
-                'office_location' => 'Agricultural Sciences Block, Room 110, KAFU Main Campus',
-                'email'           => 'dept.aerd@kafu.ac.ke',
-                'phone'           => '+254 700 100 530',
-                'sort_order'      => 4,
-            ],
-
             // ── SHS ──────────────────────────────────────────────────────────
             [
                 'school_code'     => 'SHS',
