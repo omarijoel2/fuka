@@ -23,3 +23,9 @@ id = "5XRiVCbmoQIeGny9sdbDv"
 uri = "file://kafu-staff-dist.zip"
 type = "unspecified"
 title = "KAFU Staff Portal — React build"
+
+[[outputs]]
+id = "BrQgXt8Mx981KUbGCcjZY"
+uri = "file://kafu-api-src.zip"
+type = "unspecified"
+title = "kafu-api-src.zip — Full Laravel API source (0.9 MB)"
