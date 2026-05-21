@@ -1085,10 +1085,10 @@ Route::get('/schools', function () {
             ],
             [
                 'code' => 'SBE',
-                'name' => 'School of Business and Economics',
-                'dean' => 'Dr. Atieno Margaret Otieno',
+                'name' => 'School of Business & Economics',
+                'dean' => 'Dr. Atieno Margaret Omondi',
                 'dean_title' => 'Dean, School of Business & Economics',
-                'dean_photo' => 'https://kafu.ac.ke/wp-content/uploads/Dr.-Margaret-Atieno.jpg',
+                'dean_photo' => 'https://kafu.ac.ke/wp-content/uploads/Dr.-Margaret-Atieno-1-300x300.jpg',
                 'description' => 'In the school of business and economics, we empower students to become transformative leaders and responsible professionals, equipped with the knowledge, skills, and ethical foundation to succeed in a rapidly changing world. Through cutting-edge research, collaborative partnerships, and community engagement, we advance knowledge and practice in business and economics, shaping a more sustainable and equitable society.',
                 'programmes_count' => ['undergraduate' => 3, 'postgraduate' => 2, 'doctoral' => 1],
                 'colour' => '#D4A017',
@@ -1181,10 +1181,10 @@ Route::get('/schools/{code}', function (string $code) {
         ],
         'SBE' => [
             'code' => 'SBE',
-            'name' => 'School of Business and Economics',
-            'dean' => 'Dr. Atieno Margaret Otieno',
+            'name' => 'School of Business & Economics',
+            'dean' => 'Dr. Atieno Margaret Omondi',
             'dean_title' => 'Dean, School of Business & Economics',
-            'dean_photo' => 'https://kafu.ac.ke/wp-content/uploads/Dr.-Margaret-Atieno.jpg',
+            'dean_photo' => 'https://kafu.ac.ke/wp-content/uploads/Dr.-Margaret-Atieno-1-300x300.jpg',
             'description' => 'In the school of business and economics, we empower students to become transformative leaders and responsible professionals, equipped with the knowledge, skills, and ethical foundation to succeed in a rapidly changing world. Through cutting-edge research, collaborative partnerships, and community engagement, we advance knowledge and practice in business and economics, shaping a more sustainable and equitable society.',
             'vision' => 'To be a centre of excellence in teaching professional and market driven courses.',
             'mission' => 'To provide professional and market driven courses that enable graduates fit in the labour market.',
@@ -1392,7 +1392,7 @@ Route::get('/opportunities', function (Request $request) {
         ['id'=>14,'slug'=>'disability-support-bursary-kafu-burs-001-2026','category'=>'scholarship','type'=>'Scholarship','title'=>'KAFU Disability Support Bursary 2026/2027','reference'=>'KAFU/BURS/001/2026','department'=>'Student Affairs Division','summary'=>'KAFU offers bursary support to students living with disabilities who demonstrate financial need. Covers tuition reduction, accommodation support, and access to specialised study resources.','publish_date'=>'2026-03-01','deadline'=>'2026-05-31','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents_count'=>1],
         ['id'=>15,'slug'=>'equity-bursary-kafu-burs-002-2026','category'=>'scholarship','type'=>'Scholarship','title'=>'Government Equity Bursary — HELB/NGEC Link 2026/2027','reference'=>'KAFU/BURS/002/2026','department'=>'Student Affairs Division','summary'=>'KAFU, in partnership with HELB and NGEC, invites applications from financially needy students from marginalised communities for the 2026/2027 Equity Bursary Fund.','publish_date'=>'2026-03-10','deadline'=>'2026-04-30','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents_count'=>2],
         ['id'=>16,'slug'=>'supply-furniture-kafu-proc-005-2025','category'=>'tender','type'=>'Tender','title'=>'Supply and Delivery of Office Furniture and Fittings','reference'=>'KAFU/PROC/005/2025','department'=>'Procurement & Supply Chain','summary'=>'Supply of executive office furniture, workstations, chairs, and filing systems for the administration block.','publish_date'=>'2025-11-15','deadline'=>'2025-12-31','deadline_time'=>'17:00','status'=>'closed','featured'=>false,'documents_count'=>1],
-        ['id'=>17,'slug'=>'lecturer-business-admin-kafu-hr-005-2025','category'=>'vacancy','type'=>'Job Vacancy','title'=>'Lecturer — Business Administration','reference'=>'KAFU/HR/005/2025','department'=>'School of Business and Economics (SBE)','summary'=>'Applications for the position of Lecturer in Business Administration. Position has since been filled.','publish_date'=>'2026-01-10','deadline'=>'2026-02-28','deadline_time'=>'17:00','status'=>'closed','featured'=>false,'documents_count'=>1],
+        ['id'=>17,'slug'=>'lecturer-business-admin-kafu-hr-005-2025','category'=>'vacancy','type'=>'Job Vacancy','title'=>'Lecturer — Business Administration','reference'=>'KAFU/HR/005/2025','department'=>'School of Business & Economics (SBE)','summary'=>'Applications for the position of Lecturer in Business Administration. Position has since been filled.','publish_date'=>'2026-01-10','deadline'=>'2026-02-28','deadline_time'=>'17:00','status'=>'closed','featured'=>false,'documents_count'=>1],
     ];
 
     // Merge: CMS opportunities first, static ones not in CMS after
@@ -1616,7 +1616,7 @@ Route::get('/staff', function (Request $request) {
             'bio' => 'Rev. Prof. Simiyu is a theologian and Quaker minister with over two decades of scholarship in African traditional religion and Quaker ethics. He has authored several books on religion and society in East Africa.',
         ],
 
-        // SBE — School of Business and Economics
+        // SBE — School of Business & Economics
         [
             'slug' => 'dr-atieno-margaret-omondi',
             'title' => 'Dr.',
@@ -1624,14 +1624,14 @@ Route::get('/staff', function (Request $request) {
             'middle_name' => 'Margaret',
             'last_name' => 'Omondi',
             'name' => 'Dr. Atieno Margaret Omondi',
-            'designation' => 'Dean, School of Business and Economics',
+            'designation' => 'Dean, School of Business & Economics',
             'school' => 'SBE',
             'department' => 'Business Administration',
             'unit' => null,
             'email' => 'dean.sbe@kafu.ac.ke',
             'specializations' => ['Strategic Management', 'Entrepreneurship', 'SME Development'],
             'photo' => null,
-            'bio' => 'Dr. Omondi leads the School of Business and Economics with a focus on entrepreneurship education and SME capacity building. Her research examines the growth constraints of women-owned enterprises in Kenya.',
+            'bio' => 'Dr. Omondi leads the School of Business & Economics with a focus on entrepreneurship education and SME capacity building. Her research examines the growth constraints of women-owned enterprises in Kenya.',
         ],
         [
             'slug' => 'dr-francis-ochieng',
@@ -2185,7 +2185,7 @@ Route::get('/staff/{slug}', function (string $slug) {
             'slug' => 'dr-atieno-margaret-omondi',
             'title' => 'Dr.',
             'name' => 'Dr. Atieno Margaret Omondi',
-            'designation' => 'Dean, School of Business and Economics',
+            'designation' => 'Dean, School of Business & Economics',
             'school' => 'SBE',
             'department' => 'Business Administration',
             'unit' => null,
@@ -2193,7 +2193,7 @@ Route::get('/staff/{slug}', function (string $slug) {
             'phone_visible' => false,
             'specializations' => ['Strategic Management', 'Entrepreneurship', 'SME Development'],
             'photo' => null,
-            'biography' => 'Dr. Atieno Margaret Omondi is the Dean of the School of Business and Economics. A strategic management scholar with a deep commitment to entrepreneurship education, Dr. Omondi has been instrumental in building SBE into one of the fastest-growing business schools in Western Kenya. Her research examines SME growth constraints, women\'s economic empowerment, and business incubation in emerging economies. She has consulted for government agencies, development organisations, and private sector bodies on entrepreneurship policy and MSME development strategy.',
+            'biography' => 'Dr. Atieno Margaret Omondi is the Dean of the School of Business & Economics. A strategic management scholar with a deep commitment to entrepreneurship education, Dr. Omondi has been instrumental in building SBE into one of the fastest-growing business schools in Western Kenya. Her research examines SME growth constraints, women\'s economic empowerment, and business incubation in emerging economies. She has consulted for government agencies, development organisations, and private sector bodies on entrepreneurship policy and MSME development strategy.',
             'qualifications' => [
                 ['year' => '2015', 'qualification' => 'Doctor of Philosophy (Business Administration)', 'institution' => 'University of Nairobi'],
                 ['year' => '2009', 'qualification' => 'Master of Business Administration', 'institution' => 'Strathmore University'],
@@ -5306,7 +5306,7 @@ Route::get('/archives', function (Request $request) {
         ['id'=>'a009','type'=>'newsletter','title'=>'The KAFU Chronicle — Issue 10 (Jul–Sep 2024)','date'=>'2024-09-30','year'=>2024,'description'=>'Features mid-year enrolment statistics, the launch of the Health Sciences School, and international partnership news.'],
         ['id'=>'a010','type'=>'announcement','title'=>'CUE Accreditation Renewal 2023','date'=>'2023-11-20','year'=>2023,'description'=>'Notification from CUE confirming accreditation renewal for all five schools and 38 programmes for 2023–2026.'],
         ['id'=>'a011','type'=>'circular','title'=>'Revised Staff Performance Appraisal Tool (2023)','date'=>'2023-04-01','year'=>2023,'description'=>'Circular on the revised annual performance appraisal tool aligned to the KAFU Strategic Plan 2023–2028.'],
-        ['id'=>'a012','type'=>'leadership','title'=>'Dean, School of Business and Economics — Dr. Atieno Omondi Appointed','date'=>'2023-08-14','year'=>2023,'description'=>'Official communication on the appointment of Dr. Atieno Margaret Omondi as Dean of the School of Business and Economics.'],
+        ['id'=>'a012','type'=>'leadership','title'=>'Dean, School of Business & Economics — Dr. Atieno Omondi Appointed','date'=>'2023-08-14','year'=>2023,'description'=>'Official communication on the appointment of Dr. Atieno Margaret Omondi as Dean of the School of Business & Economics.'],
         ['id'=>'a013','type'=>'notice','title'=>'Academic Calendar 2023/2024','date'=>'2023-08-01','year'=>2023,'description'=>'Full academic calendar for the 2023/2024 academic year including commencement dates, recess periods, and examination timetables.'],
         ['id'=>'a014','type'=>'announcement','title'=>'KAFU Achieves ISO Pre-Assessment Milestone','date'=>'2024-06-15','year'=>2024,'description'=>'Management memo on the successful completion of the ISO 9001:2015 pre-assessment.'],
         ['id'=>'a015','type'=>'newsletter','title'=>'The KAFU Chronicle — Issue 9 (Apr–Jun 2024)','date'=>'2024-06-28','year'=>2024,'description'=>'Features the Research Week 2024 highlights, student innovation showcase, and sports day results.'],

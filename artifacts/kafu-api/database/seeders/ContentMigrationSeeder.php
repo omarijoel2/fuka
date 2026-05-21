@@ -47,7 +47,7 @@ class ContentMigrationSeeder extends Seeder
             ],
             [
                 'code'  => 'SBE',
-                'name'  => 'School of Business and Economics',
+                'name'  => 'School of Business & Economics',
                 'dean'  => 'Dr. Atieno Margaret Omondi',
                 'dean_title' => 'Dean, School of Business & Economics',
                 'dean_photo' => 'https://kafu.ac.ke/wp-content/uploads/Dr.-Margaret-Atieno-1-300x300.jpg',
@@ -335,12 +335,12 @@ class ContentMigrationSeeder extends Seeder
                     'first_name'  => 'Atieno',
                     'middle_name' => 'Margaret',
                     'last_name'   => 'Omondi',
-                    'designation' => 'Dean, School of Business and Economics',
+                    'designation' => 'Dean, School of Business & Economics',
                     'department'  => 'Business Administration',
                     'unit'        => null,
                     'email'       => 'dean.sbe@kafu.ac.ke',
                     'photo'       => null,
-                    'biography'   => 'Dr. Atieno Margaret Omondi is the Dean of the School of Business and Economics. A strategic management scholar with a deep commitment to entrepreneurship education, Dr. Omondi has been instrumental in building SBE into one of the fastest-growing business schools in Western Kenya. Her research examines SME growth constraints, women\'s economic empowerment, and business incubation in emerging economies.',
+                    'biography'   => 'Dr. Atieno Margaret Omondi is the Dean of the School of Business & Economics. A strategic management scholar with a deep commitment to entrepreneurship education, Dr. Omondi has been instrumental in building SBE into one of the fastest-growing business schools in Western Kenya. Her research examines SME growth constraints, women\'s economic empowerment, and business incubation in emerging economies.',
                     'specializations' => ['Strategic Management', 'Entrepreneurship', 'SME Development'],
                     'qualifications'  => [
                         ['year'=>'2015','qualification'=>'Doctor of Philosophy (Business Administration)','institution'=>'University of Nairobi'],
