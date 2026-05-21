@@ -1,16 +1,17 @@
 #!/bin/bash
 # ============================================================
-# KAFU Website — Server Deploy Fix Script
-# Run this from the Laravel root (e.g. /home/user/kafu-api/)
-# Usage: bash server-deploy.sh
+# KAFU Website — Server Deploy Script
+# Run this from inside the kafu-api directory after git pull.
+# Usage: bash artifacts/kafu-api/server-deploy.sh
+# Or, if you cd into the api dir: bash server-deploy.sh
 # ============================================================
 set -e
 
 echo ""
-echo "=== KAFU Server Deploy Fix ==="
+echo "=== KAFU Server Deploy ==="
 echo ""
 
-# 1. Clear all Laravel caches first
+# 1. Clear all caches so stale config/routes don't cause 500s
 echo "[1/6] Clearing caches..."
 php artisan route:clear
 php artisan config:clear
@@ -28,7 +29,7 @@ echo "[3/6] Seeding departments..."
 php artisan db:seed --class=DepartmentSeeder --no-interaction
 echo "      Done."
 
-# 4. Update image URLs in database (old kafu.ac.ke URLs -> local /imgs/ paths)
+# 4. Update image URLs (old kafu.ac.ke URLs -> local /imgs/ paths)
 echo "[4/6] Updating image URLs in database..."
 php artisan db:seed --class=UpdateImageUrlsSeeder --no-interaction
 echo "      Done."
@@ -39,14 +40,12 @@ php artisan route:cache
 php artisan config:cache
 echo "      Done."
 
-# 6. Fix storage permissions
+# 6. Fix storage/cache permissions for Apache www-data
 echo "[6/6] Fixing storage permissions..."
 chmod -R 775 storage bootstrap/cache 2>/dev/null || true
+chown -R www-data:www-data storage bootstrap/cache 2>/dev/null || true
 echo "      Done."
 
 echo ""
-echo "=== All done! ==="
-echo ""
-echo "REMINDER: Make sure the imgs/ folder has been uploaded to public_html/imgs/"
-echo "          (download kafu-imgs.zip and extract it into public_html/)"
+echo "=== Deploy complete ==="
 echo ""

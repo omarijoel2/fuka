@@ -2,6 +2,10 @@
 
 # compiled output
 dist
+# un-ignore the built kafu-foundation frontend — these files are deployed directly
+# to the server via git pull, so the production build must be tracked in git.
+!artifacts/kafu-foundation/dist/
+!artifacts/kafu-foundation/dist/**
 tmp
 out-tsc
 *.tsbuildinfo
@@ -40,6 +44,9 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+# Deployment bundles — generated locally, not committed
+*.zip
 
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md

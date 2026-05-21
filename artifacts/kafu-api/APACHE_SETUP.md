@@ -1,81 +1,122 @@
-# Apache Setup — kafu.difbac.com
+# Apache Setup — kafu.difbac.com (HTTP)
 
-The Laravel API lives at `/api` on the same domain as the React frontend.
-Apache needs two separate `DocumentRoot` directives (via `Alias`) so that:
+The Laravel API and React frontend share one domain. Apache maps:
 
-- `kafu.difbac.com/`    → React static files (`dist/public/`)
-- `kafu.difbac.com/api` → Laravel PHP app (`public/`)
+- `http://kafu.difbac.com/`    → React static files (built `dist/public/`)
+- `http://kafu.difbac.com/api` → Laravel PHP app (`public/index.php`)
 
-## VirtualHost configuration
+After `git clone` / `git pull`, the repo lives at e.g. `/var/www/kafu-website/`.
+Adjust all paths below to match where you cloned it.
 
-Add this inside your existing `<VirtualHost *:443>` block (adjust paths to match where you uploaded the files):
+---
 
-```apache
-<VirtualHost *:443>
-    ServerName kafu.difbac.com
-
-    # ── React frontend (main site) ─────────────────────────────────────────
-    DocumentRoot /var/www/kafu/frontend/dist/public
-
-    <Directory /var/www/kafu/frontend/dist/public>
-        Options -Indexes +FollowSymLinks
-        AllowOverride All
-        Require all granted
-
-        # SPA fallback — serve index.html for all routes
-        FallbackResource /index.html
-    </Directory>
-
-    # ── Laravel API ────────────────────────────────────────────────────────
-    Alias /api /var/www/kafu/api/public
-
-    <Directory /var/www/kafu/api/public>
-        Options -Indexes +FollowSymLinks
-        AllowOverride All
-        Require all granted
-    </Directory>
-
-    # SSL (already configured — leave as-is)
-    # SSLEngine on
-    # SSLCertificateFile ...
-    # SSLCertificateKeyFile ...
-</VirtualHost>
-```
-
-## Required Apache modules
-
-Ensure these are enabled:
+## 1. Required Apache modules
 
 ```bash
-sudo a2enmod rewrite alias
+sudo a2enmod rewrite alias php8.2
 sudo systemctl restart apache2
 ```
 
-## Laravel .env settings for this setup
+---
 
-```
-APP_URL=https://kafu.difbac.com
-SESSION_DOMAIN=kafu.difbac.com
-CORS_ALLOWED_ORIGINS=https://kafu.difbac.com
+## 2. VirtualHost configuration
+
+Edit (or create) `/etc/apache2/sites-available/kafu.conf`:
+
+```apache
+<VirtualHost *:80>
+    ServerName kafu.difbac.com
+
+    # ── React frontend ──────────────────────────────────────────────────────
+    DocumentRoot /var/www/kafu-website/artifacts/kafu-foundation/dist/public
+
+    <Directory /var/www/kafu-website/artifacts/kafu-foundation/dist/public>
+        Options -Indexes +FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    # ── Laravel API (aliased at /api) ────────────────────────────────────────
+    Alias /api /var/www/kafu-website/artifacts/kafu-api/public
+
+    <Directory /var/www/kafu-website/artifacts/kafu-api/public>
+        Options -Indexes +FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/kafu_error.log
+    CustomLog ${APACHE_LOG_DIR}/kafu_access.log combined
+</VirtualHost>
 ```
 
-## After uploading and configuring Apache
+Enable and reload:
 
 ```bash
-cd /var/www/kafu/api
+sudo a2ensite kafu.conf
+sudo a2dissite 000-default.conf   # disable default if needed
+sudo systemctl reload apache2
+```
+
+---
+
+## 3. Laravel .env settings
+
+```
+APP_URL=http://kafu.difbac.com
+SESSION_DOMAIN=kafu.difbac.com
+SESSION_SECURE_COOKIE=false
+CORS_ALLOWED_ORIGINS=http://kafu.difbac.com
+```
+
+---
+
+## 4. First-time setup (after git clone)
+
+```bash
+cd /var/www/kafu-website/artifacts/kafu-api
+
+# Install PHP dependencies
 composer install --no-dev --optimize-autoloader
+
+# Create and configure the .env file
 cp .env.example .env
-# Edit .env with your database credentials, then:
+nano .env    # fill in APP_KEY (generate below), DB credentials, etc.
+
 php artisan key:generate
-php artisan migrate:fresh --seed
+
+# Run migrations and seed all data
+php artisan migrate --seed
+
+# Build caches
 php artisan config:cache
 php artisan route:cache
-php artisan view:clear
+
+# Fix permissions for Apache (www-data)
+chmod -R 775 storage bootstrap/cache
+chown -R www-data:www-data storage bootstrap/cache
 ```
 
-## Verify it works
+---
+
+## 5. Subsequent deployments (after git pull)
 
 ```bash
-curl https://kafu.difbac.com/api/stats
-# Should return JSON with university statistics
+cd /var/www/kafu-website
+git pull origin main
+
+cd artifacts/kafu-api
+bash server-deploy.sh
+```
+
+---
+
+## 6. Verify it works
+
+```bash
+curl http://kafu.difbac.com/api/stats
+# Should return JSON — {"data": {...}}
+
+curl -I http://kafu.difbac.com/about
+# Should return HTTP 200 with Content-Type: text/html (SPA fallback)
 ```
