@@ -34,7 +34,7 @@ const SLIDES = [
     headline: "Spring of",
     accent: "Knowledge",
     body: "Kaimosi Friends University — a premier institution in Western Kenya dedicated to truth, service, and academic excellence. Join over 5,000 students shaping Kenya's future.",
-    cta1: { label: "Apply for Admissions", href: "/admissions", external: false },
+    cta1: { label: "Apply for Admissions", href: "/admissions/apply", external: false },
     cta2: { label: "Explore Programmes", href: "/programmes", external: false },
     testid: "hero-slide-0",
   },
@@ -74,7 +74,7 @@ const SLIDES = [
     headline: "Shaping",
     accent: "Tomorrow's Leaders",
     body: "Thousands of undergraduate students are discovering their potential at KAFU — through rigorous academics, hands-on learning, and a vibrant campus community.",
-    cta1: { label: "Apply Now", href: "/admissions", external: false },
+    cta1: { label: "Apply Now", href: "/admissions/apply", external: false },
     cta2: { label: "Student Services", href: "/student-services", external: false },
     testid: "hero-slide-4",
   },
@@ -95,7 +95,7 @@ const SLIDES = [
     accent: "Grow, Excel",
     body: "From inter-university tournaments to fitness and recreation, KAFU nurtures the whole student — balancing academic rigour with sport, culture, and community involvement.",
     cta1: { label: "Student Life", href: "/student-services", external: false },
-    cta2: { label: "Admissions Open", href: "/admissions", external: false },
+    cta2: { label: "Apply Now", href: "/admissions/apply", external: false },
     testid: "hero-slide-6",
   },
   {
@@ -104,7 +104,7 @@ const SLIDES = [
     headline: "A Community",
     accent: "That Inspires",
     body: "Experience rich campus life in the lush highlands of Kaimosi — where friendships form, talents flourish, and futures are forged in the spirit of service and truth.",
-    cta1: { label: "Admissions Open", href: "/admissions", external: false },
+    cta1: { label: "Apply Now", href: "/admissions/apply", external: false },
     cta2: { label: "About KAFU", href: "/about", external: false },
     testid: "hero-slide-7",
   },
@@ -289,6 +289,102 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
           to { width: 100%; }
         }
       `}</style>
+    </section>
+  );
+}
+
+interface OpenIntake {
+  id: number;
+  name: string;
+  intake_period: string;
+  status: string;
+  close_at: string;
+  open_at: string;
+  application_fee_undergraduate: number;
+  application_fee_masters: number;
+  application_fee_phd: number;
+}
+
+function IntakeConversionSection() {
+  const [intakes, setIntakes] = React.useState<OpenIntake[]>([]);
+  const [loaded, setLoaded] = React.useState(false);
+
+  React.useEffect(() => {
+    fetch("/api/admissions-app/intakes/open")
+      .then(r => r.json())
+      .then(d => { setIntakes(d.data ?? []); setLoaded(true); })
+      .catch(() => setLoaded(true));
+  }, []);
+
+  if (!loaded || intakes.length === 0) return null;
+
+  const intake = intakes[0];
+  const closeDate = new Date(intake.close_at);
+  const now = new Date();
+  const daysLeft = Math.ceil((closeDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+  const isUrgent = daysLeft > 0 && daysLeft <= 21;
+  const isClosed = daysLeft <= 0;
+
+  return (
+    <section className="bg-primary text-primary-foreground py-10" data-testid="intake-conversion-section">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+
+          {/* Left: Intake info */}
+          <div>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              {!isClosed && (
+                <span className="inline-flex items-center gap-1.5 bg-accent text-accent-foreground text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wide">
+                  Applications Open
+                </span>
+              )}
+              {isUrgent && !isClosed && (
+                <span className="inline-flex items-center gap-1.5 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                  Closing in {daysLeft} day{daysLeft !== 1 ? "s" : ""}
+                </span>
+              )}
+            </div>
+            <h2 className="text-2xl md:text-3xl font-serif font-bold mb-1">{intake.name}</h2>
+            <p className="text-primary-foreground/70 text-sm">
+              {isClosed
+                ? "This intake is now closed. Check back for the next intake window."
+                : `Deadline: ${closeDate.toLocaleDateString("en-KE", { day: "numeric", month: "long", year: "numeric" })} — ${daysLeft} days remaining`}
+            </p>
+          </div>
+
+          {/* Right: CTAs */}
+          {!isClosed && (
+            <div className="flex flex-wrap gap-3 shrink-0">
+              <Button
+                size="lg"
+                className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
+                asChild
+                data-testid="intake-btn-apply-ug"
+              >
+                <Link href="/admissions/apply">Apply — Undergraduate</Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="bg-transparent text-white border-white/50 hover:bg-white/10"
+                asChild
+                data-testid="intake-btn-apply-pg"
+              >
+                <Link href="/admissions/apply">Apply — Masters / PhD</Link>
+              </Button>
+              <Button
+                size="lg"
+                variant="ghost"
+                className="text-white/80 hover:text-white hover:bg-white/10"
+                asChild
+                data-testid="intake-btn-track"
+              >
+                <Link href="/admissions/track">Track Application</Link>
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
     </section>
   );
 }
@@ -522,6 +618,9 @@ export default function Home() {
 
       {/* ─── INTAKE STATUS BANNER ─── */}
       <IntakeBanner />
+
+      {/* ─── LIVE ADMISSIONS CONVERSION ─── */}
+      <IntakeConversionSection />
 
       {/* ─── NEWS, EVENTS & ANNOUNCEMENTS ─── */}
       <section className="py-20 bg-secondary/40 border-y">

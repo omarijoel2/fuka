@@ -78,7 +78,7 @@ export function IntakeBanner() {
         {/* Actions */}
         <div className="flex items-center gap-3 shrink-0 ml-auto">
           <Link
-            href="/admissions"
+            href="/admissions/apply"
             data-testid="intake-banner-apply"
             className="flex items-center gap-1 text-sm font-semibold text-accent hover:text-accent/90 transition-colors whitespace-nowrap"
           >

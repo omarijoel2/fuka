@@ -429,12 +429,15 @@ export default function Admissions() {
 
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button className="bg-accent text-accent-foreground hover:bg-accent/90" asChild data-testid="unified-btn-apply">
-                  <a href="https://portal.kafu.ac.ke" target="_blank" rel="noreferrer">
-                    Start Your Application <ExternalLink className="ml-2 w-4 h-4" />
-                  </a>
+                  <Link href="/admissions/apply">
+                    Start Your Application <ArrowRight className="ml-2 w-4 h-4" />
+                  </Link>
                 </Button>
-                <Button variant="outline" className="border-primary text-primary hover:bg-primary/5" asChild data-testid="unified-btn-programmes">
-                  <Link href="/programmes">Browse All Programmes <ChevronRight className="ml-1 w-4 h-4" /></Link>
+                <Button variant="outline" className="border-primary text-primary hover:bg-primary/5" asChild data-testid="unified-btn-track">
+                  <Link href="/admissions/track">Track Application <ChevronRight className="ml-1 w-4 h-4" /></Link>
+                </Button>
+                <Button variant="ghost" className="text-muted-foreground hover:text-primary" asChild data-testid="unified-btn-programmes">
+                  <Link href="/programmes">Browse Programmes <ChevronRight className="ml-1 w-4 h-4" /></Link>
                 </Button>
               </div>
             </div>

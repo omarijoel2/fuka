@@ -19,11 +19,18 @@ interface AppStatus {
 }
 
 const STATUS_META: Record<string, { label: string; icon: React.ElementType; colour: string; bg: string }> = {
-  submitted:    { label: "Application Received", icon: CheckCircle, colour: "#1A5C38", bg: "#dcfce7" },
-  under_review: { label: "Under Review", icon: Clock, colour: "#C9A227", bg: "#fef9c3" },
-  offered:      { label: "Offer Issued", icon: CheckCircle, colour: "#1B3A6B", bg: "#dbeafe" },
-  rejected:     { label: "Unsuccessful", icon: XCircle, colour: "#8B1A1A", bg: "#fee2e2" },
-  draft:        { label: "Draft — Not Submitted", icon: AlertCircle, colour: "#888", bg: "#f3f4f6" },
+  draft:              { label: "Draft — Not Submitted",         icon: AlertCircle,   colour: "#888",    bg: "#f3f4f6" },
+  awaiting_payment:   { label: "Awaiting Payment",              icon: Clock,         colour: "#C9A227", bg: "#fef9c3" },
+  submitted:          { label: "Application Received",          icon: CheckCircle,   colour: "#1A5C38", bg: "#dcfce7" },
+  under_review:       { label: "Under Review",                  icon: Clock,         colour: "#C9A227", bg: "#fef9c3" },
+  documents_queried:  { label: "Documents Required",            icon: AlertCircle,   colour: "#D97706", bg: "#fef3c7" },
+  documents_verified: { label: "Documents Verified",            icon: CheckCircle,   colour: "#1A5C38", bg: "#dcfce7" },
+  eligible:           { label: "Eligible for Admission",        icon: CheckCircle,   colour: "#1A5C38", bg: "#dcfce7" },
+  offered:            { label: "Offer of Admission Issued",     icon: CheckCircle,   colour: "#1B3A6B", bg: "#dbeafe" },
+  offered_admission:  { label: "Offer of Admission Issued",     icon: CheckCircle,   colour: "#1B3A6B", bg: "#dbeafe" },
+  accepted:           { label: "Offer Accepted",                icon: CheckCircle,   colour: "#1A5C38", bg: "#dcfce7" },
+  deferred:           { label: "Deferred to Next Intake",       icon: Clock,         colour: "#6B7280", bg: "#f3f4f6" },
+  rejected:           { label: "Application Unsuccessful",      icon: XCircle,       colour: "#8B1A1A", bg: "#fee2e2" },
 };
 
 export default function AdmissionsTrack() {

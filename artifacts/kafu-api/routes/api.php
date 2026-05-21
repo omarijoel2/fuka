@@ -4633,11 +4633,18 @@ Route::prefix('admissions-app')->group(function () {
         if (!$app) return response()->json(['error' => 'Application not found.'], 404);
 
         $messages = [
-            'submitted'    => 'Your application has been received and is being processed by the Admissions Office.',
-            'under_review' => 'Your application is currently under review by the Admissions Committee.',
-            'offered'      => 'Congratulations! An admission offer has been issued. Please check your email for further instructions.',
-            'rejected'     => 'We regret that your application was unsuccessful at this time.',
-            'draft'        => 'Your application is saved as a draft and has not yet been submitted.',
+            'draft'              => 'Your application is saved as a draft and has not yet been submitted.',
+            'awaiting_payment'   => 'Your application form is complete. Please pay the application fee via M-Pesa Paybill 123456, Account: ' . $app->reference_number . '.',
+            'submitted'          => 'Your application has been received and is being processed by the Admissions Office.',
+            'under_review'       => 'Your application is currently under review by the Admissions Committee.',
+            'documents_queried'  => 'The Admissions Office requires additional documentation. Please check your email for details and submit the requested documents as soon as possible.',
+            'documents_verified' => 'Your submitted documents have been verified. Your application is proceeding to the next stage.',
+            'eligible'           => 'Your application has been assessed and you are eligible for admission. An offer letter will be issued shortly.',
+            'offered'            => 'Congratulations! An offer of admission has been issued. Please check your email and accept your offer within 14 days via the Student Portal.',
+            'offered_admission'  => 'Congratulations! An offer of admission has been issued. Please check your email and accept your offer within 14 days via the Student Portal.',
+            'accepted'           => 'Your admission offer has been accepted. Welcome to KAFU! Joining instructions will be sent to your email.',
+            'deferred'           => 'Your application has been deferred to the next intake. You will be contacted with further details.',
+            'rejected'           => 'We regret that your application was unsuccessful for this intake. You may apply for a different programme or a future intake.',
         ];
 
         return response()->json(['data' => [
