@@ -64,6 +64,12 @@ import DirectorateDetail from "@/pages/directorate-detail";
 import GalleryPage from "@/pages/gallery";
 import GalleryAlbumPage from "@/pages/gallery-album";
 import DepartmentDetail from "@/pages/department-detail";
+import MediaPage from "@/pages/media";
+import MediaVideosPage from "@/pages/media-videos";
+import MediaPressReleasesPage from "@/pages/media-press-releases";
+import MediaPublicationsPage from "@/pages/media-publications";
+import MediaDownloadsPage from "@/pages/media-downloads";
+import MediaBrandingPage from "@/pages/media-branding";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -147,6 +153,12 @@ function Router() {
           </Route>
           <Route path="/gallery" component={GalleryPage} />
           <Route path="/gallery/:slug" component={GalleryAlbumPage} />
+          <Route path="/media" component={MediaPage} />
+          <Route path="/media/videos" component={MediaVideosPage} />
+          <Route path="/media/press-releases" component={MediaPressReleasesPage} />
+          <Route path="/media/publications" component={MediaPublicationsPage} />
+          <Route path="/media/downloads" component={MediaDownloadsPage} />
+          <Route path="/media/branding" component={MediaBrandingPage} />
           <Route path="/departments/:slug" component={DepartmentDetail} />
           <Route component={NotFound} />
         </Switch>
