@@ -415,7 +415,14 @@ export async function fetchApi<T>(endpoint: string): Promise<T> {
   if (!res.ok) {
     throw new Error(`API error: ${res.status} ${res.statusText}`);
   }
+  const ct = res.headers.get("content-type") ?? "";
+  if (!ct.includes("application/json")) {
+    throw new Error(`API returned non-JSON for ${endpoint} (content-type: ${ct})`);
+  }
   const json = await res.json();
+  if (json && typeof json === "object" && "error" in json && json.error === true) {
+    throw new Error(json.message ?? "Server error");
+  }
   if ("data" in json) {
     return json.data as T;
   }

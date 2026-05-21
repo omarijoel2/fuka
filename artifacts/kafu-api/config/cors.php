@@ -11,9 +11,9 @@ return [
     | or "CORS". This determines what cross-origin operations may execute
     | in web browsers. You are free to adjust these settings as needed.
     |
-    | In production set CORS_ALLOWED_ORIGINS to a comma-separated list of
-    | trusted domains, e.g.:
-    |   CORS_ALLOWED_ORIGINS=https://www.kafu.ac.ke,https://cms.kafu.ac.ke,https://staff.kafu.ac.ke
+    | In production set CORS_ALLOWED_ORIGINS in .env to the site origin, e.g.:
+    |   CORS_ALLOWED_ORIGINS=http://kafu.difbac.com
+    | When SSL is enabled, change to https://kafu.difbac.com
     |
     | To learn more: https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS
     |
