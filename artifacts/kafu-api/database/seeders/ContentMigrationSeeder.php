@@ -12,13 +12,9 @@ class ContentMigrationSeeder extends Seeder
     {
         $now = Carbon::now();
 
-        // Helper: upsert — skip if slug+type already exists as published
+        // Helper: upsert — skip if slug already exists (unique index on slug alone)
         $upsert = function (array $data) use ($now) {
-            $existing = CmsContent::where('type', $data['type'])
-                ->where('slug', $data['slug'])
-                ->where('is_deleted', false)
-                ->first();
-            if ($existing) {
+            if (CmsContent::where('slug', $data['slug'])->exists()) {
                 return; // already seeded
             }
             CmsContent::create(array_merge([

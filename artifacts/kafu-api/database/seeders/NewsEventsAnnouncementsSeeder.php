@@ -11,11 +11,9 @@ class NewsEventsAnnouncementsSeeder extends Seeder
     public function run(): void
     {
         $upsert = function (array $data) {
-            $existing = CmsContent::where('type', $data['type'])
-                ->where('slug', $data['slug'])
-                ->where('is_deleted', false)
-                ->first();
-            if ($existing) {
+            // Guard by slug alone — cms_content has a unique index on slug
+            // regardless of type, so we must check across all types.
+            if (CmsContent::where('slug', $data['slug'])->exists()) {
                 return;
             }
             CmsContent::create(array_merge([
@@ -363,7 +361,7 @@ class NewsEventsAnnouncementsSeeder extends Seeder
         // ─────────────────────────────────────────────────────────────
         $announcements = [
             [
-                'slug'       => 'academic-calendar-2025-2026',
+                'slug'       => 'academic-calendar-announcement-2025-2026',
                 'title'      => 'Academic Calendar — 2025/2026 Academic Year',
                 'department' => 'Academic Registrar',
                 'summary'    => 'The official academic calendar for the 2025/2026 academic year has been approved by the Academic Board and is now available for download via the student portal and this website.',
