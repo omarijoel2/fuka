@@ -41,10 +41,8 @@ const DEPARTMENTS_BY_SCHOOL = [
     code: "SOS",
     path: "/schools/SOS",
     depts: [
-      { name: "Biological Sciences",               slug: "biological-sciences" },
-      { name: "Physical & Chemical Sciences",      slug: "physical-chemical-sciences" },
-      { name: "Mathematics & Statistics",          slug: "mathematics-statistics" },
-      { name: "Agricultural Economics & Rural Dev.", slug: "agricultural-economics-rural-development" },
+      { name: "Physical & Biological Sciences",   slug: "physical-biological-sciences" },
+      { name: "Mathematics & Statistics",         slug: "mathematics-statistics" },
     ],
   },
   {

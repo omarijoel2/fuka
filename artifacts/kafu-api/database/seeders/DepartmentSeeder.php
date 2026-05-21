@@ -169,22 +169,6 @@ class DepartmentSeeder extends Seeder
             // ── SOS ──────────────────────────────────────────────────────────
             [
                 'school_code'     => 'SOS',
-                'name'            => 'Department of Biological Sciences',
-                'slug'            => 'biological-sciences',
-                'description'     => 'The Department of Biological Sciences offers programmes in biology, botany, zoology, microbiology, and biochemistry. It is home to well-equipped molecular biology and ecology laboratories, supporting research in biodiversity, food security, and infectious diseases in Western Kenya.',
-                'hod_name'        => 'Dr. Loice Mureithi',
-                'hod_title'       => 'Chair, Department of Biological Sciences',
-                'hod_email'       => 'l.mureithi@kafu.ac.ke',
-                'hod_phone'       => '+254 700 100 501',
-                'hod_photo_url'   => 'https://kafu.ac.ke/wp-content/uploads/2025/10/Dr.-Loice-COD-Biology-300x300.jpg',
-                'hod_bio'         => 'Dr. Loice Mureithi chairs the Department of Biological Sciences at the School of Science, Kaimosi Friends University. She is committed to excellence in biological education and research.',
-                'office_location' => 'Science Block A, Room 102, KAFU Main Campus',
-                'email'           => 'dept.biosciences@kafu.ac.ke',
-                'phone'           => '+254 700 100 500',
-                'sort_order'      => 1,
-            ],
-            [
-                'school_code'     => 'SOS',
                 'name'            => 'Department of Physical & Biological Sciences',
                 'slug'            => 'physical-biological-sciences',
                 'description'     => 'Welcome to the Physical and Biological Sciences at Kaimosi Friends University. Our department is a dynamic hub of scientific excellence, dedicated to advancing knowledge and innovation through high-quality teaching, transformative research, and meaningful community engagement. We offer a diverse range of rigorous undergraduate and postgraduate programs—spanning Physics, Chemistry, Biology, Microbiology, and Agriculture—designed to equip students for impactful careers in education, industry, research, and NGOs. With state-of-the-art laboratory facilities and interdisciplinary pathways like Appropriate Technology and Agricultural Economics, we provide a holistic environment where learners are challenged to apply scientific curiosity to real-world challenges, from technological innovation to global food security. At the heart of our mission is a commitment to fostering critical thinking, ethical responsibility, and digital literacy. Our highly qualified faculty is dedicated to mentorship and training, ensuring that 95% of our graduates secure immediate employment by offering competitive, demand-driven courses. In collaboration with global stakeholders, we drive research focused on solving critical issues such as climate action, sustainable smart agriculture, and global health challenges.',
