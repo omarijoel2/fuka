@@ -38,7 +38,7 @@ class DepartmentSeeder extends Seeder
                 'hod_title'       => 'Chair, Curriculum & Instruction',
                 'hod_email'       => 'a.amugune@kafu.ac.ke',
                 'hod_phone'       => '+254 700 100 211',
-                'hod_photo_url'   => null,
+                'hod_photo_url'   => '/staff/amugune.jpg',
                 'hod_bio'         => 'Dr. Aggrey A. Amugune chairs the Department of Curriculum and Instruction at Kaimosi Friends University. His leadership continues to drive academic excellence, professional growth and quality teacher education.',
                 'office_location' => 'Education Block, Room 207, KAFU Main Campus',
                 'email'           => 'dept.ci@kafu.ac.ke',
