@@ -408,8 +408,10 @@ export interface AdmissionsData {
   contact: AdmissionsContact;
 }
 
+const API_ORIGIN = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
+
 export async function fetchApi<T>(endpoint: string): Promise<T> {
-  const res = await fetch(`/api${endpoint}`);
+  const res = await fetch(`${API_ORIGIN}/api${endpoint}`);
   if (!res.ok) {
     throw new Error(`API error: ${res.status} ${res.statusText}`);
   }

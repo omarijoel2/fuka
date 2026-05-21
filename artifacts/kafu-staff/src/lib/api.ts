@@ -1,4 +1,5 @@
-const API_BASE = "/api/staff";
+const API_ORIGIN = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
+const API_BASE = `${API_ORIGIN}/api/staff`;
 const TOKEN_KEY = "kafu_staff_token";
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -62,7 +63,7 @@ export function reviewerFetch(path: string, options: RequestInit = {}) {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers as Record<string, string> || {}),
   };
-  return fetch(`/api/reviewer${path}`, { ...options, headers }).then(async res => {
+  return fetch(`${API_ORIGIN}/api/reviewer${path}`, { ...options, headers }).then(async res => {
     if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e?.message || `API error ${res.status}`); }
     return res.json();
   });
@@ -76,7 +77,7 @@ export function adminStaffFetch(path: string, options: RequestInit = {}) {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers as Record<string, string> || {}),
   };
-  return fetch(`/api/admin/staff-accounts${path}`, { ...options, headers }).then(async res => {
+  return fetch(`${API_ORIGIN}/api/admin/staff-accounts${path}`, { ...options, headers }).then(async res => {
     if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e?.message || `API error ${res.status}`); }
     return res.json();
   });
