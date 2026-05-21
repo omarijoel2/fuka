@@ -520,6 +520,47 @@ class GovernanceSeeder extends Seeder
                 ],
                 'position_order'    => 9,
             ],
+            // Source: https://kafu.ac.ke/directorate-of-open-distance-e-learning/
+            [
+                'name'              => 'Directorate of Open, Distance and e-Learning',
+                'slug'              => 'open-distance-elearning',
+                'tagline'           => 'Expanding Access to Quality Higher Education',
+                'description'       => 'The Directorate of Open, Distance and e-Learning (ODeL) coordinates the delivery of all open, distance, and online learning programmes at Kaimosi Friends University. The Directorate works in close collaboration with academic schools, the ICT Directorate, and external technology partners to ensure that distance learners receive the same quality of education as their campus-based peers, regardless of location or schedule.',
+                'director_name'     => 'Dr. Jacqueline Wanjiku',
+                'director_title'    => 'Director, Open Distance and e-Learning',
+                'director_email'    => 'odel@kafu.ac.ke',
+                'director_phone'    => '+254 777 373 770',
+                'director_bio'      => 'Dr. Jacqueline Wanjiku leads the Directorate of Open, Distance and e-Learning at Kaimosi Friends University, coordinating the university\'s distance learning strategy and e-learning platform management. She has championed the expansion of online programme offerings, the integration of mobile-first learning tools, and the establishment of regional study centres across Western Kenya to bring quality university education closer to working professionals and underserved communities.',
+                'director_photo_url'=> null,
+                'functions'         => [
+                    'Development and implementation of the university ODeL strategy',
+                    'Coordination of distance and online programme registration and delivery',
+                    'Management and maintenance of the KAFU e-learning platform (Moodle)',
+                    'Training of academic staff in online course design and facilitation',
+                    'Establishment and management of regional study centres',
+                    'Quality assurance for online and distance learning programmes',
+                    'Student support services for distance learners',
+                    'Coordination of online examinations and proctoring',
+                    'Monitoring and evaluation of ODeL programme performance',
+                ],
+                'services'          => [
+                    'ODeL programme information and application guidance',
+                    'Distance learner registration and course enrolment support',
+                    'E-learning platform access and technical support',
+                    'Online study materials and digital resource access',
+                    'Regional study centre access and scheduling',
+                    'Online examination registration and support',
+                    'Distance learner student identity documents',
+                    'ODeL fee structure advisory',
+                ],
+                'quick_links'       => [
+                    ['label' => 'E-Learning Platform',       'url' => 'https://elearning.kafu.ac.ke', 'external' => true],
+                    ['label' => 'ODeL Programmes',           'url' => '/programmes?mode=distance'],
+                    ['label' => 'Student Portal',            'url' => 'https://portal.kafu.ac.ke', 'external' => true],
+                    ['label' => 'Apply for ODeL Programme',  'url' => '/admissions'],
+                ],
+                'position_order'    => 10,
+            ],
         ];
 
         foreach ($directorates as $data) {

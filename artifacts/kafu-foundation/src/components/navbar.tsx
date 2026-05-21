@@ -278,6 +278,7 @@ const navItems: NavItem[] = [
           { name: "Research & Innovation",  path: "/directorates/research-innovation" },
           { name: "Quality Assurance",      path: "/directorates/quality-assurance" },
           { name: "International Relations",path: "/directorates/international-relations" },
+          { name: "Open Distance e-Learning (ODeL)", path: "/directorates/open-distance-elearning" },
         ],
       },
       {
