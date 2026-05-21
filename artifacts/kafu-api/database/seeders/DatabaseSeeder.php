@@ -25,6 +25,7 @@ class DatabaseSeeder extends Seeder
         // ── Content (all depend on author_id = 1 from CmsSeeder) ──────────────
         $this->call(ContentMigrationSeeder::class);
         $this->call(NewsEventsAnnouncementsSeeder::class);
+        $this->call(OpportunitiesSeeder::class);
 
         // ── Research & International ───────────────────────────────────────────
         $this->call(ResearchSeeder::class);
