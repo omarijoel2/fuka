@@ -9,6 +9,15 @@ export function getToken(): string | null {
 export function setToken(t: string) { localStorage.setItem(TOKEN_KEY, t); }
 export function clearToken() { localStorage.removeItem(TOKEN_KEY); localStorage.removeItem("kafu_staff_user"); }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function parseJsonSafe(res: Response): Promise<any> {
+  const ct = res.headers.get("content-type") ?? "";
+  if (!ct.includes("application/json")) {
+    throw new Error(`The server returned an unexpected response (status ${res.status}). The API may be unavailable.`);
+  }
+  return res.json();
+}
+
 export async function staffFetch(path: string, options: RequestInit = {}) {
   const token = getToken();
   const headers: Record<string, string> = {
@@ -29,11 +38,11 @@ export async function staffFetch(path: string, options: RequestInit = {}) {
     throw new Error("Session expired. Please log in again.");
   }
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
+    const err = await parseJsonSafe(res).catch(() => ({}));
     throw new Error(err?.message || `API error ${res.status}`);
   }
   if (res.status === 204) return null;
-  return res.json();
+  return parseJsonSafe(res);
 }
 
 export function staffGet(path: string, params?: Record<string, string | number | undefined>) {
@@ -55,7 +64,7 @@ export function staffPostForm(path: string, form: FormData) {
   return staffFetch(path, { method: "POST", body: form, headers: {} });
 }
 
-export function reviewerFetch(path: string, options: RequestInit = {}) {
+export async function reviewerFetch(path: string, options: RequestInit = {}) {
   const token = getToken();
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -63,13 +72,12 @@ export function reviewerFetch(path: string, options: RequestInit = {}) {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers as Record<string, string> || {}),
   };
-  return fetch(`${API_ORIGIN}/api/reviewer${path}`, { ...options, headers }).then(async res => {
-    if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e?.message || `API error ${res.status}`); }
-    return res.json();
-  });
+  const res = await fetch(`${API_ORIGIN}/api/reviewer${path}`, { ...options, headers });
+  if (!res.ok) { const e = await parseJsonSafe(res).catch(() => ({})); throw new Error(e?.message || `API error ${res.status}`); }
+  return parseJsonSafe(res);
 }
 
-export function adminStaffFetch(path: string, options: RequestInit = {}) {
+export async function adminStaffFetch(path: string, options: RequestInit = {}) {
   const token = getToken();
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
@@ -77,10 +85,9 @@ export function adminStaffFetch(path: string, options: RequestInit = {}) {
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers as Record<string, string> || {}),
   };
-  return fetch(`${API_ORIGIN}/api/admin/staff-accounts${path}`, { ...options, headers }).then(async res => {
-    if (!res.ok) { const e = await res.json().catch(() => ({})); throw new Error(e?.message || `API error ${res.status}`); }
-    return res.json();
-  });
+  const res = await fetch(`${API_ORIGIN}/api/admin/staff-accounts${path}`, { ...options, headers });
+  if (!res.ok) { const e = await parseJsonSafe(res).catch(() => ({})); throw new Error(e?.message || `API error ${res.status}`); }
+  return parseJsonSafe(res);
 }
 
 export type WorkflowStatus = "draft" | "submitted" | "under_review" | "revision_requested" | "approved" | "published" | "withdrawn";
