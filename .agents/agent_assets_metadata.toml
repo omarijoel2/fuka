@@ -34,10 +34,16 @@ title = "kafu-api-src.zip — Laravel API source (upload alongside public_html/)
 id = "ivroJ9V7jWdYfcBFvZeFA"
 uri = "file://kafu-foundation-dist.zip"
 type = "unspecified"
-title = "kafu-foundation-dist.zip — Main website (upload to public_html/)"
+title = "kafu-foundation-dist.zip — Updated main website (with photo fallbacks)"
 
 [[outputs]]
 id = "0wJBAk8AI_G1C9XhG-Mx1"
 uri = "file://SchoolsOnlySeeder.zip"
 type = "unspecified"
 title = "SchoolsOnlySeeder.zip — Upload to database/seeders/ on your server"
+
+[[outputs]]
+id = "KUlsRzhIdVyHuitW7MThc"
+uri = "file://FixPhotoPathsSeeder.zip"
+type = "unspecified"
+title = "FixPhotoPathsSeeder.zip — Upload to database/seeders/ on your server"

@@ -284,15 +284,23 @@ export default function StaffProfilePage() {
 
           <div className="flex flex-col sm:flex-row items-start gap-7">
             {/* Avatar */}
-            <div className={`w-28 h-28 sm:w-36 sm:h-36 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0 shadow-lg ring-4 ring-white/10`}>
+            <div className={`w-28 h-28 sm:w-36 sm:h-36 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0 shadow-lg ring-4 ring-white/10 relative overflow-hidden`}>
               {isLoading ? (
                 <div className="w-full h-full animate-pulse rounded-2xl bg-white/20" />
-              ) : profile?.photo ? (
-                <img src={profile.photo} alt={profile.name} className="w-full h-full object-cover rounded-2xl" />
               ) : (
-                <span className="text-white text-4xl font-serif font-bold select-none">
-                  {getInitials(profile?.name ?? "")}
-                </span>
+                <>
+                  <span className="text-white text-4xl font-serif font-bold select-none">
+                    {getInitials(profile?.name ?? "")}
+                  </span>
+                  {profile?.photo && (
+                    <img
+                      src={profile.photo}
+                      alt={profile.name ?? ""}
+                      className="absolute inset-0 w-full h-full object-cover rounded-2xl"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                    />
+                  )}
+                </>
               )}
             </div>
 

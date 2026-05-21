@@ -92,13 +92,17 @@ function StaffCard({ member }: { member: StaffMember }) {
       data-testid={`staff-card-${member.slug}`}
     >
       {/* Avatar */}
-      <div className={`h-36 bg-gradient-to-br ${gradient} flex items-center justify-center relative`}>
-        {member.photo ? (
-          <img src={member.photo} alt={member.name} className="w-full h-full object-cover" />
-        ) : (
-          <span className="text-white text-4xl font-serif font-bold opacity-90 select-none">
-            {getInitials(member.name)}
-          </span>
+      <div className={`h-36 bg-gradient-to-br ${gradient} flex items-center justify-center relative overflow-hidden`}>
+        <span className="text-white text-4xl font-serif font-bold opacity-90 select-none">
+          {getInitials(member.name)}
+        </span>
+        {member.photo && (
+          <img
+            src={member.photo}
+            alt={member.name}
+            className="absolute inset-0 w-full h-full object-cover"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+          />
         )}
         {schoolOrUnit && (
           <span

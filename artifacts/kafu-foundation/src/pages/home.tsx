@@ -813,20 +813,20 @@ export default function Home() {
                         <div className="p-6 flex flex-col flex-1">
                           {/* Dean row */}
                           <div className="flex items-center gap-3 mb-5">
-                            {school.dean_photo ? (
-                              <img
-                                src={school.dean_photo}
-                                alt={school.dean ?? "Dean"}
-                                className="w-12 h-12 rounded-full object-cover ring-2 ring-border group-hover:ring-primary/40 transition-all shrink-0"
-                              />
-                            ) : (
-                              <div
-                                className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
-                                style={{ backgroundColor: school.colour ?? "hsl(var(--primary))" }}
-                              >
-                                {initials ?? "?"}
-                              </div>
-                            )}
+                            <div
+                              className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0 relative overflow-hidden ring-2 ring-border group-hover:ring-primary/40 transition-all"
+                              style={{ backgroundColor: school.colour ?? "hsl(var(--primary))" }}
+                            >
+                              {initials ?? "?"}
+                              {school.dean_photo && (
+                                <img
+                                  src={school.dean_photo}
+                                  alt={school.dean ?? "Dean"}
+                                  className="absolute inset-0 w-full h-full object-cover rounded-full"
+                                  onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                                />
+                              )}
+                            </div>
                             <div className="min-w-0">
                               <p className="text-sm font-semibold text-foreground truncate leading-tight">
                                 {school.dean ?? `Dean, ${school.name}`}
