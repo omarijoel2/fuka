@@ -53,3 +53,9 @@ id = "HpjuNVzmLfcaO1E0BhwsK"
 uri = "file://UpdateImageUrlsSeeder.zip"
 type = "unspecified"
 title = "UpdateImageUrlsSeeder.zip — Run on server to fix existing DB records"
+
+[[outputs]]
+id = "StkW9DHZriQASLvb6YLm9"
+uri = "file://kafu-api-update.zip"
+type = "unspecified"
+title = "kafu-api-update.zip — API routes + migration + seeders (86 KB)"
