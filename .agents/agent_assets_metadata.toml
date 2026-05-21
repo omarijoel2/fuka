@@ -1,8 +1,25 @@
 uploads = []
-outputs = []
 
 [[generated]]
 id = "gcwroWleWqOaCoRCyQgRc"
 uri = "file://artifacts/kafu-foundation/src/assets/images/hero-campus.png"
 type = "image"
 title = "KAFU university campus hero"
+
+[[outputs]]
+id = "PPdeyrKH9UVWnFupnhAdk"
+uri = "file://kafu-website-dist.zip"
+type = "unspecified"
+title = "KAFU Website (kafu.difbac.com) — React build"
+
+[[outputs]]
+id = "0gTWElafuEvuDRsDCzfLA"
+uri = "file://kafu-cms-dist.zip"
+type = "unspecified"
+title = "KAFU CMS Admin — React build"
+
+[[outputs]]
+id = "5XRiVCbmoQIeGny9sdbDv"
+uri = "file://kafu-staff-dist.zip"
+type = "unspecified"
+title = "KAFU Staff Portal — React build"

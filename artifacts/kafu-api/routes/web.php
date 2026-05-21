@@ -4,9 +4,14 @@ use Illuminate\Support\Facades\Route;
 use App\Models\CmsContent;
 use App\Models\RepositoryItem;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Serve React SPA for all non-API, non-sitemap, non-static routes
+Route::get('/{any}', function () {
+    $indexPath = public_path('index.html');
+    if (file_exists($indexPath)) {
+        return response()->file($indexPath);
+    }
+    return response()->view('welcome');
+})->where('any', '^(?!api|sitemap|robots).*$');
 
 Route::get('/robots.txt', function () {
     $host = request()->getSchemeAndHttpHost();
