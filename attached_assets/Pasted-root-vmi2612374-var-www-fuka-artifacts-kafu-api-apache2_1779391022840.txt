@@ -1,0 +1,40 @@
+root@vmi2612374:/var/www/fuka/artifacts/kafu-api# apache2ctl -S
+ls /etc/apache2/sites-enabled/
+VirtualHost configuration:
+*:443                  is a NameVirtualHost
+         default server kafu.difbac.com (/etc/apache2/sites-enabled/001-kafu-difbac-le-ssl.conf:2)
+         port 443 namevhost kafu.difbac.com (/etc/apache2/sites-enabled/001-kafu-difbac-le-ssl.conf:2)
+                 alias www.kafu.difbac.com
+         port 443 namevhost jiwa.hezsun.com (/etc/apache2/sites-enabled/jiwa-le-ssl.conf:2)
+                 alias jiwa.hezsun.com
+         port 443 namevhost mlp.hezsun.com (/etc/apache2/sites-enabled/mpesa-le-ssl.conf:2)
+                 alias mlp.hezsun.com
+*:80                   is a NameVirtualHost
+         default server vmi2612374.contaboserver.net (/etc/apache2/sites-enabled/000-default.conf:1)
+         port 80 namevhost vmi2612374.contaboserver.net (/etc/apache2/sites-enabled/000-default.conf:1)
+         port 80 namevhost kafu.difbac.com (/etc/apache2/sites-enabled/001-kafu-difbac.conf:1)
+                 alias www.kafu.difbac.com
+         port 80 namevhost jiwa.hezsun.com (/etc/apache2/sites-enabled/jiwa.conf:1)
+                 alias jiwa.hezsun.com
+         port 80 namevhost mlp.hezsun.com (/etc/apache2/sites-enabled/mpesa.conf:1)
+                 alias mlp.hezsun.com
+ServerRoot: "/etc/apache2"
+Main DocumentRoot: "/var/www/html"
+Main ErrorLog: "/var/log/apache2/error.log"
+Mutex ssl-cache: using_defaults
+Mutex default: dir="/var/run/apache2/" mechanism=default 
+Mutex mpm-accept: using_defaults
+Mutex watchdog-callback: using_defaults
+Mutex rewrite-map: using_defaults
+Mutex ssl-stapling-refresh: using_defaults
+Mutex ssl-stapling: using_defaults
+Mutex proxy: using_defaults
+PidFile: "/var/run/apache2/apache2.pid"
+Define: DUMP_VHOSTS
+Define: DUMP_RUN_CFG
+User: name="www-data" id=33
+Group: name="www-data" id=33
+000-default.conf             jiwa-le-ssl.conf   mpesa.conf
+001-kafu-difbac-le-ssl.conf  jiwa.conf
+001-kafu-difbac.conf         mpesa-le-ssl.conf
+root@vmi2612374:/var/www/fuka/artifacts/kafu-api# 
