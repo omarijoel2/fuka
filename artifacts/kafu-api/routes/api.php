@@ -4692,12 +4692,14 @@ Route::prefix('admissions-app')->group(function () {
 Route::prefix('applications')->group(function () {
 
     // Middleware helper: resolve applicant from Bearer token
+    if (!function_exists('resolveApplicant')) {
     function resolveApplicant(Illuminate\Http\Request $request) {
         $token = $request->bearerToken();
         if (!$token) return null;
         return \Illuminate\Support\Facades\DB::table('applicants')
             ->where('portal_token', $token)
             ->first();
+    }
     }
 
     // ── Create/Resume Applicant Account & Start Application ───────────────────
@@ -4839,11 +4841,13 @@ Route::prefix('applications')->group(function () {
     });
 
     // Helper to get application owned by applicant
+    if (!function_exists('getOwnedApplication')) {
     function getOwnedApplication(string $ref, int $applicantId) {
         return \Illuminate\Support\Facades\DB::table('applications')
             ->where('reference', $ref)
             ->where('applicant_id', $applicantId)
             ->first();
+    }
     }
 
     // ── Get Application State ─────────────────────────────────────────────────
