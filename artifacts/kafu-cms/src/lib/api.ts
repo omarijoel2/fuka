@@ -6,6 +6,17 @@ function getToken() {
   return localStorage.getItem(TOKEN_KEY);
 }
 
+const BASE_URL = import.meta.env.BASE_URL?.replace(/\/$/, "") ?? "";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function parseJsonSafe(res: Response): Promise<any> {
+  const ct = res.headers.get("content-type") ?? "";
+  if (!ct.includes("application/json")) {
+    throw new Error(`Expected JSON but received ${ct || "unknown content type"} (status ${res.status})`);
+  }
+  return res.json();
+}
+
 export async function apiFetch(path: string, options: RequestInit = {}) {
   const token = getToken();
   const res = await fetch(`${API_BASE}${path}`, {
@@ -21,17 +32,17 @@ export async function apiFetch(path: string, options: RequestInit = {}) {
   if (res.status === 401) {
     localStorage.removeItem(TOKEN_KEY);
     localStorage.removeItem("kafu_cms_user");
-    window.location.href = "/kafu-cms/login";
+    window.location.href = `${BASE_URL}/login`;
     throw new Error("Session expired. Please log in again.");
   }
 
   if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || `API error ${res.status}`);
+    const err = await parseJsonSafe(res).catch(() => ({})) as Record<string, unknown>;
+    throw new Error((err?.message as string) || `API error ${res.status}`);
   }
 
   if (res.status === 204) return null;
-  return res.json();
+  return parseJsonSafe(res);
 }
 
 export async function apiRequest(url: string, options: RequestInit = {}): Promise<Response> {
