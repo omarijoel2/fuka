@@ -141,7 +141,7 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
 
   return (
     <section
-      className="relative min-h-[620px] md:min-h-[700px] flex items-center justify-center overflow-hidden bg-primary"
+      className="relative min-h-[520px] sm:min-h-[600px] md:min-h-[700px] flex items-center justify-center overflow-hidden bg-primary"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-label="Hero carousel"
@@ -176,20 +176,20 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
 
       {/* Slide content */}
       <div
-        className="relative container mx-auto px-4 py-20 text-center text-white max-w-5xl"
+        className="relative container mx-auto px-10 sm:px-14 md:px-8 py-10 sm:py-14 md:py-20 text-center text-white max-w-5xl w-full"
         style={{ zIndex: 2 }}
       >
-        <span className="inline-block py-1 px-4 rounded-full bg-accent/20 text-accent border border-accent/40 font-medium text-sm mb-6 transition-opacity duration-500">
+        <span className="inline-block py-1 px-3 sm:px-4 rounded-full bg-accent/20 text-accent border border-accent/40 font-medium text-xs sm:text-sm mb-4 md:mb-6 transition-opacity duration-500 max-w-full leading-snug">
           {slide.badge}
         </span>
-        <h1 className="text-5xl md:text-7xl font-serif font-bold mb-6 leading-tight transition-opacity duration-500">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-serif font-bold mb-3 md:mb-6 leading-tight transition-opacity duration-500">
           {slide.headline}{" "}
           <span className="text-accent">{slide.accent}</span>
         </h1>
-        <p className="text-lg md:text-xl mb-10 max-w-3xl mx-auto text-white/85 leading-relaxed transition-opacity duration-500">
+        <p className="text-sm sm:text-base md:text-xl mb-5 md:mb-10 max-w-3xl mx-auto text-white/85 leading-relaxed transition-opacity duration-500">
           {slide.body}
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-14">
+        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6 md:mb-14">
           <Button
             size="lg"
             className="bg-accent text-accent-foreground hover:bg-accent/90 text-base px-8 h-12 font-semibold"
@@ -218,19 +218,19 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
         </div>
 
         {/* Stats overlay */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 max-w-3xl mx-auto">
           {statsLoading
             ? Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="bg-white/10 rounded-xl p-4 animate-pulse h-20" />
+                <div key={i} className="bg-white/10 rounded-xl p-4 animate-pulse h-16 sm:h-20" />
               ))
             : stats?.map((stat) => (
                 <div
                   key={stat.label}
-                  className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-3"
+                  className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3"
                   data-testid={`hero-stat-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}
                 >
-                  <div className="text-2xl md:text-3xl font-serif font-bold text-accent">{stat.value}+</div>
-                  <div className="text-xs text-white/75 mt-0.5 uppercase tracking-wide">{stat.label}</div>
+                  <div className="text-xl sm:text-2xl md:text-3xl font-serif font-bold text-accent">{stat.value}+</div>
+                  <div className="text-[10px] sm:text-xs text-white/75 mt-0.5 uppercase tracking-wide leading-tight">{stat.label}</div>
                 </div>
               ))}
         </div>
@@ -401,6 +401,17 @@ export default function Home() {
   const [progLevel, setProgLevel] = React.useState("");
   const [progSchool, setProgSchool] = React.useState("");
   const [whyIdx, setWhyIdx] = React.useState(0);
+  const [whyPerView, setWhyPerView] = React.useState(3);
+
+  React.useEffect(() => {
+    const update = () => {
+      const pv = window.innerWidth >= 1024 ? 3 : window.innerWidth >= 768 ? 2 : 1;
+      setWhyPerView(pv);
+    };
+    update();
+    window.addEventListener("resize", update);
+    return () => window.removeEventListener("resize", update);
+  }, []);
 
   const featuredNews = news?.filter((n) => n.featured).slice(0, 3) ?? [];
   const latestNews = news?.slice(0, 4) ?? [];
@@ -623,9 +634,9 @@ export default function Home() {
       <IntakeConversionSection />
 
       {/* ─── NEWS, EVENTS & ANNOUNCEMENTS ─── */}
-      <section className="py-20 bg-secondary/40 border-y">
+      <section className="py-12 md:py-20 bg-secondary/40 border-y">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
 
             {/* News — 2/3 width */}
             <div className="lg:col-span-2">
@@ -717,9 +728,9 @@ export default function Home() {
       </section>
 
       {/* ─── ADMISSIONS PATHWAYS ─── */}
-      <section className="py-20 bg-primary/5 border-y" id="admissions-pathways">
+      <section className="py-12 md:py-20 bg-primary/5 border-y" id="admissions-pathways">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 md:mb-12">
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary mb-4">Admission Pathways</h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
               Choose the pathway that fits your academic background and goals.
@@ -756,9 +767,9 @@ export default function Home() {
       </section>
 
       {/* ─── SCHOOLS & FACULTIES ─── */}
-      <section className="py-20 bg-secondary/30">
+      <section className="py-12 md:py-20 bg-secondary/30">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-8 md:mb-12 gap-4">
             <div className="max-w-2xl">
               <span className="text-xs font-bold uppercase tracking-widest text-accent mb-3 block">Our Schools</span>
               <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary mb-4">Schools & Faculties</h2>
@@ -916,9 +927,9 @@ export default function Home() {
       </section>
 
       {/* ─── VIRTUAL CAMPUS TOUR ─── */}
-      <section className="py-20 bg-primary text-primary-foreground overflow-hidden">
+      <section className="py-12 md:py-20 bg-primary text-primary-foreground overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 md:mb-12">
             <span className="text-xs font-bold uppercase tracking-widest text-accent mb-3 block">Virtual Campus Tour</span>
             <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">Life at Kaimosi</h2>
             <p className="text-primary-foreground/75 max-w-xl mx-auto">
@@ -1012,21 +1023,21 @@ export default function Home() {
       </section>
 
       {/* ─── WHY KAFU — Image Carousel ─── */}
-      <section className="py-20 bg-primary text-primary-foreground overflow-hidden">
+      <section className="py-12 md:py-20 bg-primary text-primary-foreground overflow-hidden">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 md:mb-12">
             <h2 className="text-3xl md:text-4xl font-serif font-bold mb-4">Why Choose KAFU?</h2>
             <p className="text-primary-foreground/80 max-w-xl mx-auto">
               More than a university — a community of purpose, rooted in values and driven by impact.
             </p>
           </div>
 
-          {/* Sliding cards — 3 visible on desktop, 1 on mobile */}
+          {/* Sliding cards — 3 visible on desktop, 2 on tablet, 1 on mobile */}
           <div className="relative">
             <div className="overflow-hidden">
               <div
                 className="flex transition-transform duration-700 ease-in-out"
-                style={{ transform: `translateX(calc(-${whyIdx} * (100% / 3)))` }}
+                style={{ transform: `translateX(calc(-${whyIdx} * (100% / ${whyPerView})))` }}
               >
                 {/* Duplicate slides at end for seamless looping feel */}
                 {[...whyKafuSlides, ...whyKafuSlides.slice(0, 3)].map((slide, i) => (
@@ -1070,19 +1081,19 @@ export default function Home() {
             {/* Prev / Next arrows */}
             <button
               onClick={() => setWhyIdx((i) => (i - 1 + whyCount) % whyCount)}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 w-10 h-10 rounded-full bg-white/20 hover:bg-accent text-white flex items-center justify-center transition-colors z-10 shadow-lg"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 sm:-translate-x-2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-accent text-white flex items-center justify-center transition-colors z-10 shadow-lg"
               aria-label="Previous"
               data-testid="why-prev"
             >
-              <ChevronLeft className="w-5 h-5" />
+              <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
             <button
               onClick={() => setWhyIdx((i) => (i + 1) % whyCount)}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 w-10 h-10 rounded-full bg-white/20 hover:bg-accent text-white flex items-center justify-center transition-colors z-10 shadow-lg"
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 sm:translate-x-2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/20 hover:bg-accent text-white flex items-center justify-center transition-colors z-10 shadow-lg"
               aria-label="Next"
               data-testid="why-next"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
           </div>
 
@@ -1106,9 +1117,9 @@ export default function Home() {
       </section>
 
       {/* ─── PROGRAMME DISCOVERY ─── */}
-      <section className="py-20 bg-background" id="programmes">
+      <section className="py-12 md:py-20 bg-background" id="programmes">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
+          <div className="text-center mb-8 md:mb-10">
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary mb-4">Find Your Programme</h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
               Search across 38+ programmes spanning Education, Business, Computing, Science, and Health Sciences.
@@ -1199,9 +1210,9 @@ export default function Home() {
       </section>
 
       {/* ─── OPPORTUNITIES ─── */}
-      <section className="py-20 bg-background">
+      <section className="py-12 md:py-20 bg-background">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-8 md:mb-10 gap-4">
             <div>
               <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary mb-3">Opportunities</h2>
               <p className="text-muted-foreground">Tenders, vacancies, scholarships, and official notices.</p>
@@ -1254,9 +1265,9 @@ export default function Home() {
       </section>
 
       {/* ─── DIGITAL SERVICES HUB ─── */}
-      <section className="py-20 bg-primary/5 border-y">
+      <section className="py-12 md:py-20 bg-primary/5 border-y">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 md:mb-12">
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary mb-4">Digital Services</h2>
             <p className="text-muted-foreground max-w-xl mx-auto">
               Access all your university services online — anytime, anywhere.
@@ -1293,7 +1304,7 @@ export default function Home() {
       </section>
 
       {/* ─── CTA ─── */}
-      <section className="relative py-24 overflow-hidden">
+      <section className="relative py-16 md:py-24 overflow-hidden">
         <img
           src="https://kafu.ac.ke/wp-content/uploads/2025/10/apply-now.jpg"
           alt=""
