@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\CmsContent;
 
+if (!function_exists('mapCmsNews')) {
 function mapCmsNews(CmsContent $item): array {
     return [
         'id'       => $item->id,
@@ -19,14 +20,18 @@ function mapCmsNews(CmsContent $item): array {
         'featured' => (bool)$item->featured,
     ];
 }
+}
 
+if (!function_exists('mapCmsNewsDetail')) {
 function mapCmsNewsDetail(CmsContent $item): array {
     $base = mapCmsNews($item);
     $base['content'] = $item->body ?? '<p>Content is being prepared. Please check back shortly.</p>';
     $base['related'] = $item->related_ids ?? [];
     return $base;
 }
+}
 
+if (!function_exists('mapCmsEvent')) {
 function mapCmsEvent(CmsContent $item): array {
     $sd = $item->structured_data ?? [];
     $status = $sd['event_status'] ?? 'upcoming';
@@ -49,13 +54,17 @@ function mapCmsEvent(CmsContent $item): array {
         'status'            => $status,
     ];
 }
+}
 
+if (!function_exists('mapCmsEventDetail')) {
 function mapCmsEventDetail(CmsContent $item): array {
     $base = mapCmsEvent($item);
     $base['full_description'] = $item->body ?? $item->summary ?? '';
     return $base;
 }
+}
 
+if (!function_exists('mapCmsAnnouncement')) {
 function mapCmsAnnouncement(CmsContent $item): array {
     $sd = $item->structured_data ?? [];
     return [
@@ -70,7 +79,9 @@ function mapCmsAnnouncement(CmsContent $item): array {
         'status'       => 'active',
     ];
 }
+}
 
+if (!function_exists('mapCmsAnnouncementDetail')) {
 function mapCmsAnnouncementDetail(CmsContent $item): array {
     $base = mapCmsAnnouncement($item);
     $sd = $item->structured_data ?? [];
@@ -78,7 +89,9 @@ function mapCmsAnnouncementDetail(CmsContent $item): array {
     $base['attachments'] = $sd['attachments'] ?? [];
     return $base;
 }
+}
 
+if (!function_exists('mapCmsOpportunity')) {
 function mapCmsOpportunity(CmsContent $item): array {
     $sd = $item->structured_data ?? [];
     return [
@@ -98,7 +111,9 @@ function mapCmsOpportunity(CmsContent $item): array {
         'documents_count'=> count($sd['documents'] ?? []),
     ];
 }
+}
 
+if (!function_exists('mapCmsStaff')) {
 function mapCmsStaff(CmsContent $item): array {
     $sd = $item->structured_data ?? [];
     return [
@@ -121,7 +136,9 @@ function mapCmsStaff(CmsContent $item): array {
         'google_scholar_url' => $sd['google_scholar_url'] ?? null,
     ];
 }
+}
 
+if (!function_exists('mapCmsStaffDetail')) {
 function mapCmsStaffDetail(CmsContent $item): array {
     $base = mapCmsStaff($item);
     $sd = $item->structured_data ?? [];
@@ -171,7 +188,9 @@ function mapCmsStaffDetail(CmsContent $item): array {
     $base['profile_completeness'] = (int)round(($filled / count($fields)) * 100);
     return $base;
 }
+}
 
+if (!function_exists('mapCmsSchool')) {
 function mapCmsSchool(CmsContent $item): array {
     $sd = $item->structured_data ?? [];
     return [
@@ -188,7 +207,9 @@ function mapCmsSchool(CmsContent $item): array {
         'programmes'       => $sd['programmes'] ?? [],
     ];
 }
+}
 
+if (!function_exists('mapCmsProgramme')) {
 function mapCmsProgramme(CmsContent $item): array {
     $sd = $item->structured_data ?? [];
     return [
@@ -199,7 +220,9 @@ function mapCmsProgramme(CmsContent $item): array {
         'duration' => $sd['duration'] ?? '4 years',
     ];
 }
+}
 
+if (!function_exists('mapCmsOpportunityDetail')) {
 function mapCmsOpportunityDetail(CmsContent $item): array {
     $base = mapCmsOpportunity($item);
     $sd = $item->structured_data ?? [];
@@ -209,6 +232,7 @@ function mapCmsOpportunityDetail(CmsContent $item): array {
     $base['contact']          = $sd['contact'] ?? ['office'=>'Registry','email'=>'info@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'Main Campus, Kaimosi'];
     $base['documents']        = $sd['documents'] ?? [];
     return $base;
+}
 }
 
 Route::get('/healthz', function () {
