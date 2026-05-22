@@ -244,39 +244,23 @@ Route::get('/site-config/{group}', function (string $group) {
     $allowed = ['homepage', '
 about', 'contact', 'site', 'seo', 'navigation', 'student-services'];
     if (!in_array($group, $allowed)) {
-        return response()->json(['error' => 'Config group not found.'], 404);    }
+        return response()->json(['error' => 'Config group not found.'], 404);
+    }
     $config = \App\Models\SiteConfig::getGroup($group);
     return response()->json(['group' => $group, 'data' => $config]);
 });
+
 Route::get('/about', function () {
     $data = \App\Models\SiteConfig::getGroup('about');
-    return response()->json(['data' => $data]);
-});
-
-Route::get('/about/vision', function () {
-    $data = \App\Models\SiteConfig::getGroup('about');
-
     return response()->json([
         'data' => [
-            'vision' => $data['vision'] ?? 'To be a premier university nurturing innovation, research, and academic excellence for sustainable development.',
-            'mission' => $data['mission'] ?? 'To provide quality education, training, research, innovation, and community service.',
-            'core_values' => $data['core_values'] ?? [
-                'Integrity',
-                'Excellence',
-                'Innovation',
-                'Accountability',
-                'Inclusivity'
-            ]
-        ]
-    ]);
-});
-
+            'vision' => $data['vision'] ?? 'To be a premier university nurturing innovation, research, and academic excellence for sustainable devel
 Route::get('/student-services', function () {
     $data = \App\Models\SiteConfig::getGroup('student-services');
     return response()->json(['data' => $data]);
 });
 
-// ── Governance: Council, Management, Directorates ────────────────────────────
+// ── Governance: Council, Management, Directorates ─────────────────────────────
 Route::get('/council', function () {
     $members = \App\Models\CouncilMember::where('is_active', true)
         ->orderBy('position_order')
