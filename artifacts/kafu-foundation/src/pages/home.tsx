@@ -29,7 +29,7 @@ import {
 // ─── Hero Carousel ─────────────────────────────────────────────────────────────
 const SLIDES = [
   {
-    image: "/imgs/campus-main.jpg",
+    image: "/imgs/whatsapp-may2026.jpeg",
     badge: "Est. 2014 · Kaimosi, Western Kenya · Quaker Heritage",
     headline: "Spring of",
     accent: "Knowledge",
@@ -49,7 +49,7 @@ const SLIDES = [
     testid: "hero-slide-1",
   },
   {
-    image: "/imgs/image-94.jpeg",
+    image: "/imgs/image-115.jpeg",
     badge: "Modern Infrastructure · Kaimosi Highlands",
     headline: "Built for",
     accent: "Excellence",
@@ -59,13 +59,13 @@ const SLIDES = [
     testid: "hero-slide-2",
   },
   {
-    image: "/imgs/image-93.jpeg",
-    badge: "Research · Innovation · Community Impact",
-    headline: "Advancing",
-    accent: "Research",
-    body: "KAFU's research centres are driving solutions in health, environment, and development across Kenya and beyond — supported by national and international partnerships.",
-    cta1: { label: "Explore Research", href: "/research", external: false },
-    cta2: { label: "International Programmes", href: "/international", external: false },
+    image: "/imgs/image-113.jpeg",
+    badge: "Community Engagement · Kobujoi Campus · Nandi County",
+    headline: "Rooted in",
+    accent: "Community",
+    body: "KAFU's Kobujoi Campus is forging strong bonds with local communities — reflecting the Quaker spirit of service, partnership, and shared growth across Western Kenya.",
+    cta1: { label: "About KAFU", href: "/about", external: false },
+    cta2: { label: "Our Campuses", href: "/campuses", external: false },
     testid: "hero-slide-3",
   },
   {
@@ -79,13 +79,13 @@ const SLIDES = [
     testid: "hero-slide-4",
   },
   {
-    image: "/imgs/vc-lecture.jpg",
-    badge: "Strong Leadership · Visionary Direction · Academic Excellence",
-    headline: "Led by",
-    accent: "Vision",
-    body: "Under the leadership of Vice-Chancellor Prof. Peter Mwita, KAFU is transforming into a globally competitive university — driven by innovation, integrity, and a commitment to the people of Kenya.",
-    cta1: { label: "Meet Our Team", href: "/staff", external: false },
-    cta2: { label: "About KAFU", href: "/about", external: false },
+    image: "/imgs/img6424.jpg",
+    badge: "Research · Innovation · Community Impact",
+    headline: "Advancing",
+    accent: "Research",
+    body: "KAFU's research centres are driving solutions in health, environment, and development across Kenya and beyond — supported by national and international partnerships.",
+    cta1: { label: "Explore Research", href: "/research", external: false },
+    cta2: { label: "International Programmes", href: "/international", external: false },
     testid: "hero-slide-5",
   },
   {
