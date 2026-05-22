@@ -314,774 +314,124 @@ Route::get('/gallery/albums/{slug}', function (string $slug) {
 });
 
 Route::get('/news', function (Request $request) {
-    $cmsItems = CmsContent::where('type', 'news')
+    $query = CmsContent::where('type', 'news')
         ->where('status', 'published')
         ->where('is_deleted', false)
         ->with('author:id,name')
-        ->orderByDesc('published_at')
-        ->get()
-        ->map(fn($item) => mapCmsNews($item))
-        ->toArray();
-    $cmsSlugSet = array_flip(array_column($cmsItems, 'slug'));
+        ->orderByDesc('published_at');
 
-    $articles = [
-        [
-            'id' => 1,
-            'slug' => 'innovators-develop-smart-digital-systems',
-            'title' => 'KAFU Innovators Develop Smart Digital Systems for Better Service Delivery',
-            'excerpt' => 'KAFU students and faculty develop cutting-edge digital solutions aimed at transforming service delivery across Western Kenya.',
-            'summary' => 'A team of students and faculty from the School of Computing and Information Technology has developed a suite of smart digital tools designed to streamline service delivery in public institutions. The innovations, showcased at the annual KAFU Innovation Expo, include a citizen-facing complaints management portal and a smart queue management system tailored for county government offices.',
-            'category' => 'Research & Innovation',
-            'author' => 'KAFU Communications Office',
-            'date' => '2026-03-20',
-            'imageUrl' => 'https://kafu.ac.ke/wp-content/uploads/2026/03/IMG_6424-scaled.jpg',
-            'tags' => ['Innovation', 'Technology', 'SCIT', 'Community'],
-            'featured' => true,
-        ],
-        [
-            'id' => 2,
-            'slug' => 'community-backs-college-of-health-sciences-vokoli',
-            'title' => 'Community Backs Proposal to Establish College of Health Sciences in Vokoli',
-            'excerpt' => 'Local community leaders and stakeholders rally behind the proposed expansion of KAFU health sciences programmes to Vokoli.',
-            'summary' => 'Community leaders, county government officials, and local residents in Vokoli have expressed overwhelming support for a proposal by Kaimosi Friends University to establish a constituent college of health sciences in the area. A public consultative forum held last week drew hundreds of attendees who highlighted the need for expanded healthcare education in the region.',
-            'category' => 'Outreach',
-            'author' => 'Dr. Annette O. Busula',
-            'date' => '2026-03-15',
-            'imageUrl' => null,
-            'tags' => ['Health Sciences', 'Community', 'Expansion', 'SHS'],
-            'featured' => false,
-        ],
-        [
-            'id' => 3,
-            'slug' => 'kafu-hosts-ministry-of-health-officials',
-            'title' => 'KAFU Hosts Officials from the Ministry of Health for Strategic Partnership Talks',
-            'excerpt' => 'Senior Ministry of Health officials visited KAFU to explore partnerships in healthcare education and training.',
-            'summary' => 'Kaimosi Friends University hosted a high-level delegation from the Ministry of Health led by the Director of Medical Services. The visit focused on identifying partnership opportunities between KAFU\'s School of Health Sciences and the Ministry, particularly in healthcare workforce development, clinical placements, and collaborative research in community health.',
-            'category' => 'Partnerships',
-            'author' => 'KAFU Communications Office',
-            'date' => '2026-03-10',
-            'imageUrl' => null,
-            'tags' => ['Ministry of Health', 'Partnerships', 'SHS', 'Healthcare'],
-            'featured' => false,
-        ],
-        [
-            'id' => 4,
-            'slug' => 'kafu-to-host-africa-public-service-day-2026',
-            'title' => 'Historic Moment as KAFU is Earmarked to Host Africa Public Service Day 2026',
-            'excerpt' => 'Kaimosi Friends University has been selected as the host institution for the continental Africa Public Service Day 2026 celebrations.',
-            'summary' => 'In a landmark recognition of its growing academic and institutional stature, Kaimosi Friends University has been designated to host the Africa Public Service Day 2026 celebrations. The announcement was made by the Cabinet Secretary for Public Service during a function in Nairobi. APSD 2026, themed "Digital Transformation for Inclusive and Sustainable Public Services," will bring together public servants, policymakers, and development partners from across the continent to Kaimosi.',
-            'category' => 'Institutional',
-            'author' => 'Office of the Vice-Chancellor',
-            'date' => '2026-03-05',
-            'imageUrl' => 'https://kafu.ac.ke/wp-content/uploads/IMG_8696.jpg',
-            'tags' => ['Africa Public Service Day', 'Institutional', 'Recognition', 'Continental'],
-            'featured' => true,
-        ],
-        [
-            'id' => 5,
-            'slug' => 'mumias-east-candidates-career-mentorship',
-            'title' => 'Mumias East Candidates Benefit from Career Mentorship and Academic Guidance Through KAFU',
-            'excerpt' => 'KAFU extends its community outreach by offering career mentorship and academic guidance to students in Mumias East.',
-            'summary' => 'Over 500 Form Four candidates from Mumias East Sub-County have benefitted from a career mentorship programme organised in collaboration with Kaimosi Friends University. The programme, run over three days at Mumias East Girls\' High School, involved KAFU faculty offering subject-specific guidance, career talks, and information on higher education pathways available at KAFU and other universities.',
-            'category' => 'Outreach',
-            'author' => 'Office of Student Affairs',
-            'date' => '2026-02-28',
-            'imageUrl' => null,
-            'tags' => ['Mentorship', 'Outreach', 'Community', 'Students'],
-            'featured' => false,
-        ],
-        [
-            'id' => 6,
-            'slug' => 'kafu-vc-represents-education-cs-migori',
-            'title' => 'KAFU VC Represents Education CS at Women Empowerment Initiative in Migori County',
-            'excerpt' => 'The Vice Chancellor represented the Cabinet Secretary for Education at a women empowerment event in Migori County.',
-            'summary' => 'Vice-Chancellor Prof. Peter Nyamuhanga Mwita represented Cabinet Secretary for Education at the Women in Leadership Empowerment Symposium held in Migori County. Addressing hundreds of women professionals and students, Prof. Mwita highlighted KAFU\'s commitment to gender equity in higher education and the university\'s growing scholarship programmes for female students from marginalised communities.',
-            'category' => 'Leadership',
-            'author' => 'Office of the Vice-Chancellor',
-            'date' => '2026-02-20',
-            'imageUrl' => null,
-            'tags' => ['VC', 'Gender', 'Leadership', 'Outreach'],
-            'featured' => false,
-        ],
-        [
-            'id' => 7,
-            'slug' => 'teacher-trainees-competency-based-education',
-            'title' => 'Teacher Trainees Receive Competency-Based Education Training at KAFU',
-            'excerpt' => 'KAFU School of Education hosts a training workshop on Competency-Based Education for teacher trainees.',
-            'summary' => 'The School of Education and Social Sciences (SESS) hosted a five-day workshop on Competency-Based Education (CBE) for fourth-year teacher trainees. The workshop, held at the KAFU Main Campus, equipped trainee teachers with practical skills in lesson planning, formative assessment, and differentiated instruction under the Competency-Based Curriculum framework. The training was facilitated by senior academics from SESS and officers from the Kenya Institute of Curriculum Development.',
-            'category' => 'Academic',
-            'author' => 'Dr. Nabeta K.N Sangili',
-            'date' => '2026-02-15',
-            'imageUrl' => 'https://kafu.ac.ke/wp-content/uploads/Vice-Chancellor-Prof.-Peter-Mwita-addresses-fourth-year-teacher-trainees-during-the-opening-of-the-Competency-Based-Education-CBE-training-at-Kaimosi-Friends-University.jpg',
-            'tags' => ['SESS', 'Education', 'CBE', 'Training'],
-            'featured' => false,
-        ],
-        [
-            'id' => 8,
-            'slug' => 'kafu-interdenominational-prayer-breakfast',
-            'title' => 'KAFU Hosts 2nd Interdenominational Prayer Breakfast',
-            'excerpt' => 'The university community gathered for the second annual interdenominational prayer breakfast, reinforcing KAFU\'s Quaker heritage.',
-            'summary' => 'Kaimosi Friends University hosted its Second Annual Interdenominational Prayer Breakfast, bringing together students, staff, and faith community leaders from across Vihiga County. The event, held at the KAFU Main Auditorium, featured prayers, worship, and reflections on the role of faith in academic excellence. Vice-Chancellor Prof. Peter Mwita called on all community members to uphold KAFU\'s founding Quaker values of simplicity, peace, integrity, community, and equality.',
-            'category' => 'Events',
-            'author' => 'Dean of Students Office',
-            'date' => '2026-02-10',
-            'imageUrl' => null,
-            'tags' => ['Quaker Heritage', 'Community', 'Faith', 'Campus Life'],
-            'featured' => false,
-        ],
-        [
-            'id' => 9,
-            'slug' => 'kafu-classified-category-a-university',
-            'title' => 'KAFU Classified as Category A University by the Kenya Universities and Colleges Central Placement Service',
-            'excerpt' => 'Kaimosi Friends University achieves Category A status, opening access to the highest-achieving KCSE candidates.',
-            'summary' => 'In a major milestone, Kaimosi Friends University has been classified as a Category A university by the Kenya Universities and Colleges Central Placement Service (KUCCPS). This classification places KAFU among the top-tier institutions in Kenya and will allow the university to attract students with the highest Kenya Certificate of Secondary Education (KCSE) scores through government sponsorship. The classification reflects improvements in infrastructure, staffing, and academic programmes.',
-            'category' => 'Institutional',
-            'author' => 'Office of the Vice-Chancellor',
-            'date' => '2026-01-30',
-            'imageUrl' => null,
-            'tags' => ['Accreditation', 'KUCCPS', 'Institutional', 'Recognition'],
-            'featured' => false,
-        ],
-        [
-            'id' => 10,
-            'slug' => 'kafu-annual-research-conference-2026',
-            'title' => 'KAFU Announces 3rd Annual Research Conference — Call for Abstracts Open',
-            'excerpt' => 'Researchers, graduate students, and practitioners are invited to submit abstracts for the KAFU Annual Research Conference 2026.',
-            'summary' => 'The Directorate of Research and Innovation at Kaimosi Friends University is pleased to announce the opening of abstract submissions for the 3rd Annual Research Conference, scheduled for April 2026. The conference, themed "Research for Sustainable Development in the African Context," invites contributions from all disciplines across KAFU\'s five schools as well as external researchers and graduate students. Accepted abstracts will be published in the KAFU Research Journal.',
-            'category' => 'Research & Innovation',
-            'author' => 'Directorate of Research & Innovation',
-            'date' => '2026-01-20',
-            'imageUrl' => null,
-            'tags' => ['Research', 'Conference', 'Call for Papers', 'Innovation'],
-            'featured' => false,
-        ],
-    ];
-
-    // Remove static articles already managed in CMS (CMS version takes precedence)
-    $articles = array_values(array_filter($articles, fn($a) => !isset($cmsSlugSet[$a['slug']])));
-    $articles = array_merge($cmsItems, $articles);
-
-    $category = $request->query('category');
-    $search = $request->query('search');
-
-    if ($category && $category !== 'All') {
-        $articles = array_values(array_filter($articles, fn($a) => strtolower($a['category']) === strtolower($category)));
+    if ($request->query('category') && $request->query('category') !== 'All') {
+        $query->where('category', $request->query('category'));
     }
-    if ($search) {
-        $articles = array_values(array_filter($articles, fn($a) =>
-            stripos($a['title'], $search) !== false ||
-            stripos($a['summary'], $search) !== false ||
-            stripos($a['category'], $search) !== false
-        ));
+    if ($request->query('search')) {
+        $s = $request->query('search');
+        $query->where(fn($q) => $q->where('title', 'like', "%{$s}%")->orWhere('summary', 'like', "%{$s}%"));
+    }
+    if ($request->query('featured')) {
+        $query->where('featured', true);
     }
 
-    return response()->json(['data' => $articles]);
+    $items = $query->get()->map(fn($item) => mapCmsNews($item))->toArray();
+    return response()->json(['data' => $items]);
 });
 
 Route::get('/news/{slug}', function (string $slug) {
-    // Check CMS first
-    $cmsItem = CmsContent::where('type', 'news')
+    $item = CmsContent::where('type', 'news')
         ->where('slug', $slug)
         ->where('status', 'published')
         ->where('is_deleted', false)
         ->with('author:id,name')
         ->first();
-    if ($cmsItem) {
-        return response()->json(['data' => mapCmsNewsDetail($cmsItem)]);
-    }
-    $articles = [
-        'innovators-develop-smart-digital-systems' => [
-            'id' => 1,
-            'slug' => 'innovators-develop-smart-digital-systems',
-            'title' => 'KAFU Innovators Develop Smart Digital Systems for Better Service Delivery',
-            'summary' => 'A team of students and faculty from the School of Computing and Information Technology has developed a suite of smart digital tools designed to streamline service delivery in public institutions.',
-            'category' => 'Research & Innovation',
-            'author' => 'KAFU Communications Office',
-            'date' => '2026-03-20',
-            'imageUrl' => 'https://kafu.ac.ke/wp-content/uploads/2026/03/IMG_6424-scaled.jpg',
-            'tags' => ['Innovation', 'Technology', 'SCIT', 'Community'],
-            'featured' => true,
-            'content' => "<p>A team of students and faculty from the School of Computing and Information Technology (SCIT) at Kaimosi Friends University has unveiled a suite of smart digital tools designed to transform service delivery in public institutions across Western Kenya.</p><p>The innovations were showcased at the annual KAFU Innovation Expo held at the Main Campus. The flagship product is a citizen-facing complaints management portal that integrates with county government systems, allowing residents to submit service delivery complaints, track resolution progress, and receive SMS and email feedback in real time.</p><p>A second innovation, a smart queue management system, uses IoT sensors and a mobile application to reduce waiting times at government service centres by up to 60%, according to pilot test data collected at the Vihiga County Huduma Centre.</p><p>Prof. Kelvin K. Omieno, Dean of SCIT, praised the team: \"This is precisely the kind of applied innovation KAFU stands for — research that does not sit on library shelves but solves real problems in the communities we serve.\"</p><p>The innovations will be presented to the Council of Governors at a forthcoming devolution conference, with plans to pilot at scale across three counties in Western Kenya.</p>",
-            'related' => [2, 3, 10],
-        ],
-        'kafu-to-host-africa-public-service-day-2026' => [
-            'id' => 4,
-            'slug' => 'kafu-to-host-africa-public-service-day-2026',
-            'title' => 'Historic Moment as KAFU is Earmarked to Host Africa Public Service Day 2026',
-            'summary' => 'Kaimosi Friends University has been designated to host the Africa Public Service Day 2026 celebrations.',
-            'category' => 'Institutional',
-            'author' => 'Office of the Vice-Chancellor',
-            'date' => '2026-03-05',
-            'imageUrl' => 'https://kafu.ac.ke/wp-content/uploads/IMG_8696.jpg',
-            'tags' => ['Africa Public Service Day', 'Institutional', 'Recognition', 'Continental'],
-            'featured' => true,
-            'content' => "<p>In a landmark recognition of its growing academic and institutional stature, Kaimosi Friends University has been designated to host the Africa Public Service Day (APSD) 2026 celebrations. The announcement was made by Cabinet Secretary for Public Service during a function in Nairobi attended by Vice-Chancellor Prof. Peter Nyamuhanga Mwita.</p><p>APSD 2026, themed \"Digital Transformation for Inclusive and Sustainable Public Services,\" will bring together public servants, policymakers, development partners, and academics from across the African continent to Kaimosi.</p><p>\"This is a historic moment not just for KAFU but for the entire Western Kenya region. We are proud to showcase Kaimosi as a hub of academic excellence and innovation on the continental stage,\" said Prof. Mwita in a statement.</p><p>The event, scheduled for 23 June 2026, will include a high-level panel discussion, an innovation showcase, and a public service excellence awards ceremony. The host designation also comes with a government grant of KES 50 million towards conference infrastructure and capacity building.</p>",
-            'related' => [1, 6, 9],
-        ],
-        'teacher-trainees-competency-based-education' => [
-            'id' => 7,
-            'slug' => 'teacher-trainees-competency-based-education',
-            'title' => 'Teacher Trainees Receive Competency-Based Education Training at KAFU',
-            'summary' => 'KAFU School of Education hosts a training workshop on Competency-Based Education for teacher trainees.',
-            'category' => 'Academic',
-            'author' => 'Dr. Nabeta K.N Sangili',
-            'date' => '2026-02-15',
-            'imageUrl' => 'https://kafu.ac.ke/wp-content/uploads/Vice-Chancellor-Prof.-Peter-Mwita-addresses-fourth-year-teacher-trainees-during-the-opening-of-the-Competency-Based-Education-CBE-training-at-Kaimosi-Friends-University.jpg',
-            'tags' => ['SESS', 'Education', 'CBE', 'Training'],
-            'featured' => false,
-            'content' => "<p>The School of Education and Social Sciences (SESS) at Kaimosi Friends University hosted a five-day workshop on Competency-Based Education (CBE) for fourth-year teacher trainees. The workshop, held at the KAFU Main Campus, equipped trainee teachers with practical skills in lesson planning, formative assessment, and differentiated instruction under the Competency-Based Curriculum (CBC) framework.</p><p>Vice-Chancellor Prof. Peter Mwita officially opened the training, emphasising the importance of quality teacher education in transforming Kenya's education system. \"KAFU is committed to producing teachers who are not just knowledgeable but competent, adaptive, and ethically grounded,\" he said.</p><p>The training was facilitated by senior academics from SESS and officers from the Kenya Institute of Curriculum Development (KICD). Participants engaged in practical teaching demonstrations, peer review sessions, and technology-integrated lesson planning exercises.</p><p>Over 120 teacher trainees completed the programme, with all participants receiving certificates of completion that will contribute toward their Teacher Service Commission registration requirements.</p>",
-            'related' => [5, 8],
-        ],
-    ];
-
-    if (!isset($articles[$slug])) {
-        $defaultContent = "<p>Full article content is being prepared by the KAFU Communications Office. Please check back shortly or contact info@kafu.ac.ke for more information.</p>";
-        $baseArticles = [
-            'community-backs-college-of-health-sciences-vokoli' => ['id'=>2,'author'=>'Dr. Annette O. Busula','category'=>'Outreach','date'=>'2026-03-15','imageUrl'=>null,'tags'=>['Health Sciences','Community','Expansion','SHS'],'featured'=>false,'related'=>[3,9]],
-            'kafu-hosts-ministry-of-health-officials' => ['id'=>3,'author'=>'KAFU Communications Office','category'=>'Partnerships','date'=>'2026-03-10','imageUrl'=>null,'tags'=>['Ministry of Health','Partnerships','SHS','Healthcare'],'featured'=>false,'related'=>[2,9]],
-            'mumias-east-candidates-career-mentorship' => ['id'=>5,'author'=>'Office of Student Affairs','category'=>'Outreach','date'=>'2026-02-28','imageUrl'=>null,'tags'=>['Mentorship','Outreach','Community','Students'],'featured'=>false,'related'=>[6,8]],
-            'kafu-vc-represents-education-cs-migori' => ['id'=>6,'author'=>'Office of the Vice-Chancellor','category'=>'Leadership','date'=>'2026-02-20','imageUrl'=>null,'tags'=>['VC','Gender','Leadership','Outreach'],'featured'=>false,'related'=>[4,5]],
-            'kafu-interdenominational-prayer-breakfast' => ['id'=>8,'author'=>'Dean of Students Office','category'=>'Events','date'=>'2026-02-10','imageUrl'=>null,'tags'=>['Quaker Heritage','Community','Faith','Campus Life'],'featured'=>false,'related'=>[5,6]],
-            'kafu-classified-category-a-university' => ['id'=>9,'author'=>'Office of the Vice-Chancellor','category'=>'Institutional','date'=>'2026-01-30','imageUrl'=>null,'tags'=>['Accreditation','KUCCPS','Institutional','Recognition'],'featured'=>false,'related'=>[4,10]],
-            'kafu-annual-research-conference-2026' => ['id'=>10,'author'=>'Directorate of Research & Innovation','category'=>'Research & Innovation','date'=>'2026-01-20','imageUrl'=>null,'tags'=>['Research','Conference','Call for Papers','Innovation'],'featured'=>false,'related'=>[1,3]],
-        ];
-        $titles = [
-            'community-backs-college-of-health-sciences-vokoli' => 'Community Backs Proposal to Establish College of Health Sciences in Vokoli',
-            'kafu-hosts-ministry-of-health-officials' => 'KAFU Hosts Officials from the Ministry of Health for Strategic Partnership Talks',
-            'mumias-east-candidates-career-mentorship' => 'Mumias East Candidates Benefit from Career Mentorship and Academic Guidance Through KAFU',
-            'kafu-vc-represents-education-cs-migori' => 'KAFU VC Represents Education CS at Women Empowerment Initiative in Migori County',
-            'kafu-interdenominational-prayer-breakfast' => 'KAFU Hosts 2nd Interdenominational Prayer Breakfast',
-            'kafu-classified-category-a-university' => 'KAFU Classified as Category A University by KUCCPS',
-            'kafu-annual-research-conference-2026' => 'KAFU Announces 3rd Annual Research Conference — Call for Abstracts Open',
-        ];
-        if (isset($baseArticles[$slug])) {
-            $article = array_merge($baseArticles[$slug], [
-                'slug' => $slug,
-                'title' => $titles[$slug],
-                'summary' => 'Read the full story on the KAFU website.',
-                'content' => $defaultContent,
-            ]);
-            return response()->json(['data' => $article]);
-        }
+    if (!$item) {
         return response()->json(['error' => 'Article not found'], 404);
     }
-
-    return response()->json(['data' => $articles[$slug]]);
+    return response()->json(['data' => mapCmsNewsDetail($item)]);
 });
 
 Route::get('/events', function (Request $request) {
-    $cmsItems = CmsContent::where('type', 'event')
+    $query = CmsContent::where('type', 'event')
         ->where('status', 'published')
         ->where('is_deleted', false)
-        ->orderByDesc('published_at')
-        ->get()
-        ->map(fn($item) => mapCmsEvent($item))
-        ->toArray();
-    $cmsSlugSet = array_flip(array_column($cmsItems, 'slug'));
+        ->orderByDesc('published_at');
 
-    $events = [
-        [
-            'id' => 1,
-            'slug' => 'examination-processing-semester-2-2025-2026',
-            'title' => 'Examination Processing Schedule — Semester II (2025/2026)',
-            'date' => '2026-04-02',
-            'end_date' => '2026-04-10',
-            'time' => '08:00 – 17:00',
-            'location' => 'Main Campus, Kaimosi',
-            'category' => 'Examinations',
-            'description' => 'The Examinations Department has published the processing schedule for end-of-semester examinations for Semester II of the 2025/2026 academic year. All students are required to clear outstanding fees and complete exam registration through the student portal before the deadline. Timetables will be posted on departmental notice boards and the student portal at least seven days before examination commencement.',
-            'registration_link' => 'https://portal.kafu.ac.ke',
-            'tags' => ['Examinations', 'Academic Calendar', 'Students'],
-            'status' => 'upcoming',
-        ],
-        [
-            'id' => 2,
-            'slug' => 'kafu-open-day-2026',
-            'title' => 'KAFU Open Day 2026 — Explore Your Future',
-            'date' => '2026-04-15',
-            'end_date' => '2026-04-15',
-            'time' => '09:00 – 16:00',
-            'location' => 'All Schools, Main Campus, Kaimosi',
-            'category' => 'Community Outreach',
-            'description' => 'KAFU Open Day 2026 is your opportunity to explore the university campus, meet faculty and current students, attend live programme demonstrations, and get all the information you need about admission pathways, fees, scholarships, and student life. All prospective students, parents, and career guidance counsellors are warmly invited. Free entry. Light refreshments provided.',
-            'registration_link' => 'https://portal.kafu.ac.ke',
-            'tags' => ['Open Day', 'Prospective Students', 'Admissions'],
-            'status' => 'upcoming',
-        ],
-        [
-            'id' => 3,
-            'slug' => 'annual-research-conference-2026',
-            'title' => '3rd KAFU Annual Research Conference',
-            'date' => '2026-04-24',
-            'end_date' => '2026-04-25',
-            'time' => '08:30 – 17:00',
-            'location' => 'KAFU Conference Centre, Main Campus',
-            'category' => 'Academic',
-            'description' => 'The 3rd Annual Research Conference brings together researchers, graduate students, and practitioners under the theme "Research for Sustainable Development in the African Context." The two-day conference will feature keynote addresses by leading academics, parallel technical sessions, a postgraduate symposium, and a research poster exhibition. Selected papers will be published in the peer-reviewed KAFU Research Journal.',
-            'registration_link' => 'https://portal.kafu.ac.ke',
-            'tags' => ['Research', 'Conference', 'Graduate Studies', 'Innovation'],
-            'status' => 'upcoming',
-        ],
-        [
-            'id' => 4,
-            'slug' => 'internal-audit-may-2026',
-            'title' => 'Internal Audit — May 2026',
-            'date' => '2026-05-05',
-            'end_date' => '2026-05-09',
-            'time' => '08:00 – 17:00',
-            'location' => 'Administration Block',
-            'category' => 'Administration',
-            'description' => 'The Internal Audit Unit will conduct its scheduled May audit of university financial records, procurement processes, and asset management. All departments are required to ensure their records are up to date and available for review. Queries should be directed to the Internal Auditor at audit@kafu.ac.ke.',
-            'registration_link' => null,
-            'tags' => ['Administration', 'Finance', 'Governance'],
-            'status' => 'upcoming',
-        ],
-        [
-            'id' => 5,
-            'slug' => 'academic-board-meeting-may-2026',
-            'title' => 'Academic Board Meeting — May 2026',
-            'date' => '2026-05-12',
-            'end_date' => '2026-05-12',
-            'time' => '10:00 – 15:00',
-            'location' => 'Council Chamber, Administration Block',
-            'category' => 'Administration',
-            'description' => 'The regular quarterly meeting of the KAFU Academic Board will convene to review academic policy matters, approve new programmes, consider examination results, and receive reports from School Deans. The agenda and related papers are available to board members via the Academic Secretariat.',
-            'registration_link' => null,
-            'tags' => ['Academic Board', 'Governance', 'Administration'],
-            'status' => 'upcoming',
-        ],
-        [
-            'id' => 6,
-            'slug' => 'graduation-ceremony-2026',
-            'title' => '8th Graduation Ceremony — KAFU Class of 2026',
-            'date' => '2026-05-22',
-            'end_date' => '2026-05-22',
-            'time' => '09:00 – 14:00',
-            'location' => 'KAFU Grounds, Main Campus',
-            'category' => 'Graduation',
-            'description' => 'Kaimosi Friends University will host its 8th Graduation Ceremony, celebrating the Class of 2026. The ceremony will confer degrees, diplomas, and certificates to graduates from all five schools. Graduands are required to collect their gowns from the Examinations Office at least three days before the ceremony and to arrive at the venue by 08:00 AM. Guests are limited to two tickets per graduand. Details will be communicated through the student portal.',
-            'registration_link' => 'https://portal.kafu.ac.ke',
-            'tags' => ['Graduation', 'Ceremony', 'Class of 2026'],
-            'status' => 'upcoming',
-        ],
-        [
-            'id' => 7,
-            'slug' => 'sports-day-2026',
-            'title' => 'KAFU Annual Sports Day 2026',
-            'date' => '2026-06-05',
-            'end_date' => '2026-06-05',
-            'time' => '09:00 – 17:00',
-            'location' => 'KAFU Sports Grounds, Main Campus',
-            'category' => 'Student Life',
-            'description' => 'The annual KAFU Sports Day brings together students, staff, and the wider university community for a day of athletic competitions, team sports, and recreational activities. Events include track and field, football, volleyball, and netball competitions, with trophies and prizes for top performers. All students and staff are encouraged to participate. Entry is free.',
-            'registration_link' => null,
-            'tags' => ['Sports', 'Student Life', 'Community', 'Athletics'],
-            'status' => 'upcoming',
-        ],
-        [
-            'id' => 8,
-            'slug' => 'africa-public-service-day-2026',
-            'title' => 'Africa Public Service Day 2026',
-            'date' => '2026-06-23',
-            'end_date' => '2026-06-23',
-            'time' => 'All Day',
-            'location' => 'Kaimosi Friends University, Main Campus',
-            'category' => 'Special Events',
-            'description' => 'KAFU is proud to host the Africa Public Service Day 2026, a continental celebration bringing together heads of government, public service commissions, development partners, and academics from across Africa. The day\'s programme will feature high-level panel discussions on digital governance, a public service innovation showcase, and the Africa Public Service Excellence Awards. Media accreditation and delegation registration are managed through the Office of the Vice-Chancellor.',
-            'registration_link' => null,
-            'tags' => ['APSD', 'Continental', 'Special Event', 'Public Service'],
-            'status' => 'upcoming',
-        ],
-        [
-            'id' => 9,
-            'slug' => 'senate-meeting-june-2026',
-            'title' => 'Senate Meeting — June 2026',
-            'date' => '2026-06-29',
-            'end_date' => '2026-06-29',
-            'time' => '09:00 – 13:00',
-            'location' => 'Council Chamber, Administration Block',
-            'category' => 'Administration',
-            'description' => 'The regular meeting of the KAFU Senate will be held to consider matters of academic policy, review reports from the Academic Board, and approve examination results for the Semester II 2025/2026 academic year. Senate members are required to confirm their attendance with the Academic Registrar\'s office at least 48 hours in advance.',
-            'registration_link' => null,
-            'tags' => ['Senate', 'Governance', 'Academic Policy'],
-            'status' => 'upcoming',
-        ],
-        [
-            'id' => 10,
-            'slug' => 'cbe-teacher-training-workshop-march-2026',
-            'title' => 'Competency-Based Education Teacher Training Workshop',
-            'date' => '2026-02-10',
-            'end_date' => '2026-02-14',
-            'time' => '08:30 – 16:30',
-            'location' => 'SESS Building, Main Campus',
-            'category' => 'Academic',
-            'description' => 'A five-day workshop on Competency-Based Education for fourth-year teacher trainees, jointly facilitated by KAFU School of Education and Social Sciences and the Kenya Institute of Curriculum Development. Participants gained practical skills in CBC lesson design, formative assessment, and technology integration.',
-            'registration_link' => null,
-            'tags' => ['CBE', 'Education', 'SESS', 'Workshop'],
-            'status' => 'past',
-        ],
-    ];
+    $items = $query->get()->map(fn($item) => mapCmsEvent($item))->toArray();
 
-    // Merge: CMS events first, static events that aren't in CMS after
-    $events = array_values(array_filter($events, fn($e) => !isset($cmsSlugSet[$e['slug']])));
-    $events = array_merge($cmsItems, $events);
-
-    $filter = $request->query('filter', 'upcoming');
+    $filter   = $request->query('filter', 'upcoming');
     $category = $request->query('category');
-    $search = $request->query('search');
+    $search   = $request->query('search');
 
     if ($filter === 'past') {
-        $events = array_values(array_filter($events, fn($e) => $e['status'] === 'past'));
+        $items = array_values(array_filter($items, fn($e) => $e['status'] === 'past'));
     } elseif ($filter === 'upcoming') {
-        $events = array_values(array_filter($events, fn($e) => $e['status'] === 'upcoming'));
+        $items = array_values(array_filter($items, fn($e) => $e['status'] === 'upcoming'));
     }
-
     if ($category && $category !== 'All') {
-        $events = array_values(array_filter($events, fn($e) => strtolower($e['category']) === strtolower($category)));
+        $items = array_values(array_filter($items, fn($e) => strtolower($e['category']) === strtolower($category)));
     }
     if ($search) {
-        $events = array_values(array_filter($events, fn($e) =>
+        $items = array_values(array_filter($items, fn($e) =>
             stripos($e['title'], $search) !== false ||
             stripos($e['description'], $search) !== false
         ));
     }
 
-    return response()->json(['data' => $events]);
+    return response()->json(['data' => $items]);
 });
 
 Route::get('/events/{slug}', function (string $slug) {
-    // Check CMS first
-    $cmsItem = CmsContent::where('type', 'event')
+    $item = CmsContent::where('type', 'event')
         ->where('slug', $slug)
         ->where('status', 'published')
         ->where('is_deleted', false)
         ->first();
-    if ($cmsItem) {
-        return response()->json(['data' => mapCmsEventDetail($cmsItem)]);
-    }
-    $all = [
-        'examination-processing-semester-2-2025-2026' => ['id'=>1,'end_date'=>'2026-04-10','time'=>'08:00 – 17:00','location'=>'Main Campus, Kaimosi','category'=>'Examinations','registration_link'=>'https://portal.kafu.ac.ke','tags'=>['Examinations','Academic Calendar','Students'],'status'=>'upcoming'],
-        'kafu-open-day-2026' => ['id'=>2,'end_date'=>'2026-04-15','time'=>'09:00 – 16:00','location'=>'All Schools, Main Campus, Kaimosi','category'=>'Community Outreach','registration_link'=>'https://portal.kafu.ac.ke','tags'=>['Open Day','Prospective Students','Admissions'],'status'=>'upcoming'],
-        'annual-research-conference-2026' => ['id'=>3,'end_date'=>'2026-04-25','time'=>'08:30 – 17:00','location'=>'KAFU Conference Centre, Main Campus','category'=>'Academic','registration_link'=>'https://portal.kafu.ac.ke','tags'=>['Research','Conference','Graduate Studies','Innovation'],'status'=>'upcoming'],
-        'internal-audit-may-2026' => ['id'=>4,'end_date'=>'2026-05-09','time'=>'08:00 – 17:00','location'=>'Administration Block','category'=>'Administration','registration_link'=>null,'tags'=>['Administration','Finance','Governance'],'status'=>'upcoming'],
-        'academic-board-meeting-may-2026' => ['id'=>5,'end_date'=>'2026-05-12','time'=>'10:00 – 15:00','location'=>'Council Chamber, Administration Block','category'=>'Administration','registration_link'=>null,'tags'=>['Academic Board','Governance','Administration'],'status'=>'upcoming'],
-        'graduation-ceremony-2026' => ['id'=>6,'end_date'=>'2026-05-22','time'=>'09:00 – 14:00','location'=>'KAFU Grounds, Main Campus','category'=>'Graduation','registration_link'=>'https://portal.kafu.ac.ke','tags'=>['Graduation','Ceremony','Class of 2026'],'status'=>'upcoming'],
-        'sports-day-2026' => ['id'=>7,'end_date'=>'2026-06-05','time'=>'09:00 – 17:00','location'=>'KAFU Sports Grounds, Main Campus','category'=>'Student Life','registration_link'=>null,'tags'=>['Sports','Student Life','Community','Athletics'],'status'=>'upcoming'],
-        'africa-public-service-day-2026' => ['id'=>8,'end_date'=>'2026-06-23','time'=>'All Day','location'=>'Kaimosi Friends University, Main Campus','category'=>'Special Events','registration_link'=>null,'tags'=>['APSD','Continental','Special Event','Public Service'],'status'=>'upcoming'],
-        'senate-meeting-june-2026' => ['id'=>9,'end_date'=>'2026-06-29','time'=>'09:00 – 13:00','location'=>'Council Chamber, Administration Block','category'=>'Administration','registration_link'=>null,'tags'=>['Senate','Governance','Academic Policy'],'status'=>'upcoming'],
-        'cbe-teacher-training-workshop-march-2026' => ['id'=>10,'end_date'=>'2026-02-14','time'=>'08:30 – 16:30','location'=>'SESS Building, Main Campus','category'=>'Academic','registration_link'=>null,'tags'=>['CBE','Education','SESS','Workshop'],'status'=>'past'],
-    ];
-    $titles = [
-        'examination-processing-semester-2-2025-2026' => 'Examination Processing Schedule — Semester II (2025/2026)',
-        'kafu-open-day-2026' => 'KAFU Open Day 2026 — Explore Your Future',
-        'annual-research-conference-2026' => '3rd KAFU Annual Research Conference',
-        'internal-audit-may-2026' => 'Internal Audit — May 2026',
-        'academic-board-meeting-may-2026' => 'Academic Board Meeting — May 2026',
-        'graduation-ceremony-2026' => '8th Graduation Ceremony — KAFU Class of 2026',
-        'sports-day-2026' => 'KAFU Annual Sports Day 2026',
-        'africa-public-service-day-2026' => 'Africa Public Service Day 2026',
-        'senate-meeting-june-2026' => 'Senate Meeting — June 2026',
-        'cbe-teacher-training-workshop-march-2026' => 'Competency-Based Education Teacher Training Workshop',
-    ];
-    $dates = [
-        'examination-processing-semester-2-2025-2026' => '2026-04-02',
-        'kafu-open-day-2026' => '2026-04-15',
-        'annual-research-conference-2026' => '2026-04-24',
-        'internal-audit-may-2026' => '2026-05-05',
-        'academic-board-meeting-may-2026' => '2026-05-12',
-        'graduation-ceremony-2026' => '2026-05-22',
-        'sports-day-2026' => '2026-06-05',
-        'africa-public-service-day-2026' => '2026-06-23',
-        'senate-meeting-june-2026' => '2026-06-29',
-        'cbe-teacher-training-workshop-march-2026' => '2026-02-10',
-    ];
-    $descriptions = [
-        'examination-processing-semester-2-2025-2026' => 'The Examinations Department has published the processing schedule for end-of-semester examinations for Semester II of the 2025/2026 academic year. All students are required to clear outstanding fees and complete exam registration through the student portal before the deadline.',
-        'kafu-open-day-2026' => 'KAFU Open Day 2026 is your opportunity to explore the university campus, meet faculty and current students, attend live programme demonstrations, and get all the information you need about admission pathways, fees, scholarships, and student life.',
-        'annual-research-conference-2026' => 'The 3rd Annual Research Conference brings together researchers, graduate students, and practitioners under the theme "Research for Sustainable Development in the African Context." The two-day conference features keynotes, technical sessions, a postgraduate symposium, and a poster exhibition.',
-        'internal-audit-may-2026' => 'The Internal Audit Unit will conduct its scheduled May audit of university financial records, procurement processes, and asset management. All departments are required to ensure their records are up to date and available for review.',
-        'academic-board-meeting-may-2026' => 'The regular quarterly meeting of the KAFU Academic Board will convene to review academic policy matters, approve new programmes, consider examination results, and receive reports from School Deans.',
-        'graduation-ceremony-2026' => 'Kaimosi Friends University will host its 8th Graduation Ceremony, celebrating the Class of 2026. The ceremony will confer degrees, diplomas, and certificates to graduates from all five schools.',
-        'sports-day-2026' => 'The annual KAFU Sports Day brings together students, staff, and the wider university community for a day of athletic competitions, team sports, and recreational activities.',
-        'africa-public-service-day-2026' => 'KAFU is proud to host the Africa Public Service Day 2026, a continental celebration bringing together heads of government, public service commissions, development partners, and academics from across Africa.',
-        'senate-meeting-june-2026' => 'The regular meeting of the KAFU Senate will be held to consider matters of academic policy, review reports from the Academic Board, and approve examination results for the Semester II 2025/2026 academic year.',
-        'cbe-teacher-training-workshop-march-2026' => 'A five-day workshop on Competency-Based Education for fourth-year teacher trainees, jointly facilitated by KAFU SESS and the Kenya Institute of Curriculum Development.',
-    ];
-    if (!isset($all[$slug])) {
+    if (!$item) {
         return response()->json(['error' => 'Event not found'], 404);
     }
-    $event = array_merge($all[$slug], [
-        'slug' => $slug,
-        'title' => $titles[$slug],
-        'date' => $dates[$slug],
-        'description' => $descriptions[$slug],
-    ]);
-    return response()->json(['data' => $event]);
+    return response()->json(['data' => mapCmsEventDetail($item)]);
 });
 
 Route::get('/announcements', function (Request $request) {
-    $cmsItems = CmsContent::where('type', 'announcement')
+    $query = CmsContent::where('type', 'announcement')
         ->where('status', 'published')
         ->where('is_deleted', false)
-        ->orderByDesc('published_at')
-        ->get()
-        ->map(fn($item) => mapCmsAnnouncement($item))
-        ->toArray();
-    $cmsSlugSet = array_flip(array_column($cmsItems, 'slug'));
+        ->orderByDesc('published_at');
 
-    $announcements = [
-        [
-            'id' => 1,
-            'slug' => 'academic-calendar-2025-2026',
-            'title' => 'Academic Calendar — 2025/2026 Academic Year',
-            'department' => 'Academic Registrar',
-            'priority' => 'normal',
-            'publish_date' => '2025-08-01',
-            'summary' => 'The official academic calendar for the 2025/2026 academic year has been approved by the Academic Board and is now available for download via the student portal and this website.',
-            'tags' => ['Academic Calendar', 'Students', 'Staff'],
-            'status' => 'active',
-        ],
-        [
-            'id' => 2,
-            'slug' => 'fee-structure-semester-2-2025-2026',
-            'title' => 'Fee Structure Update — Second Semester 2025/2026',
-            'department' => 'Finance Office',
-            'priority' => 'urgent',
-            'publish_date' => '2026-01-10',
-            'summary' => 'The Finance Office has released the updated fee structure for the Second Semester 2025/2026. Students must clear all fee balances before the deadline to be allowed to sit examinations. Penalty interest applies to all overdue balances.',
-            'tags' => ['Fees', 'Finance', 'Students'],
-            'status' => 'active',
-        ],
-        [
-            'id' => 3,
-            'slug' => 'examination-registration-deadline-semester-2',
-            'title' => 'Notice: Examination Registration Deadline — Semester II',
-            'department' => 'Examinations Office',
-            'priority' => 'urgent',
-            'publish_date' => '2026-03-01',
-            'summary' => 'All registered students must complete their examination registration through the student portal by 31 March 2026. Late registration will attract a penalty fee and no student will be permitted to sit examinations without a valid exam card.',
-            'tags' => ['Examinations', 'Registration', 'Students', 'Deadline'],
-            'status' => 'active',
-        ],
-        [
-            'id' => 4,
-            'slug' => 'staff-recruitment-various-positions',
-            'title' => 'Staff Recruitment Notice — Various Academic and Administrative Positions',
-            'department' => 'Human Resources',
-            'priority' => 'normal',
-            'publish_date' => '2026-02-15',
-            'summary' => 'Kaimosi Friends University invites applications from suitably qualified candidates for various academic and administrative positions. Detailed job descriptions and application requirements are available on the Opportunities page of this website.',
-            'tags' => ['Recruitment', 'Jobs', 'HR', 'Academic Staff'],
-            'status' => 'active',
-        ],
-        [
-            'id' => 5,
-            'slug' => 'holiday-closure-good-friday-easter',
-            'title' => 'Holiday Closure Notice — Good Friday & Easter Monday 2026',
-            'department' => 'Office of the Registrar',
-            'priority' => 'normal',
-            'publish_date' => '2026-03-20',
-            'summary' => 'All university offices will be closed on Good Friday (3 April 2026) and Easter Monday (6 April 2026) in observance of the public holidays. Normal operations will resume on Tuesday, 7 April 2026. Emergency inquiries may be directed to the security desk.',
-            'tags' => ['Holiday', 'Office Closure', 'Administration'],
-            'status' => 'active',
-        ],
-        [
-            'id' => 6,
-            'slug' => 'student-health-insurance-enrollment',
-            'title' => 'Student Health Insurance Enrollment Drive — 2025/2026',
-            'department' => 'Dean of Students',
-            'priority' => 'normal',
-            'publish_date' => '2026-01-20',
-            'summary' => 'All continuing and newly admitted students are required to enroll in the KAFU Student Health Insurance Scheme. Enrollment forms are available at the Dean of Students office and the student health clinic. The annual premium is included in the student welfare fees.',
-            'tags' => ['Health Insurance', 'Student Welfare', 'Dean of Students'],
-            'status' => 'active',
-        ],
-        [
-            'id' => 7,
-            'slug' => 'special-council-meeting-notice',
-            'title' => 'Notice of Special Council Meeting — March 2026',
-            'department' => 'Office of the Vice-Chancellor',
-            'priority' => 'normal',
-            'publish_date' => '2026-03-10',
-            'summary' => 'The University Council will convene a special meeting on 26 March 2026 to consider strategic matters related to the proposed campus expansion and the 2026/2027 budget framework. Council members are requested to confirm attendance with the Council Secretary.',
-            'tags' => ['Council', 'Governance', 'Administration'],
-            'status' => 'active',
-        ],
-        [
-            'id' => 8,
-            'slug' => 'library-extended-hours-examinations',
-            'title' => 'Library Extended Hours During Examination Period',
-            'department' => 'University Library',
-            'priority' => 'normal',
-            'publish_date' => '2026-03-25',
-            'summary' => 'The KAFU University Library will operate extended hours during the examination period (April – May 2026). The library will be open Monday to Friday from 07:00 to 22:00, and Saturday and Sunday from 09:00 to 18:00. Students are reminded to carry valid student identification.',
-            'tags' => ['Library', 'Examinations', 'Students'],
-            'status' => 'active',
-        ],
-        [
-            'id' => 9,
-            'slug' => 'kuccps-category-a-classification',
-            'title' => 'KAFU Achieves Category A Classification by KUCCPS',
-            'department' => 'Office of the Vice-Chancellor',
-            'priority' => 'normal',
-            'publish_date' => '2026-01-30',
-            'summary' => 'Kaimosi Friends University has been officially classified as a Category A institution by the Kenya Universities and Colleges Central Placement Service (KUCCPS). This milestone places KAFU among the top universities in Kenya for government-sponsored student placement.',
-            'tags' => ['Institutional', 'KUCCPS', 'Accreditation', 'Recognition'],
-            'status' => 'active',
-        ],
-        [
-            'id' => 10,
-            'slug' => 'postgraduate-intake-june-2026',
-            'title' => 'Postgraduate Intake — January 2026 Session Now Open',
-            'department' => 'Graduate School',
-            'priority' => 'normal',
-            'publish_date' => '2026-02-01',
-            'summary' => 'Applications for postgraduate programmes (Masters and PhD) for the January 2026 intake are now open. Applicants must hold a minimum of Second Class Honours (Upper Division) for Masters programmes and a Masters degree for Doctoral programmes. Apply through the student portal.',
-            'tags' => ['Postgraduate', 'Admissions', 'Masters', 'PhD'],
-            'status' => 'active',
-        ],
-    ];
+    $items = $query->get()->map(fn($item) => mapCmsAnnouncement($item))->toArray();
 
-    // Merge: CMS announcements first, static ones not in CMS after
-    $announcements = array_values(array_filter($announcements, fn($a) => !isset($cmsSlugSet[$a['slug']])));
-    $announcements = array_merge($cmsItems, $announcements);
-
-    $priority = $request->query('priority');
+    $priority   = $request->query('priority');
     $department = $request->query('department');
-    $search = $request->query('search');
-    $status = $request->query('status', 'active');
+    $search     = $request->query('search');
+    $status     = $request->query('status', 'active');
 
     if ($status && $status !== 'all') {
-        $announcements = array_values(array_filter($announcements, fn($a) => $a['status'] === $status));
+        $items = array_values(array_filter($items, fn($a) => $a['status'] === $status));
     }
     if ($priority && $priority !== 'all') {
-        $announcements = array_values(array_filter($announcements, fn($a) => $a['priority'] === $priority));
+        $items = array_values(array_filter($items, fn($a) => $a['priority'] === $priority));
     }
     if ($department) {
-        $announcements = array_values(array_filter($announcements, fn($a) => stripos($a['department'], $department) !== false));
+        $items = array_values(array_filter($items, fn($a) => stripos($a['department'], $department) !== false));
     }
     if ($search) {
-        $announcements = array_values(array_filter($announcements, fn($a) =>
+        $items = array_values(array_filter($items, fn($a) =>
             stripos($a['title'], $search) !== false ||
             stripos($a['summary'], $search) !== false
         ));
     }
 
-    return response()->json(['data' => $announcements]);
+    return response()->json(['data' => $items]);
 });
 
 Route::get('/announcements/{slug}', function (string $slug) {
-    // Check CMS first
-    $cmsItem = CmsContent::where('type', 'announcement')
+    $item = CmsContent::where('type', 'announcement')
         ->where('slug', $slug)
         ->where('status', 'published')
         ->where('is_deleted', false)
         ->first();
-    if ($cmsItem) {
-        return response()->json(['data' => mapCmsAnnouncementDetail($cmsItem)]);
-    }
-    $content_map = [
-        'academic-calendar-2025-2026' => "<p>The Academic Board of Kaimosi Friends University, at its meeting held on 28 July 2025, approved the official academic calendar for the 2025/2026 academic year. All students, staff, and other stakeholders are advised to familiarise themselves with the key dates and plan accordingly.</p><p>The academic calendar is available for download from the student portal and the university website. Physical copies are available at the Academic Registrar's office, the Dean of Students office, and all School offices.</p><p>Key dates include: Semester I commencing 8 September 2025; Semester I examinations 15–26 December 2025; Semester II commencing 12 January 2026; and Semester II examinations commencing 6 April 2026. The graduation ceremony is scheduled for 22 May 2026.</p>",
-        'fee-structure-semester-2-2025-2026' => "<p>The Finance Office wishes to notify all students that the fee structure for the Second Semester 2025/2026 has been reviewed and updated in line with the university's approved budget. Students are required to note the following key updates:</p><ul><li>Tuition fees remain unchanged for continuing students.</li><li>Student welfare and medical fees have been adjusted upward by 5% following a review by the University Council.</li><li>All fee balances from Semester I must be cleared by 31 January 2026 to avoid a late payment penalty of 10% per month.</li></ul><p>Fee payment options include M-Pesa Paybill (Business Number: 123456, Account: Student Registration Number), bank deposit at Equity Bank (Account Number: 0290265940855), or direct payment at the Finance Office cashiers.</p>",
-        'examination-registration-deadline-semester-2' => "<p>The Examinations Office wishes to notify all students that the deadline for examination registration for the Second Semester 2025/2026 is <strong>31 March 2026</strong>.</p><p>All students must:</p><ol><li>Log in to the student portal at portal.kafu.ac.ke</li><li>Confirm course registration for all units taken in Semester II</li><li>Verify that all fee balances are cleared</li><li>Generate and print an examination card</li></ol><p>Students who have not registered by the deadline will be required to pay a late registration penalty of KES 2,000 before they will be allowed to sit examinations. No exceptions will be made.</p>",
-        'default' => "<p>Please contact the issuing department for full details of this announcement. Contact information is available in the sidebar or through the KAFU main switchboard at +254 777 373 633.</p>",
-    ];
-
-    $departments = [
-        'academic-calendar-2025-2026' => 'Academic Registrar',
-        'fee-structure-semester-2-2025-2026' => 'Finance Office',
-        'examination-registration-deadline-semester-2' => 'Examinations Office',
-        'staff-recruitment-various-positions' => 'Human Resources',
-        'holiday-closure-good-friday-easter' => 'Office of the Registrar',
-        'student-health-insurance-enrollment' => 'Dean of Students',
-        'special-council-meeting-notice' => 'Office of the Vice-Chancellor',
-        'library-extended-hours-examinations' => 'University Library',
-        'kuccps-category-a-classification' => 'Office of the Vice-Chancellor',
-        'postgraduate-intake-june-2026' => 'Graduate School',
-    ];
-    $priorities = [
-        'academic-calendar-2025-2026' => 'normal',
-        'fee-structure-semester-2-2025-2026' => 'urgent',
-        'examination-registration-deadline-semester-2' => 'urgent',
-        'staff-recruitment-various-positions' => 'normal',
-        'holiday-closure-good-friday-easter' => 'normal',
-        'student-health-insurance-enrollment' => 'normal',
-        'special-council-meeting-notice' => 'normal',
-        'library-extended-hours-examinations' => 'normal',
-        'kuccps-category-a-classification' => 'normal',
-        'postgraduate-intake-june-2026' => 'normal',
-    ];
-    $dates = [
-        'academic-calendar-2025-2026' => '2025-08-01',
-        'fee-structure-semester-2-2025-2026' => '2026-01-10',
-        'examination-registration-deadline-semester-2' => '2026-03-01',
-        'staff-recruitment-various-positions' => '2026-02-15',
-        'holiday-closure-good-friday-easter' => '2026-03-20',
-        'student-health-insurance-enrollment' => '2026-01-20',
-        'special-council-meeting-notice' => '2026-03-10',
-        'library-extended-hours-examinations' => '2026-03-25',
-        'kuccps-category-a-classification' => '2026-01-30',
-        'postgraduate-intake-june-2026' => '2026-02-01',
-    ];
-    $titles = [
-        'academic-calendar-2025-2026' => 'Academic Calendar — 2025/2026 Academic Year',
-        'fee-structure-semester-2-2025-2026' => 'Fee Structure Update — Second Semester 2025/2026',
-        'examination-registration-deadline-semester-2' => 'Notice: Examination Registration Deadline — Semester II',
-        'staff-recruitment-various-positions' => 'Staff Recruitment Notice — Various Academic and Administrative Positions',
-        'holiday-closure-good-friday-easter' => 'Holiday Closure Notice — Good Friday & Easter Monday 2026',
-        'student-health-insurance-enrollment' => 'Student Health Insurance Enrollment Drive — 2025/2026',
-        'special-council-meeting-notice' => 'Notice of Special Council Meeting — March 2026',
-        'library-extended-hours-examinations' => 'Library Extended Hours During Examination Period',
-        'kuccps-category-a-classification' => 'KAFU Achieves Category A Classification by KUCCPS',
-        'postgraduate-intake-june-2026' => 'Postgraduate Intake — January 2026 Session Now Open',
-    ];
-    $summaries = [
-        'academic-calendar-2025-2026' => 'The official academic calendar for the 2025/2026 academic year has been approved by the Academic Board and is now available for download.',
-        'fee-structure-semester-2-2025-2026' => 'The Finance Office has released the updated fee structure for the Second Semester 2025/2026. Students must clear all fee balances before the deadline.',
-        'examination-registration-deadline-semester-2' => 'All registered students must complete their examination registration through the student portal by 31 March 2026.',
-        'staff-recruitment-various-positions' => 'KAFU invites applications from suitably qualified candidates for various academic and administrative positions.',
-        'holiday-closure-good-friday-easter' => 'All university offices will be closed on Good Friday (3 April 2026) and Easter Monday (6 April 2026).',
-        'student-health-insurance-enrollment' => 'All continuing and newly admitted students are required to enroll in the KAFU Student Health Insurance Scheme.',
-        'special-council-meeting-notice' => 'The University Council will convene a special meeting on 26 March 2026 to consider strategic matters.',
-        'library-extended-hours-examinations' => 'The KAFU University Library will operate extended hours during the examination period (April – May 2026).',
-        'kuccps-category-a-classification' => 'KAFU has been officially classified as a Category A institution by KUCCPS, placing it among Kenya\'s top universities.',
-        'postgraduate-intake-june-2026' => 'Applications for postgraduate programmes (Masters and PhD) for the January 2026 intake are now open.',
-    ];
-    $tags_map = [
-        'academic-calendar-2025-2026' => ['Academic Calendar','Students','Staff'],
-        'fee-structure-semester-2-2025-2026' => ['Fees','Finance','Students'],
-        'examination-registration-deadline-semester-2' => ['Examinations','Registration','Students','Deadline'],
-        'staff-recruitment-various-positions' => ['Recruitment','Jobs','HR','Academic Staff'],
-        'holiday-closure-good-friday-easter' => ['Holiday','Office Closure','Administration'],
-        'student-health-insurance-enrollment' => ['Health Insurance','Student Welfare','Dean of Students'],
-        'special-council-meeting-notice' => ['Council','Governance','Administration'],
-        'library-extended-hours-examinations' => ['Library','Examinations','Students'],
-        'kuccps-category-a-classification' => ['Institutional','KUCCPS','Accreditation','Recognition'],
-        'postgraduate-intake-june-2026' => ['Postgraduate','Admissions','Masters','PhD'],
-    ];
-    $ids = [
-        'academic-calendar-2025-2026'=>1,'fee-structure-semester-2-2025-2026'=>2,'examination-registration-deadline-semester-2'=>3,
-        'staff-recruitment-various-positions'=>4,'holiday-closure-good-friday-easter'=>5,'student-health-insurance-enrollment'=>6,
-        'special-council-meeting-notice'=>7,'library-extended-hours-examinations'=>8,'kuccps-category-a-classification'=>9,'postgraduate-intake-june-2026'=>10,
-    ];
-
-    if (!isset($titles[$slug])) {
+    if (!$item) {
         return response()->json(['error' => 'Announcement not found'], 404);
     }
-
-    return response()->json(['data' => [
-        'id' => $ids[$slug],
-        'slug' => $slug,
-        'title' => $titles[$slug],
-        'department' => $departments[$slug],
-        'priority' => $priorities[$slug],
-        'publish_date' => $dates[$slug],
-        'summary' => $summaries[$slug],
-        'content' => $content_map[$slug] ?? $content_map['default'],
-        'tags' => $tags_map[$slug],
-        'status' => 'active',
-        'attachments' => [],
-    ]]);
+    return response()->json(['data' => mapCmsAnnouncementDetail($item)]);
 });
 
 Route::get('/schools', function () {
@@ -1390,93 +740,45 @@ Route::get('/contact', function () {
 });
 
 Route::get('/opportunities', function (Request $request) {
-    $cmsItems = CmsContent::where('type', 'opportunity')
+    $query = CmsContent::where('type', 'opportunity')
         ->where('status', 'published')
         ->where('is_deleted', false)
-        ->orderByDesc('published_at')
-        ->get()
-        ->map(fn($item) => mapCmsOpportunity($item))
-        ->toArray();
-    $cmsSlugSet = array_flip(array_column($cmsItems, 'slug'));
+        ->orderByDesc('published_at');
 
-    $all = [
-        ['id'=>1,'slug'=>'supply-laboratory-equipment-kafu-proc-001-2026','category'=>'tender','type'=>'Tender','title'=>'Supply of Laboratory Equipment and Consumables','reference'=>'KAFU/PROC/001/2026','department'=>'Procurement & Supply Chain','summary'=>'KAFU invites sealed bids from qualified and registered suppliers for the supply and delivery of laboratory equipment and consumables for the Schools of Science and Health Sciences.','publish_date'=>'2026-03-17','deadline'=>'2026-04-30','deadline_time'=>'17:00','status'=>'open','featured'=>true,'documents_count'=>2],
-        ['id'=>2,'slug'=>'provision-security-services-kafu-proc-002-2026','category'=>'tender','type'=>'Tender','title'=>'Provision of Security Guard Services','reference'=>'KAFU/PROC/002/2026','department'=>'Procurement & Supply Chain','summary'=>'KAFU invites tenders from licensed security firms for the provision of professional security guard services across all university campuses and facilities.','publish_date'=>'2026-03-20','deadline'=>'2026-04-08','deadline_time'=>'12:00','status'=>'closing-soon','featured'=>false,'documents_count'=>1],
-        ['id'=>3,'slug'=>'supply-ict-equipment-kafu-proc-003-2026','category'=>'tender','type'=>'Tender','title'=>'Supply and Delivery of ICT Equipment and Accessories','reference'=>'KAFU/PROC/003/2026','department'=>'Information and Communication Technology','summary'=>'Kaimosi Friends University invites sealed bids for the supply, delivery, and installation of ICT equipment including computers, servers, networking hardware, and peripherals.','publish_date'=>'2026-03-25','deadline'=>'2026-05-09','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents_count'=>2],
-        ['id'=>4,'slug'=>'construction-student-centre-kafu-proc-004-2026','category'=>'tender','type'=>'Tender','title'=>'Construction of Student Centre — Phase 2','reference'=>'KAFU/PROC/004/2026','department'=>'Estates & Facilities Management','summary'=>'KAFU invites bids from eligible NCA-registered contractors for the construction of the second phase of the university student centre including a multi-purpose hall, student lounges, and commercial units.','publish_date'=>'2026-04-01','deadline'=>'2026-05-30','deadline_time'=>'17:00','status'=>'open','featured'=>true,'documents_count'=>3],
-        ['id'=>5,'slug'=>'lecturer-computer-science-kafu-hr-001-2026','category'=>'vacancy','type'=>'Job Vacancy','title'=>'Lecturer — Computer Science','reference'=>'KAFU/HR/001/2026','department'=>'School of Computing and Information Technology (SCIT)','summary'=>'Applications are invited from suitably qualified candidates for the position of Lecturer in Computer Science, specialising in AI, Software Engineering, or Data Science.','publish_date'=>'2026-03-18','deadline'=>'2026-04-25','deadline_time'=>'17:00','status'=>'open','featured'=>true,'documents_count'=>1],
-        ['id'=>6,'slug'=>'lecturer-nursing-kafu-hr-002-2026','category'=>'vacancy','type'=>'Job Vacancy','title'=>'Lecturer — Nursing','reference'=>'KAFU/HR/002/2026','department'=>'School of Health Sciences (SHS)','summary'=>'The School of Health Sciences invites applications from registered nurses with postgraduate qualifications for the position of Lecturer in Nursing.','publish_date'=>'2026-03-22','deadline'=>'2026-04-08','deadline_time'=>'17:00','status'=>'closing-soon','featured'=>false,'documents_count'=>1],
-        ['id'=>7,'slug'=>'finance-officer-kafu-hr-003-2026','category'=>'vacancy','type'=>'Job Vacancy','title'=>'Finance Officer','reference'=>'KAFU/HR/003/2026','department'=>'Finance Department','summary'=>'KAFU seeks a Finance Officer to support financial reporting, budget monitoring, and compliance with public finance management regulations.','publish_date'=>'2026-03-28','deadline'=>'2026-04-28','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents_count'=>1],
-        ['id'=>8,'slug'=>'registrar-academics-kafu-hr-004-2026','category'=>'vacancy','type'=>'Job Vacancy','title'=>'Deputy Registrar (Academics)','reference'=>'KAFU/HR/004/2026','department'=>'Academic Registry','summary'=>'Applications are invited for the position of Deputy Registrar (Academics) to support examinations management, student records, and academic programme coordination.','publish_date'=>'2026-04-01','deadline'=>'2026-05-02','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents_count'=>1],
-        ['id'=>9,'slug'=>'ict-internship-programme-kafu-intern-001-2026','category'=>'internship','type'=>'Internship','title'=>'ICT Internship Programme — 2026','reference'=>'KAFU/INTERN/001/2026','department'=>'Information and Communication Technology','summary'=>'KAFU offers an ICT internship opportunity for final-year undergraduate students or recent graduates in Computer Science or IT.','publish_date'=>'2026-03-10','deadline'=>'2026-04-15','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents_count'=>1],
-        ['id'=>10,'slug'=>'research-assistantship-sos-kafu-intern-002-2026','category'=>'internship','type'=>'Internship','title'=>'Research Assistantship — School of Science','reference'=>'KAFU/INTERN/002/2026','department'=>'School of Science (SOS)','summary'=>'The School of Science invites applications from postgraduate students for research assistantships in Molecular Biology, Environmental Chemistry, and Applied Physics.','publish_date'=>'2026-03-20','deadline'=>'2026-04-30','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents_count'=>1],
-        ['id'=>11,'slug'=>'internal-research-grants-kafu-call-001-2026','category'=>'call','type'=>'Call for Applications','title'=>'Internal Research Grants — 2026/2027 Cycle','reference'=>'KAFU/CALL/001/2026','department'=>'Directorate of Research, Innovation & Outreach','summary'=>"KAFU invites academic staff to submit proposals for the 2026/2027 Internal Research Grant cycle, aligned with the university's strategic research themes.",'publish_date'=>'2026-03-15','deadline'=>'2026-04-30','deadline_time'=>'17:00','status'=>'open','featured'=>true,'documents_count'=>2],
-        ['id'=>12,'slug'=>'industry-partnership-call-kafu-call-002-2026','category'=>'call','type'=>'Call for Applications','title'=>'Call for Industry and Academic Partnership Proposals','reference'=>'KAFU/CALL/002/2026','department'=>'Office of the Vice-Chancellor','summary'=>'KAFU welcomes proposals from industry partners, research institutions, NGOs, and government agencies for collaborative partnerships in research, training, and technology transfer.','publish_date'=>'2026-04-01','deadline'=>'2026-05-31','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents_count'=>1],
-        ['id'=>13,'slug'=>'notice-academic-calendar-amendment-2026','category'=>'notice','type'=>'Notice','title'=>'Notice: Amendment to 2025/2026 Academic Calendar','reference'=>'KAFU/NOT/001/2026','department'=>'Academic Registry','summary'=>'All students and staff are notified of an amendment to the 2025/2026 academic calendar. Supplementary examination dates have been revised.','publish_date'=>'2026-03-28','deadline'=>null,'deadline_time'=>null,'status'=>'open','featured'=>false,'documents_count'=>1],
-        ['id'=>14,'slug'=>'disability-support-bursary-kafu-burs-001-2026','category'=>'scholarship','type'=>'Scholarship','title'=>'KAFU Disability Support Bursary 2026/2027','reference'=>'KAFU/BURS/001/2026','department'=>'Student Affairs Division','summary'=>'KAFU offers bursary support to students living with disabilities who demonstrate financial need. Covers tuition reduction, accommodation support, and access to specialised study resources.','publish_date'=>'2026-03-01','deadline'=>'2026-05-31','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents_count'=>1],
-        ['id'=>15,'slug'=>'equity-bursary-kafu-burs-002-2026','category'=>'scholarship','type'=>'Scholarship','title'=>'Government Equity Bursary — HELB/NGEC Link 2026/2027','reference'=>'KAFU/BURS/002/2026','department'=>'Student Affairs Division','summary'=>'KAFU, in partnership with HELB and NGEC, invites applications from financially needy students from marginalised communities for the 2026/2027 Equity Bursary Fund.','publish_date'=>'2026-03-10','deadline'=>'2026-04-30','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents_count'=>2],
-        ['id'=>16,'slug'=>'supply-furniture-kafu-proc-005-2025','category'=>'tender','type'=>'Tender','title'=>'Supply and Delivery of Office Furniture and Fittings','reference'=>'KAFU/PROC/005/2025','department'=>'Procurement & Supply Chain','summary'=>'Supply of executive office furniture, workstations, chairs, and filing systems for the administration block.','publish_date'=>'2025-11-15','deadline'=>'2025-12-31','deadline_time'=>'17:00','status'=>'closed','featured'=>false,'documents_count'=>1],
-        ['id'=>17,'slug'=>'lecturer-business-admin-kafu-hr-005-2025','category'=>'vacancy','type'=>'Job Vacancy','title'=>'Lecturer — Business Administration','reference'=>'KAFU/HR/005/2025','department'=>'School of Business & Economics (SBE)','summary'=>'Applications for the position of Lecturer in Business Administration. Position has since been filled.','publish_date'=>'2026-01-10','deadline'=>'2026-02-28','deadline_time'=>'17:00','status'=>'closed','featured'=>false,'documents_count'=>1],
-    ];
-
-    // Merge: CMS opportunities first, static ones not in CMS after
-    $all = array_values(array_filter($all, fn($o) => !isset($cmsSlugSet[$o['slug']])));
-    $all = array_merge($cmsItems, $all);
+    $items = $query->get()->map(fn($item) => mapCmsOpportunity($item))->toArray();
 
     $category = $request->query('category');
-    $status = $request->query('status');
-    $search = $request->query('search');
+    $status   = $request->query('status');
+    $search   = $request->query('search');
 
-    $filtered = $all;
     if ($category && $category !== 'all') {
-        $filtered = array_values(array_filter($filtered, fn($o) => $o['category'] === $category));
+        $items = array_values(array_filter($items, fn($o) => $o['category'] === $category));
     }
     if ($status) {
-        $filtered = array_values(array_filter($filtered, fn($o) => $o['status'] === $status));
+        $items = array_values(array_filter($items, fn($o) => $o['status'] === $status));
     }
     if ($search) {
-        $filtered = array_values(array_filter($filtered, function($o) use ($search) {
-            return stripos($o['title'], $search) !== false || stripos($o['summary'], $search) !== false || stripos($o['reference'] ?? '', $search) !== false || stripos($o['department'], $search) !== false;
-        }));
+        $items = array_values(array_filter($items, fn($o) =>
+            stripos($o['title'], $search) !== false ||
+            stripos($o['summary'], $search) !== false ||
+            stripos($o['reference'] ?? '', $search) !== false ||
+            stripos($o['department'], $search) !== false
+        ));
     }
 
-    return response()->json(['data' => $filtered]);
+    return response()->json(['data' => $items]);
 });
 
 Route::get('/opportunities/{slug}', function (string $slug) {
-    // Check CMS first
-    $cmsItem = CmsContent::where('type', 'opportunity')
+    $item = CmsContent::where('type', 'opportunity')
         ->where('slug', $slug)
         ->where('status', 'published')
         ->where('is_deleted', false)
         ->first();
-    if ($cmsItem) {
-        return response()->json(['data' => mapCmsOpportunityDetail($cmsItem)]);
-    }
-
-    $details = [
-        'supply-laboratory-equipment-kafu-proc-001-2026' => ['id'=>1,'slug'=>'supply-laboratory-equipment-kafu-proc-001-2026','category'=>'tender','type'=>'Tender','title'=>'Supply of Laboratory Equipment and Consumables','reference'=>'KAFU/PROC/001/2026','department'=>'Procurement & Supply Chain','summary'=>'KAFU invites sealed bids from qualified and registered suppliers for the supply and delivery of laboratory equipment and consumables for the Schools of Science and Health Sciences.','description'=>"Kaimosi Friends University (KAFU) wishes to procure laboratory equipment and consumables for use in the Schools of Science (SOS) and Health Sciences (SHS). Items include general laboratory glassware, chemicals, microscopes, centrifuges, autoclaves, optometry instruments, and clinical diagnostic equipment. Suppliers must be registered with the AGPO and have a valid business permit. Interested bidders may collect tender documents from the Procurement Office at the Main Campus during business hours.",'requirements'=>['Valid business registration certificate','Tax compliance certificate from KRA','AGPO registration certificate (where applicable)','Certificate of Incorporation or business permit','Audited accounts for the last two financial years','Evidence of supply of similar equipment (at least 3 LPOs)','Filled tender document duly signed'],'submission_info'=>'Sealed tenders in plain envelopes marked "KAFU/PROC/001/2026 — Laboratory Equipment" must be deposited in the Tender Box at the Procurement Office, Main Administration Block, Kaimosi Campus, by the deadline date and time. Tenders received after the deadline will not be accepted.','contact'=>['office'=>'Procurement & Supply Chain Department','email'=>'procurement@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'Main Administration Block, Kaimosi Campus'],'publish_date'=>'2026-03-17','deadline'=>'2026-04-30','deadline_time'=>'17:00','status'=>'open','featured'=>true,'documents'=>[['title'=>'Tender Document — Supply of Lab Equipment (KAFU/PROC/001/2026)','type'=>'PDF','size'=>'1.2 MB','url'=>'#'],['title'=>'Schedule of Requirements — Lab Consumables','type'=>'PDF','size'=>'348 KB','url'=>'#']]],
-        'provision-security-services-kafu-proc-002-2026' => ['id'=>2,'slug'=>'provision-security-services-kafu-proc-002-2026','category'=>'tender','type'=>'Tender','title'=>'Provision of Security Guard Services','reference'=>'KAFU/PROC/002/2026','department'=>'Procurement & Supply Chain','summary'=>'KAFU invites tenders from licensed security firms for the provision of professional security guard services across all university campuses and facilities.','description'=>'Kaimosi Friends University invites proposals from registered and licensed security companies to provide manned security guard services at the main campus and satellite facilities. Services required include day and night guarding, access control, patrol, and incident reporting. The contract period is one year, renewable subject to satisfactory performance.','requirements'=>['Private Security Regulatory Authority (PSRA) license — valid','Certificate of Registration of Company/Business','KRA Tax Compliance Certificate','Minimum 3 years of experience providing security to educational institutions','Evidence of at least two similar contracts in educational or institutional settings','Bonded and insured against third-party liability','NSSF and NHIF compliance certificates'],'submission_info'=>'Sealed bids in plain envelopes clearly marked "KAFU/PROC/002/2026 — Security Services" must be deposited in the Tender Box at the Procurement Office by 8 April 2026 at 12:00 noon. Late submissions will be disqualified.','contact'=>['office'=>'Procurement & Supply Chain Department','email'=>'procurement@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'Main Administration Block, Kaimosi Campus'],'publish_date'=>'2026-03-20','deadline'=>'2026-04-08','deadline_time'=>'12:00','status'=>'closing-soon','featured'=>false,'documents'=>[['title'=>'Tender Document — Security Services (KAFU/PROC/002/2026)','type'=>'PDF','size'=>'980 KB','url'=>'#']]],
-        'supply-ict-equipment-kafu-proc-003-2026' => ['id'=>3,'slug'=>'supply-ict-equipment-kafu-proc-003-2026','category'=>'tender','type'=>'Tender','title'=>'Supply and Delivery of ICT Equipment and Accessories','reference'=>'KAFU/PROC/003/2026','department'=>'Information and Communication Technology','summary'=>'Kaimosi Friends University invites sealed bids for the supply, delivery, and installation of ICT equipment including computers, servers, networking hardware, and peripherals.','description'=>'KAFU is seeking to procure ICT equipment to support academic and administrative operations. The procurement includes desktop computers, laptops, servers, network switches, routers, UPS systems, projectors, and related peripherals. Suppliers must demonstrate capacity to deliver, install, and provide post-delivery warranty and support.','requirements'=>['Valid business registration and KRA PIN','Tax compliance certificate','Authorized dealer certificate from manufacturer(s) for key equipment','Evidence of similar ICT supply contracts (minimum 3)','Technical specifications of proposed equipment (must meet or exceed specs in tender document)','After-sales service and warranty commitment letter'],'submission_info'=>'Completed tender documents to be deposited in the Tender Box at Procurement Office, Kaimosi Campus by 9 May 2026 at 17:00. Tenders must be sealed and marked "KAFU/PROC/003/2026 — ICT Equipment".','contact'=>['office'=>'ICT Department / Procurement','email'=>'ict@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'ICT Centre, Kaimosi Campus'],'publish_date'=>'2026-03-25','deadline'=>'2026-05-09','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents'=>[['title'=>'Tender Document — ICT Equipment 2026 (KAFU/PROC/003/2026)','type'=>'PDF','size'=>'1.4 MB','url'=>'#'],['title'=>'Technical Specifications — ICT Equipment Schedule','type'=>'PDF','size'=>'620 KB','url'=>'#']]],
-        'construction-student-centre-kafu-proc-004-2026' => ['id'=>4,'slug'=>'construction-student-centre-kafu-proc-004-2026','category'=>'tender','type'=>'Tender','title'=>'Construction of Student Centre — Phase 2','reference'=>'KAFU/PROC/004/2026','department'=>'Estates & Facilities Management','summary'=>'KAFU invites bids from eligible NCA-registered contractors for the construction of the second phase of the university student centre.','description'=>'Kaimosi Friends University invites competitive bids from qualified and NCA-registered contractors for the civil and building works for Phase 2 of the Student Centre. Works include construction of a multi-purpose hall (capacity 600), student lounge areas, commercial units, and associated external works. A mandatory site visit will be held before bid submission.','requirements'=>['NCA Category NCA 3 or above registration','Valid NCA practicing certificate','KRA Tax Compliance Certificate','Evidence of similar works of comparable value','Certified copies of registration with NSSF, NHIF','Site visit attendance confirmation'],'submission_info'=>'Sealed bids in plain envelopes marked "KAFU/PROC/004/2026 — Student Centre Phase 2" to be submitted to the Procurement Office by 30 May 2026 at 17:00. Site visit: 20 April 2026 at 10:00 AM, assemble at the Estates Office.','contact'=>['office'=>'Estates & Facilities Management','email'=>'estates@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'Estates Office, Kaimosi Campus'],'publish_date'=>'2026-04-01','deadline'=>'2026-05-30','deadline_time'=>'17:00','status'=>'open','featured'=>true,'documents'=>[['title'=>'Tender Document — Student Centre Phase 2 (KAFU/PROC/004/2026)','type'=>'PDF','size'=>'2.1 MB','url'=>'#'],['title'=>'Architectural Drawings — Student Centre Phase 2','type'=>'PDF','size'=>'4.5 MB','url'=>'#'],['title'=>'Bills of Quantities — Student Centre Phase 2','type'=>'PDF','size'=>'1.8 MB','url'=>'#']]],
-        'lecturer-computer-science-kafu-hr-001-2026' => ['id'=>5,'slug'=>'lecturer-computer-science-kafu-hr-001-2026','category'=>'vacancy','type'=>'Job Vacancy','title'=>'Lecturer — Computer Science','reference'=>'KAFU/HR/001/2026','department'=>'School of Computing and Information Technology (SCIT)','summary'=>'Applications are invited from suitably qualified candidates for the position of Lecturer in Computer Science, specialising in AI, Software Engineering, or Data Science.','description'=>'The School of Computing and Information Technology (SCIT) at Kaimosi Friends University invites applications for the position of Lecturer in Computer Science. The successful candidate will teach undergraduate and postgraduate courses, supervise student research projects, conduct independent research, and contribute to departmental development.','requirements'=>["PhD in Computer Science or related field (holders of a Master's with demonstrable progression towards PhD will be considered)",'Minimum Grade B+ in KCSE or equivalent','At least 3 years\' teaching experience at university level','Demonstrable research output (publications in peer-reviewed journals preferred)','Strong written and oral communication skills in English','Registration with relevant professional body (e.g. IEEE, ACM) is an advantage'],'submission_info'=>"Applications including a cover letter, detailed CV, copies of academic and professional certificates, and names of three referees (with full contact details) should be sent to the Human Resources Office by email or hard copy by 25 April 2026. Only shortlisted candidates will be contacted.",'contact'=>['office'=>'Human Resources Division','email'=>'hr@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'HR Office, Administration Block, Kaimosi Campus'],'publish_date'=>'2026-03-18','deadline'=>'2026-04-25','deadline_time'=>'17:00','status'=>'open','featured'=>true,'documents'=>[['title'=>'Job Description — Lecturer, Computer Science (KAFU/HR/001/2026)','type'=>'PDF','size'=>'420 KB','url'=>'#']]],
-        'lecturer-nursing-kafu-hr-002-2026' => ['id'=>6,'slug'=>'lecturer-nursing-kafu-hr-002-2026','category'=>'vacancy','type'=>'Job Vacancy','title'=>'Lecturer — Nursing','reference'=>'KAFU/HR/002/2026','department'=>'School of Health Sciences (SHS)','summary'=>'The School of Health Sciences invites applications from registered nurses with postgraduate qualifications for the position of Lecturer in Nursing.','description'=>"KAFU School of Health Sciences invites applications from Registered Nurses and Midwives with a minimum of a Master's degree in Nursing or related clinical field. The Lecturer will teach undergraduate BSN students, coordinate clinical placements, supervise research projects, and participate in community health outreach.",'requirements'=>["Master's degree in Nursing, Midwifery, or related clinical field (PhD preferred)",'Active registration with the Nursing Council of Kenya (NCK)','Minimum 3 years\' clinical nursing experience','Teaching experience at diploma or degree level preferred','Good academic writing and communication skills'],'submission_info'=>'Send applications to hr@kafu.ac.ke with subject "KAFU/HR/002/2026 — Lecturer Nursing" by 8 April 2026 at 17:00.','contact'=>['office'=>'Human Resources Division','email'=>'hr@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'HR Office, Kaimosi Campus'],'publish_date'=>'2026-03-22','deadline'=>'2026-04-08','deadline_time'=>'17:00','status'=>'closing-soon','featured'=>false,'documents'=>[['title'=>'Job Description — Lecturer, Nursing (KAFU/HR/002/2026)','type'=>'PDF','size'=>'385 KB','url'=>'#']]],
-        'finance-officer-kafu-hr-003-2026' => ['id'=>7,'slug'=>'finance-officer-kafu-hr-003-2026','category'=>'vacancy','type'=>'Job Vacancy','title'=>'Finance Officer','reference'=>'KAFU/HR/003/2026','department'=>'Finance Department','summary'=>'KAFU seeks a Finance Officer to support financial reporting, budget monitoring, and compliance with public finance management regulations.','description'=>'The Finance Officer will be responsible for day-to-day financial operations including accounts payable and receivable, bank reconciliations, budget tracking, preparation of management accounts, and compliance with PFMA and donor reporting requirements.','requirements'=>['CPA(K) finalist or fully qualified','Bachelor\'s degree in Commerce, Finance, or Accounting','Minimum 3 years\' relevant experience in a public sector or university environment','Proficiency in accounting software (SAGE, QuickBooks, or similar)','Knowledge of IPSAS and IFRS','High level of integrity and attention to detail'],'submission_info'=>'Applications with CV, certificates, and three referees to hr@kafu.ac.ke, subject: "KAFU/HR/003/2026 — Finance Officer". Deadline: 28 April 2026.','contact'=>['office'=>'Human Resources Division','email'=>'hr@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'HR Office, Kaimosi Campus'],'publish_date'=>'2026-03-28','deadline'=>'2026-04-28','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents'=>[['title'=>'Job Description — Finance Officer (KAFU/HR/003/2026)','type'=>'PDF','size'=>'360 KB','url'=>'#']]],
-        'registrar-academics-kafu-hr-004-2026' => ['id'=>8,'slug'=>'registrar-academics-kafu-hr-004-2026','category'=>'vacancy','type'=>'Job Vacancy','title'=>'Deputy Registrar (Academics)','reference'=>'KAFU/HR/004/2026','department'=>'Academic Registry','summary'=>'Applications are invited for the position of Deputy Registrar (Academics) to support examinations management, student records, and academic programme coordination.','description'=>'The Deputy Registrar (Academics) will provide leadership in academic records management, examination administration, senate secretariat support, student progression monitoring, and regulatory compliance with CUE and accreditation bodies.','requirements'=>["Master's degree in Administration, Education Management, or related field",'Minimum 5 years\' experience in university registry or academic administration','Thorough understanding of Kenya university regulations and CUE requirements','Strong communication, organisational, and IT skills','High level of integrity and professionalism'],'submission_info'=>'Applications to hr@kafu.ac.ke, subject: "KAFU/HR/004/2026 — Deputy Registrar (Academics)". Deadline: 2 May 2026.','contact'=>['office'=>'Human Resources Division','email'=>'hr@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'HR Office, Kaimosi Campus'],'publish_date'=>'2026-04-01','deadline'=>'2026-05-02','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents'=>[['title'=>'Job Description — Deputy Registrar, Academics (KAFU/HR/004/2026)','type'=>'PDF','size'=>'400 KB','url'=>'#']]],
-        'ict-internship-programme-kafu-intern-001-2026' => ['id'=>9,'slug'=>'ict-internship-programme-kafu-intern-001-2026','category'=>'internship','type'=>'Internship','title'=>'ICT Internship Programme — 2026','reference'=>'KAFU/INTERN/001/2026','department'=>'Information and Communication Technology','summary'=>'KAFU offers an ICT internship opportunity for final-year undergraduate students or recent graduates in Computer Science or IT.','description'=>'The KAFU ICT Department offers a structured internship programme for outstanding students and recent graduates. Interns will rotate across network administration, systems support, software maintenance, and digital services. Successful interns receive a certificate of completion and may be considered for future employment.','requirements'=>['Final-year undergraduate student or graduate (within 12 months) in Computer Science, IT, or related field','Minimum upper second class honours GPA (or equivalent)','Introductory letter from university/college','Evidence of relevant coursework or projects','Availability for full-time attachment (minimum 3 months)'],'submission_info'=>'Applications to ict@kafu.ac.ke, subject "KAFU/INTERN/001/2026 — ICT Internship". Include CV, academic transcript, and an introduction letter from your institution.','contact'=>['office'=>'ICT Department','email'=>'ict@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'ICT Centre, Kaimosi Campus'],'publish_date'=>'2026-03-10','deadline'=>'2026-04-15','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents'=>[['title'=>'ICT Internship Programme Details (KAFU/INTERN/001/2026)','type'=>'PDF','size'=>'295 KB','url'=>'#']]],
-        'research-assistantship-sos-kafu-intern-002-2026' => ['id'=>10,'slug'=>'research-assistantship-sos-kafu-intern-002-2026','category'=>'internship','type'=>'Internship','title'=>'Research Assistantship — School of Science','reference'=>'KAFU/INTERN/002/2026','department'=>'School of Science (SOS)','summary'=>'The School of Science invites applications from postgraduate students for research assistantships in Molecular Biology, Environmental Chemistry, and Applied Physics.','description'=>'Positions are available for postgraduate students to serve as Research Assistants in active research projects within the School of Science. Research Assistants will assist with data collection, laboratory experiments, analysis, and report writing under the supervision of academic staff.','requirements'=>['Registered postgraduate student (MSc or PhD) in a relevant science field','Strong laboratory skills and relevant subject knowledge','Introductory letter from supervisor','Brief statement of research interest (300 words max)'],'submission_info'=>'Email to dean.sos@kafu.ac.ke, subject "KAFU/INTERN/002/2026 — Research Assistantship". Deadline: 30 April 2026.','contact'=>['office'=>'School of Science (SOS)','email'=>'dean.sos@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>"SOS Dean's Office, Kaimosi Campus"],'publish_date'=>'2026-03-20','deadline'=>'2026-04-30','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents'=>[['title'=>'Research Assistantship Call — SOS (KAFU/INTERN/002/2026)','type'=>'PDF','size'=>'280 KB','url'=>'#']]],
-        'internal-research-grants-kafu-call-001-2026' => ['id'=>11,'slug'=>'internal-research-grants-kafu-call-001-2026','category'=>'call','type'=>'Call for Applications','title'=>'Internal Research Grants — 2026/2027 Cycle','reference'=>'KAFU/CALL/001/2026','department'=>'Directorate of Research, Innovation & Outreach','summary'=>"KAFU invites academic staff to submit proposals for the 2026/2027 Internal Research Grant cycle, aligned with the university's strategic research themes.",'description'=>"The Directorate of Research, Innovation and Outreach announces the 2026/2027 internal research grant competition open to all permanent and probationary academic staff. Individual grants of up to KES 500,000 and collaborative grants of up to KES 1.2 million are available. Research must align with at least one of KAFU's strategic research themes: Health and Life Sciences, Education and Social Development, Technology and Innovation, Environmental Sustainability, or Business and Economic Development.",'requirements'=>['Full-time academic staff member at KAFU','Completed research proposal using the prescribed form','Endorsement from Head of Department and Dean','Ethics clearance letter where human or animal subjects are involved','Budget narrative and justification'],'submission_info'=>'Submit completed proposals electronically to research@kafu.ac.ke and a hard copy to the Directorate of Research by 30 April 2026. Proposals must use the prescribed template available for download.','contact'=>['office'=>'Directorate of Research, Innovation & Outreach','email'=>'research@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'Research Directorate, Administration Block, Kaimosi Campus'],'publish_date'=>'2026-03-15','deadline'=>'2026-04-30','deadline_time'=>'17:00','status'=>'open','featured'=>true,'documents'=>[['title'=>'Internal Research Grants Call Document 2026/2027','type'=>'PDF','size'=>'560 KB','url'=>'#'],['title'=>'Research Proposal Template (KAFU/CALL/001/2026)','type'=>'DOCX','size'=>'220 KB','url'=>'#']]],
-        'industry-partnership-call-kafu-call-002-2026' => ['id'=>12,'slug'=>'industry-partnership-call-kafu-call-002-2026','category'=>'call','type'=>'Call for Applications','title'=>'Call for Industry and Academic Partnership Proposals','reference'=>'KAFU/CALL/002/2026','department'=>'Office of the Vice-Chancellor','summary'=>'KAFU welcomes proposals from industry partners, research institutions, NGOs, and government agencies for collaborative partnerships in research, training, and technology transfer.','description'=>"KAFU is seeking to deepen its engagement with industry, government, civil society, and research institutions. The university welcomes proposals for collaboration in research and publication, student placement and mentorship, curriculum co-design, community engagement programmes, and technology transfer. Proposals may be submitted by organisations registered and operating in Kenya and regionally.",'requirements'=>['Registered organisation with valid certificate of incorporation or equivalent','Concept note (max 5 pages) describing the proposed partnership','Contact details of a designated partnership coordinator','Proposed timeline and resource commitment'],'submission_info'=>'Submit concept notes to partnerships@kafu.ac.ke with subject "KAFU/CALL/002/2026 — Partnership Proposal". Deadline: 31 May 2026.','contact'=>['office'=>"Office of the Vice-Chancellor — Partnerships",'email'=>'partnerships@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>"VC's Office, Kaimosi Campus"],'publish_date'=>'2026-04-01','deadline'=>'2026-05-31','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents'=>[['title'=>'Partnership Call — Guidelines and Concept Note Template (KAFU/CALL/002/2026)','type'=>'PDF','size'=>'415 KB','url'=>'#']]],
-        'notice-academic-calendar-amendment-2026' => ['id'=>13,'slug'=>'notice-academic-calendar-amendment-2026','category'=>'notice','type'=>'Notice','title'=>'Notice: Amendment to 2025/2026 Academic Calendar','reference'=>'KAFU/NOT/001/2026','department'=>'Academic Registry','summary'=>'All students and staff are notified of an amendment to the 2025/2026 academic calendar. Supplementary examination dates have been revised.','description'=>"The Academic Registrar wishes to notify all students, academic staff, and stakeholders that the 2025/2026 Academic Calendar has been amended. Supplementary and special examinations, which were previously scheduled for April 2026, have been rescheduled to the dates contained in the attached amended calendar. All other academic dates remain unchanged. Students are advised to liaise with their respective Heads of Department for any additional guidance.",'requirements'=>[],'submission_info'=>'This is a public notice. No action required from the public. Students and staff should take note of the revised examination dates.','contact'=>['office'=>'Academic Registry','email'=>'registrar@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'Academic Registry, Administration Block'],'publish_date'=>'2026-03-28','deadline'=>null,'deadline_time'=>null,'status'=>'open','featured'=>false,'documents'=>[['title'=>'Amended Academic Calendar 2025/2026','type'=>'PDF','size'=>'185 KB','url'=>'#']]],
-        'disability-support-bursary-kafu-burs-001-2026' => ['id'=>14,'slug'=>'disability-support-bursary-kafu-burs-001-2026','category'=>'scholarship','type'=>'Scholarship','title'=>'KAFU Disability Support Bursary 2026/2027','reference'=>'KAFU/BURS/001/2026','department'=>'Student Affairs Division','summary'=>'KAFU offers bursary support to students living with disabilities who demonstrate financial need.','description'=>"Kaimosi Friends University, in line with its commitment to inclusive education and access, offers a Disability Support Bursary for registered students living with disabilities who demonstrate financial need. The bursary covers partial tuition fee waiver (up to 50%), accommodation subsidy, and access to specialised study materials and assistive technology.",'requirements'=>['Registered student of KAFU (must be enrolled for 2026/2027 academic year)','Certified disability documentation from a recognised medical or government institution','Demonstrated financial need (means test form required)','Recommendation letter from Student Welfare Office','Minimum CGPA of 2.0 (or equivalent)','Statement of need (max 500 words)'],'submission_info'=>'Applications to be submitted to the Student Affairs Office with all supporting documents by 31 May 2026. Forms available at the Student Affairs Office and for download below.','contact'=>['office'=>'Student Affairs Division','email'=>'studentaffairs@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'Student Centre, Kaimosi Campus'],'publish_date'=>'2026-03-01','deadline'=>'2026-05-31','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents'=>[['title'=>'Disability Support Bursary Application Form (KAFU/BURS/001/2026)','type'=>'PDF','size'=>'230 KB','url'=>'#']]],
-        'equity-bursary-kafu-burs-002-2026' => ['id'=>15,'slug'=>'equity-bursary-kafu-burs-002-2026','category'=>'scholarship','type'=>'Scholarship','title'=>'Government Equity Bursary — HELB/NGEC Link 2026/2027','reference'=>'KAFU/BURS/002/2026','department'=>'Student Affairs Division','summary'=>'KAFU, in partnership with HELB and NGEC, invites applications from financially needy students from marginalised communities for the 2026/2027 Equity Bursary Fund.','description'=>'In partnership with the Higher Education Loans Board (HELB) and the National Gender and Equality Commission (NGEC), KAFU is making available equity bursaries for academically deserving students from marginalised communities including students from ASALs, youth with disabilities, and students from historically underserved counties.','requirements'=>['Registered KAFU student for 2026/2027 academic year','HELB loan application confirmation (where applicable)','Proof of originating from a designated marginalised community (Sub-County Officer letter)','Academic transcript with minimum CGPA of 2.0','Financial needs declaration','Completed KAFU/BURS/002 form'],'submission_info'=>'Applications to Student Affairs Office or by email to studentaffairs@kafu.ac.ke, subject "KAFU/BURS/002/2026 — Equity Bursary". Deadline: 30 April 2026.','contact'=>['office'=>'Student Affairs Division','email'=>'studentaffairs@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'Student Centre, Kaimosi Campus'],'publish_date'=>'2026-03-10','deadline'=>'2026-04-30','deadline_time'=>'17:00','status'=>'open','featured'=>false,'documents'=>[['title'=>'Equity Bursary Application Form (KAFU/BURS/002/2026)','type'=>'PDF','size'=>'260 KB','url'=>'#'],['title'=>'Marginalised Communities Criteria Guide','type'=>'PDF','size'=>'190 KB','url'=>'#']]],
-    ];
-
-    if (!isset($details[$slug])) {
+    if (!$item) {
         return response()->json(['error' => 'Opportunity not found'], 404);
     }
-
-    return response()->json(['data' => $details[$slug]]);
+    return response()->json(['data' => mapCmsOpportunityDetail($item)]);
 });
 
 Route::get('/staff', function (Request $request) {
