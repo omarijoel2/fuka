@@ -141,9 +141,7 @@ function Router() {
           <Route path="/international/exchange" component={InternationalExchange} />
           <Route path="/repository" component={RepositoryPage} />
           <Route path="/repository/browse" component={RepositoryBrowse} />
-          <Route path="/repository/items/:slug">
-            {(params) => <RepositoryItem slug={params.slug ?? ""} />}
-          </Route>
+          <Route path="/repository/items/:slug" component={RepositoryItem} />
           <Route path="/about/council" component={CouncilPage} />
           <Route path="/about/management" component={ManagementPage} />
           <Route path="/about/strategic-plan" component={StrategicPlan} />

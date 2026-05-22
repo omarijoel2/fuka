@@ -798,7 +798,7 @@ export default function Home() {
               : schools?.map((school, idx) => {
                   const pc =
                     typeof school.programmes_count === "object"
-                      ? (school.programmes_count as Record<string, number>)
+                      ? (school.programmes_count as unknown as Record<string, number>)
                       : null;
                   const initials = school.dean
                     ? school.dean
@@ -1245,7 +1245,7 @@ export default function Home() {
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-wrap items-center gap-2 mb-1.5">
                       <span className="text-xs font-semibold text-accent uppercase tracking-wider">{opp.type}</span>
-                      <span className="text-xs text-muted-foreground">Closes: {new Date(opp.deadline).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}</span>
+                      <span className="text-xs text-muted-foreground">Closes: {opp.deadline ? new Date(opp.deadline).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—"}</span>
                     </div>
                     <h4 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2">
                       {opp.title}

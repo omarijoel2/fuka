@@ -319,7 +319,7 @@ export default function AdmissionsEligibilityPage() {
                     </div>
                     <div>
                       <span className="text-sm font-medium text-foreground block">{qt.label}</span>
-                      {"desc" in qt && <span className="text-xs text-muted-foreground mt-0.5 block">{qt.desc}</span>}
+                      {"desc" in qt && <span className="text-xs text-muted-foreground mt-0.5 block">{(qt as { desc: string }).desc}</span>}
                     </div>
                   </button>
                 ))}

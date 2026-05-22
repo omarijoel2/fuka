@@ -245,7 +245,7 @@ export default function StaffProfilePage() {
     sameAs: [
       ...(profile.orcid_id ? [`https://orcid.org/${profile.orcid_id}`] : []),
       ...(profile.google_scholar_url ? [profile.google_scholar_url] : []),
-      ...(profile.scopus_url ? [profile.scopus_url] : []),
+      ...(profile.scopus_id ? [`https://www.scopus.com/authid/detail.uri?authorId=${profile.scopus_id}`] : []),
       ...(profile.linkedin_url ? [profile.linkedin_url] : []),
     ],
     ...(profile.research_interests?.length
@@ -257,7 +257,7 @@ export default function StaffProfilePage() {
     <div className="flex flex-col min-h-screen">
       <SeoHead
         title={`${profile.name} — ${profile.title} | KAFU`}
-        description={profile.biography ? profile.biography.slice(0, 160) : `${profile.name} is ${profile.title} at the ${SCHOOL_NAMES[profile.school] ?? profile.school}, Kaimosi Friends University.`}
+        description={profile.biography ? profile.biography.slice(0, 160) : `${profile.name} is ${profile.title} at the ${SCHOOL_NAMES[profile.school ?? ""] ?? profile.school}, Kaimosi Friends University.`}
         path={`/staff/${slug}`}
         type="profile"
         breadcrumbs={[

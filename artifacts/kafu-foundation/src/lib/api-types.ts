@@ -52,6 +52,7 @@ export interface Programme {
   name: string;
   code: string;
   duration: string;
+  description?: string;
 }
 
 export interface Event {
@@ -62,6 +63,7 @@ export interface Event {
   end_date?: string | null;
   time: string;
   location: string;
+  venue?: string;
   category: string;
   description: string;
   registration_link?: string | null;
@@ -461,7 +463,7 @@ export interface ResearchProject {
   sdg_goals: number[];
   featured_image_url?: string;
   is_featured: boolean;
-  theme?: { name: string; slug: string; colour: string };
+  theme?: { name: string; slug: string; colour: string; description?: string };
   publications?: ResearchPublication[];
   grant?: { name: string; funder: string; amount: number; currency: string; status: string };
   seo_meta?: { title?: string; description?: string } | null;
