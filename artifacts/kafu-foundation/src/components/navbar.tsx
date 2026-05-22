@@ -298,36 +298,30 @@ const navItems: NavItem[] = [
   {
     name: "Directorates",
     path: "/directorates",
-    megaWidth: 680, megaCols: 3,
+    megaWidth: 620, megaCols: 3,
     megaGroups: [
       {
         heading: "Academic",
         links: [
-          { name: "Graduate Studies",                   path: "/directorates/graduate-studies" },
-          { name: "Quality Assurance (DQAMS)",          path: "/directorates/quality-assurance" },
-          { name: "Open, Distance & e-Learning",        path: "/directorates/open-distance-elearning" },
+          { name: "Graduate Studies",              path: "/directorates/graduate-studies" },
+          { name: "Quality Assurance (DQA&MS)",   path: "/directorates/quality-assurance" },
+          { name: "Open, Distance & e-Learning",  path: "/directorates/open-distance-elearning" },
+        ],
+      },
+      {
+        heading: "Research & Partnerships",
+        links: [
+          { name: "Research, Innovation & Outreach",      path: "/directorates/research-innovation" },
           { name: "University Linkages, Alumni & Career", path: "/directorates/university-linkages-alumni-career" },
         ],
       },
       {
-        heading: "Research & Outreach",
+        heading: "Administration",
         links: [
-          { name: "Research, Innovation & Outreach",    path: "/directorates/research-innovation" },
-          { name: "International Relations",            path: "/directorates/international-relations" },
-          { name: "Centre of Excellence — Climate Action", path: "/directorates/centre-climate-action-research" },
-        ],
-      },
-      {
-        heading: "Administration & Support",
-        links: [
-          { name: "ICT Services",                       path: "/directorates/ict" },
-          { name: "Corporate Affairs",                  path: "/directorates/corporate-affairs" },
-          { name: "Corporate Communications",           path: "/directorates/corporate-communications" },
-          { name: "Planning & Performance Contracting", path: "/directorates/planning-performance-contracting" },
-          { name: "Enterprise & Resource Mobilization", path: "/directorates/enterprises-resource-mobilization" },
-          { name: "Student Affairs",                    path: "/directorates/student-affairs" },
-          { name: "Finance",                            path: "/directorates/finance" },
-          { name: "Procurement",                        path: "/directorates/procurement" },
+          { name: "ICT Services",                        path: "/directorates/ict" },
+          { name: "Corporate Affairs",                   path: "/directorates/corporate-affairs" },
+          { name: "Planning & Performance Contracting",  path: "/directorates/planning-performance-contracting" },
+          { name: "Enterprise & Resource Mobilization",  path: "/directorates/enterprises-resource-mobilization" },
         ],
       },
     ],
