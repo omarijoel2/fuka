@@ -100,6 +100,14 @@ const navItems: NavItem[] = [
           { name: "University Management",  path: "/about/management" },
         ],
       },
+      {
+        heading: "Institutional",
+        links: [
+          { name: "Complaints & Resolution", path: "/about/complaints" },
+          { name: "Legal Office",            path: "/about/legal" },
+          { name: "Corporate Social Responsibility", path: "/about/csr" },
+        ],
+      },
     ],
     megaFooter: [{ label: "University overview", path: "/about", testid: "nav-about-overview" }],
   },
@@ -150,20 +158,23 @@ const navItems: NavItem[] = [
       {
         heading: "Apply",
         links: [
-          { name: "Admissions Overview", path: "/admissions" },
-          { name: "Apply Online",        path: "/admissions/apply" },
-          { name: "Track Application",   path: "/admissions/track" },
-          { name: "Intake Calendar",     path: "/admissions/calendar" },
+          { name: "Admissions Overview",    path: "/admissions" },
+          { name: "Apply Online",           path: "/admissions/apply" },
+          { name: "Track Application",      path: "/admissions/track" },
+          { name: "Intake Calendar",        path: "/admissions/calendar" },
+          { name: "Joining Instructions",   path: "/admissions/joining-instructions" },
         ],
       },
       {
-        heading: "Entry Requirements",
+        heading: "Fees & Funding",
         links: [
           { name: "Undergraduate (KUCCPS)", path: "/admissions#undergraduate" },
           { name: "Postgraduate",           path: "/admissions#postgraduate" },
           { name: "Self-Sponsored",         path: "/admissions#self-sponsored" },
           { name: "Fees & Financing",       path: "/admissions/fees" },
+          { name: "Access to Funding",      path: "/admissions/funding" },
           { name: "Eligibility",            path: "/admissions/eligibility" },
+          { name: "Timetables",             path: "/admissions/timetables" },
         ],
       },
       {
@@ -257,8 +268,9 @@ const navItems: NavItem[] = [
       {
         heading: "Resources",
         links: [
-          { name: "Partnerships & Grants",    path: "/research/partnerships" },
-          { name: "Institutional Repository", path: "/repository" },
+          { name: "Partnerships & Grants",         path: "/research/partnerships" },
+          { name: "Institutional Repository",      path: "/repository" },
+          { name: "Ethics Review Committee",       path: "/research/ethics" },
         ],
       },
     ],

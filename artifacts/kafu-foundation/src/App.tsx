@@ -54,10 +54,17 @@ import ManagementPage from "@/pages/management";
 import StrategicPlan from "@/pages/about-strategic-plan";
 import AboutPolicies from "@/pages/about-policies";
 import ServiceCharter from "@/pages/about-service-charter";
+import AboutComplaints from "@/pages/about-complaints";
+import AboutLegal from "@/pages/about-legal";
+import AboutCSR from "@/pages/about-csr";
 import Archives from "@/pages/archives";
 import AdmissionsApply from "@/pages/admissions-apply";
 import AdmissionsTrack from "@/pages/admissions-track";
 import AdmissionsCalendar from "@/pages/admissions-calendar";
+import AdmissionsFunding from "@/pages/admissions-funding";
+import AdmissionsJoiningInstructions from "@/pages/admissions-joining-instructions";
+import AdmissionsTimetables from "@/pages/admissions-timetables";
+import ResearchEthics from "@/pages/research-ethics";
 import SearchPage from "@/pages/search";
 import DirectoratesPage from "@/pages/directorates";
 import DirectorateDetail from "@/pages/directorate-detail";
@@ -142,10 +149,17 @@ function Router() {
           <Route path="/about/strategic-plan" component={StrategicPlan} />
           <Route path="/about/policies" component={AboutPolicies} />
           <Route path="/about/service-charter" component={ServiceCharter} />
+          <Route path="/about/complaints" component={AboutComplaints} />
+          <Route path="/about/legal" component={AboutLegal} />
+          <Route path="/about/csr" component={AboutCSR} />
           <Route path="/archives" component={Archives} />
           <Route path="/admissions/apply" component={AdmissionsApply} />
           <Route path="/admissions/track" component={AdmissionsTrack} />
           <Route path="/admissions/calendar" component={AdmissionsCalendar} />
+          <Route path="/admissions/funding" component={AdmissionsFunding} />
+          <Route path="/admissions/joining-instructions" component={AdmissionsJoiningInstructions} />
+          <Route path="/admissions/timetables" component={AdmissionsTimetables} />
+          <Route path="/research/ethics" component={ResearchEthics} />
           <Route path="/search" component={SearchPage} />
           <Route path="/directorates" component={DirectoratesPage} />
           <Route path="/directorates/:slug">
