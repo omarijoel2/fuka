@@ -5,16 +5,17 @@ import { Button } from "./ui/button";
 import { SearchModal } from "./search-bar";
 
 // ─── Departments mega-menu data (grouped by school) ──────────────────────────
+// Slugs MUST match the `slug` column in the `departments` table (DepartmentSeeder)
 const DEPARTMENTS_BY_SCHOOL = [
   {
     school: "Education & Social Sciences",
     code: "SESS",
     path: "/schools/SESS",
     depts: [
-      { name: "Arts & Social Sciences Education",  slug: "arts-social-sciences-education" },
-      { name: "Science & Technical Education",     slug: "science-technical-education" },
-      { name: "Social Work & Community Dev.",      slug: "social-work-community-development" },
-      { name: "Criminology, Security & Peace",     slug: "criminology-security-peace-studies" },
+      { name: "Educational Foundations & Psychology", slug: "educational-foundations-psychology-management" },
+      { name: "Curriculum & Instruction",             slug: "curriculum-instruction" },
+      { name: "Languages & Literature",               slug: "languages-literature" },
+      { name: "Social Sciences",                      slug: "social-sciences" },
     ],
   },
   {
@@ -22,9 +23,8 @@ const DEPARTMENTS_BY_SCHOOL = [
     code: "SBE",
     path: "/schools/SBE",
     depts: [
-      { name: "Business Administration & Mgmt",   slug: "business-administration-management" },
-      { name: "Accounting & Finance",              slug: "accounting-finance" },
-      { name: "Economics",                         slug: "economics" },
+      { name: "Business Administration & Mgmt",    slug: "business-administration-management" },
+      { name: "Accounting, Finance & Economics",   slug: "accounting-finance-economics" },
     ],
   },
   {
@@ -50,9 +50,9 @@ const DEPARTMENTS_BY_SCHOOL = [
     code: "SHS",
     path: "/schools/SHS",
     depts: [
-      { name: "Optometry & Vision Sciences",       slug: "optometry-vision-sciences" },
-      { name: "Public & Community Health",         slug: "public-community-health" },
-      { name: "Medical Laboratory Sciences",       slug: "medical-laboratory-sciences" },
+      { name: "Optometry & Vision Sciences",           slug: "optometry-vision-sciences" },
+      { name: "Nursing",                               slug: "nursing" },
+      { name: "Clinical Medicine & Community Health",  slug: "clinical-medicine-community-health" },
     ],
   },
 ];
@@ -98,6 +98,14 @@ const navItems: NavItem[] = [
           { name: "University Council",     path: "/about/council" },
           { name: "Vice-Chancellor",        path: "/about/management" },
           { name: "University Management",  path: "/about/management" },
+        ],
+      },
+      {
+        heading: "Institutional",
+        links: [
+          { name: "Complaints & Resolution", path: "/about/complaints" },
+          { name: "Legal Office",            path: "/about/legal" },
+          { name: "Corporate Social Responsibility", path: "/about/csr" },
         ],
       },
     ],
@@ -150,20 +158,23 @@ const navItems: NavItem[] = [
       {
         heading: "Apply",
         links: [
-          { name: "Admissions Overview", path: "/admissions" },
-          { name: "Apply Online",        path: "/admissions/apply" },
-          { name: "Track Application",   path: "/admissions/track" },
-          { name: "Intake Calendar",     path: "/admissions/calendar" },
+          { name: "Admissions Overview",    path: "/admissions" },
+          { name: "Apply Online",           path: "/admissions/apply" },
+          { name: "Track Application",      path: "/admissions/track" },
+          { name: "Intake Calendar",        path: "/admissions/calendar" },
+          { name: "Joining Instructions",   path: "/admissions/joining-instructions" },
         ],
       },
       {
-        heading: "Entry Requirements",
+        heading: "Fees & Funding",
         links: [
           { name: "Undergraduate (KUCCPS)", path: "/admissions#undergraduate" },
           { name: "Postgraduate",           path: "/admissions#postgraduate" },
           { name: "Self-Sponsored",         path: "/admissions#self-sponsored" },
           { name: "Fees & Financing",       path: "/admissions/fees" },
+          { name: "Access to Funding",      path: "/admissions/funding" },
           { name: "Eligibility",            path: "/admissions/eligibility" },
+          { name: "Timetables",             path: "/admissions/timetables" },
         ],
       },
       {
@@ -257,8 +268,9 @@ const navItems: NavItem[] = [
       {
         heading: "Resources",
         links: [
-          { name: "Partnerships & Grants",    path: "/research/partnerships" },
-          { name: "Institutional Repository", path: "/repository" },
+          { name: "Partnerships & Grants",         path: "/research/partnerships" },
+          { name: "Institutional Repository",      path: "/repository" },
+          { name: "Ethics Review Committee",       path: "/research/ethics" },
         ],
       },
     ],
@@ -272,10 +284,10 @@ const navItems: NavItem[] = [
         heading: "Academic",
         links: [
           { name: "All Directorates",       path: "/directorates" },
-          { name: "Graduate Studies",       path: "/directorates/graduate-studies" },
-          { name: "Research & Innovation",  path: "/directorates/research-innovation" },
-          { name: "Quality Assurance",      path: "/directorates/quality-assurance" },
-          { name: "International Relations",path: "/directorates/international-relations" },
+          { name: "Graduate Studies",             path: "/directorates/graduate-studies" },
+          { name: "Research & Innovation",        path: "/directorates/research-innovation" },
+          { name: "Quality Assurance",            path: "/directorates/quality-assurance" },
+          { name: "International Relations",      path: "/directorates/international-relations" },
           { name: "Open Distance e-Learning (ODeL)", path: "/directorates/open-distance-elearning" },
         ],
       },
@@ -283,7 +295,7 @@ const navItems: NavItem[] = [
         heading: "Administrative",
         links: [
           { name: "ICT",                     path: "/directorates/ict" },
-          { name: "Corporate Communications",path: "/directorates/corporate-communications" },
+          { name: "Corporate Affairs",       path: "/directorates/corporate-affairs" },
           { name: "Student Affairs",         path: "/directorates/student-affairs" },
           { name: "Finance",                 path: "/directorates/finance" },
           { name: "Procurement",             path: "/directorates/procurement" },

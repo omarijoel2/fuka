@@ -223,7 +223,7 @@ Route::get('/sitemap-staff.xml', function () {
     $host = "https://kafu.ac.ke";
 
     $staticSlugs = [
-        'prof-kelvin-k-omieno', 'dr-annette-o-busula', 'prof-winnie-awino',
+        'prof-kelvin-k-omieno', 'dr-annette-o-busula', 'dr-cyprian-mabonga',
         'prof-peter-n-mwita', 'dr-george-otieno', 'dr-faith-simiyu',
         'dr-samuel-odhiambo', 'dr-lucy-anyango', 'mr-james-wafula',
         'ms-grace-akinyi', 'dr-daniel-kipkemei', 'mr-robert-otieno',

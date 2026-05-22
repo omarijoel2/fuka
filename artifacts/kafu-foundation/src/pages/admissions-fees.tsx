@@ -25,7 +25,7 @@ export default function AdmissionsFeesPage() {
   const { data, isLoading } = useAdmissionsFees();
   const [activePathway, setActivePathway] = useState<string>("government");
 
-  const fees = data?.data ?? data as any;
+  const fees = (data as any)?.data ?? data;
   const pathways = fees?.pathways ?? [];
   const currentPathway = pathways.find((p: any) => p.id === activePathway);
   const paymentMethods = fees?.payment_methods ?? [];

@@ -37,7 +37,7 @@ class SchoolsOnlySeeder extends Seeder
             [
                 'code'           => 'SBE',
                 'name'           => 'School of Business & Economics',
-                'dean'           => 'Dr. Atieno Margaret Omondi',
+                'dean'           => 'Dr. Atieno Margaret Otieno',
                 'dean_title'     => 'Dean, School of Business & Economics',
                 'dean_photo'     => '/imgs/staff/Dr.-Atieno.jpg',
                 'colour'         => '#D4A017',
@@ -79,9 +79,9 @@ class SchoolsOnlySeeder extends Seeder
             [
                 'code'           => 'SHS',
                 'name'           => 'School of Health Sciences',
-                'dean'           => 'Prof. Winnie Awino',
+                'dean'           => 'Dr. Cyprian Mabonga',
                 'dean_title'     => 'Dean, School of Health Sciences',
-                'dean_photo'     => null,
+                'dean_photo'     => '/imgs/staff/Dr.-Mabonga.jpg',
                 'colour'         => '#8B1A1A',
                 'description'    => 'Established in 2022, SHS is one of only two institutions in Kenya offering Optometry up to PhD level.',
                 'vision'         => 'To be a centre of excellence in health sciences education and research in East and Central Africa.',

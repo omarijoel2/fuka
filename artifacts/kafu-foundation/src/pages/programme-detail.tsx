@@ -409,7 +409,7 @@ export default function ProgrammeDetailPage() {
                       </div>
                       <div className="min-w-0">
                         <div className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1">{member.name}</div>
-                        <div className="text-xs text-muted-foreground line-clamp-1">{member.designation ?? member.rank}</div>
+                        <div className="text-xs text-muted-foreground line-clamp-1">{member.designation}</div>
                       </div>
                     </Link>
                   ))}

@@ -205,7 +205,7 @@ export default function StudentServices() {
                             <Icon className="w-4.5 h-4.5" style={{ color: group.colour, width: "1.125rem", height: "1.125rem" }} />
                           </div>
                           <div className="flex items-center gap-1.5">
-                            {sys.sso && <Lock className="w-3.5 h-3.5 text-primary" title="SSO Enabled" />}
+                            {sys.sso && <Lock className="w-3.5 h-3.5 text-primary" aria-label="SSO Enabled" />}
                             <span className="text-xs font-medium px-2 py-0.5 rounded-full" style={{ backgroundColor: badge.bg, color: badge.colour }}>
                               {badge.label}
                             </span>

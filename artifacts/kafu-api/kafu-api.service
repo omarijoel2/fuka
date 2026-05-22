@@ -1,0 +1,24 @@
+[Unit]
+Description=KAFU Laravel API Service
+Documentation=https://github.com/your-org/kafu-website
+After=network.target mysql.service
+Wants=mysql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/fuka/artifacts/kafu-api
+ExecStart=/usr/bin/php artisan serve --host=127.0.0.1 --port=8080
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=kafu-api
+
+# Security hardening
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

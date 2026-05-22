@@ -38,7 +38,7 @@ export default function ResearchPublicationDetail({ slug }: { slug: string }) {
     "@type": "ScholarlyArticle",
     headline: pub.title,
     abstract: pub.abstract ?? undefined,
-    author: pub.authors?.map((a: string) => ({ "@type": "Person", name: a })),
+    author: pub.authors?.map((a) => ({ "@type": "Person", name: typeof a === "string" ? a : a.name })),
     datePublished: String(pub.year),
     publisher: ORG_JSONLD,
     ...(pub.doi ? { identifier: `https://doi.org/${pub.doi}`, sameAs: `https://doi.org/${pub.doi}` } : {}),

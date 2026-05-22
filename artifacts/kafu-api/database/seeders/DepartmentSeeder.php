@@ -51,12 +51,17 @@ class DepartmentSeeder extends Seeder
                 'slug'            => 'languages-literature',
                 'description'     => 'The Department of Languages and Literature is a vibrant academic hub dedicated to shaping eloquent communicators, creative thinkers and transformative educators. It offers Master\'s and Bachelor\'s programmes in Literature, Kiswahili, French, English and Linguistics, equipping students with strong language mastery, analytical skills and global communication competencies.',
                 'vision'          => 'To be the leading centre for language and literary studies, fostering creativity and cultural appreciation.',
-                'hod_name'        => 'Ms. Margaret Thang\'wa',
+                'hod_name'        => 'Dr. Margaret Thang\'wa',
                 'hod_title'       => 'Chair, Languages & Literature Department',
                 'hod_email'       => 'm.thangwa@kafu.ac.ke',
                 'hod_phone'       => '+254 700 100 221',
+<<<<<<< HEAD
                 'hod_photo_url'   => '/staff/thangwa.jpg',
                 'hod_bio'         => 'Ms. Margaret Thang\'wa chairs the Department of Languages and Literature at Kaimosi Friends University. Her leadership continues to strengthen academic excellence and student growth within the discipline.',
+=======
+                'hod_photo_url'   => null,
+                'hod_bio'         => 'Dr. Margaret Thang\'wa chairs the Department of Languages and Literature at Kaimosi Friends University. Her leadership continues to strengthen academic excellence and student growth within the discipline.',
+>>>>>>> 49b10222f2da04116c68a97941eeb0c8ee7f15db
                 'office_location' => 'Humanities Block, Room 115, KAFU Main Campus',
                 'email'           => 'dept.languages@kafu.ac.ke',
                 'phone'           => '+254 700 100 220',
@@ -100,9 +105,9 @@ class DepartmentSeeder extends Seeder
             ],
             [
                 'school_code'     => 'SBE',
-                'name'            => 'Department of Accounting & Finance',
-                'slug'            => 'accounting-finance',
-                'description'     => 'The Department of Accounting & Finance prepares students for professional careers in financial management, auditing, taxation, and investment. The department is aligned with CPA(K) and ACCA professional standards, and its graduates are sought after in banking, public finance, and corporate accounting.',
+                'name'            => 'Department of Accounting, Finance & Economics',
+                'slug'            => 'accounting-finance-economics',
+                'description'     => 'The Department of Accounting, Finance and Economics prepares students for professional careers in financial management, auditing, taxation, investment, and economic analysis. The department is aligned with CPA(K) and ACCA professional standards, and its graduates are sought after in banking, public finance, corporate accounting, government ministries, and international financial institutions.',
                 'hod_name'        => 'Dr. Robert Opanyi',
                 'hod_title'       => 'Chair, Department of Accounting, Finance & Economics',
                 'hod_email'       => 'r.opanyi@kafu.ac.ke',
@@ -114,6 +119,7 @@ class DepartmentSeeder extends Seeder
                 'phone'           => '+254 700 100 310',
                 'sort_order'      => 2,
             ],
+<<<<<<< HEAD
             [
                 'school_code'     => 'SBE',
                 'name'            => 'Department of Economics',
@@ -131,6 +137,8 @@ class DepartmentSeeder extends Seeder
                 'sort_order'      => 3,
             ],
 
+=======
+>>>>>>> 49b10222f2da04116c68a97941eeb0c8ee7f15db
             // ── SCIT ─────────────────────────────────────────────────────────
             [
                 'school_code'     => 'SCIT',

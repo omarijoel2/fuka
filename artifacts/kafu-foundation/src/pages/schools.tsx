@@ -4,7 +4,7 @@ import { useSchools } from "@/lib/api-hooks";
 import { SeoHead } from "@/components/seo-head";
 import { BookOpen, GraduationCap, ChevronRight, User } from "lucide-react";
 
-function progTotal(count: Record<string, number> | number): number {
+function progTotal(count: Record<string, number> | { undergraduate?: number; postgraduate?: number; doctoral?: number } | number): number {
   if (typeof count === "number") return count;
   return Object.values(count).reduce((a, b) => a + b, 0);
 }

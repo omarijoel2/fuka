@@ -197,7 +197,7 @@ export default function Events() {
           </div>
         ) : (
           <div className="space-y-4">
-            {events.map((event) => (
+            {(events ?? []).map((event) => (
               <EventCard key={event.id} event={event} />
             ))}
           </div>

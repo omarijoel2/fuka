@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 // ── Types ─────────────────────────────────────────────────────────────────────
 interface Pathway { id: number; code: string; name: string; description: string; level: string; requires_payment: boolean; requires_kuccps_verification: boolean; }
 interface Intake  { id: number; name: string; academic_year: string; intake_period: string; open_at: string; close_at: string; status: string; is_published: boolean; application_fee_undergraduate: number; application_fee_masters: number; application_fee_phd: number; }
-interface Programme { id: number; programme_code: string; programme_name: string; school_code: string; department: string; level: string; duration: string; mode: string; minimum_requirements: string; required_documents: string | string[]; }
+interface Programme { id: number; programme_code: string; programme_name: string; school_code: string; department: string; level: string; duration: string; mode: string; minimum_requirements: string; required_documents: string | string[]; available_pathways?: string | string[]; }
 interface UploadedDoc { document_type: string; original_filename: string; }
 interface WizardState {
   step: number;
@@ -523,7 +523,7 @@ function StepReview({ token, reference, wizardState, uploadedDocs, onAccepted }:
           {row("Programme", wizardState.programme?.programme_name ?? "—")}
           {row("Level", wizardState.programme?.level ?? "—")}
           {row("Academic Year", wizardState.intake?.academic_year ?? "—")}
-          {row("Application Fee", wizardState.pathway?.requires_payment ? `KES ${(wizardState.programme?.level === "masters" ? wizardState.intake?.application_fee_masters : wizardState.programme?.level === "phd" ? wizardState.intake?.application_fee_phd : wizardState.intake?.application_fee_undergraduate ?? 1000).toLocaleString()}` : "Not required")}
+          {row("Application Fee", wizardState.pathway?.requires_payment ? `KES ${((wizardState.programme?.level === "masters" ? wizardState.intake?.application_fee_masters : wizardState.programme?.level === "phd" ? wizardState.intake?.application_fee_phd : wizardState.intake?.application_fee_undergraduate) ?? 1000).toLocaleString()}` : "Not required")}
         </div>
       </div>
 
