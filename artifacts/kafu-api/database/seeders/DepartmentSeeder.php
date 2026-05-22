@@ -100,9 +100,9 @@ class DepartmentSeeder extends Seeder
             ],
             [
                 'school_code'     => 'SBE',
-                'name'            => 'Department of Accounting & Finance',
-                'slug'            => 'accounting-finance',
-                'description'     => 'The Department of Accounting & Finance prepares students for professional careers in financial management, auditing, taxation, and investment. The department is aligned with CPA(K) and ACCA professional standards, and its graduates are sought after in banking, public finance, and corporate accounting.',
+                'name'            => 'Department of Accounting, Finance & Economics',
+                'slug'            => 'accounting-finance-economics',
+                'description'     => 'The Department of Accounting, Finance and Economics prepares students for professional careers in financial management, auditing, taxation, investment, and economic analysis. The department is aligned with CPA(K) and ACCA professional standards, and its graduates are sought after in banking, public finance, corporate accounting, government ministries, and international financial institutions.',
                 'hod_name'        => 'Dr. Robert Opanyi',
                 'hod_title'       => 'Chair, Department of Accounting, Finance & Economics',
                 'hod_email'       => 'r.opanyi@kafu.ac.ke',
@@ -114,23 +114,6 @@ class DepartmentSeeder extends Seeder
                 'phone'           => '+254 700 100 310',
                 'sort_order'      => 2,
             ],
-            [
-                'school_code'     => 'SBE',
-                'name'            => 'Department of Economics',
-                'slug'            => 'economics',
-                'description'     => 'The Department of Economics provides rigorous training in micro and macroeconomic theory, econometrics, development economics, and policy analysis. Graduates are employed in government ministries, international financial institutions, research organisations, and the private sector.',
-                'hod_name'        => 'Dr. Mackton',
-                'hod_title'       => 'Chair, Department of Economics',
-                'hod_email'       => 'hod.economics@kafu.ac.ke',
-                'hod_phone'       => '+254 700 100 321',
-                'hod_photo_url'   => '/imgs/staff/Dr.-Mackton.jpg',
-                'hod_bio'         => 'Dr. Mackton chairs the Department of Economics at the School of Business and Economics, Kaimosi Friends University.',
-                'office_location' => 'Business Block, Room 225, KAFU Main Campus',
-                'email'           => 'dept.econ@kafu.ac.ke',
-                'phone'           => '+254 700 100 320',
-                'sort_order'      => 3,
-            ],
-
             // ── SCIT ─────────────────────────────────────────────────────────
             [
                 'school_code'     => 'SCIT',
