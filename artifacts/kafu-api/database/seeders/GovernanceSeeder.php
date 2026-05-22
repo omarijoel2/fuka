@@ -209,30 +209,31 @@ class GovernanceSeeder extends Seeder
                 'name'              => 'Directorate of Information and Communication Technology Services',
                 'slug'              => 'ict',
                 'tagline'           => 'Powering Digital Transformation at KAFU',
-                'description'       => 'The Directorate of Information and Communication Technology Services is responsible for planning, implementing, and managing the university\'s technology infrastructure and digital services. From campus network connectivity to the enterprise resource planning system, the Directorate ensures that KAFU\'s digital platforms are reliable, secure, and aligned with the university\'s strategic goals.',
+                'description'       => 'The Directorate of Information and Communication Technology (ICTs) is the central support unit that provides all the University\'s ICT services and facilities. Our directorate is committed to supporting, improving, and transforming how ICTs are used across Kaimosi Friends University (KAFU). At KAFU, our goal is to provide the best possible experience for our students and staff, which is why we are persistently improving the way we work. Our ongoing ICTs Transformation Journey is focused on delivering significant improvements to our systems, website, connectivity, and services. This will empower our staff and students to work flexibly with all the information they need at their fingertips. The wireless network (Wi-Fi) is now available across the University campuses, offering connection speeds that are significantly faster than before. We are continually upgrading our infrastructure to increase the internet connection speed and enhance the reliability of our services.',
                 'director_name'     => 'Mr. Yohana Obiye',
-                'director_title'    => 'In-Charge, Directorate of ICT Services',
+                'director_title'    => 'In-Charge, ICTS',
                 'director_email'    => 'ict@kafu.ac.ke',
                 'director_phone'    => '+254 777 373 680',
-                'director_bio'      => 'Mr. Yohana Obiye is the In-Charge of the Directorate of Information and Communication Technology Services at Kaimosi Friends University, overseeing the university\'s digital infrastructure, enterprise systems, network services, and e-learning platforms.',
+                'director_bio'      => 'Mr. Yohana Obiye is the In-Charge of the Directorate of Information and Communication Technology Services (ICTS) at Kaimosi Friends University. He oversees the university\'s digital infrastructure, enterprise systems, network services, information systems, and web services, leading the ongoing ICTs Transformation Journey to improve connectivity, systems, and digital services across the institution.',
                 'functions'         => [
-                    'Management and maintenance of ICT infrastructure and networks',
-                    'Administration of the university ERP and student information systems',
-                    'Support and development of e-learning platforms',
-                    'Cybersecurity policy and implementation',
-                    'ICT procurement and asset management',
-                    'Website and digital services administration',
-                    'ICT training and user support for staff and students',
-                    'Data backup, recovery, and business continuity planning',
+                    'ICT Support: Installation, maintenance, and repair of all university computer systems and equipment; management of both managed and non-managed devices on the network',
+                    'Network Infrastructure and Security: Design and maintenance of the campus-wide High-Speed Local Area Network (LAN) and Data Communication systems; implementation of information security and all ICT networking projects',
+                    'Network Management: Creation and maintenance of network configuration and addressing policy; maximising network uptime and performance',
+                    'Information Systems: Development and deployment of application software for information management; administration of the Student Portal and ERP server',
+                    'Information Security: Coordination and securing of all university data; compliance with Standard Information Security Procedures',
+                    'Web Services: Management of the university\'s strategic web presence, content development, upload, and storage; integration of disparate systems into a unified online platform',
+                    'E-Learning and Innovation: Support and enhancement of the e-learning infrastructure; guidance on adoption of new ICT in teaching including audio-visuals and video conferencing',
+                    'Critical Systems Management: Management of web and repository servers and support for departmental critical systems',
                 ],
                 'services'          => [
                     'ICT helpdesk and technical support',
-                    'Email and productivity tools provisioning',
-                    'Network connectivity and Wi-Fi access',
-                    'ERP system access and troubleshooting',
-                    'E-learning platform support (Moodle)',
-                    'Software licensing and computer lab management',
-                    'Video conferencing and digital collaboration tools',
+                    'Equipment maintenance and PC upgrades for staff and students',
+                    'Network connectivity, Wi-Fi access, and managed device support',
+                    'Student Portal access and records management (online registration, fee statements)',
+                    'ERP system hosting and access for academic and administrative functions',
+                    'E-learning platform support and video conferencing tools',
+                    'University website management and digital content services',
+                    'Information security and data protection services',
                 ],
                 'quick_links'       => [
                     ['label' => 'Student Portal', 'url' => 'https://portal.kafu.ac.ke', 'external' => true],
@@ -685,7 +686,7 @@ class GovernanceSeeder extends Seeder
         ];
 
         foreach ($directorates as $data) {
-            Directorate::firstOrCreate(
+            Directorate::updateOrCreate(
                 ['slug' => $data['slug']],
                 $data
             );
