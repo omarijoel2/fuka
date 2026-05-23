@@ -331,68 +331,78 @@ Route::get('/gallery/albums/{slug}', function (string $slug) {
 });
 
 Route::get('/news', function (Request $request) {
-    $query = CmsContent::where('type', 'news')
-        ->where('status', 'published')
-        ->where('is_deleted', false)
-        ->with('author:id,name')
-        ->orderByDesc('published_at');
+    try {
+        $query = CmsContent::where('type', 'news')
+            ->where('status', 'published')
+            ->where('is_deleted', false)
+            ->orderByDesc('published_at');
 
-    if ($request->query('category') && $request->query('category') !== 'All') {
-        $query->where('category', $request->query('category'));
-    }
-    if ($request->query('search')) {
-        $s = $request->query('search');
-        $query->where(fn($q) => $q->where('title', 'like', "%{$s}%")->orWhere('summary', 'like', "%{$s}%"));
-    }
-    if ($request->query('featured')) {
-        $query->where('featured', true);
-    }
+        if ($request->query('category') && $request->query('category') !== 'All') {
+            $query->where('category', $request->query('category'));
+        }
+        if ($request->query('search')) {
+            $s = $request->query('search');
+            $query->where(fn($q) => $q->where('title', 'like', "%{$s}%")->orWhere('summary', 'like', "%{$s}%"));
+        }
+        if ($request->query('featured')) {
+            $query->where('featured', true);
+        }
 
-    $items = $query->get()->map(fn($item) => mapCmsNews($item))->toArray();
-    return response()->json(['data' => $items]);
+        $items = $query->get()->map(fn($item) => mapCmsNews($item))->toArray();
+        return response()->json(['data' => $items]);
+    } catch (\Throwable $e) {
+        return response()->json(['data' => []]);
+    }
 });
 
 Route::get('/news/{slug}', function (string $slug) {
-    $item = CmsContent::where('type', 'news')
-        ->where('slug', $slug)
-        ->where('status', 'published')
-        ->where('is_deleted', false)
-        ->with('author:id,name')
-        ->first();
-    if (!$item) {
+    try {
+        $item = CmsContent::where('type', 'news')
+            ->where('slug', $slug)
+            ->where('status', 'published')
+            ->where('is_deleted', false)
+            ->first();
+        if (!$item) {
+            return response()->json(['error' => 'Article not found'], 404);
+        }
+        return response()->json(['data' => mapCmsNewsDetail($item)]);
+    } catch (\Throwable $e) {
         return response()->json(['error' => 'Article not found'], 404);
     }
-    return response()->json(['data' => mapCmsNewsDetail($item)]);
 });
 
 Route::get('/events', function (Request $request) {
-    $query = CmsContent::where('type', 'event')
-        ->where('status', 'published')
-        ->where('is_deleted', false)
-        ->orderByDesc('published_at');
+    try {
+        $query = CmsContent::where('type', 'event')
+            ->where('status', 'published')
+            ->where('is_deleted', false)
+            ->orderByDesc('published_at');
 
-    $items = $query->get()->map(fn($item) => mapCmsEvent($item))->toArray();
+        $items = $query->get()->map(fn($item) => mapCmsEvent($item))->toArray();
 
-    $filter   = $request->query('filter', 'upcoming');
-    $category = $request->query('category');
-    $search   = $request->query('search');
+        $filter   = $request->query('filter', 'upcoming');
+        $category = $request->query('category');
+        $search   = $request->query('search');
 
-    if ($filter === 'past') {
-        $items = array_values(array_filter($items, fn($e) => $e['status'] === 'past'));
-    } elseif ($filter === 'upcoming') {
-        $items = array_values(array_filter($items, fn($e) => $e['status'] === 'upcoming'));
+        if ($filter === 'past') {
+            $items = array_values(array_filter($items, fn($e) => $e['status'] === 'past'));
+        } elseif ($filter === 'upcoming') {
+            $items = array_values(array_filter($items, fn($e) => $e['status'] === 'upcoming'));
+        }
+        if ($category && $category !== 'All') {
+            $items = array_values(array_filter($items, fn($e) => strtolower($e['category']) === strtolower($category)));
+        }
+        if ($search) {
+            $items = array_values(array_filter($items, fn($e) =>
+                stripos($e['title'], $search) !== false ||
+                stripos($e['description'], $search) !== false
+            ));
+        }
+
+        return response()->json(['data' => $items]);
+    } catch (\Throwable $e) {
+        return response()->json(['data' => []]);
     }
-    if ($category && $category !== 'All') {
-        $items = array_values(array_filter($items, fn($e) => strtolower($e['category']) === strtolower($category)));
-    }
-    if ($search) {
-        $items = array_values(array_filter($items, fn($e) =>
-            stripos($e['title'], $search) !== false ||
-            stripos($e['description'], $search) !== false
-        ));
-    }
-
-    return response()->json(['data' => $items]);
 });
 
 Route::get('/events/{slug}', function (string $slug) {
@@ -408,35 +418,39 @@ Route::get('/events/{slug}', function (string $slug) {
 });
 
 Route::get('/announcements', function (Request $request) {
-    $query = CmsContent::where('type', 'announcement')
-        ->where('status', 'published')
-        ->where('is_deleted', false)
-        ->orderByDesc('published_at');
+    try {
+        $query = CmsContent::where('type', 'announcement')
+            ->where('status', 'published')
+            ->where('is_deleted', false)
+            ->orderByDesc('published_at');
 
-    $items = $query->get()->map(fn($item) => mapCmsAnnouncement($item))->toArray();
+        $items = $query->get()->map(fn($item) => mapCmsAnnouncement($item))->toArray();
 
-    $priority   = $request->query('priority');
-    $department = $request->query('department');
-    $search     = $request->query('search');
-    $status     = $request->query('status', 'active');
+        $priority   = $request->query('priority');
+        $department = $request->query('department');
+        $search     = $request->query('search');
+        $status     = $request->query('status', 'active');
 
-    if ($status && $status !== 'all') {
-        $items = array_values(array_filter($items, fn($a) => $a['status'] === $status));
-    }
-    if ($priority && $priority !== 'all') {
-        $items = array_values(array_filter($items, fn($a) => $a['priority'] === $priority));
-    }
-    if ($department) {
-        $items = array_values(array_filter($items, fn($a) => stripos($a['department'], $department) !== false));
-    }
-    if ($search) {
-        $items = array_values(array_filter($items, fn($a) =>
-            stripos($a['title'], $search) !== false ||
-            stripos($a['summary'], $search) !== false
-        ));
-    }
+        if ($status && $status !== 'all') {
+            $items = array_values(array_filter($items, fn($a) => $a['status'] === $status));
+        }
+        if ($priority && $priority !== 'all') {
+            $items = array_values(array_filter($items, fn($a) => $a['priority'] === $priority));
+        }
+        if ($department) {
+            $items = array_values(array_filter($items, fn($a) => stripos($a['department'], $department) !== false));
+        }
+        if ($search) {
+            $items = array_values(array_filter($items, fn($a) =>
+                stripos($a['title'], $search) !== false ||
+                stripos($a['summary'], $search) !== false
+            ));
+        }
 
-    return response()->json(['data' => $items]);
+        return response()->json(['data' => $items]);
+    } catch (\Throwable $e) {
+        return response()->json(['data' => []]);
+    }
 });
 
 Route::get('/announcements/{slug}', function (string $slug) {
@@ -765,33 +779,37 @@ Route::get('/contact', function () {
 });
 
 Route::get('/opportunities', function (Request $request) {
-    $query = CmsContent::where('type', 'opportunity')
-        ->where('status', 'published')
-        ->where('is_deleted', false)
-        ->orderByDesc('published_at');
+    try {
+        $query = CmsContent::where('type', 'opportunity')
+            ->where('status', 'published')
+            ->where('is_deleted', false)
+            ->orderByDesc('published_at');
 
-    $items = $query->get()->map(fn($item) => mapCmsOpportunity($item))->toArray();
+        $items = $query->get()->map(fn($item) => mapCmsOpportunity($item))->toArray();
 
-    $category = $request->query('category');
-    $status   = $request->query('status');
-    $search   = $request->query('search');
+        $category = $request->query('category');
+        $status   = $request->query('status');
+        $search   = $request->query('search');
 
-    if ($category && $category !== 'all') {
-        $items = array_values(array_filter($items, fn($o) => $o['category'] === $category));
+        if ($category && $category !== 'all') {
+            $items = array_values(array_filter($items, fn($o) => $o['category'] === $category));
+        }
+        if ($status) {
+            $items = array_values(array_filter($items, fn($o) => $o['status'] === $status));
+        }
+        if ($search) {
+            $items = array_values(array_filter($items, fn($o) =>
+                stripos($o['title'], $search) !== false ||
+                stripos($o['summary'], $search) !== false ||
+                stripos($o['reference'] ?? '', $search) !== false ||
+                stripos($o['department'], $search) !== false
+            ));
+        }
+
+        return response()->json(['data' => $items]);
+    } catch (\Throwable $e) {
+        return response()->json(['data' => []]);
     }
-    if ($status) {
-        $items = array_values(array_filter($items, fn($o) => $o['status'] === $status));
-    }
-    if ($search) {
-        $items = array_values(array_filter($items, fn($o) =>
-            stripos($o['title'], $search) !== false ||
-            stripos($o['summary'], $search) !== false ||
-            stripos($o['reference'] ?? '', $search) !== false ||
-            stripos($o['department'], $search) !== false
-        ));
-    }
-
-    return response()->json(['data' => $items]);
 });
 
 Route::get('/opportunities/{slug}', function (string $slug) {
