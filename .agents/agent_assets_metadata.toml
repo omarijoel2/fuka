@@ -71,3 +71,9 @@ id = "SWLJSep-MqRAv9t4zg5iW"
 uri = "file://kafu-api-complete.zip"
 type = "unspecified"
 title = "kafu-api-complete.zip — API fix bundle + server-deploy.sh (111 KB)"
+
+[[outputs]]
+id = "QnFpeXoXObSJhWJJNhEDy"
+uri = "file://kafu-deploy.zip"
+type = "unspecified"
+title = "KAFU Deployment Package — Latest Build"
