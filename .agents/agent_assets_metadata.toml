@@ -77,3 +77,9 @@ id = "QnFpeXoXObSJhWJJNhEDy"
 uri = "file://kafu-deploy.zip"
 type = "unspecified"
 title = "KAFU Deployment Package — Latest Build"
+
+[[outputs]]
+id = "v9QnYJhcM9cHlv3tQXjE1"
+uri = "file://kafu-cms-deploy.zip"
+type = "unspecified"
+title = "CMS Deployment Package — kafu.difbac.com/cms"
