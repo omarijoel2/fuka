@@ -15,7 +15,7 @@ class SiteConfigSeeder extends Seeder
             'hero_subtitle'        => 'Kaimosi Friends University — Rooted in Quaker values, driven by excellence. Join a community that shapes leaders for Kenya and the world.',
             'hero_cta_primary'     => 'Apply Now',
             'hero_cta_secondary'   => 'Explore Programmes',
-            'hero_image_url'       => '/imgs/campus-hero.jpg',
+            'hero_image_url'       => 'https://kafu.ac.ke/wp-content/uploads/2024/07/campus-hero.jpg',
             'featured_programme_ids' => [1, 2, 3, 4],
             'featured_research_ids'  => [],
             'stats' => [
@@ -121,7 +121,7 @@ class SiteConfigSeeder extends Seeder
         SiteConfig::setGroup('seo', [
             'default_title_suffix'  => ' | Kaimosi Friends University',
             'default_description'   => 'Kaimosi Friends University (KAFU) — Quaker-founded public university in Western Kenya. Excellence in education, research, and community service.',
-            'default_og_image'      => '/imgs/logo-updated.png',
+            'default_og_image'      => 'https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png',
             'google_analytics_id'   => '',
             'google_site_verification' => '',
             'robots_default'        => 'index,follow',
@@ -144,8 +144,8 @@ class SiteConfigSeeder extends Seeder
         SiteConfig::setGroup('about', [
             'hero_heading'      => 'About KAFU',
             'hero_description'  => 'Discover the history, mission, and vision of Kaimosi Friends University — a Quaker-founded institution at the heart of Western Kenya.',
-            'hero_image_url'    => '/imgs/IMG_8696.jpg',
-            'campus_photo_url'  => '/imgs/PIC1.jpg',
+            'hero_image_url'    => 'https://kafu.ac.ke/wp-content/uploads/IMG_8696.jpg',
+            'campus_photo_url'  => 'https://kafu.ac.ke/wp-content/uploads/PIC1.jpg',
             'history_heading'   => 'Our History',
             'history_p1'        => 'Kaimosi Friends University (KAFU) was established in 2014, rooted deeply in the Quaker heritage of truth and service. What began as a constituent college has rapidly grown into a fully-fledged, independent public university in Western Kenya.',
             'history_p2'        => 'The university stands as a testament to the pioneering educational efforts of the Friends Church (Quakers) in the region. Since its inception, KAFU has been dedicated to providing quality higher education, fostering research, and promoting innovation that addresses societal needs.',
@@ -157,7 +157,7 @@ class SiteConfigSeeder extends Seeder
             'vc_title'          => 'Vice-Chancellor',
             'vc_bio'            => 'Prof. Mwita was officially appointed Vice-Chancellor of Kaimosi Friends University on 14 May 2025, having served in an acting capacity since February 2024. Under his leadership, KAFU continues to advance its mission of quality education, research, and community engagement.',
             'vc_email'          => 'vc@kafu.ac.ke',
-            'vc_photo_url'      => '/imgs/vc-lecture.jpg',
+            'vc_photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/Vice-Chancellor-Prof.-Peter-Mwita-addresses-fourth-year-teacher-trainees-during-the-opening-of-the-Competency-Based-Education-CBE-training-at-Kaimosi-Friends-University.jpg',
             'core_values'       => ['Integrity and Professionalism', 'Quality and Excellence', 'Equity and Inclusivity', 'Innovation and Creativity', 'Teamwork and Collaboration'],
             'sidebar_stats'     => [
                 ['label' => 'Location',        'value' => 'Kaimosi, Western Kenya'],

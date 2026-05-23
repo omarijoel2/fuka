@@ -26,7 +26,7 @@ class GovernanceSeeder extends Seeder
                 'category'       => 'chairperson',
                 'credentials'    => [],
                 'bio'            => 'Prof. Stanley O. Khainga chairs the Kaimosi Friends University Council, providing strategic leadership and ensuring sound governance of the institution in accordance with the Universities Act, 2012 and the KAFU Charter.',
-                'photo_url'      => '/imgs/staff/Prof.-Khainga.jpg',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Prof.-Stanley-O.-Khainga-Council-Chair.jpg',
                 'position_order' => 1,
             ],
             [
@@ -35,7 +35,7 @@ class GovernanceSeeder extends Seeder
                 'category'       => 'ex_officio',
                 'credentials'    => ['PhD'],
                 'bio'            => 'Prof. Peter N. Mwita is the Vice Chancellor of Kaimosi Friends University and serves as Secretary to the University Council. He is a Full Professor of Statistics and previously served as Deputy Vice-Chancellor (Research, Innovation & Linkages) at Machakos University.',
-                'photo_url'      => '/imgs/staff/Prof.-Mwita-council.jpg',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Prof.-Peter-Mwita-Sec-to-Council.jpg',
                 'position_order' => 2,
             ],
             [
@@ -44,7 +44,7 @@ class GovernanceSeeder extends Seeder
                 'category'       => 'member',
                 'credentials'    => [],
                 'bio'            => null,
-                'photo_url'      => '/imgs/staff/Ms.-Langat.jpg',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Ms.-Rose-Chepkoech-Langat-.jpg',
                 'position_order' => 3,
             ],
             [
@@ -53,7 +53,7 @@ class GovernanceSeeder extends Seeder
                 'category'       => 'member',
                 'credentials'    => [],
                 'bio'            => null,
-                'photo_url'      => '/imgs/staff/Mr.-Mongosi.jpg',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Mr.-David-Mongosi-member.jpg',
                 'position_order' => 4,
             ],
             [
@@ -62,7 +62,7 @@ class GovernanceSeeder extends Seeder
                 'category'       => 'member',
                 'credentials'    => ['PhD'],
                 'bio'            => null,
-                'photo_url'      => '/imgs/staff/Dr.-Mwanje.jpg',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Dr.-Moses-Osia-Mwanje.jpg',
                 'position_order' => 5,
             ],
             [
@@ -71,7 +71,7 @@ class GovernanceSeeder extends Seeder
                 'category'       => 'member',
                 'credentials'    => [],
                 'bio'            => null,
-                'photo_url'      => '/imgs/staff/Mr.-Kala.jpg',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Mr.-Yusuf-Kala.jpg',
                 'position_order' => 6,
             ],
             [
@@ -80,7 +80,7 @@ class GovernanceSeeder extends Seeder
                 'category'       => 'member',
                 'credentials'    => ['CPA (K)'],
                 'bio'            => null,
-                'photo_url'      => '/imgs/staff/CPA-Kangogo.jpg',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/CPA-Gilbert-K-Kangogo-1.jpg',
                 'position_order' => 7,
             ],
             [
@@ -89,7 +89,7 @@ class GovernanceSeeder extends Seeder
                 'category'       => 'member',
                 'credentials'    => ['PhD'],
                 'bio'            => null,
-                'photo_url'      => '/imgs/staff/Dr.-Egondi.jpg',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Dr.-Thaddaeus-W.-Egondi.jpg',
                 'position_order' => 8,
             ],
             [
@@ -98,7 +98,7 @@ class GovernanceSeeder extends Seeder
                 'category'       => 'member',
                 'credentials'    => ['PhD'],
                 'bio'            => null,
-                'photo_url'      => '/imgs/staff/Dr.-Njuki.jpg',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Dr.-Milton-Njuki.jpg',
                 'position_order' => 9,
             ],
         ];
@@ -122,7 +122,7 @@ class GovernanceSeeder extends Seeder
                 'email'          => 'vc@kafu.ac.ke',
                 'office'         => 'Vice Chancellor\'s Office, Main Administration Block',
                 'phone'          => '+254 777 373 633',
-                'photo_url'      => '/imgs/staff/Prof.-Mwita-council.jpg',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Prof.-Peter-Mwita-Sec-to-Council.jpg',
                 'position_order' => 1,
             ],
             [
@@ -133,7 +133,7 @@ class GovernanceSeeder extends Seeder
                 'email'          => 'dvc-asar@kafu.ac.ke',
                 'office'         => 'DVC Academic Office, Administration Block',
                 'phone'          => '+254 777 373 640',
-                'photo_url'      => '/imgs/staff/Prof.-Amimo.jpg',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Prof.-Amimo.jpg',
                 'position_order' => 2,
             ],
             [
@@ -144,7 +144,7 @@ class GovernanceSeeder extends Seeder
                 'email'          => 'dvc-afpd@kafu.ac.ke',
                 'office'         => 'DVC Administration Office, Administration Block',
                 'phone'          => '+254 777 373 642',
-                'photo_url'      => '/imgs/staff/Kipkurgat.jpg',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Kipkurgat.jpg',
                 'position_order' => 3,
             ],
             [
@@ -155,7 +155,7 @@ class GovernanceSeeder extends Seeder
                 'email'          => 'registrar-aa@kafu.ac.ke',
                 'office'         => 'Academic Registrar\'s Office, Administration Block',
                 'phone'          => '+254 777 373 650',
-                'photo_url'      => '/imgs/Dr.-Munda-1.jpg',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/Dr.-Munda-1.jpg',
                 'position_order' => 4,
             ],
             [
@@ -166,7 +166,7 @@ class GovernanceSeeder extends Seeder
                 'email'          => 'registrar@kafu.ac.ke',
                 'office'         => 'Registry, Administration Block',
                 'phone'          => '+254 777 373 651',
-                'photo_url'      => '/imgs/staff/Dr.-Agesa.jpg',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Dr.-Agesa.jpg',
                 'position_order' => 5,
             ],
             [
@@ -177,7 +177,7 @@ class GovernanceSeeder extends Seeder
                 'email'          => 'finance@kafu.ac.ke',
                 'office'         => 'Finance Department, Administration Block',
                 'phone'          => '+254 777 373 660',
-                'photo_url'      => '/imgs/IMGPSP_001.png',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/IMGPSP_001.png',
                 'position_order' => 6,
             ],
             [
@@ -188,7 +188,7 @@ class GovernanceSeeder extends Seeder
                 'email'          => 'dean.students@kafu.ac.ke',
                 'office'         => 'Dean of Students Office, Student Centre',
                 'phone'          => '+254 777 373 670',
-                'photo_url'      => '/imgs/staff/Monanti.jpg',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Monanti.jpg',
                 'position_order' => 7,
             ],
         ];
