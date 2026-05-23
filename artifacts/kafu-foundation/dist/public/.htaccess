@@ -7,6 +7,10 @@
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
 
-    # Route everything else to index.html (SPA fallback)
+    # Do NOT rewrite /api/* — handled by Apache ProxyPass to Laravel
+    RewriteCond %{REQUEST_URI} ^/api(/|$)
+    RewriteRule ^ - [L]
+
+    # SPA fallback: route all other requests to index.html
     RewriteRule ^ index.html [L]
 </IfModule>
