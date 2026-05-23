@@ -83,3 +83,9 @@ id = "v9QnYJhcM9cHlv3tQXjE1"
 uri = "file://kafu-cms-deploy.zip"
 type = "unspecified"
 title = "CMS Deployment Package — kafu.difbac.com/cms"
+
+[[outputs]]
+id = "7K2NBsshpv8GyoxqWCpAU"
+uri = "file://kafu-api-routes-fix.zip"
+type = "unspecified"
+title = "routes/api.php — Schools fix (60 KB)"

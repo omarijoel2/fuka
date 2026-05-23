@@ -241,10 +241,10 @@ Route::get('/healthz', function () {
 
 // ── Public site-config (read-only) ────────────────────────────────────────────
 Route::get('/site-config/{group}', function (string $group) {
-    $allowed = ['homepage', '
-about', 'contact', 'site', 'seo', 'navigation', 'student-services'];
+    $allowed = ['homepage', 'about', 'contact', 'site', 'seo', 'navigation', 'student-services'];
     if (!in_array($group, $allowed)) {
-        return response()->json(['error' => 'Config group not found.'], 404);    }
+        return response()->json(['error' => 'Config group not found.'], 404);
+    }
     $config = \App\Models\SiteConfig::getGroup($group);
     return response()->json(['group' => $group, 'data' => $config]);
 });
@@ -452,15 +452,19 @@ Route::get('/announcements/{slug}', function (string $slug) {
 });
 
 Route::get('/schools', function () {
-    $cmsSchools = CmsContent::where('type', 'school')
-        ->where('status', 'published')
-        ->where('is_deleted', false)
-        ->orderBy('title')
-        ->get()
-        ->map(fn($item) => mapCmsSchool($item))
-        ->toArray();
-    if (!empty($cmsSchools)) {
-        return response()->json(['data' => $cmsSchools]);
+    try {
+        $cmsSchools = CmsContent::where('type', 'school')
+            ->where('status', 'published')
+            ->where('is_deleted', false)
+            ->orderBy('title')
+            ->get()
+            ->map(fn($item) => mapCmsSchool($item))
+            ->toArray();
+        if (!empty($cmsSchools)) {
+            return response()->json(['data' => $cmsSchools]);
+        }
+    } catch (\Throwable $e) {
+        // DB unavailable or schema mismatch — serve static fallback
     }
     return response()->json([
         'data' => [
@@ -655,18 +659,22 @@ Route::get('/programmes', function (Request $request) {
     $school = $request->query('school') ? strtoupper($request->query('school')) : null;
     $level  = $request->query('level')  ? strtolower($request->query('level'))  : null;
 
-    $cmsQuery = CmsContent::where('type', 'programme')
-        ->where('status', 'published')
-        ->where('is_deleted', false);
-    if ($school) $cmsQuery->where('school_code', $school);
-    $cmsProgs = $cmsQuery->orderBy('title')->get();
+    try {
+        $cmsQuery = CmsContent::where('type', 'programme')
+            ->where('status', 'published')
+            ->where('is_deleted', false);
+        if ($school) $cmsQuery->where('school_code', $school);
+        $cmsProgs = $cmsQuery->orderBy('title')->get();
 
-    if ($cmsProgs->isNotEmpty()) {
-        $mapped = $cmsProgs->map(fn($p) => mapCmsProgramme($p))->toArray();
-        if ($level) {
-            $mapped = array_values(array_filter($mapped, fn($p) => $p['level'] === $level));
+        if ($cmsProgs->isNotEmpty()) {
+            $mapped = $cmsProgs->map(fn($p) => mapCmsProgramme($p))->toArray();
+            if ($level) {
+                $mapped = array_values(array_filter($mapped, fn($p) => $p['level'] === $level));
+            }
+            return response()->json(['data' => $mapped, 'total' => count($mapped)]);
         }
-        return response()->json(['data' => $mapped, 'total' => count($mapped)]);
+    } catch (\Throwable $e) {
+        // DB unavailable or schema mismatch — serve static fallback
     }
 
     // Static fallback
@@ -803,26 +811,30 @@ Route::get('/staff', function (Request $request) {
     $designation = $request->query('designation');
     $search      = $request->query('search');
 
-    $cmsQuery = CmsContent::where('type', 'staff_profile')
-        ->where('status', 'published')
-        ->where('is_deleted', false);
-    if ($school) $cmsQuery->where('school_code', strtoupper($school));
-    $cmsStaff = $cmsQuery->orderBy('title')->get();
+    try {
+        $cmsQuery = CmsContent::where('type', 'staff_profile')
+            ->where('status', 'published')
+            ->where('is_deleted', false);
+        if ($school) $cmsQuery->where('school_code', strtoupper($school));
+        $cmsStaff = $cmsQuery->orderBy('title')->get();
 
-    if ($cmsStaff->isNotEmpty()) {
-        $mapped = $cmsStaff->map(fn($s) => mapCmsStaff($s))->toArray();
-        if ($designation) {
-            $mapped = array_values(array_filter($mapped, fn($s) => stripos($s['designation'], $designation) !== false));
+        if ($cmsStaff->isNotEmpty()) {
+            $mapped = $cmsStaff->map(fn($s) => mapCmsStaff($s))->toArray();
+            if ($designation) {
+                $mapped = array_values(array_filter($mapped, fn($s) => stripos($s['designation'], $designation) !== false));
+            }
+            if ($search) {
+                $mapped = array_values(array_filter($mapped, function ($s) use ($search) {
+                    return stripos($s['name'], $search) !== false
+                        || stripos($s['designation'], $search) !== false
+                        || stripos($s['department'], $search) !== false
+                        || !empty(array_filter($s['specializations'] ?? [], fn($sp) => stripos($sp, $search) !== false));
+                }));
+            }
+            return response()->json(['data' => $mapped]);
         }
-        if ($search) {
-            $mapped = array_values(array_filter($mapped, function ($s) use ($search) {
-                return stripos($s['name'], $search) !== false
-                    || stripos($s['designation'], $search) !== false
-                    || stripos($s['department'], $search) !== false
-                    || !empty(array_filter($s['specializations'] ?? [], fn($sp) => stripos($sp, $search) !== false));
-            }));
-        }
-        return response()->json(['data' => $mapped]);
+    } catch (\Throwable $e) {
+        // DB unavailable or schema mismatch — serve static fallback
     }
 
     // Static fallback
@@ -2186,10 +2198,14 @@ Route::get('/admissions', function () {
 });
 
 Route::get('/stats', function () {
-    $page = CmsContent::where('type', 'page')->where('slug', 'stats')
-        ->where('status', 'published')->where('is_deleted', false)->first();
-    if ($page && !empty($page->structured_data)) {
-        return response()->json(['data' => $page->structured_data]);
+    try {
+        $page = CmsContent::where('type', 'page')->where('slug', 'stats')
+            ->where('status', 'published')->where('is_deleted', false)->first();
+        if ($page && !empty($page->structured_data)) {
+            return response()->json(['data' => $page->structured_data]);
+        }
+    } catch (\Throwable $e) {
+        // DB unavailable — serve static fallback
     }
     return response()->json([
         'data' => [
