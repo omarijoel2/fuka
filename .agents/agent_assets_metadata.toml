@@ -95,3 +95,9 @@ id = "u6L3vWDE2PdRYAeppKUPf"
 uri = "file://kafu-foundation-hero-redesign.zip"
 type = "unspecified"
 title = "Hero redesign — src/pages/home.tsx"
+
+[[outputs]]
+id = "mH8WjxaND3wPxm-0yHErY"
+uri = "file://kafu-foundation-hero-v2.zip"
+type = "unspecified"
+title = "Hero redesign — index.html + src/pages/home.tsx"
