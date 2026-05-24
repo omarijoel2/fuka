@@ -27,86 +27,87 @@ import {
 } from "lucide-react";
 
 // ─── Hero Carousel ─────────────────────────────────────────────────────────────
+// Each slide: photo is shown at near-full brightness. Text sits in a bottom
+// gradient strip — the photo is clearly visible in the upper portion.
+// Slides ordered so the VC appears first.
 const SLIDES = [
   {
-    image: "/imgs/whatsapp-may2026.jpeg",
-    badge: "Est. 2014 · Kaimosi, Western Kenya · Quaker Heritage",
-    headline: "Spring of",
-    accent: "Knowledge",
-    body: "Kaimosi Friends University — a premier institution in Western Kenya dedicated to truth, service, and academic excellence. Join over 5,000 students shaping Kenya's future.",
-    cta1: { label: "Apply for Admissions", href: "/admissions/apply", external: false },
-    cta2: { label: "Explore Programmes", href: "/programmes", external: false },
+    image: "/imgs/vc.jpeg",
+    // object-position keeps the VC's face in frame on crop
+    objectPosition: "center top",
+    badge: "Vice-Chancellor · Prof. Peter N. Mwita",
+    headline: "Vision. Leadership.",
+    accent: "Excellence.",
+    body: "KAFU is transforming lives through quality education in Western Kenya.",
+    cta1: { label: "Apply for Admissions", href: "/admissions", external: false },
+    cta2: { label: "About the VC", href: "/staff/prof-peter-n-mwita", external: false },
     testid: "hero-slide-0",
   },
   {
-    image: "/imgs/posgraduate.jpg",
-    badge: "5 Schools · 60+ Programmes · All Levels",
-    headline: "World-Class",
-    accent: "Programmes",
-    body: "From Optometry to Computer Science, Education to Business — KAFU offers over 60 nationally accredited programmes, preparing graduates for a competitive and changing world.",
-    cta1: { label: "Browse Programmes", href: "/programmes", external: false },
-    cta2: { label: "Admissions Guide", href: "/admissions", external: false },
+    image: "/imgs/vc-lecture.jpg",
+    objectPosition: "center center",
+    badge: "Academic Excellence · Teaching & Research",
+    headline: "Learning Led by",
+    accent: "the Best.",
+    body: "Our VC leads from the front — inspiring students and staff across every school.",
+    cta1: { label: "Explore Programmes", href: "/programmes", external: false },
+    cta2: { label: "Our Schools", href: "/schools", external: false },
     testid: "hero-slide-1",
   },
   {
-    image: "/imgs/image-115.jpeg",
-    badge: "Modern Infrastructure · Kaimosi Highlands",
-    headline: "Built for",
-    accent: "Excellence",
-    body: "State-of-the-art lecture halls, laboratories, and learning spaces set amidst the serene highlands of Kaimosi — an environment designed to inspire academic achievement.",
-    cta1: { label: "About KAFU", href: "/about", external: false },
-    cta2: { label: "Visit Campus", href: "/contact", external: false },
+    image: "/imgs/whatsapp-may2026.jpeg",
+    objectPosition: "center center",
+    badge: "Est. 2014 · Kaimosi, Western Kenya · Quaker Heritage",
+    headline: "Spring of",
+    accent: "Knowledge.",
+    body: "A premier university dedicated to truth, service, and excellence — shaping Kenya's future.",
+    cta1: { label: "Apply Now", href: "/admissions", external: false },
+    cta2: { label: "About KAFU", href: "/about", external: false },
     testid: "hero-slide-2",
   },
   {
-    image: "/imgs/image-113.jpeg",
-    badge: "Community Engagement · Kobujoi Campus · Nandi County",
-    headline: "Rooted in",
-    accent: "Community",
-    body: "KAFU's Kobujoi Campus is forging strong bonds with local communities — reflecting the Quaker spirit of service, partnership, and shared growth across Western Kenya.",
-    cta1: { label: "About KAFU", href: "/about", external: false },
-    cta2: { label: "Our Campuses", href: "/campuses", external: false },
+    image: "/imgs/posgraduate.jpg",
+    objectPosition: "center center",
+    badge: "5 Schools · 60+ Programmes · All Levels",
+    headline: "World-Class",
+    accent: "Programmes.",
+    body: "From Optometry to Computer Science — 60+ accredited programmes across 5 schools.",
+    cta1: { label: "Browse Programmes", href: "/programmes", external: false },
+    cta2: { label: "Admissions Guide", href: "/admissions", external: false },
     testid: "hero-slide-3",
   },
   {
-    image: "/imgs/undergraduate.jpg",
-    badge: "Student Life · Clubs · Community",
-    headline: "Shaping",
-    accent: "Tomorrow's Leaders",
-    body: "Thousands of undergraduate students are discovering their potential at KAFU — through rigorous academics, hands-on learning, and a vibrant campus community.",
-    cta1: { label: "Apply Now", href: "/admissions/apply", external: false },
-    cta2: { label: "Student Services", href: "/student-services", external: false },
+    image: "/imgs/campus-hero.jpg",
+    objectPosition: "center center",
+    badge: "Modern Infrastructure · Kaimosi Highlands",
+    headline: "Built for",
+    accent: "Excellence.",
+    body: "State-of-the-art facilities set in the serene highlands of Western Kenya.",
+    cta1: { label: "About KAFU", href: "/about", external: false },
+    cta2: { label: "Visit Campus", href: "/contact", external: false },
     testid: "hero-slide-4",
   },
   {
     image: "/imgs/img6424.jpg",
+    objectPosition: "center center",
     badge: "Research · Innovation · Community Impact",
     headline: "Advancing",
-    accent: "Research",
-    body: "KAFU's research centres are driving solutions in health, environment, and development across Kenya and beyond — supported by national and international partnerships.",
+    accent: "Research.",
+    body: "Driving solutions in health, environment and development — locally and globally.",
     cta1: { label: "Explore Research", href: "/research", external: false },
     cta2: { label: "International Programmes", href: "/international", external: false },
     testid: "hero-slide-5",
   },
   {
     image: "/imgs/sports.jpg",
+    objectPosition: "center center",
     badge: "Sports · Recreation · Student Wellness",
-    headline: "Compete,",
-    accent: "Grow, Excel",
-    body: "From inter-university tournaments to fitness and recreation, KAFU nurtures the whole student — balancing academic rigour with sport, culture, and community involvement.",
+    headline: "Beyond the",
+    accent: "Classroom.",
+    body: "Sport, culture, and community — KAFU nurtures the whole student.",
     cta1: { label: "Student Life", href: "/student-services", external: false },
-    cta2: { label: "Apply Now", href: "/admissions/apply", external: false },
+    cta2: { label: "Apply Now", href: "/admissions", external: false },
     testid: "hero-slide-6",
-  },
-  {
-    image: "/imgs/art-culture.jpg",
-    badge: "Vibrant Campus Life · Western Kenya Highlands",
-    headline: "A Community",
-    accent: "That Inspires",
-    body: "Experience rich campus life in the lush highlands of Kaimosi — where friendships form, talents flourish, and futures are forged in the spirit of service and truth.",
-    cta1: { label: "Apply Now", href: "/admissions/apply", external: false },
-    cta2: { label: "About KAFU", href: "/about", external: false },
-    testid: "hero-slide-7",
   },
 ];
 
@@ -133,7 +134,7 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
 
   React.useEffect(() => {
     if (paused) return;
-    const t = setInterval(() => goTo(current + 1), 6000);
+    const t = setInterval(() => goTo(current + 1), 7000);
     return () => clearInterval(t);
   }, [current, paused, goTo]);
 
@@ -141,60 +142,73 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
 
   return (
     <section
-      className="relative min-h-[520px] sm:min-h-[600px] md:min-h-[700px] flex items-center justify-center overflow-hidden bg-primary"
+      className="relative overflow-hidden bg-gray-900"
+      style={{ minHeight: "clamp(480px, 85vh, 720px)" }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-label="Hero carousel"
       data-testid="hero-carousel"
     >
-      {/* Slide backgrounds — crossfade */}
+      {/* Photos — crossfade, high brightness, NO colour overlay */}
       {SLIDES.map((s, i) => (
         <img
           key={s.testid}
           src={s.image}
           alt=""
           aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-700"
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
           style={{
             opacity: i === current ? 1 : 0,
-            filter: "brightness(0.68)",
+            objectPosition: s.objectPosition,
+            filter: "brightness(0.92)",
             zIndex: 0,
           }}
         />
       ))}
 
-      {/* Overlays */}
-      <div className="absolute inset-0 bg-primary/30" style={{ zIndex: 1 }} />
+      {/* Bottom gradient — only covers the lower portion so photos stay clear above */}
       <div
-        className="absolute inset-0 opacity-25"
+        className="absolute inset-0"
         style={{
           zIndex: 1,
-          backgroundImage:
-            "radial-gradient(ellipse at 20% 60%, #D4A017 0%, transparent 55%), radial-gradient(ellipse at 80% 10%, rgba(255,255,255,0.15) 0%, transparent 45%)",
+          background:
+            "linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.55) 30%, rgba(0,0,0,0.10) 60%, transparent 100%)",
         }}
       />
 
-      {/* Slide content */}
+      {/* Text — anchored to bottom-left, sitting in the gradient zone */}
       <div
-        className="relative container mx-auto px-10 sm:px-14 md:px-8 py-10 sm:py-14 md:py-20 text-center text-white max-w-5xl w-full"
+        className="absolute bottom-0 left-0 right-0 px-5 sm:px-10 md:px-14 pb-16 sm:pb-20 md:pb-24 max-w-3xl"
         style={{ zIndex: 2 }}
       >
-        <span className="inline-block py-1 px-3 sm:px-4 rounded-full bg-accent/20 text-accent border border-accent/40 font-medium text-xs sm:text-sm mb-4 md:mb-6 transition-opacity duration-500 max-w-full leading-snug">
+        <span
+          className="inline-block py-0.5 px-3 rounded-full border border-accent/70 text-accent font-medium text-xs sm:text-sm mb-3 leading-snug"
+          style={{ textShadow: "0 1px 4px rgba(0,0,0,0.6)" }}
+        >
           {slide.badge}
         </span>
-        <h1 className="text-4xl sm:text-5xl md:text-7xl font-serif font-bold mb-3 md:mb-6 leading-tight transition-opacity duration-500">
+
+        <h1
+          className="text-3xl sm:text-5xl md:text-6xl font-serif font-bold leading-tight mb-2 md:mb-3 text-white"
+          style={{ textShadow: "0 2px 12px rgba(0,0,0,0.7)" }}
+        >
           {slide.headline}{" "}
           <span className="text-accent">{slide.accent}</span>
         </h1>
-        <p className="text-sm sm:text-base md:text-xl mb-5 md:mb-10 max-w-3xl mx-auto text-white/85 leading-relaxed transition-opacity duration-500">
+
+        <p
+          className="text-sm sm:text-base md:text-lg text-white/90 mb-5 md:mb-6 leading-relaxed max-w-xl"
+          style={{ textShadow: "0 1px 6px rgba(0,0,0,0.8)" }}
+        >
           {slide.body}
         </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6 md:mb-14">
+
+        <div className="flex flex-row gap-3 flex-wrap">
           <Button
             size="lg"
-            className="bg-accent text-accent-foreground hover:bg-accent/90 text-base px-8 h-12 font-semibold"
+            className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold px-6 h-11 text-sm sm:text-base"
             asChild
-            data-testid="hero-button-apply"
+            data-testid="hero-button-primary"
           >
             {slide.cta1.external ? (
               <a href={slide.cta1.href} target="_blank" rel="noreferrer">{slide.cta1.label}</a>
@@ -205,9 +219,9 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
           <Button
             size="lg"
             variant="outline"
-            className="bg-transparent text-white border-white/60 hover:bg-white/10 text-base px-8 h-12"
+            className="bg-transparent text-white border-white/70 hover:bg-white/15 px-6 h-11 text-sm sm:text-base"
             asChild
-            data-testid="hero-button-programmes"
+            data-testid="hero-button-secondary"
           >
             {slide.cta2.external ? (
               <a href={slide.cta2.href} target="_blank" rel="noreferrer">{slide.cta2.label}</a>
@@ -216,30 +230,12 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
             )}
           </Button>
         </div>
-
-        {/* Stats overlay */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 max-w-3xl mx-auto">
-          {statsLoading
-            ? Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="bg-white/10 rounded-xl p-4 animate-pulse h-16 sm:h-20" />
-              ))
-            : stats?.map((stat) => (
-                <div
-                  key={stat.label}
-                  className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-3 sm:px-4 py-2.5 sm:py-3"
-                  data-testid={`hero-stat-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}
-                >
-                  <div className="text-xl sm:text-2xl md:text-3xl font-serif font-bold text-accent">{stat.value}+</div>
-                  <div className="text-[10px] sm:text-xs text-white/75 mt-0.5 uppercase tracking-wide leading-tight">{stat.label}</div>
-                </div>
-              ))}
-        </div>
       </div>
 
       {/* Prev / Next arrows */}
       <button
         onClick={() => goTo(current - 1)}
-        className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm transition-colors border border-white/20"
+        className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/25 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm transition-colors"
         aria-label="Previous slide"
         data-testid="carousel-prev"
       >
@@ -247,7 +243,7 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
       </button>
       <button
         onClick={() => goTo(current + 1)}
-        className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-black/30 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm transition-colors border border-white/20"
+        className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/25 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm transition-colors"
         aria-label="Next slide"
         data-testid="carousel-next"
       >
@@ -255,15 +251,15 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
       </button>
 
       {/* Dot indicators */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2">
+      <div className="absolute bottom-5 right-5 sm:right-10 z-10 flex items-center gap-1.5">
         {SLIDES.map((_, i) => (
           <button
             key={i}
             onClick={() => goTo(i)}
             className={`rounded-full transition-all duration-300 ${
               i === current
-                ? "w-7 h-2.5 bg-accent"
-                : "w-2.5 h-2.5 bg-white/40 hover:bg-white/70"
+                ? "w-6 h-2 bg-accent"
+                : "w-2 h-2 bg-white/40 hover:bg-white/70"
             }`}
             aria-label={`Go to slide ${i + 1}`}
             data-testid={`carousel-dot-${i}`}
@@ -271,14 +267,30 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
         ))}
       </div>
 
-      {/* Progress bar */}
-      <div className="absolute bottom-0 left-0 right-0 z-10 h-0.5 bg-white/10">
+      {/* Stats bar — pinned to very bottom inside hero */}
+      {(stats && stats.length > 0) && (
         <div
-          className={`h-full bg-accent/70 transition-none ${!paused ? "animate-none" : ""}`}
-          style={{
-            width: paused ? "100%" : undefined,
-            animation: paused ? "none" : `progress-bar 6000ms linear`,
-          }}
+          className="absolute bottom-0 left-0 right-0 z-10 hidden md:flex justify-center gap-0 border-t border-white/10"
+          style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(6px)" }}
+        >
+          {stats.map((stat, i) => (
+            <div
+              key={stat.label}
+              className={`flex-1 text-center py-3 ${i < stats.length - 1 ? "border-r border-white/10" : ""}`}
+              data-testid={`hero-stat-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}
+            >
+              <div className="text-xl font-serif font-bold text-accent leading-none">{stat.value}+</div>
+              <div className="text-[10px] text-white/70 uppercase tracking-wide mt-0.5">{stat.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Progress bar */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 h-0.5 bg-white/10">
+        <div
+          className="h-full bg-accent/70"
+          style={{ animation: paused ? "none" : `progress-bar 7000ms linear`, width: paused ? "100%" : undefined }}
           key={`${current}-${paused}`}
         />
       </div>

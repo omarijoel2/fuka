@@ -89,3 +89,9 @@ id = "7K2NBsshpv8GyoxqWCpAU"
 uri = "file://kafu-api-routes-fix.zip"
 type = "unspecified"
 title = "routes/api.php — All CmsContent protected (60.8 KB)"
+
+[[outputs]]
+id = "u6L3vWDE2PdRYAeppKUPf"
+uri = "file://kafu-foundation-hero-redesign.zip"
+type = "unspecified"
+title = "Hero redesign — src/pages/home.tsx"
