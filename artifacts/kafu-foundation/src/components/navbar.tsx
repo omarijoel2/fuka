@@ -199,7 +199,10 @@ const navItems: NavItem[] = [
     megaGroups: [
       {
         heading: "Student Life",
-        links: [{ name: "Student Services", path: "/student-services" }],
+        links: [
+          { name: "Student Services",  path: "/student-services" },
+          { name: "Dean of Students",  path: "/students/affairs" },
+        ],
       },
       {
         heading: "Online Services",
