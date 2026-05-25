@@ -292,12 +292,16 @@ export default function SchoolDetails() {
                           data-testid={`dept-${dept.slug}`}
                         >
                           {dept.hod_photo_url ? (
-                            <img
-                              src={dept.hod_photo_url}
-                              alt={dept.hod_name ?? ""}
-                              className="w-12 h-12 rounded-full object-cover shrink-0 ring-2 ring-border group-hover:ring-primary transition-all"
-                            />
-                          ) : (
+                              <img
+                                src={dept.hod_photo_url}
+                                alt={dept.hod_name ?? ""}
+                                className="w-14 h-14 rounded-full object-cover object-top shrink-0 ring-2 ring-border group-hover:ring-primary transition-all bg-white"
+                                loading="lazy"
+                                onError={(e) => {
+                                  e.currentTarget.src = "/images/default-avatar.png";
+                                }}
+                              />
+                            ) : (
                             <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
                               <Building2 className="w-6 h-6 text-primary" />
                             </div>
