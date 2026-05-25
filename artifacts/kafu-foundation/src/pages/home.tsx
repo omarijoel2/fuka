@@ -27,13 +27,11 @@ import {
 } from "lucide-react";
 
 // ─── Hero Carousel ─────────────────────────────────────────────────────────────
-// Each slide: photo is shown at near-full brightness. Text sits in a bottom
-// gradient strip — the photo is clearly visible in the upper portion.
-// Slides ordered so the VC appears first.
+// Split layout: text panel left, clean photo right — matching kafu.ac.ke style.
+// No overlay on photos. Light background with decorative blobs.
 const SLIDES = [
   {
     image: "/imgs/vc.jpeg",
-    // object-position keeps the VC's face in frame on crop
     objectPosition: "center top",
     badge: "Vice-Chancellor · Prof. Peter N. Mwita",
     headline: "Vision. Leadership.",
@@ -127,7 +125,7 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
       if (animating) return;
       setAnimating(true);
       setCurrent((idx + count) % count);
-      setTimeout(() => setAnimating(false), 700);
+      setTimeout(() => setAnimating(false), 600);
     },
     [animating, count]
   );
@@ -142,100 +140,96 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
 
   return (
     <section
-      className="relative overflow-hidden bg-gray-900"
-      style={{ minHeight: "clamp(480px, 85vh, 720px)" }}
+      className="relative overflow-hidden bg-gray-50"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       aria-label="Hero carousel"
       data-testid="hero-carousel"
     >
-      {/* Photos — crossfade, high brightness, NO colour overlay */}
-      {SLIDES.map((s, i) => (
-        <img
-          key={s.testid}
-          src={s.image}
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-700"
-          style={{
-            opacity: i === current ? 1 : 0,
-            objectPosition: s.objectPosition,
-            filter: "brightness(0.92)",
-            zIndex: 0,
-          }}
-        />
-      ))}
-
-      {/* Bottom gradient — only covers the lower portion so photos stay clear above */}
+      {/* ── Decorative blobs (matching kafu.ac.ke style) ── */}
+      {/* Gold blob — bottom left */}
       <div
-        className="absolute inset-0"
-        style={{
-          zIndex: 1,
-          background:
-            "linear-gradient(to top, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.55) 30%, rgba(0,0,0,0.10) 60%, transparent 100%)",
-        }}
+        className="absolute -bottom-24 -left-24 w-80 h-80 rounded-full opacity-30 pointer-events-none"
+        style={{ background: "radial-gradient(circle, #C9A227 0%, transparent 70%)", zIndex: 0 }}
+      />
+      {/* Green blob — top right */}
+      <div
+        className="absolute -top-16 -right-16 w-96 h-96 rounded-full opacity-20 pointer-events-none"
+        style={{ background: "radial-gradient(circle, #1A5C38 0%, transparent 70%)", zIndex: 0 }}
       />
 
-      {/* Text — anchored to bottom-left, sitting in the gradient zone */}
+      {/* ── Main split layout ── */}
       <div
-        className="absolute bottom-0 left-0 right-0 px-5 sm:px-10 md:px-14 pb-16 sm:pb-20 md:pb-24 max-w-3xl"
-        style={{ zIndex: 2 }}
+        className="relative max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-0 md:gap-8 px-6 sm:px-10 md:px-12 py-10 md:py-14"
+        style={{ zIndex: 1, minHeight: "clamp(420px, 70vh, 620px)" }}
       >
-        <span
-          className="inline-block py-0.5 px-3 rounded-full border border-accent/70 text-accent font-medium text-xs sm:text-sm mb-3 leading-snug"
-          style={{ textShadow: "0 1px 4px rgba(0,0,0,0.6)" }}
-        >
-          {slide.badge}
-        </span>
+        {/* LEFT — text panel */}
+        <div className="flex-1 flex flex-col justify-center order-2 md:order-1 py-4 md:py-0 md:pr-6 w-full">
+          <span className="inline-block py-1 px-3 rounded-full bg-accent/15 text-accent border border-accent/40 font-medium text-xs sm:text-sm mb-4 w-fit leading-snug">
+            {slide.badge}
+          </span>
 
-        <h1
-          className="text-3xl sm:text-5xl md:text-6xl font-serif font-bold leading-tight mb-2 md:mb-3 text-white"
-          style={{ textShadow: "0 2px 12px rgba(0,0,0,0.7)" }}
-        >
-          {slide.headline}{" "}
-          <span className="text-accent">{slide.accent}</span>
-        </h1>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-bold leading-tight mb-4 text-gray-900">
+            {slide.headline}{" "}
+            <span className="text-primary">{slide.accent}</span>
+          </h1>
 
-        <p
-          className="text-sm sm:text-base md:text-lg text-white/90 mb-5 md:mb-6 leading-relaxed max-w-xl"
-          style={{ textShadow: "0 1px 6px rgba(0,0,0,0.8)" }}
-        >
-          {slide.body}
-        </p>
+          <p className="text-base md:text-lg text-gray-600 mb-7 leading-relaxed max-w-lg">
+            {slide.body}
+          </p>
 
-        <div className="flex flex-row gap-3 flex-wrap">
-          <Button
-            size="lg"
-            className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold px-6 h-11 text-sm sm:text-base"
-            asChild
-            data-testid="hero-button-primary"
-          >
-            {slide.cta1.external ? (
-              <a href={slide.cta1.href} target="_blank" rel="noreferrer">{slide.cta1.label}</a>
-            ) : (
-              <Link href={slide.cta1.href}>{slide.cta1.label}</Link>
-            )}
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            className="bg-transparent text-white border-white/70 hover:bg-white/15 px-6 h-11 text-sm sm:text-base"
-            asChild
-            data-testid="hero-button-secondary"
-          >
-            {slide.cta2.external ? (
-              <a href={slide.cta2.href} target="_blank" rel="noreferrer">{slide.cta2.label}</a>
-            ) : (
-              <Link href={slide.cta2.href}>{slide.cta2.label}</Link>
-            )}
-          </Button>
+          <div className="flex flex-row flex-wrap gap-3">
+            <Button
+              size="lg"
+              className="bg-primary text-white hover:bg-primary/90 font-semibold px-7 h-12 text-sm sm:text-base rounded-full"
+              asChild
+              data-testid="hero-button-primary"
+            >
+              {slide.cta1.external ? (
+                <a href={slide.cta1.href} target="_blank" rel="noreferrer">{slide.cta1.label}</a>
+              ) : (
+                <Link href={slide.cta1.href}>{slide.cta1.label}</Link>
+              )}
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="border-primary text-primary hover:bg-primary/5 px-7 h-12 text-sm sm:text-base rounded-full"
+              asChild
+              data-testid="hero-button-secondary"
+            >
+              {slide.cta2.external ? (
+                <a href={slide.cta2.href} target="_blank" rel="noreferrer">{slide.cta2.label}</a>
+              ) : (
+                <Link href={slide.cta2.href}>{slide.cta2.label}</Link>
+              )}
+            </Button>
+          </div>
+        </div>
+
+        {/* RIGHT — clean photo, no overlay */}
+        <div className="relative flex-shrink-0 order-1 md:order-2 w-full md:w-[52%] lg:w-[55%]">
+          <div className="relative w-full overflow-hidden rounded-2xl shadow-xl" style={{ aspectRatio: "4/3" }}>
+            {SLIDES.map((s, i) => (
+              <img
+                key={s.testid}
+                src={s.image}
+                alt={s.badge}
+                className="absolute inset-0 w-full h-full object-cover transition-opacity duration-600"
+                style={{
+                  opacity: i === current ? 1 : 0,
+                  objectPosition: s.objectPosition,
+                }}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Prev / Next arrows */}
+      {/* ── Prev / Next arrows ── */}
       <button
         onClick={() => goTo(current - 1)}
-        className="absolute left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/25 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm transition-colors"
+        className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white shadow-md hover:bg-gray-100 text-primary flex items-center justify-center transition-colors border border-gray-200"
         aria-label="Previous slide"
         data-testid="carousel-prev"
       >
@@ -243,23 +237,23 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
       </button>
       <button
         onClick={() => goTo(current + 1)}
-        className="absolute right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-black/25 hover:bg-black/50 text-white flex items-center justify-center backdrop-blur-sm transition-colors"
+        className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 z-10 w-9 h-9 rounded-full bg-white shadow-md hover:bg-gray-100 text-primary flex items-center justify-center transition-colors border border-gray-200"
         aria-label="Next slide"
         data-testid="carousel-next"
       >
         <ChevronRight className="w-5 h-5" />
       </button>
 
-      {/* Dot indicators */}
-      <div className="absolute bottom-5 right-5 sm:right-10 z-10 flex items-center gap-1.5">
+      {/* ── Dot indicators ── */}
+      <div className="relative z-10 flex items-center justify-center gap-2 pb-5 pt-1">
         {SLIDES.map((_, i) => (
           <button
             key={i}
             onClick={() => goTo(i)}
             className={`rounded-full transition-all duration-300 ${
               i === current
-                ? "w-6 h-2 bg-accent"
-                : "w-2 h-2 bg-white/40 hover:bg-white/70"
+                ? "w-6 h-2.5 bg-primary"
+                : "w-2.5 h-2.5 bg-gray-300 hover:bg-gray-400"
             }`}
             aria-label={`Go to slide ${i + 1}`}
             data-testid={`carousel-dot-${i}`}
@@ -267,29 +261,10 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
         ))}
       </div>
 
-      {/* Stats bar — pinned to very bottom inside hero */}
-      {(stats && stats.length > 0) && (
+      {/* ── Progress bar ── */}
+      <div className="absolute bottom-0 left-0 right-0 z-20 h-0.5 bg-gray-200">
         <div
-          className="absolute bottom-0 left-0 right-0 z-10 hidden md:flex justify-center gap-0 border-t border-white/10"
-          style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(6px)" }}
-        >
-          {stats.map((stat, i) => (
-            <div
-              key={stat.label}
-              className={`flex-1 text-center py-3 ${i < stats.length - 1 ? "border-r border-white/10" : ""}`}
-              data-testid={`hero-stat-${stat.label.toLowerCase().replace(/\s+/g, "-")}`}
-            >
-              <div className="text-xl font-serif font-bold text-accent leading-none">{stat.value}+</div>
-              <div className="text-[10px] text-white/70 uppercase tracking-wide mt-0.5">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Progress bar */}
-      <div className="absolute bottom-0 left-0 right-0 z-20 h-0.5 bg-white/10">
-        <div
-          className="h-full bg-accent/70"
+          className="h-full bg-primary/50"
           style={{ animation: paused ? "none" : `progress-bar 7000ms linear`, width: paused ? "100%" : undefined }}
           key={`${current}-${paused}`}
         />
