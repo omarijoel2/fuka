@@ -41,6 +41,7 @@ class DatabaseSeeder extends Seeder
 
         // ── Governance, Gallery, Departments, Campuses ────────────────────────
         $this->call(GovernanceSeeder::class);
+        $this->call(DirectoratesSeeder::class);   // Full directorate + centre data (supersedes GovernanceSeeder's directorate block + DirectoratesPhotoSeeder)
         $this->call(GallerySeeder::class);
         $this->call(DepartmentSeeder::class);
         $this->call(CampusSeeder::class);
