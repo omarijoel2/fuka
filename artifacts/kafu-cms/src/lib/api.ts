@@ -1,5 +1,7 @@
 const API_ORIGIN = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
-const API_BASE = `${API_ORIGIN}/api/admin`;
+const API_BASE = API_ORIGIN.endsWith("/api")
+  ? `${API_ORIGIN}/admin`
+  : `${API_ORIGIN}/api/admin`;
 const TOKEN_KEY = "kafu_cms_token";
 
 function getToken() {

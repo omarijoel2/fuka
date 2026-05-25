@@ -414,7 +414,11 @@ export interface AdmissionsData {
 const API_ORIGIN = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
 
 export async function fetchApi<T>(endpoint: string): Promise<T> {
-  const res = await fetch(`${API_ORIGIN}/api${endpoint}`);
+const API_BASE = API_ORIGIN.endsWith("/api")
+  ? API_ORIGIN
+  : `${API_ORIGIN}/api`;
+
+const res = await fetch(`${API_BASE}${endpoint}`);
   if (!res.ok) {
     throw new Error(`API error: ${res.status} ${res.statusText}`);
   }

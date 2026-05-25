@@ -192,25 +192,53 @@ class AdmissionsModuleSeeder extends Seeder
         $progIds = [];
         foreach ($programmes as $p) {
             [$code, $name, $school, $dept, $level, $duration, $intakes, $pathways, $minReq, $docs] = $p;
-            $id = DB::table('admission_programmes')->insertGetId([
-                'programme_code'       => $code,
-                'programme_name'       => $name,
-                'school_code'          => $school,
-                'department'           => $dept,
-                'level'                => $level,
-                'duration'             => $duration,
-                'mode'                 => 'full_time',
-                'campus'               => 'Main Campus',
-                'minimum_requirements' => $minReq,
-                'available_intakes'    => json_encode($intakes),
-                'available_pathways'   => json_encode($pathways),
-                'required_documents'   => json_encode($docs),
-                'is_active'            => true,
-                'sort_order'           => 0,
-                'created_at'           => $now,
-                'updated_at'           => $now,
-            ]);
-            $progIds[$code] = $id;
+	DB::table('admission_programmes')->updateOrInsert(
+    ['programme_code' => $code],
+    [
+        'programme_name'       => $name,
+        'school_code'          => $school,
+        'department'           => $dept,
+        'level'                => $level,
+        'duration'             => $duration,
+        'mode'                 => 'full_time',
+        'campus'               => 'Main Campus',
+        'minimum_requirements' => $minReq,
+        'available_intakes'    => json_encode($intakes),
+        'available_pathways'   => json_encode($pathways),
+        'required_documents'   => json_encode($docs),
+        'is_active'            => true,
+        'sort_order'           => 0,
+        'created_at'           => $now,
+        'updated_at'           => $now,
+    ]
+);
+
+$id = DB::table('admission_programmes')
+    ->where('programme_code', $code)
+    ->value('id');[201~DB::table('admission_programmes')->updateOrInsert(
+    ['programme_code' => $code],
+    [
+        'programme_name'       => $name,
+        'school_code'          => $school,
+        'department'           => $dept,
+        'level'                => $level,
+        'duration'             => $duration,
+        'mode'                 => 'full_time',
+        'campus'               => 'Main Campus',
+        'minimum_requirements' => $minReq,
+        'available_intakes'    => json_encode($intakes),
+        'available_pathways'   => json_encode($pathways),
+        'required_documents'   => json_encode($docs),
+        'is_active'            => true,
+        'sort_order'           => 0,
+        'created_at'           => $now,
+        'updated_at'           => $now,
+    ]
+);
+
+$id = DB::table('admission_programmes')
+    ->where('programme_code', $code)
+    ->value('id');
         }
 
         // ── Link all programmes to the September 2026 intake ─────────────────
