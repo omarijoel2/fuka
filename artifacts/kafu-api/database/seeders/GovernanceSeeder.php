@@ -26,16 +26,7 @@ class GovernanceSeeder extends Seeder
                 'category'       => 'chairperson',
                 'credentials'    => [],
                 'bio'            => 'Prof. Stanley O. Khainga chairs the Kaimosi Friends University Council, providing strategic leadership and ensuring sound governance of the institution in accordance with the Universities Act, 2012 and the KAFU Charter.',
-                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Prof.-Stanley-O.-Khainga-Council-Chair.jpg',
-                'position_order' => 1,
-            ],
-            [
-                'name'           => 'Prof. Peter N. Mwita',
-                'title'          => 'Secretary to the Council',
-                'category'       => 'ex_officio',
-                'credentials'    => ['PhD'],
-                'bio'            => 'Prof. Peter N. Mwita is the Vice Chancellor of Kaimosi Friends University and serves as Secretary to the University Council. He is a Full Professor of Statistics and previously served as Deputy Vice-Chancellor (Research, Innovation & Linkages) at Machakos University.',
-                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Prof.-Peter-Mwita-Sec-to-Council.jpg',
+                'photo_url'      => '/images/uploads/Prof.-Stanley-O.-Khainga-Council-Chair.jpg',
                 'position_order' => 2,
             ],
             [
@@ -44,16 +35,7 @@ class GovernanceSeeder extends Seeder
                 'category'       => 'member',
                 'credentials'    => [],
                 'bio'            => null,
-                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Ms.-Rose-Chepkoech-Langat-.jpg',
-                'position_order' => 3,
-            ],
-            [
-                'name'           => 'Mr. David Mongosi Sigano',
-                'title'          => 'Member, University Council',
-                'category'       => 'member',
-                'credentials'    => [],
-                'bio'            => null,
-                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Mr.-David-Mongosi-member.jpg',
+                'photo_url'      => '/images/uploads/Ms.-Rose-Chepkoech-Langat-.jpg',
                 'position_order' => 4,
             ],
             [
@@ -62,16 +44,7 @@ class GovernanceSeeder extends Seeder
                 'category'       => 'member',
                 'credentials'    => ['PhD'],
                 'bio'            => null,
-                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Dr.-Moses-Osia-Mwanje.jpg',
-                'position_order' => 5,
-            ],
-            [
-                'name'           => 'Mr. Yussuf Kala',
-                'title'          => 'Member, University Council',
-                'category'       => 'member',
-                'credentials'    => [],
-                'bio'            => null,
-                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Mr.-Yusuf-Kala.jpg',
+                'photo_url'      => '/images/uploads/Dr.-Moses-Osia-Mwanje.jpg',
                 'position_order' => 6,
             ],
             [
@@ -80,16 +53,7 @@ class GovernanceSeeder extends Seeder
                 'category'       => 'member',
                 'credentials'    => ['CPA (K)'],
                 'bio'            => null,
-                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/CPA-Gilbert-K-Kangogo-1.jpg',
-                'position_order' => 7,
-            ],
-            [
-                'name'           => 'Dr. Thaddaeus W. Egondi',
-                'title'          => 'Member, University Council',
-                'category'       => 'member',
-                'credentials'    => ['PhD'],
-                'bio'            => null,
-                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Dr.-Thaddaeus-W.-Egondi.jpg',
+                'photo_url'      => '/images/uploads/CPA-Gilbert-K-Kangogo-1.jpg',
                 'position_order' => 8,
             ],
             [
@@ -98,31 +62,7 @@ class GovernanceSeeder extends Seeder
                 'category'       => 'member',
                 'credentials'    => ['PhD'],
                 'bio'            => null,
-                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Dr.-Milton-Njuki.jpg',
-                'position_order' => 9,
-            ],
-        ];
-
-        foreach ($members as $member) {
-            CouncilMember::firstOrCreate(
-                ['name' => $member['name']],
-                $member
-            );
-        }
-    }
-
-    private function seedManagement(): void
-    {
-        $profiles = [
-            [
-                'name'           => 'Prof. Peter N. Mwita',
-                'title'          => 'Vice Chancellor',
-                'category'       => 'vc',
-                'bio'            => 'Prof. Peter N. Mwita (born 15 July 1968) is the Vice Chancellor of Kaimosi Friends University and Secretary to the University Council. He is a Full Professor of Statistics and holds a PhD. He previously served as Deputy Vice-Chancellor (Research, Innovation & Linkages) at Machakos University, where he also served as Acting Vice Chancellor. He has served as Dean of the School of Mathematical Sciences and Chairman of the Department of Statistics and Actuarial Sciences at Jomo Kenyatta University of Agriculture and Technology (JKUAT). He played a key role in restructuring the Kenya National Bureau of Statistics (KNBS) into a competitive semi-autonomous government agency. He currently chairs the Board of Governors of Kendege Technical and Vocational College.',
-                'email'          => 'vc@kafu.ac.ke',
-                'office'         => 'Vice Chancellor\'s Office, Main Administration Block',
-                'phone'          => '+254 777 373 633',
-                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Prof.-Peter-Mwita-Sec-to-Council.jpg',
+                'photo_url'      => '/images/uploads/Dr.-Milton-Njuki.jpg',
                 'position_order' => 1,
             ],
             [
@@ -133,18 +73,7 @@ class GovernanceSeeder extends Seeder
                 'email'          => 'dvc-asar@kafu.ac.ke',
                 'office'         => 'DVC Academic Office, Administration Block',
                 'phone'          => '+254 777 373 640',
-                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Prof.-Amimo.jpg',
-                'position_order' => 2,
-            ],
-            [
-                'name'           => 'Prof. Thomas Kipkurgat',
-                'title'          => 'Deputy Vice Chancellor — Administration, Finance, Planning & Development',
-                'category'       => 'dvc',
-                'bio'            => 'Prof. Thomas Kipkurgat serves as the Deputy Vice Chancellor responsible for Administration, Finance, Planning and Development (DVC AFP&D) at Kaimosi Friends University. He oversees the university\'s administrative operations, financial management, strategic planning, and campus infrastructure development.',
-                'email'          => 'dvc-afpd@kafu.ac.ke',
-                'office'         => 'DVC Administration Office, Administration Block',
-                'phone'          => '+254 777 373 642',
-                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Kipkurgat.jpg',
+                'photo_url'      => '/images/uploads/Prof.-Amimo.jpg',
                 'position_order' => 3,
             ],
             [
@@ -155,18 +84,7 @@ class GovernanceSeeder extends Seeder
                 'email'          => 'registrar-aa@kafu.ac.ke',
                 'office'         => 'Academic Registrar\'s Office, Administration Block',
                 'phone'          => '+254 777 373 650',
-                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/Dr.-Munda-1.jpg',
-                'position_order' => 4,
-            ],
-            [
-                'name'           => 'Dr. Patrick Agesa',
-                'title'          => 'Acting Deputy Registrar',
-                'category'       => 'registrar',
-                'bio'            => 'Dr. Patrick Agesa serves as the Acting Deputy Registrar at Kaimosi Friends University, supporting the overall registry functions including student admissions, records management, academic governance, and institutional compliance.',
-                'email'          => 'registrar@kafu.ac.ke',
-                'office'         => 'Registry, Administration Block',
-                'phone'          => '+254 777 373 651',
-                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Dr.-Agesa.jpg',
+                'photo_url'      => '/images/uploads/Dr.-Munda-1.jpg',
                 'position_order' => 5,
             ],
             [
@@ -177,18 +95,7 @@ class GovernanceSeeder extends Seeder
                 'email'          => 'finance@kafu.ac.ke',
                 'office'         => 'Finance Department, Administration Block',
                 'phone'          => '+254 777 373 660',
-                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/IMGPSP_001.png',
-                'position_order' => 6,
-            ],
-            [
-                'name'           => 'Dr. Fredrick M. Nyambane',
-                'title'          => 'Dean of Students',
-                'category'       => 'other',
-                'bio'            => 'Dr. Fredrick M. Nyambane serves as the Dean of Students at Kaimosi Friends University, overseeing student welfare, counselling services, accommodation, clubs and societies, and the general wellbeing of the student body.',
-                'email'          => 'dean.students@kafu.ac.ke',
-                'office'         => 'Dean of Students Office, Student Centre',
-                'phone'          => '+254 777 373 670',
-                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Monanti.jpg',
+                'photo_url'      => '/images/uploads/IMGPSP_001.png',
                 'position_order' => 7,
             ],
         ];

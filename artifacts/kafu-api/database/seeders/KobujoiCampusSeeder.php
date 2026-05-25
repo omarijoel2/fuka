@@ -20,16 +20,11 @@ class KobujoiCampusSeeder extends Seeder
     public function run(): void
     {
         $galleryImages = [
-            'https://kafu.ac.ke/wp-content/uploads/image-82.jpeg',
-            'https://kafu.ac.ke/wp-content/uploads/image-110.jpeg',
-            'https://kafu.ac.ke/wp-content/uploads/image-108.jpeg',
-            'https://kafu.ac.ke/wp-content/uploads/image-93.jpeg',
-            'https://kafu.ac.ke/wp-content/uploads/image-87.jpeg',
-            'https://kafu.ac.ke/wp-content/uploads/image-80.jpeg',
-            'https://kafu.ac.ke/wp-content/uploads/image-113.jpeg',
-            'https://kafu.ac.ke/wp-content/uploads/image-94.jpeg',
-            'https://kafu.ac.ke/wp-content/uploads/WhatsApp-Image-2026-05-18-at-18.39.27-480x320.jpeg',
-            'https://kafu.ac.ke/wp-content/uploads/2026/02/Members-of-the-University-Council-pose-for-a-group-photo-at-Moi-Girls-Vokoli-during-the-familiarization-tour-of-the-proposed-site-for-the-Moses-Mudavadi-College-of-Health-Sciences.jpeg',
+            '/images/uploads/image-82.jpeg',
+            '/images/uploads/image-108.jpeg',
+            '/images/uploads/image-87.jpeg',
+            '/images/uploads/image-113.jpeg',
+            '/images/uploads/WhatsApp-Image-2026-05-18-at-18.39.27-480x320.jpeg',
         ];
 
         $data = [
@@ -46,7 +41,7 @@ class KobujoiCampusSeeder extends Seeder
             'region'          => 'Rift Valley',
             'latitude'        => 0.1742,
             'longitude'       => 35.2935,
-            'hero_image'      => 'https://kafu.ac.ke/wp-content/uploads/2026/02/Members-of-the-University-Council-tour-Kaimosi-Friends-Universitys-Kobujoi-Campus-during-the-three-day-familiarization-and-induction-programme.jpeg',
+            'hero_image'      => '/images/uploads/Members-of-the-University-Council-tour-Kaimosi-Friends-Universitys-Kobujoi-Campus-during-the-three-day-familiarization-and-induction-programme.jpeg',
             'gallery_images'  => $galleryImages,
             'contact_email'   => 'kobujoi@kafu.ac.ke',
             'contact_phone'   => '+254 700 000 002',

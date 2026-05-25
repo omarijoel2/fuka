@@ -95,7 +95,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="flex flex-col items-center mb-8">
           <img
-            src="https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png"
+            src="/images/uploads/logo-updated-750x126.png"
             alt="Kaimosi Friends University"
             className="h-10 object-contain brightness-0 invert mb-4"
           />

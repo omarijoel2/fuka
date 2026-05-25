@@ -105,7 +105,7 @@ export default function MediaBrandingPage() {
               <div key={logo.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" data-testid={`logo-card-${logo.id}`}>
                 <div className={`h-32 flex items-center justify-center ${logo.preview_bg}`}>
                   <img
-                    src="https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png"
+                    src="/images/uploads/logo-updated-750x126.png"
                     alt={logo.name}
                     className={`h-12 w-auto object-contain ${logo.preview_bg === "bg-[#1A5C38]" ? "brightness-0 invert" : ""}`}
                   />

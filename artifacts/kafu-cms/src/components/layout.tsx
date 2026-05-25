@@ -237,7 +237,7 @@ export function CmsLayout({ children }: { children: React.ReactNode }) {
         {/* Logo */}
         <div className="flex items-center gap-3 p-4 border-b border-sidebar-border">
           <img
-            src="https://kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png"
+            src="/images/uploads/logo-updated-750x126.png"
             alt="KAFU"
             className="h-7 object-contain brightness-0 invert opacity-90"
           />
