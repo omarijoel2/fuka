@@ -298,6 +298,7 @@ const navItems: NavItem[] = [
           { name: "Partnerships & Grants",         path: "/research/partnerships" },
           { name: "Institutional Repository",      path: "/repository" },
           { name: "Ethics Review Committee",       path: "/research/ethics" },
+          { name: "Innovation & Incubation Hub",   path: "https://kafu-iihub.com", external: true },
         ],
       },
     ],
