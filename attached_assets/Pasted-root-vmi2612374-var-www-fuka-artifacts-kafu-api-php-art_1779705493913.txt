@@ -1,0 +1,47 @@
+root@vmi2612374:/var/www/fuka/artifacts/kafu-api# php artisan db:seed --class=DirectoratesPhotoSeeder
+
+                                                                                    
+                             APPLICATION IN PRODUCTION.                             
+                                                                                    
+
+ ┌ Are you sure you want to run this command? ──────────────────┐
+ │ Yes                                                          │
+ └──────────────────────────────────────────────────────────────┘
+
+   INFO  Seeding database.  
+
+
+In Container.php line 1124:
+                                                                           
+  Target class [Database\Seeders\DirectoratesPhotoSeeder] does not exist.  
+                                                                           
+
+In Container.php line 1122:
+                                                                   
+  Class "Database\Seeders\DirectoratesPhotoSeeder" does not exist  
+                                                                   
+
+root@vmi2612374:/var/www/fuka/artifacts/kafu-api# php artisan db:seed --class=DepartmentsPhotoSeeder
+
+                                                                                    
+                             APPLICATION IN PRODUCTION.                             
+                                                                                    
+
+ ┌ Are you sure you want to run this command? ──────────────────┐
+ │ Yes                                                          │
+ └──────────────────────────────────────────────────────────────┘
+
+   INFO  Seeding database.  
+
+
+In Container.php line 1124:
+                                                                          
+  Target class [Database\Seeders\DepartmentsPhotoSeeder] does not exist.  
+                                                                          
+
+In Container.php line 1122:
+                                                                  
+  Class "Database\Seeders\DepartmentsPhotoSeeder" does not exist  
+                                                                  
+
+root@vmi2612374:/var/www/fuka/artifacts/kafu-api# 
