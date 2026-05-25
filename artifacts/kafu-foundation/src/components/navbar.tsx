@@ -200,8 +200,10 @@ const navItems: NavItem[] = [
       {
         heading: "Student Life",
         links: [
-          { name: "Student Services",  path: "/student-services" },
-          { name: "Dean of Students",  path: "/students/affairs" },
+          { name: "Student Services",   path: "/student-services" },
+          { name: "Dean of Students",   path: "/students/affairs" },
+          { name: "Student Council",    path: "/students/council" },
+          { name: "Timetables",         path: "/admissions/timetables" },
         ],
       },
       {

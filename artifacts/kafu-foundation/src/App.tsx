@@ -58,6 +58,7 @@ import AboutComplaints from "@/pages/about-complaints";
 import AboutLegal from "@/pages/about-legal";
 import AboutCSR from "@/pages/about-csr";
 import StudentAffairs from "@/pages/student-affairs";
+import StudentsCouncil from "@/pages/students-council";
 import Archives from "@/pages/archives";
 import AdmissionsApply from "@/pages/admissions-apply";
 import AdmissionsTrack from "@/pages/admissions-track";
@@ -152,6 +153,7 @@ function Router() {
           <Route path="/about/legal" component={AboutLegal} />
           <Route path="/about/csr" component={AboutCSR} />
           <Route path="/students/affairs" component={StudentAffairs} />
+          <Route path="/students/council" component={StudentsCouncil} />
           <Route path="/archives" component={Archives} />
           <Route path="/admissions/apply" component={AdmissionsApply} />
           <Route path="/admissions/track" component={AdmissionsTrack} />
