@@ -330,9 +330,20 @@ Route::get('/management', function () {
 });
 
 Route::get('/directorates', function () {
+    $hasType = \Illuminate\Support\Facades\Schema::hasColumn('directorates', 'type');
+    $columns = ['id', 'name', 'slug', 'tagline', 'description', 'director_name', 'director_title', 'director_photo_url', 'position_order'];
+    if ($hasType) {
+        $columns[] = 'type';
+    }
     $directorates = \App\Models\Directorate::where('is_active', true)
         ->orderBy('position_order')
-        ->get(['id', 'name', 'slug', 'type', 'tagline', 'description', 'director_name', 'director_title', 'director_photo_url', 'position_order']);
+        ->get($columns)
+        ->map(function ($d) use ($hasType) {
+            if (!$hasType) {
+                $d->type = 'directorate';
+            }
+            return $d;
+        });
     return response()->json(['data' => $directorates]);
 });
 
