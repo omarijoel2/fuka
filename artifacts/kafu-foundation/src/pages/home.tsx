@@ -859,8 +859,8 @@ export default function Home() {
                               <p className="text-sm font-semibold text-foreground truncate leading-tight">
                                 {school.dean ?? `Dean, ${school.name}`}
                               </p>
-                              <p className="text-xs text-muted-foreground">
-                                Dean of School
+                              <p className="text-xs text-muted-foreground truncate">
+                                {school.dean_title ?? `Dean, ${school.name}`}
                               </p>
                             </div>
                           </div>
