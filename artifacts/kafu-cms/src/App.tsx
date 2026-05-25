@@ -27,6 +27,7 @@ import OfficesCmsPage from "@/pages/offices-cms";
 import StaffReviewCmsPage from "@/pages/staff-review-cms";
 import StaffAccountsCmsPage from "@/pages/staff-accounts-cms";
 import HomepageManagerPage from "@/pages/homepage-manager";
+import HeroSlidesCmsPage from "@/pages/hero-slides-cms";
 import NavigationManagerPage from "@/pages/navigation-manager";
 import SiteControlsPage from "@/pages/site-controls";
 import RedirectsCmsPage from "@/pages/redirects-cms";
@@ -255,6 +256,13 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <HomepageManagerPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/hero-slides">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <HeroSlidesCmsPage />
             </RequireRole>
           )}
         </Route>

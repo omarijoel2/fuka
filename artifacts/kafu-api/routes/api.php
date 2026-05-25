@@ -4,6 +4,26 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\CmsContent;
 
+if (!function_exists('mapHeroSlide')) {
+function mapHeroSlide(CmsContent $item): array {
+    $sd = is_string($item->structured_data) ? json_decode($item->structured_data, true) : ($item->structured_data ?? []);
+    return [
+        'id'              => $item->id,
+        'headline'        => $item->title,
+        'accent'          => $sd['accent'] ?? '',
+        'badge'           => $sd['badge'] ?? '',
+        'body'            => $item->summary ?? '',
+        'image'           => $item->featured_image ?? '',
+        'objectPosition'  => $sd['object_position'] ?? 'center center',
+        'sortOrder'       => (int)($sd['sort_order'] ?? 0),
+        'cta1'            => ['label' => $sd['cta1_label'] ?? 'Learn More', 'href' => $sd['cta1_href'] ?? '/', 'external' => (bool)($sd['cta1_external'] ?? false)],
+        'cta2'            => ['label' => $sd['cta2_label'] ?? 'About KAFU', 'href' => $sd['cta2_href'] ?? '/about', 'external' => (bool)($sd['cta2_external'] ?? false)],
+        'status'          => $item->status,
+        'featured'        => (bool)$item->featured,
+    ];
+}
+}
+
 if (!function_exists('mapCmsNews')) {
 function mapCmsNews(CmsContent $item): array {
     return [
@@ -237,6 +257,23 @@ function mapCmsOpportunityDetail(CmsContent $item): array {
 
 Route::get('/healthz', function () {
     return response()->json(['status' => 'ok', 'service' => 'KAFU API']);
+});
+
+// ── Hero Slides (public) ───────────────────────────────────────────────────────
+Route::get('/hero-slides', function () {
+    try {
+        $slides = CmsContent::where('type', 'hero_slide')
+            ->where('status', 'published')
+            ->where('is_deleted', false)
+            ->get()
+            ->map(fn($item) => mapHeroSlide($item))
+            ->sortBy('sortOrder')
+            ->values()
+            ->toArray();
+        return response()->json(['data' => $slides]);
+    } catch (\Throwable $e) {
+        return response()->json(['data' => []]);
+    }
 });
 
 // ── Public site-config (read-only) ────────────────────────────────────────────
@@ -4870,4 +4907,118 @@ Route::get('/admissions-app/track/{ref}', function (string $ref) {
         'submitted_at'     => $app->submitted_at,
         'status_message'   => $statusMessages[$app->status] ?? '',
     ]]);
+});
+
+// ── Admin: Hero Slides CRUD ────────────────────────────────────────────────────
+Route::middleware(['auth:sanctum'])->prefix('admin/hero-slides')->group(function () {
+    // List all slides (including drafts)
+    Route::get('/', function () {
+        try {
+            $slides = CmsContent::where('type', 'hero_slide')
+                ->where('is_deleted', false)
+                ->get()
+                ->map(fn($item) => mapHeroSlide($item))
+                ->sortBy('sortOrder')
+                ->values()
+                ->toArray();
+            return response()->json(['data' => $slides]);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    });
+
+    // Create new slide
+    Route::post('/', function (Request $request) {
+        try {
+            $sd = json_encode([
+                'accent'          => $request->input('accent', ''),
+                'badge'           => $request->input('badge', ''),
+                'cta1_label'      => $request->input('cta1_label', 'Learn More'),
+                'cta1_href'       => $request->input('cta1_href', '/'),
+                'cta1_external'   => (bool)$request->input('cta1_external', false),
+                'cta2_label'      => $request->input('cta2_label', 'About KAFU'),
+                'cta2_href'       => $request->input('cta2_href', '/about'),
+                'cta2_external'   => (bool)$request->input('cta2_external', false),
+                'object_position' => $request->input('object_position', 'center center'),
+                'sort_order'      => (int)$request->input('sort_order', 99),
+            ]);
+            $item = CmsContent::create([
+                'type'            => 'hero_slide',
+                'title'           => $request->input('headline', 'New Slide'),
+                'slug'            => 'hero-slide-' . time(),
+                'summary'         => $request->input('body', ''),
+                'body'            => $request->input('body', ''),
+                'featured_image'  => $request->input('image', ''),
+                'featured'        => (bool)$request->input('featured', false),
+                'status'          => $request->input('status', 'draft'),
+                'structured_data' => $sd,
+                'is_deleted'      => false,
+                'author_id'       => $request->user()->id,
+                'tags'            => '[]',
+                'seo_meta'        => '{}',
+                'published_at'    => now(),
+            ]);
+            return response()->json(['data' => mapHeroSlide($item)], 201);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    });
+
+    // Update slide
+    Route::put('/{id}', function (Request $request, int $id) {
+        try {
+            $item = CmsContent::where('type', 'hero_slide')->where('is_deleted', false)->findOrFail($id);
+            $sdOld = is_string($item->structured_data) ? json_decode($item->structured_data, true) : ($item->structured_data ?? []);
+            $sd = json_encode([
+                'accent'          => $request->input('accent', $sdOld['accent'] ?? ''),
+                'badge'           => $request->input('badge', $sdOld['badge'] ?? ''),
+                'cta1_label'      => $request->input('cta1_label', $sdOld['cta1_label'] ?? 'Learn More'),
+                'cta1_href'       => $request->input('cta1_href', $sdOld['cta1_href'] ?? '/'),
+                'cta1_external'   => (bool)$request->input('cta1_external', $sdOld['cta1_external'] ?? false),
+                'cta2_label'      => $request->input('cta2_label', $sdOld['cta2_label'] ?? 'About KAFU'),
+                'cta2_href'       => $request->input('cta2_href', $sdOld['cta2_href'] ?? '/about'),
+                'cta2_external'   => (bool)$request->input('cta2_external', $sdOld['cta2_external'] ?? false),
+                'object_position' => $request->input('object_position', $sdOld['object_position'] ?? 'center center'),
+                'sort_order'      => (int)$request->input('sort_order', $sdOld['sort_order'] ?? 0),
+            ]);
+            $item->update([
+                'title'           => $request->input('headline', $item->title),
+                'summary'         => $request->input('body', $item->summary),
+                'body'            => $request->input('body', $item->body),
+                'featured_image'  => $request->input('image', $item->featured_image),
+                'featured'        => $request->has('featured') ? (bool)$request->input('featured') : $item->featured,
+                'status'          => $request->input('status', $item->status),
+                'structured_data' => $sd,
+            ]);
+            return response()->json(['data' => mapHeroSlide($item->fresh())]);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    });
+
+    // Delete (soft)
+    Route::delete('/{id}', function (int $id) {
+        try {
+            CmsContent::where('type', 'hero_slide')->findOrFail($id)->update(['is_deleted' => true]);
+            return response()->json(['message' => 'Slide deleted']);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    });
+
+    // Reorder: POST body { order: [id, id, ...] }
+    Route::post('/reorder', function (Request $request) {
+        try {
+            foreach ($request->input('order', []) as $position => $id) {
+                $item = CmsContent::where('type', 'hero_slide')->find($id);
+                if (!$item) continue;
+                $sd = is_string($item->structured_data) ? json_decode($item->structured_data, true) : ($item->structured_data ?? []);
+                $sd['sort_order'] = $position;
+                $item->update(['structured_data' => json_encode($sd)]);
+            }
+            return response()->json(['message' => 'Reordered']);
+        } catch (\Throwable $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    });
 });

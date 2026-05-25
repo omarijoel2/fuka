@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { useStats, useNews, useSchools, useEvents, useOpportunities, useProgrammes } from "@/lib/api-hooks";
+import { useStats, useNews, useSchools, useEvents, useOpportunities, useProgrammes, useHeroSlides, type HeroSlide } from "@/lib/api-hooks";
 import { IntakeBanner } from "@/components/intake-banner";
 import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import {
@@ -109,16 +109,38 @@ const SLIDES = [
   },
 ];
 
+// Static fallback used while API loads or if API fails
+const STATIC_SLIDES = SLIDES;
+
 interface HeroCarouselProps {
   stats?: { label: string; value: string | number }[];
   statsLoading?: boolean;
 }
 
 function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
+  const { data: apiSlides } = useHeroSlides();
+  // Map API shape → carousel shape, fall back to static SLIDES if API empty
+  const slides: typeof SLIDES = React.useMemo(() => {
+    if (apiSlides && apiSlides.length > 0) {
+      return apiSlides.map((s: HeroSlide, i: number) => ({
+        image: s.image,
+        objectPosition: s.objectPosition,
+        badge: s.badge,
+        headline: s.headline,
+        accent: s.accent,
+        body: s.body,
+        cta1: s.cta1,
+        cta2: s.cta2,
+        testid: `hero-slide-${i}`,
+      }));
+    }
+    return STATIC_SLIDES;
+  }, [apiSlides]);
+
   const [current, setCurrent] = React.useState(0);
   const [paused, setPaused] = React.useState(false);
   const [animating, setAnimating] = React.useState(false);
-  const count = SLIDES.length;
+  const count = slides.length;
 
   const goTo = React.useCallback(
     (idx: number) => {
@@ -136,7 +158,7 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
     return () => clearInterval(t);
   }, [current, paused, goTo]);
 
-  const slide = SLIDES[current];
+  const slide = slides[current];
 
   return (
     <section
@@ -210,7 +232,7 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
         {/* RIGHT — clean photo, no overlay */}
         <div className="relative flex-shrink-0 order-1 md:order-2 w-full md:w-[52%] lg:w-[55%]">
           <div className="relative w-full overflow-hidden rounded-2xl shadow-xl" style={{ aspectRatio: "4/3" }}>
-            {SLIDES.map((s, i) => (
+            {slides.map((s, i) => (
               <img
                 key={s.testid}
                 src={s.image}
@@ -246,7 +268,7 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
 
       {/* ── Dot indicators ── */}
       <div className="relative z-10 flex items-center justify-center gap-2 pb-5 pt-1">
-        {SLIDES.map((_, i) => (
+        {slides.map((_, i) => (
           <button
             key={i}
             onClick={() => goTo(i)}

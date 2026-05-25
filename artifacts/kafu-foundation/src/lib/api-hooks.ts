@@ -32,6 +32,29 @@ import type {
   ServicePoint,
 } from "./api-types";
 
+export interface HeroSlide {
+  id: number;
+  headline: string;
+  accent: string;
+  badge: string;
+  body: string;
+  image: string;
+  objectPosition: string;
+  sortOrder: number;
+  cta1: { label: string; href: string; external: boolean };
+  cta2: { label: string; href: string; external: boolean };
+  status: string;
+  featured: boolean;
+}
+
+export function useHeroSlides() {
+  return useQuery({
+    queryKey: ["hero-slides"],
+    queryFn: () => fetchApi<HeroSlide[]>("/hero-slides"),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 export function useStats() {
   return useQuery({
     queryKey: ["stats"],

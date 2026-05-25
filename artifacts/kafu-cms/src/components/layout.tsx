@@ -124,6 +124,7 @@ const navItems: NavItem[] = [
     roles: ADMIN_ROLES,
     children: [
       { label: "Homepage Manager", href: "/homepage" },
+      { label: "Hero Slides", href: "/hero-slides" },
       { label: "About Page", href: "/site/about" },
       { label: "Student Services", href: "/site/student-services" },
       { label: "Navigation Manager", href: "/navigation" },
