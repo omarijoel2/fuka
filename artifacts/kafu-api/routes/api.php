@@ -332,7 +332,7 @@ Route::get('/management', function () {
 Route::get('/directorates', function () {
     $directorates = \App\Models\Directorate::where('is_active', true)
         ->orderBy('position_order')
-        ->get(['id', 'name', 'slug', 'tagline', 'description', 'director_name', 'director_title', 'director_photo_url', 'position_order']);
+        ->get(['id', 'name', 'slug', 'type', 'tagline', 'description', 'director_name', 'director_title', 'director_photo_url', 'position_order']);
     return response()->json(['data' => $directorates]);
 });
 

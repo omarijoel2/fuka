@@ -44,6 +44,44 @@ interface DirectorateListItem {
 }
 
 const STATIC_FALLBACKS: Record<string, Partial<Directorate>> = {
+  "cecare": {
+    id: 16,
+    name: "Centre of Excellence on Climate Action and Research",
+    slug: "cecare",
+    tagline: "A Premier Hub for Climate Research, Policy and Community Resilience",
+    description:
+      "The Centre of Excellence on Climate Action and Research (CECARE) was established at Kaimosi Friends University in September 2024 in collaboration with the County Government of Vihiga (CGV) and the University Fund (UF). CECARE is responsible for informing policies through research and training on climate change issues, including adaptation, mitigation, and financing. It stands as a vital nexus between academia, government, and local communities, driving tangible climate action and sustainable development in Vihiga County, the Lake Region Economic Block (LREB) and beyond.",
+    director_message:
+      "The Centre of Excellence on Climate Action and Research (CECARE) was established at Kaimosi Friends University in September 2024 in collaboration with the County Government of Vihiga (CGV) and the University Fund (UF). It is responsible for informing policies through research and training on Climate Change issues, including adaptation, mitigation, and financing. Our mission is to serve as a premier hub for informing evidence-based policy, driving innovative research, and building community resilience in the face of climate change. CECARE is dedicated to understanding climate variability and its impacts on the environment and society. Its core activities are structured around four key pillars: Research and Knowledge Management, Policy and Stakeholder Engagement, Community Action and Innovation, and Global Alignment. We interpret and localise global climate frameworks and declarations to contribute effectively to achieving the Sustainable Development Goals (SDGs). CECARE stands as a vital nexus between academia, government, and local communities, driving tangible climate action and sustainable development in Vihiga County, the Lake Region Economic Block (LREB) and beyond.",
+    director_name: "Prof. Caroline Mulinya",
+    director_title: "Director, CECARE",
+    director_photo_url: null,
+    director_bio: null,
+    director_email: "cecare@kafu.ac.ke",
+    director_phone: "+254 777 373 633",
+    functions: [
+      "Research and Knowledge Management — conducting cutting-edge research on climate adaptation, mitigation, and financing; managing climate information and documenting best practices.",
+      "Policy and Stakeholder Engagement — translating research into actionable insights for policymakers and increasing public awareness through targeted outreach on climate change consequences and solutions.",
+      "Community Action and Innovation — developing and implementing on-the-ground projects to enhance community resilience, including innovations in renewable energy, clean technology, recycling, and sustainable practices.",
+      "Global Alignment — interpreting and localising global climate frameworks and declarations to contribute effectively to achieving the Sustainable Development Goals (SDGs).",
+    ],
+    services: [
+      "Climate change research and technical advisory",
+      "Policy briefs and evidence-based recommendations",
+      "Community resilience training and capacity building",
+      "Renewable energy and clean technology innovation",
+      "Climate data and knowledge management",
+      "Stakeholder outreach and public awareness programmes",
+    ],
+    quick_links: [
+      { label: "Research Overview",  url: "/research" },
+      { label: "Research Projects",  url: "/research/projects" },
+      { label: "Contact Us",         url: "/contact" },
+    ],
+    staff_roster: [
+      { name: "Prof. Caroline Mulinya", title: "Director, CECARE", photo_url: null, email: "cecare@kafu.ac.ke" },
+    ],
+  },
   "corporate-affairs": {
     id: 11,
     name: "Directorate of Corporate Affairs",
