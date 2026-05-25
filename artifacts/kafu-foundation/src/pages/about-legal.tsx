@@ -95,9 +95,11 @@ export default function AboutLegal() {
               </p>
             </div>
             <div className="bg-primary text-white rounded-xl p-6">
-              <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center mb-4">
-                <Scale className="w-6 h-6" />
-              </div>
+              <img
+                src="/imgs/legal-officer-kethi.jpg"
+                alt="Harriet Kethi, Legal Officer"
+                className="w-20 h-20 rounded-full object-cover object-top mb-4 border-2 border-white/30"
+              />
               <p className="font-bold text-lg mb-1">Harriet Kethi</p>
               <p className="text-white/80 text-sm mb-3">Legal Officer</p>
               <p className="text-white/70 text-xs leading-relaxed mb-4">
