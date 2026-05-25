@@ -2,8 +2,9 @@ import React, { useEffect, useState, useCallback } from "react";
 import { useLocation } from "wouter";
 import { apiGet, apiPost, apiPut, apiDelete, CONTENT_TYPE_LABELS, CONTENT_TYPES, WORKFLOW_TRANSITIONS, STATUS_LABELS, formatDateTime, type WorkflowStatus } from "@/lib/api";
 import { StatusBadge } from "@/components/status-badge";
+import { PhotoBrowserModal } from "@/components/photo-browser-modal";
 import { useAuth } from "@/lib/auth";
-import { Save, Trash2, Clock, ArrowLeft, RotateCcw, ChevronDown, ChevronUp, Plus, X, Upload } from "lucide-react";
+import { Save, Trash2, Clock, ArrowLeft, RotateCcw, ChevronDown, ChevronUp, Plus, X, Upload, Images } from "lucide-react";
 
 const ADMIN_ROLES = ["super_admin", "ict_admin", "communications_admin"];
 
@@ -78,6 +79,7 @@ export default function ContentEditorPage({ id }: { id?: string }) {
   const [success, setSuccess] = useState("");
   const [scheduleAt, setScheduleAt] = useState("");
   const [requirementInput, setRequirementInput] = useState("");
+  const [photoBrowserTarget, setPhotoBrowserTarget] = useState<"featured_image" | "staff_photo" | null>(null);
 
   const load = useCallback(async () => {
     if (isNew) return;
@@ -644,7 +646,22 @@ export default function ContentEditorPage({ id }: { id?: string }) {
               </div>
               <div>
                 <label className="block text-xs font-medium text-muted-foreground mb-1">Photo URL</label>
-                <input type="url" value={sdField(sd, "photo")} onChange={(e) => setSd("photo", e.target.value)} placeholder="https://..." className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" data-testid="input-staff-photo" />
+                <div className="flex gap-2">
+                  <input type="url" value={sdField(sd, "photo")} onChange={(e) => setSd("photo", e.target.value)} placeholder="https://..." className="flex-1 px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" data-testid="input-staff-photo" />
+                  <button
+                    type="button"
+                    onClick={() => setPhotoBrowserTarget("staff_photo")}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition shrink-0"
+                    data-testid="btn-browse-staff-photo"
+                    title="Browse media library"
+                  >
+                    <Images className="w-3.5 h-3.5" />
+                    Browse
+                  </button>
+                </div>
+                {sdField(sd, "photo") && (
+                  <img src={sdField(sd, "photo")} alt="" className="mt-2 w-20 h-20 rounded-full object-cover border border-border" />
+                )}
               </div>
               {/* Specializations */}
               <div>
@@ -941,17 +958,40 @@ export default function ContentEditorPage({ id }: { id?: string }) {
               <label htmlFor="chk-featured" className="text-xs font-medium text-muted-foreground">Featured</label>
             </div>
             <div>
-              <label className="block text-xs font-medium text-muted-foreground mb-1">Featured Image URL</label>
-              <input
-                type="url"
-                value={form.featured_image_url}
-                onChange={(e) => field("featured_image_url", e.target.value)}
-                placeholder="https://..."
-                className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
-                data-testid="input-featured-image"
-              />
+              <label className="block text-xs font-medium text-muted-foreground mb-1">Featured Image</label>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={form.featured_image_url}
+                  onChange={(e) => field("featured_image_url", e.target.value)}
+                  placeholder="https://... or browse below"
+                  className="flex-1 px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  data-testid="input-featured-image"
+                />
+                <button
+                  type="button"
+                  onClick={() => setPhotoBrowserTarget("featured_image")}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition shrink-0"
+                  data-testid="btn-browse-featured-image"
+                  title="Browse media library"
+                >
+                  <Images className="w-3.5 h-3.5" />
+                  Browse
+                </button>
+              </div>
               {form.featured_image_url && (
-                <img src={form.featured_image_url} alt="" className="mt-2 w-full rounded-lg aspect-video object-cover border border-border" />
+                <div className="mt-2 relative group">
+                  <img src={form.featured_image_url} alt="" className="w-full rounded-lg aspect-video object-cover border border-border" />
+                  <button
+                    type="button"
+                    onClick={() => field("featured_image_url", "")}
+                    className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition hover:bg-black/80"
+                    data-testid="btn-clear-featured-image"
+                    title="Remove image"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </div>
               )}
             </div>
             {!isNew && (
@@ -1037,6 +1077,21 @@ export default function ContentEditorPage({ id }: { id?: string }) {
           )}
         </div>
       </div>
+
+      {photoBrowserTarget && (
+        <PhotoBrowserModal
+          title={photoBrowserTarget === "staff_photo" ? "Select Profile Photo" : "Select Featured Image"}
+          onSelect={(url) => {
+            if (photoBrowserTarget === "staff_photo") {
+              setSd("photo", url);
+            } else {
+              field("featured_image_url", url);
+            }
+            setPhotoBrowserTarget(null);
+          }}
+          onClose={() => setPhotoBrowserTarget(null)}
+        />
+      )}
     </div>
   );
 }
