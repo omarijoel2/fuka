@@ -177,14 +177,20 @@ class UpdateImageUrlsSeeder extends Seeder
     private function existingColumns(string $table, array $cols): array
     {
         try {
-            $actual = array_map(
-                fn($c) => $c->name ?? $c->Field ?? null,
-                DB::select('PRAGMA table_info(' . $table . ')') ?: []
-            );
-            // PRAGMA returns nothing for MySQL; fall back to attempting the query
-            if (empty($actual)) {
-                return $cols; // trust the schema definition on MySQL
+            $driver = DB::getDriverName();
+
+            if ($driver === 'sqlite') {
+                $rows   = DB::select('PRAGMA table_info(' . $table . ')');
+                $actual = array_map(fn($r) => $r->name, $rows);
+            } else {
+                // MySQL / MariaDB
+                $rows   = DB::select(
+                    'SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ?',
+                    [$table]
+                );
+                $actual = array_map(fn($r) => $r->COLUMN_NAME, $rows);
             }
+
             return array_values(array_filter($cols, fn($c) => in_array($c, $actual)));
         } catch (\Exception) {
             return $cols;

@@ -1,0 +1,54 @@
+Do not run Composer as root/super user! See https://getcomposer.org/root for details
+Continue as root/super user [yes]? yes
+Generating optimized autoload files
+> Illuminate\Foundation\ComposerScripts::postAutoloadDump
+> @php artisan package:discover --ansi
+
+   INFO  Discovering packages.  
+
+  barryvdh/laravel-dompdf .............................................................. DONE
+  laravel/sanctum ...................................................................... DONE
+  laravel/tinker ....................................................................... DONE
+  maatwebsite/excel .................................................................... DONE
+  nesbot/carbon ........................................................................ DONE
+  nunomaduro/termwind .................................................................. DONE
+
+Generated optimized autoload files containing 5870 classes
+
+                                                                                               
+                                  APPLICATION IN PRODUCTION.                                   
+                                                                                               
+
+ ┌ Are you sure you want to run this command? ──────────────────┐
+ │ Yes                                                          │
+ └──────────────────────────────────────────────────────────────┘
+
+   INFO  Seeding database.  
+
+Updated: Kobujoi Campus (slug fixed to 'kobujoi', hero + gallery added).
+
+                                                                                               
+                                  APPLICATION IN PRODUCTION.                                   
+                                                                                               
+
+ ┌ Are you sure you want to run this command? ──────────────────┐
+ │ Yes                                                          │
+ └──────────────────────────────────────────────────────────────┘
+
+   INFO  Seeding database.  
+
+  Skipped  (table missing): schools
+
+In Connection.php line 838:
+                                                                                              
+  SQLSTATE[42S22]: Column not found: 1054 Unknown column 'hero_image' in 'where clause' (Con  
+  nection: mysql, Host: 127.0.0.1, Port: 3306, Database: kafu, SQL: select * from `directora  
+  tes` where `director_photo_url` LIKE '%kafu.ac.ke%' OR `hero_image` LIKE '%kafu.ac.ke%')    
+                                                                                              
+
+In Connection.php line 420:
+                                                                                         
+  SQLSTATE[42S22]: Column not found: 1054 Unknown column 'hero_image' in 'where clause'  
+                                                                                         
+
+root@vmi2612374:/var/www/fuka/artifacts/kafu-api# 
