@@ -48,6 +48,18 @@ Thumbs.db
 # Deployment bundles — generated locally, not committed
 *.zip
 
+# Environment config — each environment keeps its own .env locally.
+# Never commit actual .env files; only commit .env.example templates.
+.env
+.env.local
+.env.*.local
+# Catch accidental editor-temp env files (e.g. .envaMA, .envnano.save)
+.env[^.e]*
+artifacts/kafu-api/.env
+artifacts/kafu-cms/.env
+artifacts/kafu-foundation/.env
+artifacts/kafu-staff/.env
+
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
 
