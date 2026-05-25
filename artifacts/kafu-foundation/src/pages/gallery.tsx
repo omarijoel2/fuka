@@ -25,6 +25,10 @@ interface GalleryAlbum {
   cover_image_url: string | null;
   album_date: string | null;
   sort_order: number;
+  /** Populated by the list API via withCount */
+  photo_count?: number;
+  video_count?: number;
+  /** Populated by the detail API via with('items') */
   items?: GalleryItem[];
 }
 
@@ -65,9 +69,8 @@ function formatDate(d: string | null) {
 }
 
 function itemCounts(album: GalleryAlbum) {
-  const items = album.items ?? [];
-  const photos = items.filter(i => i.type === "image").length;
-  const videos = items.filter(i => i.type === "video").length;
+  const photos = album.photo_count ?? album.items?.filter(i => i.type === "image").length ?? 0;
+  const videos = album.video_count ?? album.items?.filter(i => i.type === "video").length ?? 0;
   return { photos, videos };
 }
 
@@ -86,8 +89,8 @@ export default function GalleryPage() {
     ? albums
     : albums.filter(a => CATEGORY_LABELS[a.category] === activeFilter);
 
-  const totalPhotos = albums.reduce((n, a) => n + (a.items?.filter(i => i.type === "image").length ?? 0), 0);
-  const totalVideos = albums.reduce((n, a) => n + (a.items?.filter(i => i.type === "video").length ?? 0), 0);
+  const totalPhotos = albums.reduce((n, a) => n + (a.photo_count ?? a.items?.filter(i => i.type === "image").length ?? 0), 0);
+  const totalVideos = albums.reduce((n, a) => n + (a.video_count ?? a.items?.filter(i => i.type === "video").length ?? 0), 0);
 
   return (
     <>

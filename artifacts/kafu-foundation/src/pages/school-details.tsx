@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { SeoHead } from "@/components/seo-head";
-import { ArrowLeft, BookOpen, User, GraduationCap, ChevronRight, Clock, ExternalLink, Building2, Mail, Phone } from "lucide-react";
+import { ArrowLeft, BookOpen, User, GraduationCap, ChevronRight, Clock, ExternalLink, Building2, Mail, Phone, Users } from "lucide-react";
 
 interface Department {
   id: number;
@@ -90,6 +90,7 @@ export default function SchoolDetails() {
     );
   }
 
+  const allSchoolStaff = staffData?.data ?? [];
   const defaultTab = departments.length > 0 ? "depts" : undergrad.length > 0 ? "ug" : postgrad.length > 0 ? "pg" : "doc";
 
   return (
@@ -265,6 +266,12 @@ export default function SchoolDetails() {
                       Departments ({departments.length})
                     </TabsTrigger>
                   )}
+                  {allSchoolStaff.length > 0 && (
+                    <TabsTrigger value="faculty" data-testid="tab-faculty">
+                      <Users className="w-3.5 h-3.5 mr-1.5" />
+                      Faculty ({allSchoolStaff.length})
+                    </TabsTrigger>
+                  )}
                   {undergrad.length > 0 && (
                     <TabsTrigger value="ug" data-testid="tab-ug">
                       Undergraduate ({undergrad.length})
@@ -281,6 +288,55 @@ export default function SchoolDetails() {
                     </TabsTrigger>
                   )}
                 </TabsList>
+
+                {/* Faculty Tab */}
+                {allSchoolStaff.length > 0 && (
+                  <TabsContent value="faculty" data-testid="faculty-tab-content">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {allSchoolStaff.map(member => (
+                        <Link key={member.slug} href={`/staff/${member.slug}`}>
+                          <div
+                            className="group flex items-center gap-4 p-4 bg-card border rounded-xl hover:border-primary hover:shadow-sm transition-all cursor-pointer"
+                            data-testid={`faculty-card-${member.slug}`}
+                          >
+                            {member.photo ? (
+                              <img
+                                src={member.photo}
+                                alt={member.name}
+                                className="w-14 h-14 rounded-full object-cover shrink-0 ring-2 ring-border group-hover:ring-primary transition-all"
+                              />
+                            ) : (
+                              <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                                <User className="w-6 h-6 text-primary" />
+                              </div>
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <p className="font-semibold text-foreground group-hover:text-primary transition-colors text-sm leading-snug truncate">
+                                {member.name}
+                              </p>
+                              <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2 leading-snug">
+                                {member.designation}
+                              </p>
+                              {member.email && (
+                                <p className="text-xs text-primary/70 mt-1 flex items-center gap-1 truncate">
+                                  <Mail className="w-3 h-3 shrink-0" />
+                                  <span className="truncate">{member.email}</span>
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                      ))}
+                    </div>
+                    <div className="mt-6 text-center">
+                      <Button asChild variant="outline" className="border-primary text-primary" data-testid="view-full-staff-directory">
+                        <Link href={`/staff?school=${code}`}>
+                          View Full Staff Directory
+                        </Link>
+                      </Button>
+                    </div>
+                  </TabsContent>
+                )}
 
                 {/* Departments Tab */}
                 {departments.length > 0 && (

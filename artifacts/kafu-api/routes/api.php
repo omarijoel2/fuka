@@ -909,6 +909,8 @@ Route::get('/staff', function (Request $request) {
     $designation = $request->query('designation');
     $search      = $request->query('search');
 
+    $department = $request->query('department');
+
     try {
         $cmsQuery = CmsContent::where('type', 'staff_profile')
             ->where('status', 'published')
@@ -918,6 +920,9 @@ Route::get('/staff', function (Request $request) {
 
         if ($cmsStaff->isNotEmpty()) {
             $mapped = $cmsStaff->map(fn($s) => mapCmsStaff($s))->toArray();
+            if ($department) {
+                $mapped = array_values(array_filter($mapped, fn($s) => stripos($s['department'], $department) !== false));
+            }
             if ($designation) {
                 $mapped = array_values(array_filter($mapped, fn($s) => stripos($s['designation'], $designation) !== false));
             }

@@ -43,8 +43,10 @@ class DatabaseSeeder extends Seeder
         $this->call(GovernanceSeeder::class);
         $this->call(DirectoratesSeeder::class);   // Full directorate + centre data (supersedes GovernanceSeeder's directorate block + DirectoratesPhotoSeeder)
         $this->call(GallerySeeder::class);
+        $this->call(KobujoiGallerySeeder::class); // Kobujoi Campus album (idempotent)
         $this->call(DepartmentSeeder::class);
         $this->call(CampusSeeder::class);
+        $this->call(SchoolStaffSeeder::class);    // Assign staff departments + add school-level staff
 
         // ── Site-wide configuration (CMS back-office settings) ────────────────
         $this->call(SiteConfigSeeder::class);

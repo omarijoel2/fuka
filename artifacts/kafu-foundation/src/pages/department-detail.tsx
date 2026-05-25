@@ -18,16 +18,27 @@ interface StaffMember {
   school: string | null;
 }
 
-function staffMatchesDept(staffDept: string | null, deptName: string): boolean {
-  if (!staffDept) return false;
-  const s = staffDept.toLowerCase().trim();
-  const d = deptName.toLowerCase().replace(/^department of\s*/i, "").trim();
-  if (s === d) return true;
-  // "social work" matches "social work & community development"
-  if (d.startsWith(s)) return true;
-  // Split by & and , to get the first key term
-  const parts = d.split(/[,&]/).map(p => p.trim());
-  return parts.some(p => p === s || p.startsWith(s) || s.startsWith(p));
+/** Match a staff member to a department — checks department field first,
+ *  then falls back to Chair/COD designation keyword matching. */
+function staffMatchesDept(staff: StaffMember, deptName: string): boolean {
+  const deptKey = deptName.toLowerCase().replace(/^department of\s*/i, "").trim();
+  const keywords = deptKey.split(/[\s,&]+/).filter(w => w.length > 3);
+
+  // 1. Department field match (e.g. "Department of Computer Science" ↔ "computer science")
+  if (staff.department?.trim()) {
+    const s = staff.department.toLowerCase().replace(/^department of\s*/i, "").trim();
+    if (s.includes(deptKey) || deptKey.includes(s)) return true;
+    if (keywords.some(kw => s.includes(kw))) return true;
+  }
+
+  // 2. Fallback: Chair/COD designation mentions a dept keyword
+  if (staff.designation?.trim()) {
+    const d = staff.designation.toLowerCase();
+    const isChair = d.includes("chair") || d.includes("cod") || d.startsWith("head");
+    if (isChair && keywords.some(kw => d.includes(kw))) return true;
+  }
+
+  return false;
 }
 
 interface Department {
@@ -81,16 +92,36 @@ export default function DepartmentDetailPage() {
   const dept = data?.data;
   const schoolColour = dept ? (SCHOOL_COLOURS[dept.school_code] ?? "#1A5C38") : "#1A5C38";
 
+  // Clean dept name for API filter (strip "Department of" prefix)
+  const deptApiParam = dept
+    ? encodeURIComponent(dept.name.replace(/^Department of\s*/i, "").trim())
+    : "";
+
   const { data: staffData } = useQuery<{ data: StaffMember[] }>({
-    queryKey: ["dept-staff", dept?.school_code],
-    queryFn: () => fetch(`/api/staff?school=${dept!.school_code}`).then(r => r.json()),
-    enabled: !!dept?.school_code,
+    queryKey: ["dept-staff", dept?.school_code, dept?.name],
+    queryFn: () =>
+      fetch(`/api/staff?school=${dept!.school_code}&department=${deptApiParam}`)
+        .then(r => r.json()),
+    enabled: !!dept?.school_code && !!dept?.name,
     staleTime: 1000 * 60 * 10,
   });
 
-  const deptStaff = (staffData?.data ?? []).filter(s =>
-    dept ? staffMatchesDept(s.department, dept.name) : false
-  );
+  // If API-filtered staff came back empty (dept field not set on legacy records),
+  // fall back to client-side matching across all school staff
+  const { data: schoolStaffData } = useQuery<{ data: StaffMember[] }>({
+    queryKey: ["school-staff-fallback", dept?.school_code],
+    queryFn: () =>
+      fetch(`/api/staff?school=${dept!.school_code}`).then(r => r.json()),
+    enabled: !!dept?.school_code && (staffData?.data ?? []).length === 0,
+    staleTime: 1000 * 60 * 10,
+  });
+
+  const apiFiltered = staffData?.data ?? [];
+  const deptStaff = apiFiltered.length > 0
+    ? apiFiltered
+    : (schoolStaffData?.data ?? []).filter(s =>
+        dept ? staffMatchesDept(s, dept.name) : false
+      );
 
   if (isLoading) {
     return (
