@@ -663,8 +663,18 @@ export default function Home() {
                       <div key={i} className="h-56 bg-muted rounded-xl animate-pulse" />
                     ))
                   : latestNews.map((article) => (
-                      <Link key={article.id} href="/news" data-testid={`card-news-${article.id}`}>
+                      <Link key={article.id} href={`/news/${article.slug}`} data-testid={`card-news-${article.id}`}>
                         <div className="group rounded-xl overflow-hidden bg-card border hover:shadow-md hover:border-primary/30 transition-all h-full flex flex-col">
+                          {article.imageUrl && (
+                            <div className="relative w-full overflow-hidden" style={{ height: "160px" }}>
+                              <img
+                                src={article.imageUrl}
+                                alt={article.title}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                            </div>
+                          )}
                           <div className="p-5 flex flex-col flex-1">
                             <div className="flex items-center gap-3 mb-3">
                               <span className="text-xs font-semibold text-accent uppercase tracking-wider bg-accent/10 px-2 py-0.5 rounded">
@@ -704,31 +714,29 @@ export default function Home() {
                       <div key={i} className="h-24 bg-muted rounded-xl animate-pulse" />
                     ))
                   : upcomingEvents.map((event) => (
-                      <div
-                        key={event.id}
-                        className="group p-4 rounded-xl border bg-card hover:border-primary/50 hover:shadow-sm transition-all flex gap-4"
-                        data-testid={`card-event-${event.id}`}
-                      >
-                        <div className="flex flex-col items-center justify-center min-w-[3rem] p-2 bg-primary/5 rounded-lg group-hover:bg-primary group-hover:text-white transition-colors text-primary">
-                          <span className="text-[10px] font-bold uppercase">
-                            {new Date(event.date).toLocaleDateString("en-US", { month: "short" })}
-                          </span>
-                          <span className="text-xl font-bold font-serif">{new Date(event.date).getDate()}</span>
-                        </div>
-                        <div className="min-w-0">
-                          <h4 className="font-semibold text-sm font-serif text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                            {event.title}
-                          </h4>
-                          <div className="flex flex-col gap-0.5 mt-1.5 text-xs text-muted-foreground">
-                            <span className="flex items-center gap-1">
-                              <Calendar className="w-3 h-3 shrink-0" /> {event.time}
+                      <Link key={event.id} href={`/events/${event.slug}`} data-testid={`card-event-${event.id}`}>
+                        <div className="group p-4 rounded-xl border bg-card hover:border-primary/50 hover:shadow-sm transition-all flex gap-4">
+                          <div className="flex flex-col items-center justify-center min-w-[3rem] p-2 bg-primary/5 rounded-lg group-hover:bg-primary group-hover:text-white transition-colors text-primary">
+                            <span className="text-[10px] font-bold uppercase">
+                              {new Date(event.date).toLocaleDateString("en-US", { month: "short" })}
                             </span>
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-3 h-3 shrink-0" /> {event.location}
-                            </span>
+                            <span className="text-xl font-bold font-serif">{new Date(event.date).getDate()}</span>
+                          </div>
+                          <div className="min-w-0">
+                            <h4 className="font-semibold text-sm font-serif text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                              {event.title}
+                            </h4>
+                            <div className="flex flex-col gap-0.5 mt-1.5 text-xs text-muted-foreground">
+                              <span className="flex items-center gap-1">
+                                <Calendar className="w-3 h-3 shrink-0" /> {event.time}
+                              </span>
+                              <span className="flex items-center gap-1">
+                                <MapPin className="w-3 h-3 shrink-0" /> {event.location}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
+                      </Link>
                     ))}
               </div>
             </div>
