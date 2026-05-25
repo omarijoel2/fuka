@@ -1499,8 +1499,8 @@ Route::get('/staff/{slug}', function (string $slug) {
             ],
             'prof-peter-n-mwita' => [
                 'rank' => 'Professor',
-                'orcid_id' => '0000-0002-1234-5678',
-                'google_scholar_url' => 'https://scholar.google.com/citations?user=mwita_kafu',
+                'orcid_id' => null,
+                'google_scholar_url' => null,
                 'supervision' => ['masters_count' => 12, 'phd_count' => 3, 'current_students' => []],
                 'grants' => [],
             ],
