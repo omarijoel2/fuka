@@ -109,6 +109,27 @@ export default function DirectoratesPage() {
         ]}
       />
 
+      {/* Intro */}
+      <section className="border-b border-border bg-white py-14">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <p className="text-muted-foreground leading-relaxed text-base md:text-lg">
+            Kaimosi Friends University's (KAFU) Directorates and Centres function as dedicated engines
+            driving our commitment to integrity, service, and academic excellence. They are strategic
+            units designed to foster innovation, ensure operational efficiency, and deliver service
+            excellence that aligns with the Friends' values of peace and community stewardship.
+          </p>
+          <p className="text-muted-foreground leading-relaxed text-base md:text-lg mt-4">
+            These Directorates and Centres strategically complement our academic and administrative
+            functions by spearheading specialised holistic programmes, impactful research initiatives,
+            and vital community outreach activities rooted in ethical service. Each unit plays a
+            pivotal role in advancing KAFU's mission and vision through focused leadership, responsible
+            resource optimisation, and the active promotion of partnerships that enhance institutional
+            growth and societal transformation. They ensure KAFU remains a beacon of quality education
+            and a dedicated partner in development.
+          </p>
+        </div>
+      </section>
+
       {/* Stats bar */}
       <section className="bg-accent/5 border-b border-border py-8">
         <div className="max-w-5xl mx-auto px-4 flex flex-wrap justify-center gap-8 text-center">
