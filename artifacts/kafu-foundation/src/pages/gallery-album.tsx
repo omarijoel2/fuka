@@ -324,7 +324,7 @@ export default function GalleryAlbumPage() {
             <ArrowLeft className="w-4 h-4" /> Back to Gallery
           </Link>
           <a
-            href={`https://kafu.ac.ke`}
+            href="/"
             target="_blank"
             rel="noreferrer"
             className="text-sm text-gray-400 hover:text-gray-600 flex items-center gap-1"

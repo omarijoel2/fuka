@@ -2,7 +2,7 @@ import { Link, useParams } from "wouter";
 import { useNewsDetail, useNews } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
 import { Calendar, User, Tag, ChevronRight, ArrowLeft, ArrowRight, Share2 } from "lucide-react";
-import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
+import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -51,7 +51,7 @@ export default function NewsDetail() {
     publisher: ORG_JSONLD,
     datePublished: article.date,
     dateModified: article.date,
-    url: `https://kafu.ac.ke/news/${slug}`,
+    url: `${SITE_URL}/news/${slug}`,
     keywords: article.tags?.join(", "),
     articleSection: article.category,
   };

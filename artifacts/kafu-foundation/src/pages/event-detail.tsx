@@ -2,7 +2,7 @@ import { Link, useParams } from "wouter";
 import { useEventDetail } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Clock, Tag, ChevronRight, ArrowLeft, ExternalLink } from "lucide-react";
-import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
+import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -66,7 +66,7 @@ export default function EventDetail() {
       ? "https://schema.org/EventPostponed"
       : "https://schema.org/EventScheduled",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-    url: `https://kafu.ac.ke/events/${slug}`,
+    url: `${SITE_URL}/events/${slug}`,
   };
 
   return (

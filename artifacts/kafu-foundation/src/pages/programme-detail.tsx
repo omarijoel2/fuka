@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRoute, Link } from "wouter";
 import { useSchool, useProgrammeDetail, useStaff } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
-import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
+import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import {
   ArrowLeft,
   BookOpen,
@@ -80,7 +80,7 @@ export default function ProgrammeDetailPage() {
     provider: ORG_JSONLD,
     courseCode: code,
     educationalLevel: LEVEL_LABELS[level] ?? level,
-    url: `https://kafu.ac.ke/programmes/${school.toLowerCase()}/${code}`,
+    url: `${SITE_URL}/programmes/${school.toLowerCase()}/${code}`,
     hasCourseInstance: {
       "@type": "CourseInstance",
       courseMode: detail?.mode ?? "Blended",

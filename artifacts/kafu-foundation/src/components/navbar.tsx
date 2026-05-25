@@ -290,7 +290,7 @@ const navItems: NavItem[] = [
           { name: "Research Overview", path: "/research" },
           { name: "Research Projects", path: "/research/projects" },
           { name: "Publications",      path: "/research/publications" },
-          { name: "KAFU Journal",      path: "https://kafu.ac.ke/kafu-journal/", external: true },
+          { name: "KAFU Journal",      path: "/research/journal" },
         ],
       },
       {

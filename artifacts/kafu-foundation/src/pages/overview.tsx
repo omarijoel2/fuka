@@ -91,7 +91,7 @@ export default function Overview() {
               <div><span className="font-medium text-foreground">VC Email: </span>vc@kafu.ac.ke</div>
               <div><span className="font-medium text-foreground">General: </span>info@kafu.ac.ke</div>
               <div><span className="font-medium text-foreground">Website: </span>
-                <a href="https://kafu.ac.ke" target="_blank" rel="noopener noreferrer" className="text-primary underline hover:no-underline">kafu.ac.ke</a>
+                <a href="/" className="text-primary underline hover:no-underline">This website</a>
               </div>
             </div>
           </div>
@@ -108,7 +108,7 @@ export default function Overview() {
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-muted-foreground">Main Website</span>
-                <a href="https://kafu.ac.ke" target="_blank" rel="noopener noreferrer" className="font-mono text-xs text-primary underline">kafu.ac.ke</a>
+                <a href="/" className="font-mono text-xs text-primary underline">This website</a>
               </div>
             </div>
           </div>

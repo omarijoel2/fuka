@@ -75,7 +75,7 @@ const DEFAULT_CONTACT: ContactData = {
   abbreviation: "KAFU",
   address: "P.O BOX 385 – 50309, Kaimosi, Kenya",
   phone: "+254 777 373 633",
-  website: "https://kafu.ac.ke",
+  website: "",
   emails: [
     { label: "Vice Chancellor", address: "vc@kafu.ac.ke" },
     { label: "General Enquiries", address: "info@kafu.ac.ke" },

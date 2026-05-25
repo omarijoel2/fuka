@@ -1,6 +1,6 @@
 import { Link, useParams } from "wouter";
 import { useCampusDetail } from "@/lib/api-hooks";
-import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
+import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import { CampusMap } from "@/components/campus-map";
 import { MapPin, Phone, Mail, Clock, ChevronRight, Building2, ArrowRight, Bus, Info } from "lucide-react";
 
@@ -50,7 +50,7 @@ export default function CampusDetailPage() {
       {
         "@type": "Place",
         "name": campus.name,
-        "url": `https://kafu.ac.ke/campuses/${campus.slug}`,
+        "url": `${SITE_URL}/campuses/${campus.slug}`,
         "description": campus.summary,
         "address": {
           "@type": "PostalAddress",
@@ -63,7 +63,7 @@ export default function CampusDetailPage() {
         } : {}),
         "telephone": campus.contact_phone,
         "email": campus.contact_email,
-        "containedInPlace": { "@id": "https://kafu.ac.ke" },
+        "containedInPlace": { "@id": SITE_URL },
       },
     ],
   };

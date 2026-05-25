@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { SITE_URL } from "@/components/seo-head";
 import { Link, useParams } from "wouter";
 import { useRepositoryItemDetail } from "../lib/api-hooks";
 import type { RepositoryItem, RepoItemType } from "../lib/api-types";
@@ -130,7 +131,7 @@ export default function RepositoryItemPage() {
     datePublished: String(item.year),
     publisher: ORG_JSONLD,
     ...(item.doi ? { identifier: `https://doi.org/${item.doi}`, sameAs: `https://doi.org/${item.doi}` } : {}),
-    url: `https://kafu.ac.ke/repository/items/${item.slug}`,
+    url: `${SITE_URL}/repository/items/${item.slug}`,
     inLanguage: "en",
     educationalUse: "research",
     ...(item.journal_name ? { isPartOf: { "@type": "Periodical", name: item.journal_name } } : {}),

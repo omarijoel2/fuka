@@ -464,7 +464,7 @@ export default function HeroSlidesCmsPage() {
                     type="text"
                     value={form.image}
                     onChange={(e) => setField("image", e.target.value)}
-                    placeholder="/imgs/vc.jpeg or https://kafu.ac.ke/..."
+                    placeholder="/imgs/vc.jpeg or /images/..."
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]"
                   />
                 </div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useRoute, Link } from "wouter";
 import { useStaffProfile } from "@/lib/api-hooks";
-import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
+import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import { Button } from "@/components/ui/button";
 import {
   Mail,
@@ -234,14 +234,14 @@ export default function StaffProfilePage() {
   const personJsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
-    "@id": `https://kafu.ac.ke/staff/${slug}`,
+    "@id": `${SITE_URL}/staff/${slug}`,
     name: profile.name,
     jobTitle: profile.title,
     description: profile.biography ?? undefined,
     email: profile.email ?? undefined,
-    affiliation: { "@id": "https://kafu.ac.ke/#organization" },
-    worksFor: { "@id": "https://kafu.ac.ke/#organization" },
-    url: `https://kafu.ac.ke/staff/${slug}`,
+    affiliation: { "@id": `${SITE_URL}/#organization` },
+    worksFor: { "@id": `${SITE_URL}/#organization` },
+    url: `${SITE_URL}/staff/${slug}`,
     sameAs: [
       ...(profile.orcid_id ? [`https://orcid.org/${profile.orcid_id}`] : []),
       ...(profile.google_scholar_url ? [profile.google_scholar_url] : []),

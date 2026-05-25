@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { useCampuses } from "@/lib/api-hooks";
-import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
+import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import { CampusMap } from "@/components/campus-map";
 import { MapPin, Phone, Mail, ChevronRight, ArrowRight } from "lucide-react";
 
@@ -8,7 +8,7 @@ const seoJsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     ORG_JSONLD,
-    { "@type": "WebPage", "name": "KAFU Campuses", "url": "https://kafu.ac.ke/campuses",
+    { "@type": "WebPage", "name": "KAFU Campuses", "url": `${SITE_URL}/campuses`,
       "description": "Discover Kaimosi Friends University campuses across Western Kenya." },
   ],
 };

@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "wouter";
 import { useResearchPublication } from "@/lib/api-hooks";
 import { ChevronRight, ExternalLink, BookOpen, Copy, Check } from "lucide-react";
-import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
+import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 
 const TYPE_LABELS: Record<string, string> = {
   journal: "Journal Article", conference: "Conference Paper", book_chapter: "Book Chapter",
@@ -42,7 +42,7 @@ export default function ResearchPublicationDetail({ slug }: { slug: string }) {
     datePublished: String(pub.year),
     publisher: ORG_JSONLD,
     ...(pub.doi ? { identifier: `https://doi.org/${pub.doi}`, sameAs: `https://doi.org/${pub.doi}` } : {}),
-    url: `https://kafu.ac.ke/research/publications/${pub.id}`,
+    url: `${SITE_URL}/research/publications/${pub.id}`,
     inLanguage: "en",
     isPartOf: pub.journal ? { "@type": "Periodical", name: pub.journal } : undefined,
   };

@@ -17,7 +17,7 @@ const TIMETABLE_SETS = [
         subtitle: "Semester II 2025/2026",
         type: "Examination",
         level: "Postgraduate",
-        url: "https://kafu.ac.ke/timetables/",
+        url: "/admissions/timetables",
         testid: "dl-pg-exam-sem2",
       },
       {
@@ -25,7 +25,7 @@ const TIMETABLE_SETS = [
         subtitle: "Semester II 2025/2026",
         type: "Examination",
         level: "Undergraduate",
-        url: "https://kafu.ac.ke/timetables/",
+        url: "/admissions/timetables",
         testid: "dl-ug-exam-sem2",
       },
       {
@@ -33,7 +33,7 @@ const TIMETABLE_SETS = [
         subtitle: "Semester II 2025/2026",
         type: "Teaching",
         level: "All Students",
-        url: "https://kafu.ac.ke/timetables/",
+        url: "/admissions/timetables",
         testid: "dl-teaching-sem2",
       },
     ],
@@ -48,7 +48,7 @@ const TIMETABLE_SETS = [
         subtitle: "Semester I 2025/2026",
         type: "Examination",
         level: "All Students",
-        url: "https://kafu.ac.ke/timetables/",
+        url: "/admissions/timetables",
         testid: "dl-exam-sem1",
       },
       {
@@ -56,7 +56,7 @@ const TIMETABLE_SETS = [
         subtitle: "Semester I 2025/2026",
         type: "Teaching",
         level: "All Students",
-        url: "https://kafu.ac.ke/timetables/",
+        url: "/admissions/timetables",
         testid: "dl-teaching-sem1",
       },
       {
@@ -64,7 +64,7 @@ const TIMETABLE_SETS = [
         subtitle: "Semester I 2025/2026",
         type: "Schedule",
         level: "All Students",
-        url: "https://kafu.ac.ke/timetables/",
+        url: "/admissions/timetables",
         testid: "dl-processing-sem1",
       },
     ],
@@ -180,8 +180,8 @@ export default function AdmissionsTimetables() {
           </div>
 
           <p className="text-sm text-gray-500 mt-6">
-            All timetable documents are hosted on the official KAFU website. Clicking any document will take you to the
-            kafu.ac.ke timetables page where the latest versions are available for download.
+            Timetable documents are published by the Academic Registrar. Click any document card above to access it
+            directly on this website.
           </p>
         </div>
       </section>
@@ -224,13 +224,13 @@ export default function AdmissionsTimetables() {
           </div>
           <div className="flex flex-wrap gap-3">
             <a
-              href="https://kafu.ac.ke/timetables/"
+              href="/admissions/timetables"
               target="_blank"
               rel="noopener noreferrer"
               data-testid="link-kafu-timetables"
               className="inline-flex items-center gap-2 bg-white text-primary px-5 py-2.5 rounded font-semibold text-sm hover:bg-white/90 transition-colors"
             >
-              <Download className="w-4 h-4" /> Download from kafu.ac.ke
+              <Download className="w-4 h-4" /> Download Timetable
             </a>
             <Link href="/admissions" data-testid="btn-admissions">
               <span className="inline-flex items-center gap-2 border border-white text-white px-5 py-2.5 rounded font-semibold text-sm hover:bg-white/10 transition-colors">

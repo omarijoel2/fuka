@@ -3,7 +3,7 @@ import { useParams } from "wouter";
 import { useOpportunityDetail } from "@/lib/api-hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
+import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import { Badge } from "@/components/ui/badge";
 import {
   ChevronLeft,
@@ -122,7 +122,7 @@ export default function OpportunityDetail() {
         validThrough: opp.deadline,
         datePosted: opp.publish_date,
         employmentType: "FULL_TIME",
-        url: `https://kafu.ac.ke/opportunities/${slug}`,
+        url: `${SITE_URL}/opportunities/${slug}`,
       }
     : undefined;
 

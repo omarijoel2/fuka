@@ -772,7 +772,7 @@ export default function ContentEditorPage({ id }: { id?: string }) {
                   type="url"
                   value={sdField(sd, "document_url")}
                   onChange={(e) => setSd("document_url", e.target.value)}
-                  placeholder="https://kafu.ac.ke/documents/handbook-2025.pdf"
+                  placeholder="/documents/handbook-2025.pdf"
                   className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                   data-testid="input-doc-url"
                 />

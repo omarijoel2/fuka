@@ -460,7 +460,7 @@ export default function OfficesCmsPage() {
               <section className="space-y-4">
                 <h3 className="text-sm font-semibold text-gray-700 border-b pb-2">Related Links <span className="font-normal text-gray-400">(Label|URL, one per line)</span></h3>
                 <textarea rows={3} value={form.related_links_raw} onChange={e => setField("related_links_raw", e.target.value)}
-                  placeholder="Apply Online|https://portal.kafu.ac.ke&#10;Fee Structure|https://kafu.ac.ke/fees"
+                  placeholder="Apply Online|https://portal.kafu.ac.ke&#10;Fee Structure|/fees"
                   data-testid="input-office-links"
                   className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm resize-none font-mono focus:outline-none focus:ring-2 focus:ring-primary/30" />
               </section>

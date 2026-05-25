@@ -1,6 +1,6 @@
 import { Link } from "wouter";
 import { useCampuses, useServicePoints } from "@/lib/api-hooks";
-import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
+import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import { CampusMap } from "@/components/campus-map";
 import {
   MapPin, Phone, Mail, Clock, Building2, ChevronRight, Wifi, Heart,
@@ -37,9 +37,9 @@ const seoJsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     ORG_JSONLD,
-    { "@type": "ContactPage", "@id": "https://kafu.ac.ke/contact", "name": "Contact KAFU",
+    { "@type": "ContactPage", "@id": `${SITE_URL}/contact`, "name": "Contact KAFU",
       "description": "Find offices, campuses, and contact information for Kaimosi Friends University.",
-      "url": "https://kafu.ac.ke/contact", "isPartOf": { "@id": "https://kafu.ac.ke" } },
+      "url": `${SITE_URL}/contact`, "isPartOf": { "@id": SITE_URL } },
   ],
 };
 

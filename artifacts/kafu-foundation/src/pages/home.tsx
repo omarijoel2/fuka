@@ -3,7 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useStats, useNews, useSchools, useEvents, useOpportunities, useProgrammes, useHeroSlides, type HeroSlide } from "@/lib/api-hooks";
 import { IntakeBanner } from "@/components/intake-banner";
-import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
+import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import {
   Calendar,
   MapPin,
@@ -612,14 +612,14 @@ export default function Home() {
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "@id": "https://kafu.ac.ke/#website",
-    url: "https://kafu.ac.ke",
+    "@id": `${SITE_URL}/#website`,
+    url: SITE_URL,
     name: "Kaimosi Friends University",
     description: "Spring of Knowledge — A Quaker-founded public university in Western Kenya",
-    publisher: { "@id": "https://kafu.ac.ke/#organization" },
+    publisher: { "@id": `${SITE_URL}/#organization` },
     potentialAction: {
       "@type": "SearchAction",
-      target: { "@type": "EntryPoint", urlTemplate: "https://kafu.ac.ke/programmes?search={search_term_string}" },
+      target: { "@type": "EntryPoint", urlTemplate: `${SITE_URL}/programmes?search={search_term_string}` },
       "query-input": "required name=search_term_string",
     },
   };

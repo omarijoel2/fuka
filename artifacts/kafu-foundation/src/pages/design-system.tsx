@@ -140,7 +140,7 @@ export default function DesignSystem() {
             <li>Favicon: University crest mark only, at 32×32px and 192×192px.</li>
           </ul>
           <div className="mt-4 flex gap-4 text-xs font-mono">
-            <div><span className="text-muted-foreground">Primary: </span>kafu.ac.ke/wp-content/uploads/2025/10/logo-updated-750x126.png</div>
+            <div><span className="text-muted-foreground">Primary: </span>/imgs/logo-updated.png</div>
           </div>
         </div>
       </section>

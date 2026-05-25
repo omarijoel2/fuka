@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "wouter";
 import { useServicePoints, useCampuses } from "@/lib/api-hooks";
-import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
+import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import { Phone, Mail, Clock, MapPin, Search, ChevronRight, Building2 } from "lucide-react";
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -24,7 +24,7 @@ const seoJsonLd = {
   "@context": "https://schema.org",
   "@graph": [
     ORG_JSONLD,
-    { "@type": "WebPage", "name": "KAFU Offices & Services Directory", "url": "https://kafu.ac.ke/offices",
+    { "@type": "WebPage", "name": "KAFU Offices & Services Directory", "url": `${SITE_URL}/offices`,
       "description": "Find offices and service points at Kaimosi Friends University." },
   ],
 };

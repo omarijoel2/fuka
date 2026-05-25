@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 
-const SITE_URL = "https://kafu.ac.ke";
+export const SITE_URL = typeof window !== "undefined" ? window.location.origin : "";
 const DEFAULT_IMAGE = "/imgs/logo-updated.png";
 const SITE_NAME = "Kaimosi Friends University";
 const DEFAULT_DESCRIPTION =
@@ -113,7 +113,7 @@ export const ORG_JSONLD: JsonLdObject = {
   },
   telephone: "+254 777 373 633",
   email: "info@kafu.ac.ke",
-  sameAs: ["https://kafu.ac.ke"],
+  sameAs: [SITE_URL],
   foundingDate: "2013",
   numberOfStudents: { "@type": "QuantitativeValue", value: 8000 },
 };

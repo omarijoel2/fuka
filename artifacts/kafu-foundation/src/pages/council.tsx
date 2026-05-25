@@ -21,7 +21,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   member: "Council Member",
 };
 
-// Source: https://kafu.ac.ke/university-council/
+// Source: /university-council
 const FALLBACK: CouncilMember[] = [
   {
     id: 1,

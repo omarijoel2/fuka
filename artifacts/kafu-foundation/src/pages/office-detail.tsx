@@ -1,6 +1,6 @@
 import { Link, useParams } from "wouter";
 import { useServicePointDetail } from "@/lib/api-hooks";
-import { SeoHead, ORG_JSONLD } from "@/components/seo-head";
+import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import { CampusMap } from "@/components/campus-map";
 import { Phone, Mail, Clock, MapPin, MessageSquare, ExternalLink, Building2, ChevronRight } from "lucide-react";
 
@@ -69,12 +69,12 @@ export default function OfficeDetailPage() {
       {
         "@type": "GovernmentOffice",
         "name": office.name,
-        "url": `https://kafu.ac.ke/offices/${office.slug}`,
+        "url": `${SITE_URL}/offices/${office.slug}`,
         "description": office.summary,
         "telephone": office.public_phone,
         "email": office.public_email,
         ...(office.physical_location ? { "address": { "@type": "PostalAddress", "streetAddress": office.physical_location, "addressCountry": "KE" } } : {}),
-        "parentOrganization": { "@id": "https://kafu.ac.ke" },
+        "parentOrganization": { "@id": SITE_URL },
       },
     ],
   };
