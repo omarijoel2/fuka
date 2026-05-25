@@ -44,6 +44,7 @@ export interface School {
   vision?: string;
   mission?: string;
   programmes?: Programme[];
+  href?: string | null;
 }
 
 export interface Programme {

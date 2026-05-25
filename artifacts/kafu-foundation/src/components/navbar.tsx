@@ -125,6 +125,8 @@ const navItems: NavItem[] = [
           { name: "SCIT — Computing & IT",              path: "/schools/SCIT" },
           { name: "SOS — Science",                      path: "/schools/SOS" },
           { name: "SHS — Health Sciences",              path: "/schools/SHS" },
+          { name: "ODeL — Open, Distance & E-Learning", path: "/directorates/open-distance-elearning" },
+          { name: "Kobujoi Campus",                     path: "/campuses/kobujoi" },
         ],
       },
       {

@@ -827,7 +827,7 @@ export default function Home() {
                   return (
                     <Link
                       key={school.code}
-                      href={`/schools/${school.code}`}
+                      href={school.href ?? `/schools/${school.code}`}
                       data-testid={`card-school-${school.code}`}
                       className={idx === 4 ? "sm:col-span-2 lg:col-span-1" : ""}
                     >

@@ -225,6 +225,7 @@ function mapCmsSchool(CmsContent $item): array {
         'programmes_count' => $sd['programmes_count'] ?? ['undergraduate' => 0, 'postgraduate' => 0, 'doctoral' => 0],
         'colour'           => $sd['colour'] ?? '#1B3A6B',
         'programmes'       => $sd['programmes'] ?? [],
+        'href'             => $sd['href'] ?? null,
     ];
 }
 }

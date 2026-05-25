@@ -78,7 +78,7 @@ export default function Schools() {
                       <div className="flex items-center gap-3 mb-6 p-3 bg-secondary rounded-lg w-fit">
                         <User className="w-4 h-4 text-primary shrink-0" />
                         <div>
-                          <span className="text-xs text-muted-foreground uppercase font-semibold block">Dean of School</span>
+                          <span className="text-xs text-muted-foreground uppercase font-semibold block">{school.dean_title ?? "Dean of School"}</span>
                           <span className="text-sm font-medium text-foreground">{school.dean}</span>
                         </div>
                       </div>
@@ -90,7 +90,7 @@ export default function Schools() {
                         asChild
                         data-testid={`btn-view-${school.code}`}
                       >
-                        <Link href={`/schools/${school.code}`}>
+                        <Link href={school.href ?? `/schools/${school.code}`}>
                           View School <ChevronRight className="ml-2 w-4 h-4" />
                         </Link>
                       </Button>
