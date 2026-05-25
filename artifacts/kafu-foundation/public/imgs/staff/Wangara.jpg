@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta name="theme-color" content="#1A5C38" />
+    <title>Kaimosi Friends University — Spring of Knowledge</title>
+    <meta name="description" content="Kaimosi Friends University (KAFU) — Spring of Knowledge. A Quaker-founded public university in Kaimosi, Western Kenya offering undergraduate, postgraduate, and doctoral programmes." />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Roboto+Condensed:wght@400;600;700;800&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Roboto+Condensed:wght@400;600;700;800&display=swap" media="print" onload="this.media='all'" />
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Roboto+Condensed:wght@400;600;700;800&display=swap" />
+    </noscript>
+
+    <meta property="og:site_name" content="Kaimosi Friends University" />
+    <meta property="og:locale" content="en_KE" />
+    <meta name="twitter:card" content="summary_large_image" />
+<link rel="stylesheet" crossorigin 
+content="@KAFU_Kenya" />
+    <script type="module" crossorigin src="/assets/index-DywI46m2.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-D4qo9fiy.css">
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
