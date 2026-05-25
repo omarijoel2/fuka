@@ -555,7 +555,7 @@ Route::get('/schools', function () {
                 'name' => 'School of Computing and Information Technology',
                 'dean' => 'Prof. Kelvin K. Omieno',
                 'dean_title' => 'Dean, School of Computing & IT',
-                'dean_photo' => 'https://kafu.ac.ke/wp-content/uploads/Prof.-Omieno-1.jpg',
+                'dean_photo' => '/images/uploads/Prof.-Omieno-1.jpg',
                 'description' => 'Nestled in the tranquil and green environment of Western Kenya, the School of Computing and Information Technology (SCIT) at Kaimosi Friends University offers an ideal learning environment for aspiring tech professionals. SCIT is a hub of academic excellence and innovation where students are trained to become solution-oriented ICT experts capable of transforming the digital economy locally and globally.',
                 'programmes_count' => ['undergraduate' => 2, 'postgraduate' => 1, 'doctoral' => 0],
                 'colour' => '#2D6A4F',
@@ -575,7 +575,7 @@ Route::get('/schools', function () {
                 'name' => 'School of Health Sciences',
                 'dean' => 'Dr. Cyprian Mabonga',
                 'dean_title' => 'Dean, School of Health Sciences',
-                'dean_photo' => 'https://kafu.ac.ke/wp-content/uploads/Dr.-Mabonga.jpg',
+                'dean_photo' => '/images/uploads/Dr.-Mabonga-300x300.jpg',
                 'description' => 'Established in 2022, the School of Health Sciences (SoHS) at Kaimosi Friends University has quickly become a flagship institution in Western Kenya, distinguished by its unique and high-demand programs. It is one of only two institutions in Kenya offering Optometry up to the PhD level, alongside robust offerings in Nursing and Clinical Medicine.',
                 'programmes_count' => ['undergraduate' => 3, 'postgraduate' => 0, 'doctoral' => 0],
                 'colour' => '#8B1A1A',
@@ -585,36 +585,47 @@ Route::get('/schools', function () {
 });
 
 Route::get('/schools/{code}', function (string $code) {
+    $code = strtoupper($code);
+
+    // Try CMS first — isolated try so DB errors fall through to static fallback
     try {
         $cmsSchool = CmsContent::where('type', 'school')
-            ->whereRaw('UPPER(slug) = ?', [strtoupper($code)])
+            ->whereRaw('UPPER(slug) = ?', [$code])
             ->where('status', 'published')
             ->where('is_deleted', false)
             ->first();
         if ($cmsSchool) {
             $mapped = mapCmsSchool($cmsSchool);
             // Also pull programmes of this school type from CMS
-            $cmsProgs = CmsContent::where('type', 'programme')
-                ->where('school_code', strtoupper($code))
-                ->where('status', 'published')
-                ->where('is_deleted', false)
-                ->orderBy('title')
-                ->get()
-                ->map(fn($p) => mapCmsProgramme($p))
-                ->toArray();
-            if (!empty($cmsProgs)) {
-                $mapped['programmes'] = $cmsProgs;
+            try {
+                $cmsProgs = CmsContent::where('type', 'programme')
+                    ->where('school_code', $code)
+                    ->where('status', 'published')
+                    ->where('is_deleted', false)
+                    ->orderBy('title')
+                    ->get()
+                    ->map(fn($p) => mapCmsProgramme($p))
+                    ->toArray();
+                if (!empty($cmsProgs)) {
+                    $mapped['programmes'] = $cmsProgs;
+                }
+            } catch (\Throwable $e) {
+                // programmes query failed — use whatever mapCmsSchool provided
             }
             return response()->json(['data' => $mapped]);
         }
+    } catch (\Throwable $e) {
+        // DB unavailable or schema mismatch — fall through to static fallback
+    }
 
-        $schools = [
+    // Static fallback
+    $schools = [
             'SESS' => [
                 'code' => 'SESS',
                 'name' => 'School of Education and Social Sciences',
                 'dean' => 'Dr. Nabeta K.N. Sangili',
                 'dean_title' => 'Dean, School of Education & Social Sciences',
-                'dean_photo' => 'https://kafu.ac.ke/wp-content/uploads/2025/10/Dr.-Sangili-Dean-Sess.jpg',
+                'dean_photo' => '/images/uploads/Dr.-Sangili-Dean-Sess-300x300.jpg',
                 'description' => 'At the School of Education and Social Sciences (SESS) at Kaimosi Friends University, academic excellence meets innovation, leadership and transformative learning. The School is dedicated to shaping the next generation of educators, researchers, policy influencers, scholars and change-makers equipped to make meaningful impact in Kenya, across Africa and the global community. SESS offers a diverse range of competitive undergraduate and postgraduate programmes carefully designed to provide students with cutting-edge knowledge, practical competencies, research skills and critical thinking abilities.',
                 'vision' => 'To be a center of excellence in the training of education and social science professionals who contribute positively to societal transformation.',
                 'mission' => 'To provide quality education, foster innovative research, and promote community engagement through responsive curricula, collaborative scholarship, and ethical practice.',
@@ -642,7 +653,7 @@ Route::get('/schools/{code}', function (string $code) {
                 'name' => 'School of Business & Economics',
                 'dean' => 'Dr. Atieno Margaret Otieno',
                 'dean_title' => 'Dean, School of Business & Economics',
-                'dean_photo' => 'https://kafu.ac.ke/wp-content/uploads/Dr.-Margaret-Atieno-1-300x300.jpg',
+                'dean_photo' => '/images/uploads/Dr.-Margaret-Atieno-1-300x300.jpg',
                 'description' => 'In the school of business and economics, we empower students to become transformative leaders and responsible professionals, equipped with the knowledge, skills, and ethical foundation to succeed in a rapidly changing world. Through cutting-edge research, collaborative partnerships, and community engagement, we advance knowledge and practice in business and economics, shaping a more sustainable and equitable society.',
                 'vision' => 'To be a centre of excellence in teaching professional and market driven courses.',
                 'mission' => 'To provide professional and market driven courses that enable graduates fit in the labour market.',
@@ -660,7 +671,7 @@ Route::get('/schools/{code}', function (string $code) {
                 'name' => 'School of Computing and Information Technology',
                 'dean' => 'Prof. Kelvin K. Omieno',
                 'dean_title' => 'Dean, School of Computing & IT',
-                'dean_photo' => 'https://kafu.ac.ke/wp-content/uploads/Prof.-Omieno-1.jpg',
+                'dean_photo' => '/images/uploads/Prof.-Omieno-1.jpg',
                 'description' => 'Nestled in the tranquil and green environment of Western Kenya, the School of Computing and Information Technology (SCIT) at Kaimosi Friends University offers an ideal learning environment for aspiring tech professionals. SCIT is a hub of academic excellence and innovation where students are trained to become solution-oriented ICT experts capable of transforming the digital economy locally and globally. Our programs are designed in line with global trends and national priorities in ICT, delivered through an optimal mix of theory, practice, and industry engagement.',
                 'vision' => 'To be a center of excellence in teaching, research, and innovation in computing and information technology for sustainable development.',
                 'mission' => 'To provide quality education in computing and IT through innovative teaching, research, and industry engagement.',
@@ -698,7 +709,7 @@ Route::get('/schools/{code}', function (string $code) {
                 'name' => 'School of Health Sciences',
                 'dean' => 'Dr. Cyprian Mabonga',
                 'dean_title' => 'Dean, School of Health Sciences',
-                'dean_photo' => 'https://kafu.ac.ke/wp-content/uploads/Dr.-Mabonga.jpg',
+                'dean_photo' => '/images/uploads/Dr.-Mabonga-300x300.jpg',
                 'description' => 'Established in 2022, the School of Health Sciences (SoHS) at Kaimosi Friends University has quickly become a flagship institution in Western Kenya, distinguished by its unique and high-demand programs. It is one of only two institutions in Kenya offering Optometry up to the PhD level, alongside robust offerings in Nursing and Clinical Medicine. Plans are underway to introduce programmes in Pharmacy, Oral Health, and Basic Medical Sciences.',
                 'vision' => 'To be a centre of excellence in health sciences education and research in East and Central Africa.',
                 'mission' => 'To train competent health professionals through quality education, research, and clinical practice.',
@@ -710,16 +721,11 @@ Route::get('/schools/{code}', function (string $code) {
             ],
         ];
 
-        $code = strtoupper($code);
-        if (!isset($schools[$code])) {
-            return response()->json(['error' => 'School not found'], 404);
-        }
-
-        return response()->json(['data' => $schools[$code]]);
-
-    } catch (\Throwable $e) {
-        // fall through to static fallback below
+    if (!isset($schools[$code])) {
+        return response()->json(['error' => 'School not found'], 404);
     }
+
+    return response()->json(['data' => $schools[$code]]);
 });
 
 Route::get('/programmes', function (Request $request) {
