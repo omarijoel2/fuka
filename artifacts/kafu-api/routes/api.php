@@ -152,8 +152,10 @@ function mapCmsStaff(CmsContent $item): array {
         'specializations' => $sd['specializations'] ?? [],
         'photo'           => $item->featured_image ?: ($sd['photo'] ?? null),
         'bio'             => $item->summary ?? '',
-        'orcid_id'        => $sd['orcid_id'] ?? null,
-        'google_scholar_url' => $sd['google_scholar_url'] ?? null,
+        'orcid_id'           => $sd['orcid_id'] ?? $sd['personal']['orcid'] ?? null,
+        'google_scholar_url' => $sd['google_scholar_url'] ?? $sd['research']['scholar_url'] ?? null,
+        'scopus_id'          => $sd['scopus_id'] ?? $sd['research']['scopus_id'] ?? null,
+        'researchgate_url'   => $sd['researchgate_url'] ?? $sd['research']['researchgate_url'] ?? null,
     ];
 }
 }
@@ -165,9 +167,10 @@ function mapCmsStaffDetail(CmsContent $item): array {
     $base['rank']              = $sd['rank'] ?? null;
     $base['biography']         = $item->body ?? $item->summary ?? '';
     $base['phone_visible']     = (bool)($sd['phone_visible'] ?? false);
-    $base['orcid_id']          = $sd['orcid_id'] ?? null;
-    $base['google_scholar_url']= $sd['google_scholar_url'] ?? null;
-    $base['scopus_id']         = $sd['scopus_id'] ?? null;
+    $base['orcid_id']          = $sd['orcid_id'] ?? $sd['personal']['orcid'] ?? null;
+    $base['google_scholar_url']= $sd['google_scholar_url'] ?? $sd['research']['scholar_url'] ?? null;
+    $base['scopus_id']         = $sd['scopus_id'] ?? $sd['research']['scopus_id'] ?? null;
+    $base['researchgate_url']  = $sd['researchgate_url'] ?? $sd['research']['researchgate_url'] ?? null;
     $base['linkedin_url']      = $sd['linkedin_url'] ?? null;
     $base['cv_url']            = $sd['cv_url'] ?? null;
     $base['qualifications']    = $sd['qualifications'] ?? [];

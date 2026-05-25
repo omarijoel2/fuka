@@ -214,8 +214,7 @@ Return ONLY valid JSON with these exact keys (omit keys you cannot find):
     "name": "Full name",
     "job_title": "Current designation at the university",
     "department": "Department or School name",
-    "staff_number": "Staff/Employee ID if present",
-    "orcid": "ORCID iD if present (format: 0000-0000-0000-0000)"
+    "staff_number": "Staff/Employee ID if present"
   },
   "bio": {
     "biography": "Professional biography paragraph (200-400 words, third person)",
@@ -234,6 +233,8 @@ Return ONLY valid JSON with these exact keys (omit keys you cannot find):
   "research": {
     "research_interests": "Research interest areas, one per line",
     "publications": "Selected publications in APA format, one per line (max 10)",
+    "orcid": "ORCID iD if present (format: 0000-0000-0000-0000)",
+    "scopus_id": "Scopus Author ID if present (numeric string, e.g. 57218934765)",
     "scholar_url": "Google Scholar URL if present",
     "researchgate_url": "ResearchGate URL if present"
   },

@@ -54,11 +54,11 @@ const SECTION_LABELS: Record<string, string> = {
 };
 
 const FIELD_LABELS: Record<string, Record<string, string>> = {
-  personal: { title: "Title", name: "Full Name", job_title: "Job Title", department: "Department/School", staff_number: "Staff Number", orcid: "ORCID iD" },
+  personal: { title: "Title", name: "Full Name", job_title: "Job Title", department: "Department/School", staff_number: "Staff Number" },
   bio: { biography: "Biography", tagline: "Tagline" },
   qualifications: { qualifications: "Academic Qualifications", certifications: "Certifications", memberships: "Professional Memberships" },
   teaching: { teaching_areas: "Teaching Areas", supervision: "Postgraduate Supervision", awards: "Awards" },
-  research: { research_interests: "Research Interests", publications: "Selected Publications", scholar_url: "Google Scholar URL", researchgate_url: "ResearchGate URL" },
+  research: { research_interests: "Research Interests", publications: "Selected Publications", orcid: "ORCID iD", scopus_id: "Scopus Author ID", scholar_url: "Google Scholar URL", researchgate_url: "ResearchGate URL" },
   contact: { contact_email: "Institutional Email", office_phone: "Office Phone", office_location: "Office Location", website: "Website" },
 };
 
@@ -437,10 +437,6 @@ export default function ProfileEditorPage() {
                       <input type="text" value={form.personal?.staff_number ?? ""} onChange={e => setField("personal", "staff_number", e.target.value)}
                         disabled={!canEdit} data-testid="input-personal-staff-number" className={INPUT} />
                     </Field>
-                    <Field label="ORCID iD">
-                      <input type="text" value={form.personal?.orcid ?? ""} onChange={e => setField("personal", "orcid", e.target.value)}
-                        disabled={!canEdit} data-testid="input-personal-orcid" className={INPUT} placeholder="0000-0000-0000-0000" />
-                    </Field>
                   </div>
                 </div>
               )}
@@ -509,27 +505,54 @@ export default function ProfileEditorPage() {
 
               {/* RESEARCH */}
               {activeTab === "research" && (
-                <div className="space-y-4">
-                  <h3 className="text-sm font-bold text-gray-700 mb-3">Research Profile</h3>
+                <div className="space-y-5">
+                  <h3 className="text-sm font-bold text-gray-700 mb-1">Research Profile</h3>
+
                   <Field label="Research Interests (one per line or comma-separated)" required>
                     <textarea rows={5} value={form.research?.research_interests ?? ""} onChange={e => setField("research", "research_interests", e.target.value)}
                       disabled={!canEdit} data-testid="textarea-research" className={TEXTAREA}
                       placeholder={"Educational equity in sub-Saharan Africa\nCurriculum reform\nTeacher professional development"} />
                   </Field>
+
                   <Field label="Selected Publications (one per line, APA format preferred)">
                     <textarea rows={5} value={form.research?.publications ?? ""} onChange={e => setField("research", "publications", e.target.value)}
                       disabled={!canEdit} data-testid="textarea-publications" className={TEXTAREA}
                       placeholder="Oduya, J. (2023). Teacher self-efficacy in rural Kenya. Journal of African Education, 12(2), 45–62." />
                   </Field>
-                  <div className="grid grid-cols-2 gap-4">
-                    <Field label="Google Scholar URL">
-                      <input type="url" value={form.research?.scholar_url ?? ""} onChange={e => setField("research", "scholar_url", e.target.value)}
-                        disabled={!canEdit} data-testid="input-scholar-url" className={INPUT} placeholder="https://scholar.google.com/..." />
-                    </Field>
-                    <Field label="ResearchGate URL">
-                      <input type="url" value={form.research?.researchgate_url ?? ""} onChange={e => setField("research", "researchgate_url", e.target.value)}
-                        disabled={!canEdit} data-testid="input-researchgate-url" className={INPUT} placeholder="https://researchgate.net/..." />
-                    </Field>
+
+                  {/* Academic Identity */}
+                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-4">
+                    <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">Academic Identity &amp; Profiles</p>
+                    <p className="text-xs text-gray-500 -mt-2">These identifiers link your profile to global academic databases and appear on your public staff page.</p>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <Field label="ORCID iD">
+                        <div className="relative">
+                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded bg-[#A6CE39] flex items-center justify-center text-white text-[9px] font-bold shrink-0 pointer-events-none">iD</span>
+                          <input type="text" value={form.research?.orcid ?? ""} onChange={e => setField("research", "orcid", e.target.value)}
+                            disabled={!canEdit} data-testid="input-orcid" className={`${INPUT} pl-9 font-mono`}
+                            placeholder="0000-0000-0000-0000" />
+                        </div>
+                        <p className="text-xs text-gray-400 mt-1">Register free at <a href="https://orcid.org/register" target="_blank" rel="noreferrer" className="underline text-blue-500">orcid.org</a></p>
+                      </Field>
+
+                      <Field label="Scopus Author ID">
+                        <input type="text" value={form.research?.scopus_id ?? ""} onChange={e => setField("research", "scopus_id", e.target.value)}
+                          disabled={!canEdit} data-testid="input-scopus-id" className={`${INPUT} font-mono`}
+                          placeholder="e.g. 57218934765" />
+                        <p className="text-xs text-gray-400 mt-1">Find yours at <a href="https://www.scopus.com/search/form.uri#author" target="_blank" rel="noreferrer" className="underline text-blue-500">scopus.com</a></p>
+                      </Field>
+
+                      <Field label="Google Scholar Profile URL">
+                        <input type="url" value={form.research?.scholar_url ?? ""} onChange={e => setField("research", "scholar_url", e.target.value)}
+                          disabled={!canEdit} data-testid="input-scholar-url" className={INPUT} placeholder="https://scholar.google.com/citations?user=..." />
+                      </Field>
+
+                      <Field label="ResearchGate Profile URL">
+                        <input type="url" value={form.research?.researchgate_url ?? ""} onChange={e => setField("research", "researchgate_url", e.target.value)}
+                          disabled={!canEdit} data-testid="input-researchgate-url" className={INPUT} placeholder="https://researchgate.net/profile/..." />
+                      </Field>
+                    </div>
                   </div>
                 </div>
               )}
