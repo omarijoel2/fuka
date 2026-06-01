@@ -61,6 +61,8 @@ Route::prefix('reviewer')
         Route::post('/staff', [ReviewerController::class, 'staffProvision']);
         Route::get('/staff/{id}', [ReviewerController::class, 'staffShow']);
         Route::put('/staff/{id}/section/{section}', [ReviewerController::class, 'staffUpdateSection']);
+        Route::post('/staff/{id}/upload-cv', [ReviewerController::class, 'staffUploadCv']);
+        Route::post('/staff/{id}/upload-photo', [ReviewerController::class, 'staffUploadPhoto']);
         Route::delete('/staff/{id}', [ReviewerController::class, 'staffDeactivate']);
         Route::post('/staff/{id}/reactivate', [ReviewerController::class, 'staffReactivate']);
     });

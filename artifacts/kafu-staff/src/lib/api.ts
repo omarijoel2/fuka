@@ -66,8 +66,9 @@ export function staffPostForm(path: string, form: FormData) {
 
 export async function reviewerFetch(path: string, options: RequestInit = {}) {
   const token = getToken();
+  const isForm = options.body instanceof FormData;
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
+    ...(!isForm ? { "Content-Type": "application/json" } : {}),
     Accept: "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
     ...(options.headers as Record<string, string> || {}),
@@ -75,6 +76,10 @@ export async function reviewerFetch(path: string, options: RequestInit = {}) {
   const res = await fetch(`${API_ORIGIN}/api/reviewer${path}`, { ...options, headers });
   if (!res.ok) { const e = await parseJsonSafe(res).catch(() => ({})); throw new Error(e?.message || `API error ${res.status}`); }
   return parseJsonSafe(res);
+}
+
+export function reviewerFetchForm(path: string, form: FormData) {
+  return reviewerFetch(path, { method: "POST", body: form });
 }
 
 export async function adminStaffFetch(path: string, options: RequestInit = {}) {

@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { reviewerFetch, STATUS_COLORS, STATUS_LABELS, fmtDate } from "@/lib/api";
+import { reviewerFetch, reviewerFetchForm, STATUS_COLORS, STATUS_LABELS, fmtDate } from "@/lib/api";
 import {
   Search, ChevronDown, UserPlus, RefreshCw, X, Save,
   ChevronRight, Users, AlertCircle, CheckCircle, RotateCcw,
-  UserCheck, UserX, Eye, EyeOff, Copy, Loader2
+  UserCheck, UserX, Eye, EyeOff, Copy, Loader2, Camera, FileText, Download
 } from "lucide-react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -58,6 +58,7 @@ const TABS = [
   { key: "teaching", label: "Teaching" },
   { key: "research", label: "Research" },
   { key: "contact", label: "Contact" },
+  { key: "uploads", label: "Uploads" },
 ];
 
 const STATUS_FILTER_OPTIONS = [
@@ -187,11 +188,170 @@ function TempPasswordModal({ name, password, onClose }: { name: string; password
 
 // ─── Profile Section Editor ───────────────────────────────────────────────────
 
-function SectionEditor({ staffId, section, data, onSaved }: {
+function UploadsSection({ staffId, photoUrl, cvUrl, onUploaded }: {
+  staffId: number;
+  photoUrl: string | undefined;
+  cvUrl: string | undefined;
+  onUploaded: (type: "photo" | "cv", url: string) => void;
+}) {
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photoErr, setPhotoErr] = useState("");
+
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [uploadingCv, setUploadingCv] = useState(false);
+  const [cvErr, setCvErr] = useState("");
+
+  useEffect(() => {
+    if (!photoFile) { setPhotoPreview(null); return; }
+    const url = URL.createObjectURL(photoFile);
+    setPhotoPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [photoFile]);
+
+  async function doUploadPhoto() {
+    if (!photoFile) return;
+    setUploadingPhoto(true);
+    setPhotoErr("");
+    try {
+      const fd = new FormData();
+      fd.append("photo", photoFile);
+      const res = await reviewerFetchForm(`/staff/${staffId}/upload-photo`, fd);
+      onUploaded("photo", res.url);
+      setPhotoFile(null);
+    } catch (ex: unknown) {
+      setPhotoErr(ex instanceof Error ? ex.message : "Upload failed.");
+    } finally {
+      setUploadingPhoto(false);
+    }
+  }
+
+  async function doUploadCv() {
+    if (!cvFile) return;
+    setUploadingCv(true);
+    setCvErr("");
+    try {
+      const fd = new FormData();
+      fd.append("cv", cvFile);
+      const res = await reviewerFetchForm(`/staff/${staffId}/upload-cv`, fd);
+      onUploaded("cv", res.url);
+      setCvFile(null);
+    } catch (ex: unknown) {
+      setCvErr(ex instanceof Error ? ex.message : "Upload failed.");
+    } finally {
+      setUploadingCv(false);
+    }
+  }
+
+  const displayPhoto = photoPreview ?? photoUrl ?? null;
+
+  return (
+    <div className="space-y-5">
+      {/* Photo upload */}
+      <div className="border-2 border-dashed border-gray-200 rounded-xl p-5">
+        <div className="flex items-start gap-4">
+          <div className="shrink-0">
+            {displayPhoto ? (
+              <img src={displayPhoto} alt="Profile photo" className="w-18 h-18 w-16 h-16 rounded-full object-cover ring-2 ring-[#1A5C38]/20" />
+            ) : (
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                <Camera className="w-7 h-7 text-gray-400" />
+              </div>
+            )}
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-gray-900">Profile Photo</p>
+            <p className="text-xs text-gray-500 mt-0.5">JPG or PNG, max 3 MB. Professional headshot required.</p>
+            {photoUrl && !photoFile && (
+              <p className="text-xs text-green-600 mt-1 flex items-center gap-1">
+                <CheckCircle className="w-3 h-3" /> Photo on file
+              </p>
+            )}
+            <div className="mt-3 flex items-center gap-3 flex-wrap">
+              <input
+                type="file"
+                accept="image/*"
+                onChange={e => setPhotoFile(e.target.files?.[0] ?? null)}
+                data-testid="reviewer-photo-file-input"
+                className="text-xs text-gray-600 file:mr-3 file:text-xs file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-gray-100 file:text-gray-700 file:cursor-pointer hover:file:bg-gray-200"
+              />
+              {photoFile && (
+                <button
+                  onClick={doUploadPhoto}
+                  disabled={uploadingPhoto}
+                  data-testid="reviewer-upload-photo-btn"
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-[#1A5C38] text-white rounded-lg hover:bg-[#154a2c] disabled:opacity-60"
+                >
+                  {uploadingPhoto ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Camera className="w-3.5 h-3.5" />}
+                  {uploadingPhoto ? "Uploading…" : "Upload Photo"}
+                </button>
+              )}
+            </div>
+            {photoErr && <p className="mt-1.5 text-xs text-red-600">{photoErr}</p>}
+          </div>
+        </div>
+      </div>
+
+      {/* CV upload */}
+      <div className="border-2 border-dashed border-gray-200 rounded-xl p-5">
+        <div className="flex items-start gap-4 mb-3">
+          <div className="w-10 h-10 bg-[#1A5C38]/10 rounded-xl flex items-center justify-center shrink-0">
+            <FileText className="w-5 h-5 text-[#1A5C38]" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-gray-900">Curriculum Vitae (CV)</p>
+            <p className="text-xs text-gray-500 mt-0.5">PDF only, max 10 MB.</p>
+            {cvUrl && !cvFile && (
+              <a
+                href={cvUrl}
+                target="_blank"
+                rel="noreferrer"
+                data-testid="reviewer-cv-download-link"
+                className="inline-flex items-center gap-1 text-xs text-[#1A5C38] mt-1 hover:underline"
+              >
+                <Download className="w-3 h-3" /> View current CV
+              </a>
+            )}
+          </div>
+        </div>
+        <div className="flex items-center gap-3 flex-wrap">
+          <input
+            type="file"
+            accept=".pdf"
+            onChange={e => setCvFile(e.target.files?.[0] ?? null)}
+            data-testid="reviewer-cv-file-input"
+            className="text-xs text-gray-600 file:mr-3 file:text-xs file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-gray-100 file:text-gray-700 file:cursor-pointer hover:file:bg-gray-200"
+          />
+          {cvFile && (
+            <button
+              onClick={doUploadCv}
+              disabled={uploadingCv}
+              data-testid="reviewer-upload-cv-btn"
+              className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-gray-700 text-white rounded-lg hover:bg-gray-800 disabled:opacity-60"
+            >
+              {uploadingCv ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />}
+              {uploadingCv ? "Uploading…" : "Upload CV"}
+            </button>
+          )}
+        </div>
+        {cvErr && <p className="mt-1.5 text-xs text-red-600">{cvErr}</p>}
+        {!cvFile && !cvUrl && (
+          <p className="mt-3 text-xs text-amber-700 bg-amber-50 border border-amber-100 rounded-lg px-3 py-2">
+            No CV on file. Select a PDF above to upload.
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function SectionEditor({ staffId, section, data, onSaved, onUploaded }: {
   staffId: number;
   section: string;
   data: Record<string, string | undefined>;
   onSaved: (submission: unknown) => void;
+  onUploaded?: (type: "photo" | "cv", url: string) => void;
 }) {
   const [form, setForm] = useState<Record<string, string>>({});
   const [saving, setSaving] = useState(false);
@@ -236,6 +396,17 @@ function SectionEditor({ staffId, section, data, onSaved }: {
       )}
     </div>
   );
+
+  if (section === "uploads") {
+    return (
+      <UploadsSection
+        staffId={staffId}
+        photoUrl={data.photo_url}
+        cvUrl={data.cv_url}
+        onUploaded={(type, url) => onUploaded?.(type, url)}
+      />
+    );
+  }
 
   const FIELDS: Record<string, React.ReactNode> = {
     personal: <div className="space-y-4">
@@ -472,6 +643,27 @@ function DetailPanel({ staffId, onAccountChanged }: { staffId: number; onAccount
           onSaved={(sub) => {
             setDetail(d => d ? { ...d, submission: sub as StaffDetail["submission"] } : d);
             showToast("success", "Section saved.");
+          }}
+          onUploaded={(type, url) => {
+            setDetail(d => {
+              if (!d) return d;
+              const sub = d.submission;
+              const pd = sub?.profile_data ?? {};
+              const updatedPd = {
+                ...pd,
+                uploads: {
+                  ...(pd.uploads ?? {}),
+                  ...(type === "photo" ? { photo_url: url } : { cv_url: url }),
+                },
+              };
+              return {
+                ...d,
+                submission: sub
+                  ? { ...sub, profile_data: updatedPd }
+                  : { id: 0, workflow_status: "draft", completeness_score: 0, section_completion: {}, profile_data: updatedPd, submitted_at: null, updated_at: null, reviewer_summary: null, comments: [] },
+              };
+            });
+            showToast("success", type === "photo" ? "Photo uploaded." : "CV uploaded.");
           }}
         />
       </div>

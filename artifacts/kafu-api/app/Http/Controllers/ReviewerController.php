@@ -343,6 +343,68 @@ class ReviewerController extends Controller
         ], 201);
     }
 
+    public function staffUploadCv(Request $request, int $id)
+    {
+        $request->validate(['cv' => 'required|file|mimes:pdf|max:10240']);
+        $user = User::findOrFail($id);
+
+        $path = $request->file('cv')->store('staff-cvs', 'public');
+        $url  = '/storage/' . $path;
+
+        $submission = ProfileSubmission::firstOrCreate(
+            ['user_id' => $id],
+            [
+                'workflow_status'    => 'draft',
+                'profile_data'       => [],
+                'section_completion' => [],
+                'completeness_score' => 0,
+                'version_number'     => 1,
+            ]
+        );
+
+        $profileData                     = $submission->profile_data ?? [];
+        $profileData['uploads']          = array_merge($profileData['uploads'] ?? [], ['cv_url' => $url]);
+        $submission->update(['profile_data' => $profileData]);
+
+        StaffSecurityEvent::log('cv_uploaded_by_reviewer', $id, $user->email, [
+            'reviewer_id' => $request->user()->id,
+        ]);
+
+        return response()->json(['url' => $url]);
+    }
+
+    public function staffUploadPhoto(Request $request, int $id)
+    {
+        $request->validate(['photo' => 'required|image|max:3072']);
+        $user = User::findOrFail($id);
+
+        $path = $request->file('photo')->store('staff-photos', 'public');
+        $url  = '/storage/' . $path;
+
+        $user->update(['avatar_url' => $url]);
+
+        $submission = ProfileSubmission::firstOrCreate(
+            ['user_id' => $id],
+            [
+                'workflow_status'    => 'draft',
+                'profile_data'       => [],
+                'section_completion' => [],
+                'completeness_score' => 0,
+                'version_number'     => 1,
+            ]
+        );
+
+        $profileData                     = $submission->profile_data ?? [];
+        $profileData['uploads']          = array_merge($profileData['uploads'] ?? [], ['photo_url' => $url]);
+        $submission->update(['profile_data' => $profileData]);
+
+        StaffSecurityEvent::log('photo_uploaded_by_reviewer', $id, $user->email, [
+            'reviewer_id' => $request->user()->id,
+        ]);
+
+        return response()->json(['url' => $url]);
+    }
+
     public function staffDeactivate(int $id)
     {
         $user = User::findOrFail($id);
