@@ -116,6 +116,12 @@ const navItems: NavItem[] = [
     roles: ADMIN_ROLES,
     children: [
       { label: "Photo & Video Gallery", href: "/media/gallery" },
+      { label: "Media Hub", href: "/media-hub" },
+      { label: "Press Releases", href: "/media-hub?tab=press_release" },
+      { label: "Publications", href: "/media-hub?tab=publication" },
+      { label: "Videos", href: "/media-hub?tab=video" },
+      { label: "Downloads", href: "/media-hub?tab=download" },
+      { label: "Archives", href: "/media-hub?tab=archive" },
     ],
   },
   {
@@ -134,6 +140,7 @@ const navItems: NavItem[] = [
     children: [
       { label: "Homepage Manager", href: "/homepage" },
       { label: "Hero Slides", href: "/hero-slides" },
+      { label: "Pages Manager", href: "/pages-manager" },
       { label: "About Page", href: "/site/about" },
       { label: "Student Services", href: "/site/student-services" },
       { label: "Navigation Manager", href: "/navigation" },

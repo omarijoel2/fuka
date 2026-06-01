@@ -226,6 +226,9 @@ export default function ProfileEditorPage() {
   const [extracted, setExtracted] = useState<ExtractedData | null>(null);
   const [cvMismatches, setCvMismatches] = useState<CvMismatch[]>([]);
 
+  const [newCourse, setNewCourse] = useState({ code: "", title: "", level: "UG", semester: "" });
+  const [newGrant, setNewGrant] = useState({ title: "", funder: "", amount: "", year: new Date().getFullYear().toString(), status: "Active" });
+
   const showToast = (type: "success" | "error", text: string) => {
     setToast({ type, text });
     setTimeout(() => setToast(null), 4000);
@@ -611,80 +614,213 @@ export default function ProfileEditorPage() {
               )}
 
               {/* TEACHING */}
-              {activeTab === "teaching" && (
-                <div className="space-y-4">
-                  <h3 className="text-sm font-bold text-gray-700 mb-3">Teaching Areas</h3>
-                  <Field label="Teaching Areas (comma-separated or one per line)" required>
-                    <textarea rows={5} value={form.teaching?.teaching_areas ?? ""} onChange={e => setField("teaching", "teaching_areas", e.target.value)}
-                      disabled={!canEdit} data-testid="textarea-teaching" className={TEXTAREA}
-                      placeholder={"Curriculum Development\nEducational Psychology\nResearch Methods in Education"} />
-                  </Field>
-                  <Field label="Postgraduate Supervision">
-                    <textarea rows={3} value={form.teaching?.supervision ?? ""} onChange={e => setField("teaching", "supervision", e.target.value)}
-                      disabled={!canEdit} data-testid="textarea-supervision" className={TEXTAREA}
-                      placeholder="e.g. 5 PhD completions (2019–2024); 12 Masters completions" />
-                  </Field>
-                  <Field label="Awards & Academic Recognition">
-                    <textarea rows={3} value={form.teaching?.awards ?? ""} onChange={e => setField("teaching", "awards", e.target.value)}
-                      disabled={!canEdit} data-testid="textarea-awards" className={TEXTAREA}
-                      placeholder="e.g. KAFU Best Lecturer Award 2022" />
-                  </Field>
-                </div>
-              )}
+              {activeTab === "teaching" && (() => {
+                let courses: { code: string; title: string; level: string; semester: string }[] = [];
+                try { courses = JSON.parse(String(form.teaching?.courses_taught ?? "[]")); } catch { courses = []; }
+                const updateCourses = (updated: typeof courses) => setField("teaching", "courses_taught", JSON.stringify(updated));
+                return (
+                  <div className="space-y-4">
+                    <h3 className="text-sm font-bold text-gray-700 mb-3">Teaching Areas</h3>
+                    <Field label="Teaching Areas (comma-separated or one per line)" required>
+                      <textarea rows={5} value={form.teaching?.teaching_areas ?? ""} onChange={e => setField("teaching", "teaching_areas", e.target.value)}
+                        disabled={!canEdit} data-testid="textarea-teaching" className={TEXTAREA}
+                        placeholder={"Curriculum Development\nEducational Psychology\nResearch Methods in Education"} />
+                    </Field>
+                    <Field label="Postgraduate Supervision">
+                      <textarea rows={3} value={form.teaching?.supervision ?? ""} onChange={e => setField("teaching", "supervision", e.target.value)}
+                        disabled={!canEdit} data-testid="textarea-supervision" className={TEXTAREA}
+                        placeholder="e.g. 5 PhD completions (2019–2024); 12 Masters completions" />
+                    </Field>
+                    <Field label="Awards & Academic Recognition">
+                      <textarea rows={3} value={form.teaching?.awards ?? ""} onChange={e => setField("teaching", "awards", e.target.value)}
+                        disabled={!canEdit} data-testid="textarea-awards" className={TEXTAREA}
+                        placeholder="e.g. KAFU Best Lecturer Award 2022" />
+                    </Field>
 
-              {/* RESEARCH */}
-              {activeTab === "research" && (
-                <div className="space-y-5">
-                  <h3 className="text-sm font-bold text-gray-700 mb-1">Research Profile</h3>
-
-                  <Field label="Research Interests (one per line or comma-separated)" required>
-                    <textarea rows={5} value={form.research?.research_interests ?? ""} onChange={e => setField("research", "research_interests", e.target.value)}
-                      disabled={!canEdit} data-testid="textarea-research" className={TEXTAREA}
-                      placeholder={"Educational equity in sub-Saharan Africa\nCurriculum reform\nTeacher professional development"} />
-                  </Field>
-
-                  <Field label="Selected Publications (one per line, APA format preferred)">
-                    <textarea rows={5} value={form.research?.publications ?? ""} onChange={e => setField("research", "publications", e.target.value)}
-                      disabled={!canEdit} data-testid="textarea-publications" className={TEXTAREA}
-                      placeholder="Oduya, J. (2023). Teacher self-efficacy in rural Kenya. Journal of African Education, 12(2), 45–62." />
-                  </Field>
-
-                  {/* Academic Identity */}
-                  <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-4">
-                    <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">Academic Identity &amp; Profiles</p>
-                    <p className="text-xs text-gray-500 -mt-2">These identifiers link your profile to global academic databases and appear on your public staff page.</p>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <Field label="ORCID iD">
-                        <div className="relative">
-                          <span className="absolute left-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded bg-[#A6CE39] flex items-center justify-center text-white text-[9px] font-bold shrink-0 pointer-events-none">iD</span>
-                          <input type="text" value={form.research?.orcid ?? ""} onChange={e => setField("research", "orcid", e.target.value)}
-                            disabled={!canEdit} data-testid="input-orcid" className={`${INPUT} pl-9 font-mono`}
-                            placeholder="0000-0000-0000-0000" />
+                    {/* Courses Taught */}
+                    <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-3">
+                      <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">Courses Taught</p>
+                      <p className="text-xs text-gray-500 -mt-1">List the courses you currently teach or have taught. These appear on your public staff profile.</p>
+                      {courses.length > 0 && (
+                        <div className="space-y-2">
+                          {courses.map((c, i) => (
+                            <div key={i} className="flex items-center justify-between bg-white rounded-lg border border-gray-200 px-3 py-2 gap-2">
+                              <div className="flex-1 min-w-0">
+                                <span className="text-xs font-mono text-gray-500 mr-2">{c.code}</span>
+                                <span className="text-sm text-gray-800">{c.title}</span>
+                                <span className="ml-2 text-xs text-gray-400">{c.level}{c.semester ? ` · ${c.semester}` : ""}</span>
+                              </div>
+                              {canEdit && (
+                                <button type="button" onClick={() => updateCourses(courses.filter((_, j) => j !== i))}
+                                  data-testid={`btn-remove-course-${i}`}
+                                  className="text-gray-400 hover:text-red-500 transition-colors shrink-0">
+                                  <X className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                          ))}
                         </div>
-                        <p className="text-xs text-gray-400 mt-1">Register free at <a href="https://orcid.org/register" target="_blank" rel="noreferrer" className="underline text-blue-500">orcid.org</a></p>
-                      </Field>
-
-                      <Field label="Scopus Author ID">
-                        <input type="text" value={form.research?.scopus_id ?? ""} onChange={e => setField("research", "scopus_id", e.target.value)}
-                          disabled={!canEdit} data-testid="input-scopus-id" className={`${INPUT} font-mono`}
-                          placeholder="e.g. 57218934765" />
-                        <p className="text-xs text-gray-400 mt-1">Find yours at <a href="https://www.scopus.com/search/form.uri#author" target="_blank" rel="noreferrer" className="underline text-blue-500">scopus.com</a></p>
-                      </Field>
-
-                      <Field label="Google Scholar Profile URL">
-                        <input type="url" value={form.research?.scholar_url ?? ""} onChange={e => setField("research", "scholar_url", e.target.value)}
-                          disabled={!canEdit} data-testid="input-scholar-url" className={INPUT} placeholder="https://scholar.google.com/citations?user=..." />
-                      </Field>
-
-                      <Field label="ResearchGate Profile URL">
-                        <input type="url" value={form.research?.researchgate_url ?? ""} onChange={e => setField("research", "researchgate_url", e.target.value)}
-                          disabled={!canEdit} data-testid="input-researchgate-url" className={INPUT} placeholder="https://researchgate.net/profile/..." />
-                      </Field>
+                      )}
+                      {canEdit && (
+                        <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 space-y-2">
+                          <div className="grid grid-cols-2 gap-2">
+                            <input value={newCourse.code} onChange={e => setNewCourse(p => ({ ...p, code: e.target.value }))}
+                              data-testid="input-new-course-code"
+                              className={INPUT} placeholder="Code (e.g. EDU 301)" />
+                            <input value={newCourse.title} onChange={e => setNewCourse(p => ({ ...p, title: e.target.value }))}
+                              data-testid="input-new-course-title"
+                              className={INPUT} placeholder="Course title" />
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <select value={newCourse.level} onChange={e => setNewCourse(p => ({ ...p, level: e.target.value }))}
+                              data-testid="select-new-course-level"
+                              className={INPUT}>
+                              {["UG", "PG", "Certificate", "Diploma", "PhD"].map(l => <option key={l}>{l}</option>)}
+                            </select>
+                            <input value={newCourse.semester} onChange={e => setNewCourse(p => ({ ...p, semester: e.target.value }))}
+                              data-testid="input-new-course-semester"
+                              className={INPUT} placeholder="Semester (e.g. Sem 1)" />
+                          </div>
+                          <button type="button" onClick={() => {
+                            if (!newCourse.title.trim()) return;
+                            updateCourses([...courses, { ...newCourse }]);
+                            setNewCourse({ code: "", title: "", level: "UG", semester: "" });
+                          }} data-testid="btn-add-course"
+                            className="w-full py-1.5 text-xs font-medium text-primary border border-primary/30 rounded-lg hover:bg-primary/5 transition-colors">
+                            + Add Course
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
+
+              {/* RESEARCH */}
+              {activeTab === "research" && (() => {
+                let grants: { title: string; funder: string; amount: string; year: string; status: string }[] = [];
+                try { grants = JSON.parse(String(form.research?.grants ?? "[]")); } catch { grants = []; }
+                const updateGrants = (updated: typeof grants) => setField("research", "grants", JSON.stringify(updated));
+                return (
+                  <div className="space-y-5">
+                    <h3 className="text-sm font-bold text-gray-700 mb-1">Research Profile</h3>
+
+                    <Field label="Research Interests (one per line or comma-separated)" required>
+                      <textarea rows={5} value={form.research?.research_interests ?? ""} onChange={e => setField("research", "research_interests", e.target.value)}
+                        disabled={!canEdit} data-testid="textarea-research" className={TEXTAREA}
+                        placeholder={"Educational equity in sub-Saharan Africa\nCurriculum reform\nTeacher professional development"} />
+                    </Field>
+
+                    <Field label="Selected Publications (one per line, APA format preferred)">
+                      <textarea rows={5} value={form.research?.publications ?? ""} onChange={e => setField("research", "publications", e.target.value)}
+                        disabled={!canEdit} data-testid="textarea-publications" className={TEXTAREA}
+                        placeholder="Oduya, J. (2023). Teacher self-efficacy in rural Kenya. Journal of African Education, 12(2), 45–62." />
+                    </Field>
+
+                    {/* Grants & Funding */}
+                    <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-3">
+                      <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">Grants &amp; Funding</p>
+                      <p className="text-xs text-gray-500 -mt-1">Record research grants, fellowships, and funded projects you have received.</p>
+                      {grants.length > 0 && (
+                        <div className="space-y-2">
+                          {grants.map((g, i) => (
+                            <div key={i} className="flex items-start justify-between bg-white rounded-lg border border-gray-200 px-3 py-2.5 gap-2">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium text-gray-800 line-clamp-1">{g.title}</p>
+                                <p className="text-xs text-gray-500 mt-0.5">
+                                  {g.funder}{g.amount ? ` · ${g.amount}` : ""}{g.year ? ` · ${g.year}` : ""}
+                                  {g.status && (
+                                    <span className={`ml-2 px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                                      g.status === "Active" ? "bg-green-100 text-green-700" :
+                                      g.status === "Completed" ? "bg-gray-100 text-gray-600" :
+                                      "bg-amber-100 text-amber-700"
+                                    }`}>{g.status}</span>
+                                  )}
+                                </p>
+                              </div>
+                              {canEdit && (
+                                <button type="button" onClick={() => updateGrants(grants.filter((_, j) => j !== i))}
+                                  data-testid={`btn-remove-grant-${i}`}
+                                  className="text-gray-400 hover:text-red-500 transition-colors shrink-0 mt-0.5">
+                                  <X className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {canEdit && (
+                        <div className="bg-white border border-dashed border-gray-300 rounded-lg p-3 space-y-2">
+                          <input value={newGrant.title} onChange={e => setNewGrant(p => ({ ...p, title: e.target.value }))}
+                            data-testid="input-new-grant-title"
+                            className={INPUT} placeholder="Grant / project title" />
+                          <div className="grid grid-cols-2 gap-2">
+                            <input value={newGrant.funder} onChange={e => setNewGrant(p => ({ ...p, funder: e.target.value }))}
+                              data-testid="input-new-grant-funder"
+                              className={INPUT} placeholder="Funding body (e.g. NRF, DAAD)" />
+                            <input value={newGrant.amount} onChange={e => setNewGrant(p => ({ ...p, amount: e.target.value }))}
+                              data-testid="input-new-grant-amount"
+                              className={INPUT} placeholder="Amount (e.g. KES 500,000)" />
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <input value={newGrant.year} onChange={e => setNewGrant(p => ({ ...p, year: e.target.value }))}
+                              data-testid="input-new-grant-year"
+                              className={INPUT} placeholder="Year (e.g. 2024)" />
+                            <select value={newGrant.status} onChange={e => setNewGrant(p => ({ ...p, status: e.target.value }))}
+                              data-testid="select-new-grant-status"
+                              className={INPUT}>
+                              {["Active", "Completed", "Pending"].map(s => <option key={s}>{s}</option>)}
+                            </select>
+                          </div>
+                          <button type="button" onClick={() => {
+                            if (!newGrant.title.trim()) return;
+                            updateGrants([...grants, { ...newGrant }]);
+                            setNewGrant({ title: "", funder: "", amount: "", year: new Date().getFullYear().toString(), status: "Active" });
+                          }} data-testid="btn-add-grant"
+                            className="w-full py-1.5 text-xs font-medium text-primary border border-primary/30 rounded-lg hover:bg-primary/5 transition-colors">
+                            + Add Grant
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Academic Identity */}
+                    <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 space-y-4">
+                      <p className="text-xs font-bold text-gray-600 uppercase tracking-wider">Academic Identity &amp; Profiles</p>
+                      <p className="text-xs text-gray-500 -mt-2">These identifiers link your profile to global academic databases and appear on your public staff page.</p>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <Field label="ORCID iD">
+                          <div className="relative">
+                            <span className="absolute left-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded bg-[#A6CE39] flex items-center justify-center text-white text-[9px] font-bold shrink-0 pointer-events-none">iD</span>
+                            <input type="text" value={form.research?.orcid ?? ""} onChange={e => setField("research", "orcid", e.target.value)}
+                              disabled={!canEdit} data-testid="input-orcid" className={`${INPUT} pl-9 font-mono`}
+                              placeholder="0000-0000-0000-0000" />
+                          </div>
+                          <p className="text-xs text-gray-400 mt-1">Register free at <a href="https://orcid.org/register" target="_blank" rel="noreferrer" className="underline text-blue-500">orcid.org</a></p>
+                        </Field>
+
+                        <Field label="Scopus Author ID">
+                          <input type="text" value={form.research?.scopus_id ?? ""} onChange={e => setField("research", "scopus_id", e.target.value)}
+                            disabled={!canEdit} data-testid="input-scopus-id" className={`${INPUT} font-mono`}
+                            placeholder="e.g. 57218934765" />
+                          <p className="text-xs text-gray-400 mt-1">Find yours at <a href="https://www.scopus.com/search/form.uri#author" target="_blank" rel="noreferrer" className="underline text-blue-500">scopus.com</a></p>
+                        </Field>
+
+                        <Field label="Google Scholar Profile URL">
+                          <input type="url" value={form.research?.scholar_url ?? ""} onChange={e => setField("research", "scholar_url", e.target.value)}
+                            disabled={!canEdit} data-testid="input-scholar-url" className={INPUT} placeholder="https://scholar.google.com/citations?user=..." />
+                        </Field>
+
+                        <Field label="ResearchGate Profile URL">
+                          <input type="url" value={form.research?.researchgate_url ?? ""} onChange={e => setField("research", "researchgate_url", e.target.value)}
+                            disabled={!canEdit} data-testid="input-researchgate-url" className={INPUT} placeholder="https://researchgate.net/profile/..." />
+                        </Field>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* CONTACT */}
               {activeTab === "contact" && (

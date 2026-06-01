@@ -44,6 +44,8 @@ import ContentHealthPage from "@/pages/content-health";
 import WorkflowConsolePage from "@/pages/workflow-console";
 import AdmissionsCmsPage from "@/pages/admissions-cms";
 import KuccpsImportWizard from "@/pages/kuccps-import-wizard";
+import MediaHubCmsPage from "@/pages/media-hub-cms";
+import PagesManagerCmsPage from "@/pages/pages-manager-cms";
 
 // ─── Role constants ───────────────────────────────────────────────────────────
 const ADMIN_ROLES    = ["super_admin", "ict_admin", "communications_admin"];
@@ -404,6 +406,31 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <AdmissionsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* Media Hub */}
+        <Route path="/media-hub">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <MediaHubCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/media-hub/:tab">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <MediaHubCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* Pages Manager */}
+        <Route path="/pages-manager">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <PagesManagerCmsPage />
             </RequireRole>
           )}
         </Route>
