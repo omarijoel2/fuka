@@ -19,6 +19,30 @@ class GovernanceSeeder extends Seeder
     {
         // Source: https://kafu.ac.ke/university-council/
         $members = [
+            // ── Vice-Chancellor (Management Profile) ─────────────────────
+            [
+                'name'           => 'Prof. Peter N. Mwita',
+                'title'          => 'Vice-Chancellor',
+                'category'       => 'vc',
+                'bio'            => 'Prof. Peter N. Mwita serves as the Vice-Chancellor of Kaimosi Friends University (KAFU), providing overall academic, administrative, and strategic leadership of the institution. He is responsible for the implementation of the University Council\'s decisions, ensuring compliance with the Universities Act, 2012, and driving KAFU\'s vision to become a globally competitive university driven by innovation, integrity, and service. Prof. Mwita champions competency-based education, research excellence, and institutional transformation across KAFU\'s five schools.',
+                'email'          => 'vc@kafu.ac.ke',
+                'office'         => 'Vice-Chancellor\'s Office, Administration Block',
+                'phone'          => '+254 777 373 600',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2025/10/prof-peter-mwita.jpg',
+                'position_order' => 1,
+                'is_active'      => true,
+            ],
+            // ── Vice-Chancellor (Ex-Officio Council Member) ───────────────
+            [
+                'name'           => 'Prof. Peter N. Mwita',
+                'title'          => 'Vice-Chancellor & Secretary to the Council',
+                'category'       => 'ex_officio',
+                'credentials'    => ['PhD'],
+                'bio'            => 'Prof. Peter N. Mwita serves as Vice-Chancellor and Secretary to the University Council in accordance with the Universities Act, 2012. In this ex-officio capacity he attends all Council meetings, implements Council decisions, and is accountable to the Council for the overall management of the university.',
+                'photo_url'      => 'https://kafu.ac.ke/wp-content/uploads/2025/10/prof-peter-mwita.jpg',
+                'position_order' => 1,
+                'is_active'      => true,
+            ],
             [
                 'name'           => 'Prof. Stanley O. Khainga',
                 'title'          => 'Chairman of the Council',
