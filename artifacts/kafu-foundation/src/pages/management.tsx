@@ -83,16 +83,16 @@ function VCCard({ profile }: { profile: ManagementProfile }) {
     <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-md flex flex-col md:flex-row">
       {/* Portrait photo */}
       <div className="relative md:w-60 shrink-0 bg-primary/5 overflow-hidden" style={{ minHeight: 300 }}>
-        {profile.photo_url ? (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-6xl font-bold text-primary/20 font-serif">{initials}</span>
+        </div>
+        {profile.photo_url && (
           <img
             src={profile.photo_url}
             alt={profile.name}
             className="absolute inset-0 w-full h-full object-cover object-top"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
           />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-6xl font-bold text-primary/20 font-serif">{initials}</span>
-          </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-r from-transparent to-transparent md:bg-gradient-to-t from-primary/40 via-transparent to-transparent" />
       </div>
@@ -136,16 +136,16 @@ function ProfileCard({ profile }: { profile: ManagementProfile }) {
     <div className="bg-white border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
       {/* Portrait photo — tall aspect ratio */}
       <div className="relative aspect-[4/3] overflow-hidden bg-primary/5">
-        {profile.photo_url ? (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-5xl font-bold text-primary/20 font-serif">{initials}</span>
+        </div>
+        {profile.photo_url && (
           <img
             src={profile.photo_url}
             alt={profile.name}
             className="absolute inset-0 w-full h-full object-cover object-top"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
           />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-5xl font-bold text-primary/20 font-serif">{initials}</span>
-          </div>
         )}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary/75 via-primary/20 to-transparent pt-12 pb-2 px-3">
           <span className="text-xs font-bold text-[#C9A227] uppercase tracking-wider">

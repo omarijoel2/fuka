@@ -1130,6 +1130,26 @@ Route::prefix('admin')->group(function () {
             return response()->json(['message' => 'Partner deleted.']);
         });
 
+        // ── Governance: Photo Upload ─────────────────────────────────────────────
+        Route::post('/governance-photo', function (Request $request) {
+            $request->validate([
+                'photo' => ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
+            ]);
+            $file     = $request->file('photo');
+            $baseName = \Illuminate\Support\Str::slug(
+                pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)
+            );
+            $ext      = strtolower($file->getClientOriginalExtension());
+            $filename = $baseName . '-' . time() . '.' . $ext;
+            $dir      = rtrim(env('GOVERNANCE_PHOTO_DIR', public_path('imgs/staff')), '/\\');
+            if (!is_dir($dir)) {
+                mkdir($dir, 0775, true);
+            }
+            $file->move($dir, $filename);
+            $prefix = rtrim(env('GOVERNANCE_PHOTO_URL_PREFIX', '/imgs/staff'), '/');
+            return response()->json(['url' => $prefix . '/' . $filename]);
+        });
+
         // ── Governance: Council Members ──────────────────────────────────────────
         Route::get('/council-members', function () {
             return response()->json(['data' => \App\Models\CouncilMember::orderBy('position_order')->get()]);

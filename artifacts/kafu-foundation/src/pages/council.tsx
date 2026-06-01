@@ -120,16 +120,16 @@ function MemberCard({ member, featured = false }: { member: CouncilMember; featu
   return (
     <div className="bg-white border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
       <div className={`relative overflow-hidden bg-primary/5 ${featured ? "aspect-[3/4]" : "aspect-square"}`}>
-        {member.photo_url ? (
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-5xl font-bold text-primary/20 font-serif">{initials}</span>
+        </div>
+        {member.photo_url && (
           <img
             src={member.photo_url}
             alt={member.name}
             className="absolute inset-0 w-full h-full object-cover object-top"
+            onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
           />
-        ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-5xl font-bold text-primary/20 font-serif">{initials}</span>
-          </div>
         )}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-primary/75 via-primary/20 to-transparent pt-12 pb-2 px-3 text-center">
           <span className="text-xs font-bold text-[#C9A227] uppercase tracking-wider">
@@ -166,7 +166,7 @@ export default function CouncilPage() {
   const chairperson = members.find(m => m.category === "chairperson");
   const viceChair = members.find(m => m.category === "vice_chair");
   const exOfficio = members.filter(m => m.category === "ex_officio");
-  const rest = members.filter(m => !["chairperson", "vice_chair"].includes(m.category));
+  const rest = members.filter(m => !["chairperson", "vice_chair", "ex_officio"].includes(m.category));
 
   return (
     <>
@@ -220,6 +220,20 @@ export default function CouncilPage() {
             <div className="flex justify-center">
               <div className="w-full max-w-xs">
                 <MemberCard member={chairperson} featured />
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* Ex-Officio: Vice Chancellor — featured portrait card */}
+        {exOfficio.length > 0 && (
+          <section>
+            <h2 className="font-serif text-2xl font-bold text-primary mb-8 pb-3 border-b border-border">
+              Ex-Officio Member
+            </h2>
+            <div className="flex justify-center">
+              <div className="w-full max-w-xs">
+                <MemberCard member={exOfficio[0]} featured />
               </div>
             </div>
           </section>

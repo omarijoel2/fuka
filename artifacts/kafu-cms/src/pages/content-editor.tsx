@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useLocation } from "wouter";
 import { apiGet, apiPost, apiPut, apiDelete, CONTENT_TYPE_LABELS, CONTENT_TYPES, WORKFLOW_TRANSITIONS, STATUS_LABELS, formatDateTime, type WorkflowStatus } from "@/lib/api";
 import { StatusBadge } from "@/components/status-badge";
@@ -80,6 +80,9 @@ export default function ContentEditorPage({ id }: { id?: string }) {
   const [scheduleAt, setScheduleAt] = useState("");
   const [requirementInput, setRequirementInput] = useState("");
   const [photoBrowserTarget, setPhotoBrowserTarget] = useState<"featured_image" | "staff_photo" | null>(null);
+  const [uploadingFeaturedImage, setUploadingFeaturedImage] = useState(false);
+  const [featuredImageUploadError, setFeaturedImageUploadError] = useState("");
+  const featuredImageInputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
     if (isNew) return;
@@ -129,6 +132,40 @@ export default function ContentEditorPage({ id }: { id?: string }) {
   };
 
   const sd = form.structured_data ?? {};
+
+  const handleFeaturedImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingFeaturedImage(true);
+    setFeaturedImageUploadError("");
+    try {
+      const token = localStorage.getItem("kafu_cms_token");
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("folder", form.type === "news" ? "news" : "general");
+      const res = await fetch("/api/admin/media", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.message || `Upload failed (${res.status})`);
+      }
+      const data = await res.json();
+      const url = data?.url ?? data?.data?.url ?? "";
+      if (url) field("featured_image_url", url);
+      else throw new Error("No URL returned from upload.");
+    } catch (err: unknown) {
+      setFeaturedImageUploadError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setUploadingFeaturedImage(false);
+      if (featuredImageInputRef.current) featuredImageInputRef.current.value = "";
+    }
+  };
 
   const save = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -959,15 +996,35 @@ export default function ContentEditorPage({ id }: { id?: string }) {
             </div>
             <div>
               <label className="block text-xs font-medium text-muted-foreground mb-1">Featured Image</label>
+              {/* Hidden file input for direct upload */}
+              <input
+                ref={featuredImageInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFeaturedImageUpload}
+                data-testid="input-featured-image-file"
+              />
               <div className="flex gap-2">
                 <input
                   type="url"
                   value={form.featured_image_url}
                   onChange={(e) => field("featured_image_url", e.target.value)}
-                  placeholder="https://... or browse below"
+                  placeholder="Paste URL, upload, or browse library"
                   className="flex-1 px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                   data-testid="input-featured-image"
                 />
+                <button
+                  type="button"
+                  onClick={() => featuredImageInputRef.current?.click()}
+                  disabled={uploadingFeaturedImage}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-sm font-medium text-muted-foreground hover:bg-muted hover:text-foreground transition shrink-0 disabled:opacity-60"
+                  data-testid="btn-upload-featured-image"
+                  title="Upload image from your computer"
+                >
+                  <Upload className="w-3.5 h-3.5" />
+                  {uploadingFeaturedImage ? "Uploading..." : "Upload"}
+                </button>
                 <button
                   type="button"
                   onClick={() => setPhotoBrowserTarget("featured_image")}
@@ -976,9 +1033,12 @@ export default function ContentEditorPage({ id }: { id?: string }) {
                   title="Browse media library"
                 >
                   <Images className="w-3.5 h-3.5" />
-                  Browse
+                  Library
                 </button>
               </div>
+              {featuredImageUploadError && (
+                <p className="mt-1 text-xs text-red-600" data-testid="featured-image-upload-error">{featuredImageUploadError}</p>
+              )}
               {form.featured_image_url && (
                 <div className="mt-2 relative group">
                   <img src={form.featured_image_url} alt="" className="w-full rounded-lg aspect-video object-cover border border-border" />

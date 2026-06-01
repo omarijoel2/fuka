@@ -2,6 +2,31 @@ const API_ORIGIN = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
 const API_BASE = API_ORIGIN.endsWith("/api")
   ? `${API_ORIGIN}/admin`
   : `${API_ORIGIN}/api/admin`;
+
+export async function apiUploadFile(path: string, file: File, fieldName = "photo"): Promise<{ url: string }> {
+  const token = localStorage.getItem("kafu_cms_token");
+  const formData = new FormData();
+  formData.append(fieldName, file);
+  const res = await fetch(`${API_BASE}${path}`, {
+    method: "POST",
+    headers: {
+      "Accept": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+    body: formData,
+  });
+  if (res.status === 401) {
+    localStorage.removeItem("kafu_cms_token");
+    localStorage.removeItem("kafu_cms_user");
+    window.location.href = `${(import.meta.env.BASE_URL ?? "").replace(/\/$/, "")}/login`;
+    throw new Error("Session expired. Please log in again.");
+  }
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({})) as Record<string, unknown>;
+    throw new Error((err?.message as string) || `Upload failed (${res.status})`);
+  }
+  return res.json();
+}
 const TOKEN_KEY = "kafu_cms_token";
 
 function getToken() {
