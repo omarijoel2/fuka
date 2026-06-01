@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { apiGet, apiPost, apiPut, apiDelete } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,7 +25,32 @@ import {
   Globe,
   Download,
   Award,
+  Camera,
+  Upload,
 } from "lucide-react";
+
+const TOKEN_KEY = "kafu_cms_token";
+
+async function uploadImageToMedia(file: File): Promise<string> {
+  const token = localStorage.getItem(TOKEN_KEY);
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("folder", "staff-photos");
+  const res = await fetch("/api/admin/media", {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: formData,
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error((err as any)?.message || `Upload failed (${res.status})`);
+  }
+  const json = await res.json();
+  return json.data?.url as string;
+}
 
 const SCHOOLS = ["SESS", "SBE", "SCIT", "SOS", "SHS"];
 
@@ -279,6 +304,25 @@ export default function StaffProfilesCmsPage() {
   const [deleteTarget, setDeleteTarget] = useState<ApiStaffItem | null>(null);
   const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
   const [openSections, setOpenSections] = useState<Set<Section>>(new Set(["basic", "identity", "research"]));
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photoUploadError, setPhotoUploadError] = useState("");
+  const photoInputRef = useRef<HTMLInputElement>(null);
+
+  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingPhoto(true);
+    setPhotoUploadError("");
+    try {
+      const url = await uploadImageToMedia(file);
+      updateField("photo", url);
+    } catch (err: unknown) {
+      setPhotoUploadError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setUploadingPhoto(false);
+      if (photoInputRef.current) photoInputRef.current.value = "";
+    }
+  };
 
   const showToast = (type: "success" | "error", msg: string) => {
     setToast({ type, msg });
@@ -572,13 +616,61 @@ export default function StaffProfilesCmsPage() {
                 </Field>
               </div>
 
-              <Field label="Photo URL">
-                <Input
-                  value={editing.photo}
-                  onChange={(e) => updateField("photo", e.target.value)}
-                  placeholder="https://..."
-                  data-testid="field-photo"
-                />
+              <Field label="Profile Photo">
+                <div className="space-y-3">
+                  {/* Preview */}
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 rounded-full border-2 border-border overflow-hidden bg-muted flex items-center justify-center shrink-0">
+                      {editing.photo ? (
+                        <img
+                          src={editing.photo}
+                          alt="Profile photo preview"
+                          className="w-full h-full object-cover"
+                          onError={(e) => { e.currentTarget.style.display = "none"; }}
+                        />
+                      ) : (
+                        <Camera className="w-6 h-6 text-muted-foreground" />
+                      )}
+                    </div>
+                    <div className="flex-1 space-y-2">
+                      {/* Upload button */}
+                      <input
+                        ref={photoInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        data-testid="input-photo-file"
+                        onChange={handlePhotoUpload}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => photoInputRef.current?.click()}
+                        disabled={uploadingPhoto}
+                        data-testid="btn-upload-photo"
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border text-xs font-medium hover:bg-muted transition disabled:opacity-50"
+                      >
+                        <Upload className="w-3.5 h-3.5" />
+                        {uploadingPhoto ? "Uploading…" : "Upload Photo"}
+                      </button>
+                      {photoUploadError && (
+                        <p className="text-xs text-destructive flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" /> {photoUploadError}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                  {/* Manual URL fallback */}
+                  <div>
+                    <p className="text-[11px] text-muted-foreground mb-1">Or paste a URL directly:</p>
+                    <Input
+                      value={editing.photo}
+                      onChange={(e) => updateField("photo", e.target.value)}
+                      placeholder="https://..."
+                      data-testid="field-photo"
+                      className="text-xs"
+                    />
+                  </div>
+                </div>
               </Field>
 
               <Field label="Biography (Short Summary)">
