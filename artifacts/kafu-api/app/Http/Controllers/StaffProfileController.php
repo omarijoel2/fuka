@@ -9,7 +9,6 @@ use App\Models\StaffConsentRecord;
 use App\Models\StaffSecurityEvent;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Http;
 
 class StaffProfileController extends Controller
 {
@@ -179,9 +178,7 @@ class StaffProfileController extends Controller
     {
         $request->validate(['cv' => 'required|file|mimes:pdf|max:10240']);
 
-        // Extract raw text from PDF
         $pdfFile = $request->file('cv');
-        $text = '';
         try {
             $parser = new \Smalot\PdfParser\Parser();
             $pdf    = $parser->parseFile($pdfFile->getRealPath());
@@ -194,92 +191,220 @@ class StaffProfileController extends Controller
             return response()->json(['error' => 'PDF appears to be image-based or empty. Please supply a text-based PDF.'], 422);
         }
 
-        // Truncate to avoid exceeding token limits (~12 000 chars ≈ 3 000 tokens)
-        $textSnippet = mb_substr($text, 0, 12000);
+        $extracted = $this->parseTextCv($text);
+        return response()->json(['extracted' => $extracted]);
+    }
 
-        $baseUrl = env('AI_INTEGRATIONS_OPENAI_BASE_URL');
-        $apiKey  = env('AI_INTEGRATIONS_OPENAI_API_KEY');
+    // ─── Rule-based CV parser ───────────────────────────────────────────────
 
-        if (!$baseUrl || !$apiKey) {
-            return response()->json(['error' => 'AI extraction service not configured.'], 503);
+    private function parseTextCv(string $rawText): array
+    {
+        $text  = str_replace(["\r\n", "\r"], "\n", $rawText);
+        $lines = explode("\n", $text);
+        $lines = array_map('trim', $lines);
+
+        $full  = implode(' ', $lines);
+        $nonEmpty = array_values(array_filter($lines, fn($l) => strlen($l) > 1));
+
+        $result = [
+            'personal'       => [],
+            'bio'            => [],
+            'qualifications' => [],
+            'teaching'       => [],
+            'research'       => [],
+            'contact'        => [],
+        ];
+
+        // ── Regex extractions (whole-document) ────────────────────────────
+
+        // Email
+        if (preg_match('/[\w.+\-]+@[\w\-]+(?:\.[\w\-]+)+/i', $full, $m)) {
+            $result['contact']['contact_email'] = $m[0];
         }
 
-        $systemPrompt = <<<PROMPT
-You are a CV parser for a Kenyan university staff profile system. Extract structured information from the provided CV text.
-
-Return ONLY valid JSON with these exact keys (omit keys you cannot find):
-{
-  "personal": {
-    "title": "Dr./Prof./Mr./Mrs./Ms./Rev.",
-    "name": "Full name",
-    "job_title": "Current designation at the university",
-    "department": "Department or School name",
-    "staff_number": "Staff/Employee ID if present"
-  },
-  "bio": {
-    "biography": "Professional biography paragraph (200-400 words, third person)",
-    "tagline": "One-line professional tagline"
-  },
-  "qualifications": {
-    "qualifications": "Academic qualifications, one per line, format: Degree — Institution, Year",
-    "certifications": "Professional certifications or short courses, one per line",
-    "memberships": "Professional body memberships, one per line"
-  },
-  "teaching": {
-    "teaching_areas": "Teaching subjects/areas, one per line",
-    "supervision": "Postgraduate supervision summary",
-    "awards": "Academic awards and recognition, one per line"
-  },
-  "research": {
-    "research_interests": "Research interest areas, one per line",
-    "publications": "Selected publications in APA format, one per line (max 10)",
-    "orcid": "ORCID iD if present (format: 0000-0000-0000-0000)",
-    "scopus_id": "Scopus Author ID if present (numeric string, e.g. 57218934765)",
-    "scholar_url": "Google Scholar URL if present",
-    "researchgate_url": "ResearchGate URL if present"
-  },
-  "contact": {
-    "contact_email": "Institutional email address",
-    "office_phone": "Office phone number",
-    "office_location": "Office building and room number",
-    "website": "Personal or institutional website URL"
-  }
-}
-
-Do not include markdown fences. Return only the JSON object.
-PROMPT;
-
-        try {
-            $response = Http::withHeaders([
-                'Authorization' => 'Bearer ' . $apiKey,
-                'Content-Type'  => 'application/json',
-            ])->timeout(60)->post(rtrim($baseUrl, '/') . '/chat/completions', [
-                'model'                => 'gpt-5-mini',
-                'max_completion_tokens' => 2048,
-                'messages' => [
-                    ['role' => 'system', 'content' => $systemPrompt],
-                    ['role' => 'user',   'content' => "Here is the CV text:\n\n" . $textSnippet],
-                ],
-            ]);
-
-            if (!$response->successful()) {
-                return response()->json(['error' => 'AI service error: ' . $response->status()], 502);
-            }
-
-            $content = $response->json('choices.0.message.content', '');
-            // Strip any accidental markdown fences
-            $content = preg_replace('/^```json\s*/i', '', trim($content));
-            $content = preg_replace('/```\s*$/', '', $content);
-
-            $extracted = json_decode($content, true);
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                return response()->json(['error' => 'AI returned invalid JSON.', 'raw' => $content], 502);
-            }
-
-            return response()->json(['extracted' => $extracted]);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'Extraction failed: ' . $e->getMessage()], 500);
+        // Kenyan phone
+        if (preg_match('/(?:\+?254|0)[17]\d{8}/', $full, $m)) {
+            $result['contact']['office_phone'] = $m[0];
         }
+
+        // ORCID iD
+        if (preg_match('/\b(\d{4}-\d{4}-\d{4}-\d{3}[\dX])\b/', $full, $m)) {
+            $result['research']['orcid'] = $m[1];
+        }
+
+        // Scopus Author ID
+        if (preg_match('/[Ss]copus\s+(?:[Aa]uthor\s+)?ID[:\s#]*(\d{8,})/i', $full, $m)) {
+            $result['research']['scopus_id'] = $m[1];
+        }
+
+        // Google Scholar URL
+        if (preg_match('|https?://scholar\.google\.com/citations\?[^\s,"\'<>]+|i', $full, $m)) {
+            $result['research']['scholar_url'] = rtrim($m[0], '.,;)');
+        }
+
+        // ResearchGate URL
+        if (preg_match('|https?://(?:www\.)?researchgate\.net/profile/[^\s,"\'<>]+|i', $full, $m)) {
+            $result['research']['researchgate_url'] = rtrim($m[0], '.,;)');
+        }
+
+        // LinkedIn URL
+        if (preg_match('|https?://(?:www\.)?linkedin\.com/in/[^\s,"\'<>]+|i', $full, $m)) {
+            $result['contact']['website'] = rtrim($m[0], '.,;)');
+        }
+
+        // ── Name & title (first 20 non-empty lines) ───────────────────────
+        $headLines = array_slice($nonEmpty, 0, 20);
+        $titleRx   = '(Prof\.?|Professor|Assoc\.\s*Prof\.?|Dr\.?|Mr\.?|Mrs\.?|Ms\.?|Rev\.?)';
+        $nameRx    = '([A-Z][a-zA-Z\'\-]+(?:\s+[A-Z][a-zA-Z\'\-]+){1,4})';
+
+        foreach ($headLines as $line) {
+            if (preg_match("/^{$titleRx}\s+{$nameRx}/", $line, $m)) {
+                $title = rtrim($m[1], '.');
+                $result['personal']['title']     = $title . '.';
+                $result['personal']['name']       = trim($m[1] . ' ' . $m[2]);
+                break;
+            }
+        }
+        if (empty($result['personal']['name'])) {
+            foreach (array_slice($headLines, 0, 5) as $line) {
+                $wc = str_word_count($line);
+                if ($wc >= 2 && $wc <= 5 && preg_match("/^{$nameRx}$/", $line, $m)) {
+                    $result['personal']['name'] = $m[1];
+                    break;
+                }
+            }
+        }
+        if (empty($result['personal']['title'])) {
+            foreach ($headLines as $line) {
+                if (preg_match("/\b{$titleRx}\b/", $line, $m)) {
+                    $result['personal']['title'] = rtrim($m[1], '.') . '.';
+                    break;
+                }
+            }
+        }
+
+        // ── Job title / designation ───────────────────────────────────────
+        $desigRx = '/\b(Vice[\s\-]Chancellor|Deputy\s+Vice[\s\-]Chancellor|Registrar|Dean|Director|Professor|Associate\s+Professor|Senior\s+Lecturer|Lecturer|Tutorial\s+Fellow|Assistant\s+Lecturer)\b/i';
+        foreach ($headLines as $line) {
+            if (preg_match($desigRx, $line, $m)) {
+                $result['personal']['job_title'] = $m[0];
+                break;
+            }
+        }
+
+        // ── Department ────────────────────────────────────────────────────
+        if (preg_match('/\bDepartment\s+of\s+([A-Z][^\n,;]{3,60})/i', implode(' ', $headLines), $m)) {
+            $result['personal']['department'] = 'Department of ' . trim($m[1]);
+        } elseif (preg_match('/\bSchool\s+of\s+([A-Z][^\n,;]{3,60})/i', implode(' ', $headLines), $m)) {
+            $result['personal']['department'] = 'School of ' . trim($m[1]);
+        }
+
+        // ── Detect section blocks ─────────────────────────────────────────
+        $sectionHeaders = [
+            'education'    => '/^(?:education|qualifications?|academic\s+(?:background|qualifications?)|degrees?\s+(?:held|obtained))/i',
+            'research'     => '/^(?:research\s+interests?|areas?\s+of\s+(?:interest|research|specialization)|research\s+focus|research\s+areas?)/i',
+            'publications' => '/^(?:publications?|selected\s+publications?|journal\s+articles?|books?\s+(?:&\s+)?chapters?|scholarly\s+works?|refereed\s+publications?)/i',
+            'teaching'     => '/^(?:teaching|courses?\s+taught|teaching\s+(?:areas?|experience|responsibilities)|subjects?\s+taught|units?\s+taught)/i',
+            'experience'   => '/^(?:(?:work\s+)?experience|employment(?:\s+history)?|professional\s+background|career\s+(?:history|summary))/i',
+            'awards'       => '/^(?:awards?|honors?|honours?|recognition|achievements?|scholarships?\s+(?:and\s+)?awards?)/i',
+            'memberships'  => '/^(?:memberships?|professional\s+(?:bodies|memberships?|affiliations?)|associations?|affiliations?)/i',
+            'summary'      => '/^(?:profile\s+summary|professional\s+summary|executive\s+summary|about\s+me|biography|professional\s+profile|career\s+objective)/i',
+            'certifications' => '/^(?:certifications?|professional\s+certifications?|short\s+courses?|training)/i',
+        ];
+
+        $sectionMap   = [];  // lineIndex => sectionKey
+        foreach ($lines as $i => $line) {
+            if (strlen($line) > 1 && strlen($line) < 80) {
+                foreach ($sectionHeaders as $key => $rx) {
+                    if (preg_match($rx, $line)) {
+                        $sectionMap[$i] = $key;
+                        break;
+                    }
+                }
+            }
+        }
+
+        $sectionLineIdxs = array_keys($sectionMap);
+        $totalLines      = count($lines);
+
+        foreach ($sectionLineIdxs as $pos => $startIdx) {
+            $sectionKey = $sectionMap[$startIdx];
+            $endIdx     = isset($sectionLineIdxs[$pos + 1]) ? $sectionLineIdxs[$pos + 1] : $totalLines;
+            $block      = array_slice($lines, $startIdx + 1, $endIdx - $startIdx - 1);
+            $block      = array_values(array_filter($block, fn($l) => strlen(trim($l)) > 0));
+
+            switch ($sectionKey) {
+                case 'education':
+                    $quals = [];
+                    foreach ($block as $line) {
+                        if (preg_match('/\b(PhD|Ph\.D\.?|DPhil|MD|MSc|M\.Sc\.?|MBA|MA\b|MEd|MPhil|BSc|B\.Sc\.?|BA\b|BEd|LLB|PGDip|Diploma|Certificate)/i', $line)) {
+                            $quals[] = $line;
+                        }
+                    }
+                    $picked = $quals ?: array_slice($block, 0, 10);
+                    if ($picked) $result['qualifications']['qualifications'] = implode("\n", $picked);
+                    break;
+
+                case 'research':
+                    $interests = array_filter(
+                        array_slice($block, 0, 20),
+                        fn($l) => strlen($l) < 120 && !preg_match('/\(\d{4}\)/', $l)
+                    );
+                    if ($interests) $result['research']['research_interests'] = implode("\n", array_values($interests));
+                    break;
+
+                case 'publications':
+                    $pubs = [];
+                    foreach ($block as $line) {
+                        if (strlen($line) > 40 && (
+                            preg_match('/\(\d{4}\)\.?/', $line) ||
+                            preg_match('/\b(?:Journal|Vol\.|pp\.|doi:|ISBN|https?:)/i', $line) ||
+                            strlen($line) > 80
+                        )) {
+                            $pubs[] = $line;
+                        }
+                    }
+                    if ($pubs) $result['research']['publications'] = implode("\n", array_slice($pubs, 0, 15));
+                    break;
+
+                case 'teaching':
+                    $areas = array_filter($block, fn($l) => strlen($l) > 3 && strlen($l) < 120);
+                    if ($areas) $result['teaching']['teaching_areas'] = implode("\n", array_slice(array_values($areas), 0, 15));
+                    break;
+
+                case 'awards':
+                    if ($block) $result['teaching']['awards'] = implode("\n", array_slice($block, 0, 10));
+                    break;
+
+                case 'memberships':
+                    if ($block) $result['qualifications']['memberships'] = implode("\n", array_slice($block, 0, 10));
+                    break;
+
+                case 'certifications':
+                    if ($block) $result['qualifications']['certifications'] = implode("\n", array_slice($block, 0, 10));
+                    break;
+
+                case 'summary':
+                    $bio = trim(implode(' ', array_slice($block, 0, 10)));
+                    if (strlen($bio) > 50) $result['bio']['biography'] = $bio;
+                    break;
+
+                case 'experience':
+                    // Try to pull the first/current position as job title if not already found
+                    if (empty($result['personal']['job_title']) && !empty($block[0])) {
+                        if (preg_match($desigRx, $block[0], $m)) {
+                            $result['personal']['job_title'] = $m[0];
+                        }
+                    }
+                    break;
+            }
+        }
+
+        // ── Strip empty sub-arrays ────────────────────────────────────────
+        foreach ($result as $section => $fields) {
+            $result[$section] = array_filter((array) $fields, fn($v) => !empty(trim((string) $v)));
+        }
+        return array_filter($result, fn($v) => !empty($v));
     }
 
     // --- Internal helpers ---

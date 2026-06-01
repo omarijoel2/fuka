@@ -4,7 +4,7 @@ import { staffGet, staffPut, staffPost, staffPostForm, STATUS_COLORS, STATUS_LAB
 import {
   User, BookOpen, Briefcase, FlaskConical, Phone, Upload,
   Save, Send, CheckCircle, AlertCircle, RotateCcw, Camera,
-  Sparkles, FileText, ChevronDown, ChevronUp, X,
+  FileText, ChevronDown, ChevronUp, X,
 } from "lucide-react";
 
 interface Submission {
@@ -83,7 +83,7 @@ function ExtractionPreview({ extracted, onApply, onDismiss }: ExtractionPreviewP
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-primary/10 bg-white">
         <div className="flex items-center gap-2">
-          <Sparkles className="w-4 h-4 text-primary" />
+          <FileText className="w-4 h-4 text-primary" />
           <span className="text-sm font-semibold text-gray-900">
             Extracted {fieldCount} fields across {sections.length} sections
           </span>
@@ -669,8 +669,8 @@ export default function ProfileEditorPage() {
                           {canEdit && (
                             <button onClick={extractFromCv} disabled={extracting || uploadingCv} data-testid="btn-extract-cv"
                               className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-white text-xs rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors">
-                              <Sparkles className="w-3.5 h-3.5" />
-                              {extracting ? "Analysing CV…" : "Extract & Auto-fill Profile"}
+                              <FileText className="w-3.5 h-3.5" />
+                              {extracting ? "Reading CV…" : "Extract & Auto-fill Profile"}
                             </button>
                           )}
                         </>
@@ -692,9 +692,9 @@ export default function ProfileEditorPage() {
                     {!cvFile && !extracting && (
                       <div className="mt-4 p-3 bg-amber-50 rounded-lg border border-amber-100">
                         <p className="text-xs text-amber-700 flex items-start gap-2">
-                          <Sparkles className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                          <FileText className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                           <span>
-                            <strong>AI Auto-fill:</strong> Select your CV (PDF) above, then click <em>Extract & Auto-fill Profile</em> to automatically populate all sections — qualifications, biography, research interests, publications, and contact details.
+                            Select your CV (PDF) above, then click <em>Extract & Auto-fill Profile</em> to automatically populate all sections — qualifications, research interests, publications, and contact details.
                           </span>
                         </p>
                       </div>
