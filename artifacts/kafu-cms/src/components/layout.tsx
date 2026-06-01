@@ -102,6 +102,15 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    label: "Academic Structure",
+    icon: <GraduationCap className="w-4 h-4" />,
+    roles: ADMIN_ROLES,
+    children: [
+      { label: "Schools & Faculties", href: "/academic/schools" },
+      { label: "Programmes", href: "/academic/programmes" },
+    ],
+  },
+  {
     label: "Media",
     icon: <Camera className="w-4 h-4" />,
     roles: ADMIN_ROLES,
@@ -152,7 +161,7 @@ const navItems: NavItem[] = [
   },
   { label: "Media Library", icon: <Image className="w-4 h-4" />, href: "/media" },
   { label: "Users", icon: <UserCog className="w-4 h-4" />, href: "/users", roles: ADMIN_ROLES },
-  { label: "Taxonomy", icon: <Tag className="w-4 h-4" />, href: "/taxonomy", roles: ADMIN_ROLES },
+  { label: "Taxonomy Manager", icon: <Tag className="w-4 h-4" />, href: "/taxonomy", roles: ADMIN_ROLES },
   { label: "Settings", icon: <Settings className="w-4 h-4" />, href: "/settings", roles: ADMIN_ROLES },
 ];
 

@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import {
   LayoutDashboard, User, ClipboardList, LogOut, Menu, X,
-  FileText, Clock, ChevronRight, Settings
+  FileText, Clock, ChevronRight, Settings, Users
 } from "lucide-react";
 
 interface NavItem { label: string; href: string; icon: React.ReactNode; roles?: string[]; }
@@ -13,6 +13,7 @@ const NAV: NavItem[] = [
   { label: "My Profile", href: "/profile", icon: <User className="w-4 h-4" /> },
   { label: "Submission History", href: "/history", icon: <ClipboardList className="w-4 h-4" /> },
   { label: "Review Queue", href: "/review", icon: <FileText className="w-4 h-4" />, roles: ["reviewer", "super_admin", "ict_admin", "communications_admin"] },
+  { label: "Staff Profiles", href: "/staff-profiles", icon: <Users className="w-4 h-4" />, roles: ["reviewer", "super_admin", "ict_admin"] },
   { label: "Account Management", href: "/accounts", icon: <Settings className="w-4 h-4" />, roles: ["super_admin", "ict_admin"] },
 ];
 
@@ -26,7 +27,7 @@ export function StaffLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex bg-background">
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-30 w-60 bg-[#228B22] text-white flex flex-col transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
+      <aside className={`fixed inset-y-0 left-0 z-30 w-60 bg-[#1A5C38] text-white flex flex-col transition-transform duration-200 ${mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}`}>
         {/* Logo */}
         <div className="px-5 py-5 border-b border-white/10">
           <p className="text-[11px] font-bold tracking-wider uppercase text-white/50">Kaimosi Friends University</p>

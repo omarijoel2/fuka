@@ -1,29 +1,30 @@
 import { useState, useEffect } from "react";
 import { apiGet, apiPut } from "../lib/api";
+import { Link } from "wouter";
+import {
+  Monitor, BarChart3, Link as LinkIcon, Megaphone,
+  Plus, Trash2, ChevronRight, ArrowRight, CheckCircle, Loader2,
+} from "lucide-react";
 
 interface QuickLink { label: string; url: string }
 interface Stat { label: string; value: string }
 
 interface HomepageConfig {
-  hero_title?: string;
-  hero_subtitle?: string;
-  hero_cta_primary?: string;
-  hero_cta_secondary?: string;
-  hero_image_url?: string;
   show_admissions_banner?: boolean;
   admissions_banner_text?: string;
   quick_links?: QuickLink[];
   stats?: Stat[];
 }
 
-function Badge({ children, color }: { children: React.ReactNode; color?: string }) {
-  const cls = color === "green"
-    ? "bg-green-100 text-green-800"
-    : "bg-gray-100 text-gray-700";
+function SectionCard({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${cls}`}>
-      {children}
-    </span>
+    <section className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+      <div className="flex items-center gap-3 px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+        <div className="w-8 h-8 bg-[#1A5C38]/10 rounded-lg flex items-center justify-center text-[#1A5C38]">{icon}</div>
+        <h2 className="text-base font-semibold text-gray-800">{title}</h2>
+      </div>
+      <div className="p-6">{children}</div>
+    </section>
   );
 }
 
@@ -36,23 +37,19 @@ export default function HomepageManagerPage() {
 
   useEffect(() => {
     apiGet("/site-config/homepage")
-      .then((d) => { setCfg(d || {}); setLoading(false); })
+      .then(d => { setCfg(d || {}); setLoading(false); })
       .catch(() => { setError("Failed to load homepage config"); setLoading(false); });
   }, []);
 
   const handleSave = async () => {
-    setSaving(true);
-    setSaved(false);
-    setError("");
+    setSaving(true); setSaved(false); setError("");
     try {
       await apiPut("/site-config/homepage", cfg);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    } catch (e: any) {
-      setError(e.message || "Save failed");
-    } finally {
-      setSaving(false);
-    }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Save failed");
+    } finally { setSaving(false); }
   };
 
   const updateQuickLink = (i: number, field: keyof QuickLink, val: string) => {
@@ -61,14 +58,8 @@ export default function HomepageManagerPage() {
     setCfg({ ...cfg, quick_links: links });
   };
 
-  const addQuickLink = () => {
-    setCfg({ ...cfg, quick_links: [...(cfg.quick_links || []), { label: "", url: "" }] });
-  };
-
-  const removeQuickLink = (i: number) => {
-    const links = (cfg.quick_links || []).filter((_, idx) => idx !== i);
-    setCfg({ ...cfg, quick_links: links });
-  };
+  const addQuickLink = () => setCfg({ ...cfg, quick_links: [...(cfg.quick_links || []), { label: "", url: "" }] });
+  const removeQuickLink = (i: number) => setCfg({ ...cfg, quick_links: (cfg.quick_links || []).filter((_, idx) => idx !== i) });
 
   const updateStat = (i: number, field: keyof Stat, val: string) => {
     const stats = [...(cfg.stats || [])];
@@ -76,257 +67,171 @@ export default function HomepageManagerPage() {
     setCfg({ ...cfg, stats: stats });
   };
 
-  const addStat = () => {
-    setCfg({ ...cfg, stats: [...(cfg.stats || []), { label: "", value: "" }] });
-  };
+  const addStat = () => setCfg({ ...cfg, stats: [...(cfg.stats || []), { label: "", value: "" }] });
+  const removeStat = (i: number) => setCfg({ ...cfg, stats: (cfg.stats || []).filter((_, idx) => idx !== i) });
 
-  const removeStat = (i: number) => {
-    const stats = (cfg.stats || []).filter((_, idx) => idx !== i);
-    setCfg({ ...cfg, stats: stats });
-  };
+  const inputCls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30 focus:border-[#1A5C38]";
 
   if (loading) {
     return (
-      <div className="p-8 text-center text-gray-500">Loading homepage configuration...</div>
+      <div className="flex items-center justify-center py-20 text-gray-400">
+        <Loader2 className="w-6 h-6 animate-spin mr-2" /> Loading homepage configuration…
+      </div>
     );
   }
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-900">Homepage Manager</h1>
-          <p className="text-sm text-gray-500 mt-1">
-            Control the homepage hero section, quick links, stats, and admissions banner.
-          </p>
+          <h1 className="text-2xl font-bold text-gray-900">Homepage Manager</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Control the admissions banner, stats block, and quick links.</p>
         </div>
         <div className="flex items-center gap-3">
-          {saved && <Badge color="green">Saved</Badge>}
+          {saved && (
+            <span className="flex items-center gap-1.5 text-sm text-green-600 font-medium">
+              <CheckCircle className="w-4 h-4" /> Saved
+            </span>
+          )}
           {error && <span className="text-sm text-red-600">{error}</span>}
-          <button
-            data-testid="btn-save-homepage"
-            onClick={handleSave}
-            disabled={saving}
-            className="px-4 py-2 bg-[#228B22] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f] disabled:opacity-50"
-          >
-            {saving ? "Saving..." : "Save Changes"}
+          <button onClick={handleSave} disabled={saving} data-testid="btn-save-homepage"
+            className="flex items-center gap-2 px-4 py-2 bg-[#1A5C38] text-white text-sm font-semibold rounded-xl hover:bg-[#154d2f] disabled:opacity-50 transition-colors">
+            {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+            {saving ? "Saving…" : "Save Changes"}
           </button>
         </div>
       </div>
 
-      {/* Hero Section */}
-      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
-        <h2 className="text-base font-semibold text-gray-800 border-b border-gray-100 pb-3">
-          Hero Section
-        </h2>
-        <div className="grid grid-cols-1 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Hero Title
-            </label>
-            <input
-              data-testid="input-hero-title"
-              type="text"
-              value={cfg.hero_title || ""}
-              onChange={(e) => setCfg({ ...cfg, hero_title: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Hero Subtitle
-            </label>
-            <textarea
-              data-testid="input-hero-subtitle"
-              rows={3}
-              value={cfg.hero_subtitle || ""}
-              onChange={(e) => setCfg({ ...cfg, hero_subtitle: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Primary CTA Label
-              </label>
-              <input
-                data-testid="input-hero-cta-primary"
-                type="text"
-                value={cfg.hero_cta_primary || ""}
-                onChange={(e) => setCfg({ ...cfg, hero_cta_primary: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
-              />
+      {/* Hero Carousel link-out card */}
+      <div className="bg-gradient-to-br from-[#1A5C38] to-[#154d2f] rounded-2xl p-6 text-white">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 bg-white/15 rounded-xl flex items-center justify-center shrink-0">
+              <Monitor className="w-6 h-6 text-white" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Secondary CTA Label
-              </label>
-              <input
-                data-testid="input-hero-cta-secondary"
-                type="text"
-                value={cfg.hero_cta_secondary || ""}
-                onChange={(e) => setCfg({ ...cfg, hero_cta_secondary: e.target.value })}
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
-              />
+              <h2 className="font-bold text-lg">Hero Carousel Slides</h2>
+              <p className="text-white/75 text-sm mt-0.5 max-w-xl">
+                Manage the rotating banner shown at the top of the homepage — add, edit, reorder, and publish individual slides with custom images, headlines, captions, and call-to-action buttons.
+              </p>
+              <div className="flex gap-2 mt-3 text-xs text-white/60">
+                <span className="bg-white/10 px-2 py-0.5 rounded">Full CRUD</span>
+                <span className="bg-white/10 px-2 py-0.5 rounded">Live preview</span>
+                <span className="bg-white/10 px-2 py-0.5 rounded">Media Library picker</span>
+                <span className="bg-white/10 px-2 py-0.5 rounded">Reorder</span>
+                <span className="bg-white/10 px-2 py-0.5 rounded">Duplicate slides</span>
+              </div>
             </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Hero Background Image URL
-            </label>
-            <input
-              data-testid="input-hero-image"
-              type="url"
-              value={cfg.hero_image_url || ""}
-              onChange={(e) => setCfg({ ...cfg, hero_image_url: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
-            />
-            {cfg.hero_image_url && (
-              <img
-                src={cfg.hero_image_url}
-                alt="Hero preview"
-                className="mt-2 h-24 w-full object-cover rounded-lg border border-gray-200"
-                onError={(e) => (e.currentTarget.style.display = "none")}
-              />
-            )}
-          </div>
+          <Link href="/hero-slides">
+            <a data-testid="btn-go-hero-slides"
+              className="flex items-center gap-2 px-5 py-3 bg-white text-[#1A5C38] font-semibold text-sm rounded-xl hover:bg-white/90 transition-colors shrink-0 whitespace-nowrap">
+              Manage Slides <ChevronRight className="w-4 h-4" />
+            </a>
+          </Link>
         </div>
-      </section>
+      </div>
 
       {/* Admissions Banner */}
-      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
-        <h2 className="text-base font-semibold text-gray-800 border-b border-gray-100 pb-3">
-          Admissions Banner
-        </h2>
-        <div className="flex items-center gap-3">
-          <input
-            data-testid="toggle-admissions-banner"
-            type="checkbox"
-            id="admissions-banner-active"
-            checked={!!cfg.show_admissions_banner}
-            onChange={(e) => setCfg({ ...cfg, show_admissions_banner: e.target.checked })}
-            className="w-4 h-4 text-[#228B22] rounded border-gray-300 focus:ring-[#228B22]"
-          />
-          <label htmlFor="admissions-banner-active" className="text-sm font-medium text-gray-700">
-            Show admissions banner on homepage
-          </label>
-        </div>
-        {cfg.show_admissions_banner && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Banner Text
-            </label>
-            <input
-              data-testid="input-admissions-banner-text"
-              type="text"
-              value={cfg.admissions_banner_text || ""}
-              onChange={(e) => setCfg({ ...cfg, admissions_banner_text: e.target.value })}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
-            />
-          </div>
-        )}
-      </section>
-
-      {/* Stats / Credibility Block */}
-      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
-        <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-          <h2 className="text-base font-semibold text-gray-800">Stats / Credibility Block</h2>
-          <button
-            data-testid="btn-add-stat"
-            onClick={addStat}
-            className="text-sm text-[#228B22] font-medium hover:underline"
-          >
-            + Add Stat
-          </button>
-        </div>
-        <div className="space-y-3">
-          {(cfg.stats || []).map((stat, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <input
-                data-testid={`input-stat-value-${i}`}
-                type="text"
-                placeholder="Value (e.g. 8,500+)"
-                value={stat.value}
-                onChange={(e) => updateStat(i, "value", e.target.value)}
-                className="w-40 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
-              />
-              <input
-                data-testid={`input-stat-label-${i}`}
-                type="text"
-                placeholder="Label (e.g. Students Enrolled)"
-                value={stat.label}
-                onChange={(e) => updateStat(i, "label", e.target.value)}
-                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
-              />
-              <button
-                data-testid={`btn-remove-stat-${i}`}
-                onClick={() => removeStat(i)}
-                className="text-red-500 hover:text-red-700 text-sm"
-              >
-                Remove
-              </button>
+      <SectionCard title="Admissions Banner" icon={<Megaphone className="w-4 h-4" />}>
+        <div className="space-y-4">
+          <p className="text-xs text-gray-500">An announcement strip shown at the top of the homepage when enabled. Typically used to highlight open intake periods.</p>
+          <label className="flex items-center gap-3 cursor-pointer">
+            <div className="relative">
+              <input type="checkbox" id="admissions-banner-active" checked={!!cfg.show_admissions_banner}
+                onChange={e => setCfg({ ...cfg, show_admissions_banner: e.target.checked })}
+                className="sr-only peer" data-testid="toggle-admissions-banner" />
+              <div className="w-11 h-6 bg-gray-200 rounded-full peer peer-checked:bg-[#1A5C38] transition-colors" />
+              <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform peer-checked:translate-x-5" />
             </div>
-          ))}
-          {(cfg.stats || []).length === 0 && (
-            <p className="text-sm text-gray-400">No stats configured. Click Add Stat to begin.</p>
+            <span className="text-sm font-medium text-gray-700">Show admissions banner on homepage</span>
+          </label>
+
+          {cfg.show_admissions_banner && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">Banner Message</label>
+              <input type="text" value={cfg.admissions_banner_text || ""}
+                onChange={e => setCfg({ ...cfg, admissions_banner_text: e.target.value })}
+                placeholder="e.g. Applications for May 2026 intake are now open. Apply before 31st August."
+                className={inputCls} data-testid="input-admissions-banner-text" />
+              <p className="text-xs text-gray-400 mt-1.5">The banner links to <code className="font-mono bg-gray-100 px-1 rounded">/admissions</code> automatically.</p>
+            </div>
           )}
         </div>
-      </section>
+      </SectionCard>
+
+      {/* Stats Block */}
+      <SectionCard title="Stats / Credibility Block" icon={<BarChart3 className="w-4 h-4" />}>
+        <div className="space-y-4">
+          <p className="text-xs text-gray-500">Key figures shown in the "Why KAFU" section — e.g. student count, programmes, years of operation.</p>
+          <div className="space-y-3">
+            {(cfg.stats || []).map((stat, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <input type="text" placeholder="Value (e.g. 8,500+)" value={stat.value}
+                  onChange={e => updateStat(i, "value", e.target.value)}
+                  className="w-32 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30 font-semibold"
+                  data-testid={`input-stat-value-${i}`} />
+                <input type="text" placeholder="Label (e.g. Students Enrolled)" value={stat.label}
+                  onChange={e => updateStat(i, "label", e.target.value)}
+                  className={`flex-1 ${inputCls}`} data-testid={`input-stat-label-${i}`} />
+                <button onClick={() => removeStat(i)} data-testid={`btn-remove-stat-${i}`}
+                  className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+            {(cfg.stats || []).length === 0 && (
+              <p className="text-sm text-gray-400 bg-gray-50 rounded-xl px-4 py-3">No stats configured. Click below to add your first figure.</p>
+            )}
+          </div>
+          <button onClick={addStat} data-testid="btn-add-stat"
+            className="flex items-center gap-2 text-sm text-[#1A5C38] font-medium hover:underline">
+            <Plus className="w-4 h-4" /> Add Stat
+          </button>
+        </div>
+      </SectionCard>
 
       {/* Quick Links */}
-      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
-        <div className="flex items-center justify-between border-b border-gray-100 pb-3">
-          <h2 className="text-base font-semibold text-gray-800">Homepage Quick Links</h2>
-          <button
-            data-testid="btn-add-quick-link"
-            onClick={addQuickLink}
-            className="text-sm text-[#228B22] font-medium hover:underline"
-          >
-            + Add Link
+      <SectionCard title="Homepage Quick Links" icon={<LinkIcon className="w-4 h-4" />}>
+        <div className="space-y-4">
+          <p className="text-xs text-gray-500">Shortcut links shown in the Digital Services Hub section of the homepage.</p>
+          <div className="space-y-3">
+            {(cfg.quick_links || []).map((link, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <input type="text" placeholder="Label" value={link.label}
+                  onChange={e => updateQuickLink(i, "label", e.target.value)}
+                  className={`flex-1 ${inputCls}`} data-testid={`input-quicklink-label-${i}`} />
+                <div className="relative flex-1">
+                  <ArrowRight className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                  <input type="text" placeholder="URL or path" value={link.url}
+                    onChange={e => updateQuickLink(i, "url", e.target.value)}
+                    className={`w-full pl-8 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30`}
+                    data-testid={`input-quicklink-url-${i}`} />
+                </div>
+                <button onClick={() => removeQuickLink(i)} data-testid={`btn-remove-quicklink-${i}`}
+                  className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                  <Trash2 className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+            {(cfg.quick_links || []).length === 0 && (
+              <p className="text-sm text-gray-400 bg-gray-50 rounded-xl px-4 py-3">No quick links configured.</p>
+            )}
+          </div>
+          <button onClick={addQuickLink} data-testid="btn-add-quick-link"
+            className="flex items-center gap-2 text-sm text-[#1A5C38] font-medium hover:underline">
+            <Plus className="w-4 h-4" /> Add Link
           </button>
         </div>
-        <div className="space-y-3">
-          {(cfg.quick_links || []).map((link, i) => (
-            <div key={i} className="flex items-center gap-3">
-              <input
-                data-testid={`input-quicklink-label-${i}`}
-                type="text"
-                placeholder="Label"
-                value={link.label}
-                onChange={(e) => updateQuickLink(i, "label", e.target.value)}
-                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
-              />
-              <input
-                data-testid={`input-quicklink-url-${i}`}
-                type="text"
-                placeholder="URL or path"
-                value={link.url}
-                onChange={(e) => updateQuickLink(i, "url", e.target.value)}
-                className="flex-1 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
-              />
-              <button
-                data-testid={`btn-remove-quicklink-${i}`}
-                onClick={() => removeQuickLink(i)}
-                className="text-red-500 hover:text-red-700 text-sm"
-              >
-                Remove
-              </button>
-            </div>
-          ))}
-          {(cfg.quick_links || []).length === 0 && (
-            <p className="text-sm text-gray-400">No quick links configured.</p>
-          )}
-        </div>
-      </section>
+      </SectionCard>
 
-      <div className="flex justify-end">
-        <button
-          data-testid="btn-save-homepage-bottom"
-          onClick={handleSave}
-          disabled={saving}
-          className="px-6 py-2 bg-[#228B22] text-white text-sm font-medium rounded-lg hover:bg-[#154d2f] disabled:opacity-50"
-        >
-          {saving ? "Saving..." : "Save All Changes"}
+      {/* Bottom save */}
+      <div className="flex justify-end pb-4">
+        <button onClick={handleSave} disabled={saving} data-testid="btn-save-homepage-bottom"
+          className="flex items-center gap-2 px-6 py-2 bg-[#1A5C38] text-white text-sm font-semibold rounded-xl hover:bg-[#154d2f] disabled:opacity-50">
+          {saving && <Loader2 className="w-4 h-4 animate-spin" />}
+          {saving ? "Saving…" : "Save All Changes"}
         </button>
       </div>
     </div>
