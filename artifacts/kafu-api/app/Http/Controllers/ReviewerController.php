@@ -202,8 +202,19 @@ class ReviewerController extends Controller
 
         $users = $query->paginate(40);
 
-        $users->getCollection()->transform(function ($user) {
-            $sub = $user->latestSubmission();
+        // Batch-load latest submission per user (avoids N+1)
+        $userIds = $users->pluck('id');
+        $latestSubIds = ProfileSubmission::selectRaw('MAX(id) as id, user_id')
+            ->whereIn('user_id', $userIds)
+            ->groupBy('user_id')
+            ->pluck('id');
+
+        $submissionsMap = ProfileSubmission::whereIn('id', $latestSubIds)
+            ->get(['id', 'user_id', 'workflow_status', 'completeness_score', 'submitted_at', 'updated_at'])
+            ->keyBy('user_id');
+
+        $users->getCollection()->transform(function ($user) use ($submissionsMap) {
+            $sub = $submissionsMap->get($user->id);
             $arr = $user->only([
                 'id', 'name', 'email', 'title', 'job_title', 'department',
                 'staff_number', 'status', 'role', 'school_code',
