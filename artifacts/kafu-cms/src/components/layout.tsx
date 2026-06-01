@@ -106,8 +106,8 @@ const navItems: NavItem[] = [
     icon: <GraduationCap className="w-4 h-4" />,
     roles: ADMIN_ROLES,
     children: [
-      { label: "Schools & Faculties", href: "/taxonomy" },
-      { label: "Programmes", href: "/content?type=programme" },
+      { label: "Schools & Faculties", href: "/academic/schools" },
+      { label: "Programmes", href: "/academic/programmes" },
     ],
   },
   {

@@ -2124,6 +2124,171 @@ Route::prefix('admin')->group(function () {
         });
     });
 
+    // ── Schools CRUD ──────────────────────────────────────────────────────────
+    Route::middleware('auth:sanctum')->prefix('schools')->group(function () {
+        Route::get('/', function () {
+            $schools = CmsContent::where('type', 'school')
+                ->where('is_deleted', false)
+                ->orderBy('title')
+                ->get()
+                ->map(function ($item) {
+                    $sd = is_string($item->structured_data) ? json_decode($item->structured_data, true) : ($item->structured_data ?? []);
+                    return [
+                        'id'               => $item->id,
+                        'name'             => $item->title,
+                        'code'             => strtoupper($item->slug),
+                        'slug'             => $item->slug,
+                        'description'      => $item->summary ?? '',
+                        'vision'           => $sd['vision'] ?? '',
+                        'mission'          => $sd['mission'] ?? '',
+                        'dean'             => $sd['dean'] ?? '',
+                        'dean_title'       => $sd['dean_title'] ?? '',
+                        'dean_photo'       => $sd['dean_photo'] ?? '',
+                        'colour'           => $sd['colour'] ?? '#1B3A6B',
+                        'href'             => $sd['href'] ?? '',
+                        'programmes_count' => $sd['programmes_count'] ?? ['undergraduate' => 0, 'postgraduate' => 0, 'doctoral' => 0],
+                        'status'           => $item->status,
+                        'updated_at'       => $item->updated_at,
+                    ];
+                });
+            return response()->json(['data' => $schools->values()]);
+        });
+
+        Route::post('/', function (Request $request) {
+            $sd = json_encode([
+                'dean'             => $request->input('dean', ''),
+                'dean_title'       => $request->input('dean_title', ''),
+                'dean_photo'       => $request->input('dean_photo', ''),
+                'vision'           => $request->input('vision', ''),
+                'mission'          => $request->input('mission', ''),
+                'colour'           => $request->input('colour', '#1B3A6B'),
+                'href'             => $request->input('href', ''),
+                'programmes_count' => $request->input('programmes_count', ['undergraduate' => 0, 'postgraduate' => 0, 'doctoral' => 0]),
+            ]);
+            $item = CmsContent::create([
+                'type'            => 'school',
+                'title'           => $request->input('name', 'New School'),
+                'slug'            => strtolower($request->input('code', $request->input('slug', 'school-' . time()))),
+                'summary'         => $request->input('description', ''),
+                'body'            => $request->input('description', ''),
+                'status'          => $request->input('status', 'draft'),
+                'structured_data' => $sd,
+                'is_deleted'      => false,
+                'author_id'       => $request->user()->id,
+                'tags'            => '[]',
+                'seo_meta'        => '{}',
+                'published_at'    => now(),
+            ]);
+            return response()->json(['data' => $item], 201);
+        });
+
+        Route::put('/{id}', function (Request $request, int $id) {
+            $item = CmsContent::where('type', 'school')->where('is_deleted', false)->findOrFail($id);
+            $sdOld = is_string($item->structured_data) ? json_decode($item->structured_data, true) : ($item->structured_data ?? []);
+            $sd = json_encode([
+                'dean'             => $request->input('dean', $sdOld['dean'] ?? ''),
+                'dean_title'       => $request->input('dean_title', $sdOld['dean_title'] ?? ''),
+                'dean_photo'       => $request->input('dean_photo', $sdOld['dean_photo'] ?? ''),
+                'vision'           => $request->input('vision', $sdOld['vision'] ?? ''),
+                'mission'          => $request->input('mission', $sdOld['mission'] ?? ''),
+                'colour'           => $request->input('colour', $sdOld['colour'] ?? '#1B3A6B'),
+                'href'             => $request->input('href', $sdOld['href'] ?? ''),
+                'programmes_count' => $request->input('programmes_count', $sdOld['programmes_count'] ?? ['undergraduate' => 0, 'postgraduate' => 0, 'doctoral' => 0]),
+            ]);
+            $item->update([
+                'title'           => $request->input('name', $item->title),
+                'slug'            => strtolower($request->input('code', $request->input('slug', $item->slug))),
+                'summary'         => $request->input('description', $item->summary),
+                'body'            => $request->input('description', $item->body),
+                'status'          => $request->input('status', $item->status),
+                'structured_data' => $sd,
+            ]);
+            return response()->json(['data' => $item->fresh()]);
+        });
+
+        Route::delete('/{id}', function (int $id) {
+            CmsContent::where('type', 'school')->findOrFail($id)->update(['is_deleted' => true]);
+            return response()->json(['message' => 'School removed.']);
+        });
+    });
+
+    // ── Programmes CRUD ───────────────────────────────────────────────────────
+    Route::middleware('auth:sanctum')->prefix('academic/programmes')->group(function () {
+        Route::get('/', function (Request $request) {
+            $q = CmsContent::where('type', 'programme')->where('is_deleted', false);
+            if ($request->school) $q->where('school_code', strtoupper($request->school));
+            $items = $q->orderBy('school_code')->orderBy('title')->get()->map(function ($item) {
+                $sd = is_string($item->structured_data) ? json_decode($item->structured_data, true) : ($item->structured_data ?? []);
+                return [
+                    'id'              => $item->id,
+                    'name'            => $item->title,
+                    'slug'            => $item->slug,
+                    'school'          => $item->school_code ?? ($sd['school_code'] ?? ''),
+                    'level'           => $sd['level'] ?? 'undergraduate',
+                    'programme_code'  => $sd['programme_code'] ?? $item->category ?? '',
+                    'duration'        => $sd['duration'] ?? '4 years',
+                    'description'     => $item->summary ?? '',
+                    'status'          => $item->status,
+                    'updated_at'      => $item->updated_at,
+                ];
+            });
+            return response()->json(['data' => $items->values(), 'total' => $items->count()]);
+        });
+
+        Route::post('/', function (Request $request) {
+            $sd = json_encode([
+                'level'          => $request->input('level', 'undergraduate'),
+                'programme_code' => $request->input('programme_code', ''),
+                'duration'       => $request->input('duration', '4 years'),
+                'school_code'    => strtoupper($request->input('school', '')),
+            ]);
+            $slug = strtolower(preg_replace('/[^a-z0-9]+/i', '-', $request->input('name', 'programme'))) . '-' . time();
+            $item = CmsContent::create([
+                'type'            => 'programme',
+                'title'           => $request->input('name', 'New Programme'),
+                'slug'            => $slug,
+                'summary'         => $request->input('description', ''),
+                'body'            => $request->input('description', ''),
+                'school_code'     => strtoupper($request->input('school', '')),
+                'category'        => $request->input('level', 'undergraduate'),
+                'status'          => $request->input('status', 'published'),
+                'structured_data' => $sd,
+                'is_deleted'      => false,
+                'author_id'       => $request->user()->id,
+                'tags'            => '[]',
+                'seo_meta'        => '{}',
+                'published_at'    => now(),
+            ]);
+            return response()->json(['data' => $item], 201);
+        });
+
+        Route::put('/{id}', function (Request $request, int $id) {
+            $item = CmsContent::where('type', 'programme')->where('is_deleted', false)->findOrFail($id);
+            $sdOld = is_string($item->structured_data) ? json_decode($item->structured_data, true) : ($item->structured_data ?? []);
+            $sd = json_encode([
+                'level'          => $request->input('level', $sdOld['level'] ?? 'undergraduate'),
+                'programme_code' => $request->input('programme_code', $sdOld['programme_code'] ?? ''),
+                'duration'       => $request->input('duration', $sdOld['duration'] ?? '4 years'),
+                'school_code'    => strtoupper($request->input('school', $item->school_code ?? '')),
+            ]);
+            $item->update([
+                'title'           => $request->input('name', $item->title),
+                'summary'         => $request->input('description', $item->summary),
+                'body'            => $request->input('description', $item->body),
+                'school_code'     => strtoupper($request->input('school', $item->school_code ?? '')),
+                'category'        => $request->input('level', $item->category),
+                'status'          => $request->input('status', $item->status),
+                'structured_data' => $sd,
+            ]);
+            return response()->json(['data' => $item->fresh()]);
+        });
+
+        Route::delete('/{id}', function (int $id) {
+            CmsContent::where('type', 'programme')->findOrFail($id)->update(['is_deleted' => true]);
+            return response()->json(['message' => 'Programme removed.']);
+        });
+    });
+
 });
 
 if (!function_exists('updateApplicationStatus')) {

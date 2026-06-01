@@ -38,6 +38,8 @@ import ManagementProfilesCmsPage from "@/pages/management-profiles-cms";
 import DirectoratesCmsPage from "@/pages/directorates-cms";
 import GalleryCmsPage from "@/pages/gallery-cms";
 import DepartmentsCmsPage from "@/pages/departments-cms";
+import SchoolsCmsPage from "@/pages/schools-cms";
+import ProgrammesCmsPage from "@/pages/programmes-cms";
 import ContentHealthPage from "@/pages/content-health";
 import WorkflowConsolePage from "@/pages/workflow-console";
 import AdmissionsCmsPage from "@/pages/admissions-cms";
@@ -231,6 +233,22 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <StaffAccountsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* Academic Structure */}
+        <Route path="/academic/schools">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <SchoolsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/academic/programmes">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <ProgrammesCmsPage />
             </RequireRole>
           )}
         </Route>
