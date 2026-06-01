@@ -7,12 +7,14 @@ import DashboardPage from "@/pages/dashboard";
 import ProfileEditorPage from "@/pages/profile-editor";
 import HistoryPage from "@/pages/history";
 import ReviewQueuePage from "@/pages/review-queue";
+import ReviewerStaffProfilesPage from "@/pages/reviewer-staff-profiles";
 import AccountsPage from "@/pages/accounts";
 import { StaffLayout } from "@/components/layout";
 
 const queryClient = new QueryClient();
 
 const REVIEWER_ROLES = ["reviewer", "super_admin", "ict_admin", "communications_admin"];
+const STAFF_PROFILES_ROLES = ["reviewer", "super_admin", "ict_admin"];
 const ADMIN_ROLES = ["super_admin", "ict_admin"];
 
 function AppRoutes() {
@@ -48,6 +50,12 @@ function AppRoutes() {
         <Route path="/review">
           {() => REVIEWER_ROLES.includes(user.role)
             ? <ReviewQueuePage />
+            : <div className="text-center py-20 text-gray-400">Access denied.</div>
+          }
+        </Route>
+        <Route path="/staff-profiles">
+          {() => STAFF_PROFILES_ROLES.includes(user.role)
+            ? <ReviewerStaffProfilesPage />
             : <div className="text-center py-20 text-gray-400">Access denied.</div>
           }
         </Route>

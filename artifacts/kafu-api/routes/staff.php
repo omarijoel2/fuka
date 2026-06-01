@@ -47,6 +47,7 @@ Route::prefix('staff')
 Route::prefix('reviewer')
     ->middleware(['auth:sanctum'])
     ->group(function () {
+        // Submission queue & workflow
         Route::get('/queue', [ReviewerController::class, 'queue']);
         Route::get('/submissions/{id}', [ReviewerController::class, 'show']);
         Route::post('/submissions/{id}/review', [ReviewerController::class, 'review']);
@@ -54,6 +55,14 @@ Route::prefix('reviewer')
         Route::post('/submissions/{id}/request-revision', [ReviewerController::class, 'requestRevision']);
         Route::post('/submissions/{id}/reject', [ReviewerController::class, 'reject']);
         Route::post('/submissions/{id}/comments', [ReviewerController::class, 'addComment']);
+
+        // Staff profiles — full CRUD
+        Route::get('/staff', [ReviewerController::class, 'staffIndex']);
+        Route::post('/staff', [ReviewerController::class, 'staffProvision']);
+        Route::get('/staff/{id}', [ReviewerController::class, 'staffShow']);
+        Route::put('/staff/{id}/section/{section}', [ReviewerController::class, 'staffUpdateSection']);
+        Route::delete('/staff/{id}', [ReviewerController::class, 'staffDeactivate']);
+        Route::post('/staff/{id}/reactivate', [ReviewerController::class, 'staffReactivate']);
     });
 
 // ICT Admin routes
