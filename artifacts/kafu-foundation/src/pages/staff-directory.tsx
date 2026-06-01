@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useStaff } from "@/lib/api-hooks";
 import type { StaffMember } from "@/lib/api-types";
 import { SeoHead } from "@/components/seo-head";
@@ -81,7 +81,22 @@ function getAvatarGradient(slug: string) {
   return gradients[hash % gradients.length];
 }
 
-function StaffCard({ member }: { member: StaffMember }) {
+function highlightText(text: string, query: string): React.ReactNode {
+  if (!query.trim()) return text;
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "gi");
+  const parts = text.split(regex);
+  return parts.map((part, i) =>
+    regex.test(part) ? (
+      <mark key={i} className="bg-yellow-200 text-yellow-900 rounded-sm px-0.5">
+        {part}
+      </mark>
+    ) : (
+      part
+    )
+  );
+}
+
+function StaffCard({ member, search }: { member: StaffMember; search: string }) {
   const gradient = getAvatarGradient(member.slug);
   const schoolOrUnit = member.school ?? (member.unit === "University Leadership" ? "leadership" : null);
 
@@ -91,7 +106,6 @@ function StaffCard({ member }: { member: StaffMember }) {
       className="group bg-card border rounded-xl overflow-hidden hover:border-primary hover:shadow-md transition-all flex flex-col"
       data-testid={`staff-card-${member.slug}`}
     >
-      {/* Avatar */}
       <div className={`h-36 bg-gradient-to-br ${gradient} flex items-center justify-center relative overflow-hidden`}>
         <span className="text-white text-4xl font-serif font-bold opacity-90 select-none">
           {getInitials(member.name)}
@@ -101,7 +115,7 @@ function StaffCard({ member }: { member: StaffMember }) {
             src={member.photo}
             alt={member.name}
             className="absolute inset-0 w-full h-full object-cover"
-            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            onError={(e) => { e.currentTarget.style.display = "none"; }}
           />
         )}
         {schoolOrUnit && (
@@ -118,22 +132,25 @@ function StaffCard({ member }: { member: StaffMember }) {
         )}
       </div>
 
-      {/* Info */}
       <div className="p-5 flex flex-col flex-1">
         <h3 className="font-serif font-bold text-foreground text-base leading-tight mb-1 group-hover:text-primary transition-colors">
-          {member.name}
+          {highlightText(member.name, search)}
         </h3>
-        <p className="text-xs text-accent font-semibold mb-0.5">{member.designation}</p>
+        <p className="text-xs text-accent font-semibold mb-0.5">
+          {highlightText(member.designation, search)}
+        </p>
         {(member as any).rank && (
           <p className="text-xs text-muted-foreground mb-0.5">{(member as any).rank}</p>
         )}
-        <p className="text-xs text-muted-foreground mb-3">{member.department}</p>
+        <p className="text-xs text-muted-foreground mb-3">
+          {highlightText(member.department, search)}
+        </p>
 
         {member.specializations.length > 0 && (
           <div className="flex flex-wrap gap-1.5 mb-4">
             {member.specializations.slice(0, 2).map((s, i) => (
               <span key={i} className="text-xs px-2 py-0.5 bg-muted rounded-full text-muted-foreground">
-                {s}
+                {highlightText(s, search)}
               </span>
             ))}
           </div>
@@ -168,22 +185,67 @@ function SkeletonCard() {
   );
 }
 
+interface Suggestion {
+  slug: string;
+  name: string;
+  designation: string;
+  department: string;
+}
+
+function SearchSuggestions({
+  suggestions,
+  search,
+  onSelect,
+}: {
+  suggestions: Suggestion[];
+  search: string;
+  onSelect: () => void;
+}) {
+  if (!suggestions.length) return null;
+  return (
+    <div
+      className="absolute top-full left-0 right-0 mt-1 bg-popover border rounded-xl shadow-lg z-50 overflow-hidden"
+      data-testid="staff-suggestions-dropdown"
+    >
+      {suggestions.map((s) => (
+        <Link
+          key={s.slug}
+          href={`/staff/${s.slug}`}
+          className="flex items-center gap-3 px-4 py-3 hover:bg-accent/10 transition-colors border-b last:border-b-0"
+          onClick={onSelect}
+          data-testid={`suggestion-${s.slug}`}
+        >
+          <div className={`w-8 h-8 rounded-full bg-gradient-to-br ${getAvatarGradient(s.slug)} flex items-center justify-center shrink-0`}>
+            <span className="text-white text-xs font-bold">{getInitials(s.name)}</span>
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold text-foreground truncate">
+              {highlightText(s.name, search)}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {highlightText(s.designation, search)}{s.department ? ` · ${s.department}` : ""}
+            </p>
+          </div>
+          <ChevronRight className="w-3.5 h-3.5 text-muted-foreground shrink-0 ml-auto" />
+        </Link>
+      ))}
+    </div>
+  );
+}
+
 export default function StaffDirectoryPage() {
   const [search, setSearch] = React.useState("");
   const [school, setSchool] = React.useState("");
   const [rank, setRank] = React.useState("");
   const [researchTheme, setResearchTheme] = React.useState("");
-  const [debouncedSearch, setDebouncedSearch] = React.useState("");
-
-  React.useEffect(() => {
-    const t = setTimeout(() => setDebouncedSearch(search), 300);
-    return () => clearTimeout(t);
-  }, [search]);
+  const [showSuggestions, setShowSuggestions] = React.useState(false);
+  const searchRef = React.useRef<HTMLDivElement>(null);
+  const [, navigate] = useLocation();
 
   const apiSchool = school === "leadership" ? "" : school;
+
   const { data: allStaff, isLoading } = useStaff({
     school: apiSchool || undefined,
-    search: debouncedSearch || undefined,
     rank: rank || undefined,
   });
 
@@ -193,6 +255,16 @@ export default function StaffDirectoryPage() {
     if (school === "leadership") {
       filtered = filtered.filter((s) => s.unit === "University Leadership");
     }
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      filtered = filtered.filter(
+        (s) =>
+          s.name.toLowerCase().includes(q) ||
+          s.designation.toLowerCase().includes(q) ||
+          s.department.toLowerCase().includes(q) ||
+          s.specializations.some((sp) => sp.toLowerCase().includes(q))
+      );
+    }
     if (researchTheme) {
       filtered = filtered.filter((s) =>
         s.specializations.some((sp) =>
@@ -201,7 +273,36 @@ export default function StaffDirectoryPage() {
       );
     }
     return filtered;
-  }, [allStaff, school, researchTheme]);
+  }, [allStaff, school, search, researchTheme]);
+
+  const suggestions: Suggestion[] = React.useMemo(() => {
+    if (!search.trim() || !allStaff) return [];
+    const q = search.toLowerCase();
+    return allStaff
+      .filter(
+        (s) =>
+          s.name.toLowerCase().includes(q) ||
+          s.designation.toLowerCase().includes(q) ||
+          s.department.toLowerCase().includes(q)
+      )
+      .slice(0, 6)
+      .map((s) => ({
+        slug: s.slug,
+        name: s.name,
+        designation: s.designation,
+        department: s.department,
+      }));
+  }, [allStaff, search]);
+
+  React.useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const hasFilters = !!search || !!school || !!rank || !!researchTheme;
 
@@ -210,6 +311,7 @@ export default function StaffDirectoryPage() {
     setSchool("");
     setRank("");
     setResearchTheme("");
+    setShowSuggestions(false);
   };
 
   return (
@@ -220,7 +322,6 @@ export default function StaffDirectoryPage() {
         path="/staff"
         breadcrumbs={[{ name: "Staff Directory", path: "/staff" }]}
       />
-      {/* Hero */}
       <div className="bg-primary text-primary-foreground relative overflow-hidden">
         <div
           className="absolute inset-0 opacity-10"
@@ -247,28 +348,39 @@ export default function StaffDirectoryPage() {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="border-b bg-card sticky top-[70px] z-30">
         <div className="container mx-auto px-4 py-3">
-          {/* Main filter row */}
           <div className="flex flex-col sm:flex-row gap-3 mb-3">
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <div className="relative flex-1" ref={searchRef}>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
               <Input
                 className="pl-9 h-10 text-sm"
                 placeholder="Search by name, role, or specialization..."
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setShowSuggestions(true);
+                }}
+                onFocus={() => setShowSuggestions(true)}
                 data-testid="staff-search-input"
+                autoComplete="off"
               />
               {search && (
                 <button
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                  onClick={() => setSearch("")}
+                  onClick={() => { setSearch(""); setShowSuggestions(false); }}
                   data-testid="staff-search-clear"
                 >
                   <X className="w-4 h-4" />
                 </button>
+              )}
+
+              {showSuggestions && suggestions.length > 0 && (
+                <SearchSuggestions
+                  suggestions={suggestions}
+                  search={search}
+                  onSelect={() => { setShowSuggestions(false); setSearch(""); }}
+                />
               )}
             </div>
             <div className="flex items-center gap-2">
@@ -307,7 +419,6 @@ export default function StaffDirectoryPage() {
             )}
           </div>
 
-          {/* Research theme chip bar */}
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-none pb-1">
             <span className="text-xs text-muted-foreground shrink-0 flex items-center gap-1">
               <TrendingUp className="w-3.5 h-3.5" /> Research:
@@ -330,9 +441,7 @@ export default function StaffDirectoryPage() {
         </div>
       </div>
 
-      {/* Content */}
       <div className="container mx-auto px-4 py-10 flex-1">
-        {/* Count + context */}
         <div className="flex items-center justify-between mb-6">
           <div className="text-sm text-muted-foreground">
             {isLoading ? (
@@ -343,6 +452,7 @@ export default function StaffDirectoryPage() {
                 {school && ` in ${SCHOOLS.find((s) => s.code === school)?.label}`}
                 {rank && ` · ${rank}`}
                 {researchTheme && ` · ${researchTheme}`}
+                {search && ` · matching "${search}"`}
               </span>
             )}
           </div>
@@ -353,7 +463,6 @@ export default function StaffDirectoryPage() {
           </Button>
         </div>
 
-        {/* Grid */}
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
@@ -372,12 +481,11 @@ export default function StaffDirectoryPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {staff.map((member) => (
-              <StaffCard key={member.slug} member={member} />
+              <StaffCard key={member.slug} member={member} search={search} />
             ))}
           </div>
         )}
 
-        {/* School Browse */}
         {!hasFilters && !isLoading && (
           <div className="mt-14 border-t pt-10">
             <h2 className="text-xl font-serif font-bold text-primary mb-5">Browse by School</h2>
