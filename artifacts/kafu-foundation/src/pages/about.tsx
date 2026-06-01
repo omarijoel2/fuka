@@ -119,12 +119,18 @@ export default function About() {
             {/* VC Photo Feature */}
             <section className="rounded-2xl overflow-hidden border shadow-sm">
               <div className="grid md:grid-cols-2">
-                <div className="relative h-64 md:h-auto min-h-[260px]">
-                  <img
-                    src={d.vc_photo_url}
-                    alt={`${d.vc_name} — ${d.vc_title}`}
-                    className="absolute inset-0 w-full h-full object-cover object-top"
-                  />
+                <div className="relative h-64 md:h-auto min-h-[260px] bg-primary/10 flex items-center justify-center">
+                  <span className="text-6xl font-bold text-primary/20 font-serif">
+                    {(d.vc_name ?? "VC").split(" ").filter((w: string) => /^[A-Z]/.test(w)).slice(0, 2).join("")}
+                  </span>
+                  {d.vc_photo_url && (
+                    <img
+                      src={d.vc_photo_url}
+                      alt={`${d.vc_name} — ${d.vc_title}`}
+                      className="absolute inset-0 w-full h-full object-cover object-top"
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                    />
+                  )}
                 </div>
                 <div className="bg-primary text-primary-foreground p-8 flex flex-col justify-center">
                   <span className="text-xs font-semibold uppercase tracking-wider text-accent mb-3">{d.vc_title}</span>
