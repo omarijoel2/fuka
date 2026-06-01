@@ -62,14 +62,22 @@ const FIELD_LABELS: Record<string, Record<string, string>> = {
   contact: { contact_email: "Institutional Email", office_phone: "Office Phone", office_location: "Office Location", website: "Website" },
 };
 
+interface CvMismatch {
+  field: string;
+  extracted: string;
+  account: string;
+}
+
 interface ExtractionPreviewProps {
   extracted: ExtractedData;
+  mismatches: CvMismatch[];
   onApply: (extracted: ExtractedData) => void;
   onDismiss: () => void;
 }
 
-function ExtractionPreview({ extracted, onApply, onDismiss }: ExtractionPreviewProps) {
+function ExtractionPreview({ extracted, mismatches, onApply, onDismiss }: ExtractionPreviewProps) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [confirmed, setConfirmed] = useState(false);
   const sections = Object.keys(extracted).filter(k => extracted[k] && Object.keys(extracted[k]).length > 0);
 
   function toggleSection(sec: string) {
@@ -77,6 +85,8 @@ function ExtractionPreview({ extracted, onApply, onDismiss }: ExtractionPreviewP
   }
 
   const fieldCount = sections.reduce((n, s) => n + Object.keys(extracted[s]).filter(k => extracted[s][k]).length, 0);
+  const hasMismatches = mismatches.length > 0;
+  const blockedByMismatch = hasMismatches && !confirmed;
 
   return (
     <div className="border-2 border-primary/20 bg-primary/5 rounded-xl overflow-hidden">
@@ -92,6 +102,46 @@ function ExtractionPreview({ extracted, onApply, onDismiss }: ExtractionPreviewP
           <X className="w-4 h-4" />
         </button>
       </div>
+
+      {/* Mismatch warning */}
+      {hasMismatches && (
+        <div className="bg-amber-50 border-b border-amber-200 px-5 py-4" data-testid="cv-mismatch-warning">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-amber-800 mb-2">
+                CV details do not match your account record
+              </p>
+              <div className="space-y-2 mb-3">
+                {mismatches.map(m => (
+                  <div key={m.field} className="text-xs text-amber-700 bg-amber-100 rounded-lg px-3 py-2">
+                    <span className="font-semibold">{m.field}:</span>
+                    <span className="ml-1">CV says <em>&quot;{m.extracted}&quot;</em></span>
+                    <span className="mx-1 text-amber-500">&mdash;</span>
+                    <span>account has <em>&quot;{m.account}&quot;</em></span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-xs text-amber-600 mb-3">
+                This may mean the CV belongs to a different person, or your account record needs updating.
+                If you are sure this is your CV, tick the box below to continue.
+              </p>
+              <label className="flex items-center gap-2 cursor-pointer select-none" data-testid="cv-mismatch-confirm-label">
+                <input
+                  type="checkbox"
+                  checked={confirmed}
+                  onChange={e => setConfirmed(e.target.checked)}
+                  data-testid="cv-mismatch-confirm"
+                  className="w-4 h-4 accent-amber-600"
+                />
+                <span className="text-xs font-medium text-amber-800">
+                  I confirm this CV belongs to me and the differences above are acceptable
+                </span>
+              </label>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Sections */}
       <div className="divide-y divide-primary/10">
@@ -132,11 +182,16 @@ function ExtractionPreview({ extracted, onApply, onDismiss }: ExtractionPreviewP
 
       {/* Actions */}
       <div className="flex items-center justify-between px-5 py-4 bg-white border-t border-primary/10">
-        <p className="text-xs text-gray-500">Review and apply extracted data to your profile. You can edit any field after applying.</p>
+        <p className="text-xs text-gray-500">
+          {blockedByMismatch
+            ? "Confirm the mismatch above before applying."
+            : "Review and apply extracted data to your profile. You can edit any field after applying."}
+        </p>
         <button
           onClick={() => onApply(extracted)}
+          disabled={blockedByMismatch}
           data-testid="btn-apply-extraction"
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary/90 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white text-sm font-semibold rounded-lg hover:bg-primary/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
         >
           <CheckCircle className="w-4 h-4" />
           Apply to Profile
@@ -169,6 +224,7 @@ export default function ProfileEditorPage() {
   // CV extraction state
   const [extracting, setExtracting] = useState(false);
   const [extracted, setExtracted] = useState<ExtractedData | null>(null);
+  const [cvMismatches, setCvMismatches] = useState<CvMismatch[]>([]);
 
   const showToast = (type: "success" | "error", text: string) => {
     setToast({ type, text });
@@ -304,7 +360,30 @@ export default function ProfileEditorPage() {
       const res = await staffPostForm("/cv-extract", fd);
       if (res.error) throw new Error(res.error);
       setExtracted(res.extracted);
-      showToast("success", "CV analysed. Review the extracted data below and apply it to your profile.");
+
+      // ── Mismatch detection ──────────────────────────────────────────────
+      const mismatches: CvMismatch[] = [];
+      const normalize = (s: string) => s.toLowerCase().replace(/\s+/g, " ").trim();
+
+      const extractedEmail: string = res.extracted?.contact?.contact_email ?? "";
+      const accountEmail: string = user?.email ?? "";
+      if (extractedEmail && accountEmail && normalize(extractedEmail) !== normalize(accountEmail)) {
+        mismatches.push({ field: "Email", extracted: extractedEmail, account: accountEmail });
+      }
+
+      const extractedName: string = res.extracted?.personal?.name ?? "";
+      const accountName: string = user?.name ?? "";
+      if (extractedName && accountName) {
+        const normExtracted = normalize(extractedName);
+        const normAccount   = normalize(accountName);
+        // Flag only if neither name is a substring of the other
+        if (!normExtracted.includes(normAccount) && !normAccount.includes(normExtracted)) {
+          mismatches.push({ field: "Name", extracted: extractedName, account: accountName });
+        }
+      }
+
+      setCvMismatches(mismatches);
+      showToast("success", "CV read. Review the extracted data below and apply it to your profile.");
     } catch (err: unknown) {
       showToast("error", err instanceof Error ? err.message : "Extraction failed. Please try a text-based PDF.");
     } finally {
@@ -705,8 +784,9 @@ export default function ProfileEditorPage() {
                   {extracted && !extracting && (
                     <ExtractionPreview
                       extracted={extracted}
+                      mismatches={cvMismatches}
                       onApply={applyExtraction}
-                      onDismiss={() => setExtracted(null)}
+                      onDismiss={() => { setExtracted(null); setCvMismatches([]); }}
                     />
                   )}
                 </div>
