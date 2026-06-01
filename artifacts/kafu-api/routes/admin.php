@@ -509,6 +509,19 @@ Route::prefix('admin')->group(function () {
             return response()->json(['data' => $media], 201);
         });
 
+        Route::put('/media/{id}', function (Request $request, $id) {
+            $user = $request->user();
+            $media = MediaFile::where('status', 'active')->findOrFail($id);
+            $data = $request->validate([
+                'alt_text' => 'nullable|string|max:500',
+                'caption'  => 'nullable|string|max:1000',
+                'folder'   => 'nullable|in:logos,campus,marketing,news,general',
+            ]);
+            $media->update(array_filter($data, fn($v) => $v !== null) + ['alt_text' => $data['alt_text'] ?? null, 'caption' => $data['caption'] ?? null]);
+            AuditLog::record($user, 'media.update', 'media_file', $media->id, $media->original_name);
+            return response()->json(['data' => $media->fresh()]);
+        });
+
         Route::delete('/media/{id}', function (Request $request, $id) {
             $user = $request->user();
             $media = MediaFile::findOrFail($id);
