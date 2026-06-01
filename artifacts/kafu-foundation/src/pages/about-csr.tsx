@@ -1,10 +1,11 @@
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { SeoHead } from "@/components/seo-head";
 import { PageHero } from "@/components/ui/page-hero";
 import { Heart, Leaf, Users, BookOpen, Globe, CheckCircle, ChevronRight, Mail } from "lucide-react";
 
-const CSR_PILLARS = [
+const FALLBACK_CSR_PILLARS = [
   {
     icon: <BookOpen className="w-6 h-6" />,
     title: "Education & Skills Development",
@@ -72,7 +73,7 @@ const CSR_PILLARS = [
   },
 ];
 
-const COMMITMENTS = [
+const FALLBACK_COMMITMENTS = [
   "Transform lives through knowledge, service, and community engagement",
   "Actively uplift society beyond the boundaries of the university campus",
   "Promote environmental sustainability and responsible resource use",
@@ -82,6 +83,19 @@ const COMMITMENTS = [
 ];
 
 export default function AboutCSR() {
+  const { data: pageData } = useQuery({
+    queryKey: ["page", "about-csr"],
+    queryFn: () => fetch("/api/pages/about-csr").then(r => r.json()),
+    staleTime: 10 * 60 * 1000,
+  });
+  const sd = pageData?.data?.structured_data ?? {};
+  const CSR_PILLARS = (() => {
+    const dbPillars = sd.pillars as Array<Omit<(typeof FALLBACK_CSR_PILLARS)[0], "icon">> | undefined;
+    if (!dbPillars?.length) return FALLBACK_CSR_PILLARS;
+    return dbPillars.map((p, i) => ({ ...FALLBACK_CSR_PILLARS[i], ...p }));
+  })();
+  const COMMITMENTS = (sd.commitments as string[]) ?? FALLBACK_COMMITMENTS;
+
   return (
     <div className="flex flex-col min-h-screen">
       <SeoHead

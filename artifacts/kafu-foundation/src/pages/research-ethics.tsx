@@ -1,10 +1,11 @@
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { SeoHead } from "@/components/seo-head";
 import { PageHero } from "@/components/ui/page-hero";
 import { Shield, FileText, CheckCircle, Users, Mail, Phone, ChevronRight, AlertCircle, ExternalLink } from "lucide-react";
 
-const MANDATE = [
+const FALLBACK_MANDATE = [
   "Review and approve research proposals involving human participants",
   "Conduct ongoing monitoring of approved research projects",
   "Ensure compliance with national and international ethical standards",
@@ -14,7 +15,7 @@ const MANDATE = [
   "Investigate alleged breaches of research ethics",
 ];
 
-const REVIEW_TYPES = [
+const FALLBACK_REVIEW_TYPES = [
   {
     title: "Full Board Review",
     colour: "#8B1A1A",
@@ -35,7 +36,7 @@ const REVIEW_TYPES = [
   },
 ];
 
-const SUBMISSION_STEPS = [
+const FALLBACK_SUBMISSION_STEPS = [
   { step: "01", title: "Obtain Application Forms", description: "Download the KAFUSERC application forms from the Research Directorate or the KAFU website." },
   { step: "02", title: "Prepare Your Protocol", description: "Complete the research protocol including objectives, methodology, participant recruitment, consent procedures, and data protection plan." },
   { step: "03", title: "Compile Supporting Documents", description: "Include informed consent forms, data collection instruments (questionnaires, interview guides), and any participant-facing materials." },
@@ -44,7 +45,7 @@ const SUBMISSION_STEPS = [
   { step: "06", title: "Receive Ethical Approval Certificate", description: "Upon approval, you will receive an official KAFUSERC Ethical Approval Certificate, which is required before commencing data collection." },
 ];
 
-const COMMITTEE_MEMBERS = [
+const FALLBACK_COMMITTEE_MEMBERS = [
   { name: "Dr. Emmanuel Okenwa-Vincent", role: "Chairman, KAFUSERC", affiliation: "School of Health Sciences" },
   { name: "Representative", role: "Secretary", affiliation: "Research Directorate" },
   { name: "Representative", role: "Legal & Compliance Member", affiliation: "Legal Office, KAFU" },
@@ -52,6 +53,17 @@ const COMMITTEE_MEMBERS = [
 ];
 
 export default function ResearchEthics() {
+  const { data: pageData } = useQuery({
+    queryKey: ["page", "research-ethics"],
+    queryFn: () => fetch("/api/pages/research-ethics").then(r => r.json()),
+    staleTime: 10 * 60 * 1000,
+  });
+  const sd = pageData?.data?.structured_data ?? {};
+  const MANDATE = (sd.mandate as string[]) ?? FALLBACK_MANDATE;
+  const REVIEW_TYPES = (sd.review_types as typeof FALLBACK_REVIEW_TYPES) ?? FALLBACK_REVIEW_TYPES;
+  const SUBMISSION_STEPS = (sd.submission_steps as typeof FALLBACK_SUBMISSION_STEPS) ?? FALLBACK_SUBMISSION_STEPS;
+  const COMMITTEE_MEMBERS = (sd.committee_members as typeof FALLBACK_COMMITTEE_MEMBERS) ?? FALLBACK_COMMITTEE_MEMBERS;
+
   return (
     <div className="flex flex-col min-h-screen">
       <SeoHead

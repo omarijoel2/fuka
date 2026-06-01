@@ -1,10 +1,11 @@
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { SeoHead } from "@/components/seo-head";
 import { PageHero } from "@/components/ui/page-hero";
 import { Users, Vote, BookOpen, Shield, Music, Trophy, Accessibility, Home, ChevronRight, Mail, Phone } from "lucide-react";
 
-const MANDATE_AREAS = [
+const FALLBACK_MANDATE_AREAS = [
   {
     icon: BookOpen,
     title: "Academics",
@@ -43,7 +44,7 @@ const MANDATE_AREAS = [
   },
 ];
 
-const GOVERNANCE = [
+const FALLBACK_GOVERNANCE = [
   {
     title: "Elections",
     description: "Student leaders are elected annually for one academic year in strict accordance with the KAFUSA Constitution and the Universities Amendment Act (2016). Elections are coordinated by the Office of the Dean of Students.",
@@ -63,6 +64,19 @@ const GOVERNANCE = [
 ];
 
 export default function StudentsCouncil() {
+  const { data: pageData } = useQuery({
+    queryKey: ["page", "students-council"],
+    queryFn: () => fetch("/api/pages/students-council").then(r => r.json()),
+    staleTime: 10 * 60 * 1000,
+  });
+  const sd = pageData?.data?.structured_data ?? {};
+  const MANDATE_AREAS = (() => {
+    const dbAreas = sd.mandate_areas as Array<Omit<(typeof FALLBACK_MANDATE_AREAS)[0], "icon">> | undefined;
+    if (!dbAreas?.length) return FALLBACK_MANDATE_AREAS;
+    return dbAreas.map((a, i) => ({ ...FALLBACK_MANDATE_AREAS[i], ...a }));
+  })();
+  const GOVERNANCE = (sd.governance as typeof FALLBACK_GOVERNANCE) ?? FALLBACK_GOVERNANCE;
+
   return (
     <div className="flex flex-col min-h-screen">
       <SeoHead

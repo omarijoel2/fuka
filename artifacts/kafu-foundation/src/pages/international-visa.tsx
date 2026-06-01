@@ -1,8 +1,9 @@
 import type { ReactElement } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { SeoHead } from "../components/seo-head";
 
-const VISA_CATEGORIES = [
+const FALLBACK_VISA_CATEGORIES = [
   {
     title: "East African Community Citizens",
     countries: "Kenya, Uganda, Tanzania, Rwanda, Burundi, South Sudan, DRC",
@@ -117,6 +118,14 @@ const SUPPORT_SERVICES = [
 ];
 
 export default function InternationalVisaPage() {
+  const { data: pageData } = useQuery({
+    queryKey: ["page", "international-visa"],
+    queryFn: () => fetch("/api/pages/international-visa").then(r => r.json()),
+    staleTime: 10 * 60 * 1000,
+  });
+  const sd = pageData?.data?.structured_data ?? {};
+  const VISA_CATEGORIES = (sd.visa_categories as typeof FALLBACK_VISA_CATEGORIES) ?? FALLBACK_VISA_CATEGORIES;
+
   return (
     <div className="min-h-screen bg-white">
       <SeoHead

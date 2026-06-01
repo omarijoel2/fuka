@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { SeoHead } from "@/components/seo-head";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, Target, TrendingUp, Users, Building2, ShieldCheck, Download, ArrowLeft } from "lucide-react";
 
-const PILLARS = [
+const FALLBACK_PILLARS = [
   {
     id: 1,
     icon: Target,
@@ -72,7 +73,7 @@ const PILLARS = [
   },
 ];
 
-const MILESTONES = [
+const FALLBACK_MILESTONES = [
   { year: "2023", label: "Plan launch & baseline assessment" },
   { year: "2024", label: "New programmes approved, 2 research centres opened" },
   { year: "2025", label: "100% campus connectivity, ISO pre-assessment" },
@@ -83,6 +84,19 @@ const MILESTONES = [
 
 export default function StrategicPlan() {
   const [active, setActive] = useState<number | null>(null);
+
+  const { data: pageData } = useQuery({
+    queryKey: ["page", "about-strategic-plan"],
+    queryFn: () => fetch("/api/pages/about-strategic-plan").then(r => r.json()),
+    staleTime: 10 * 60 * 1000,
+  });
+  const sd = pageData?.data?.structured_data ?? {};
+  const PILLARS = (() => {
+    const dbPillars = sd.pillars as Array<Omit<(typeof FALLBACK_PILLARS)[0], "icon">> | undefined;
+    if (!dbPillars?.length) return FALLBACK_PILLARS;
+    return dbPillars.map((p, i) => ({ ...FALLBACK_PILLARS[i], ...p }));
+  })();
+  const MILESTONES = (sd.milestones as typeof FALLBACK_MILESTONES) ?? FALLBACK_MILESTONES;
 
   return (
     <div className="flex flex-col min-h-screen">

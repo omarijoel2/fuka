@@ -1,11 +1,12 @@
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { SeoHead } from "@/components/seo-head";
 import { Button } from "@/components/ui/button";
 import { Clock, CheckCircle, AlertCircle, Phone, Mail, ArrowLeft, Download } from "lucide-react";
 import { PageHero } from "@/components/ui/page-hero";
 
-const STANDARDS = [
+const FALLBACK_STANDARDS = [
   {
     category: "Admissions & Registration",
     colour: "#1A5C38",
@@ -70,6 +71,14 @@ const STANDARDS = [
 ];
 
 export default function ServiceCharter() {
+  const { data: pageData } = useQuery({
+    queryKey: ["page", "about-service-charter"],
+    queryFn: () => fetch("/api/pages/about-service-charter").then(r => r.json()),
+    staleTime: 10 * 60 * 1000,
+  });
+  const sd = pageData?.data?.structured_data ?? {};
+  const STANDARDS = (sd.standards as typeof FALLBACK_STANDARDS) ?? FALLBACK_STANDARDS;
+
   return (
     <div className="flex flex-col min-h-screen">
       <SeoHead

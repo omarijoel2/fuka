@@ -332,6 +332,206 @@ Route::get('/management', function () {
     return response()->json(['data' => $profiles]);
 });
 
+// ── Pages (structured content pages) ──────────────────────────────────────
+Route::get('/pages/{slug}', function (string $slug) {
+    try {
+        $item = \DB::table('cms_content')
+            ->where('type', 'page')
+            ->where('slug', $slug)
+            ->where('status', 'published')
+            ->where('is_deleted', 0)
+            ->first();
+        if (!$item) {
+            return response()->json(['error' => 'Page not found.'], 404);
+        }
+        $data = (array) $item;
+        if (is_string($data['structured_data'])) {
+            $data['structured_data'] = json_decode($data['structured_data'], true) ?? [];
+        }
+        return response()->json(['data' => $data]);
+    } catch (\Throwable $e) {
+        return response()->json(['error' => 'Failed to load page.'], 500);
+    }
+});
+
+// ── Press Releases ─────────────────────────────────────────────────────────
+Route::get('/press-releases', function (Request $request) {
+    try {
+        $query = \DB::table('cms_content')
+            ->where('type', 'press_release')
+            ->where('status', 'published')
+            ->where('is_deleted', 0)
+            ->orderByDesc('published_at');
+        if ($cat = $request->query('category')) {
+            if ($cat !== 'All') $query->where('category', $cat);
+        }
+        if ($yr = $request->query('year')) {
+            $query->whereRaw("strftime('%Y', published_at) = ?", [$yr]);
+        }
+        if ($s = $request->query('search')) {
+            $query->where(function ($q) use ($s) {
+                $q->where('title', 'like', "%{$s}%")->orWhere('summary', 'like', "%{$s}%");
+            });
+        }
+        $items = $query->get()->map(function ($item) {
+            $sd = json_decode($item->structured_data ?? '{}', true) ?? [];
+            return [
+                'id'       => $item->slug,
+                'title'    => $item->title,
+                'date'     => $item->published_at ? date('j M Y', strtotime($item->published_at)) : '',
+                'year'     => $item->published_at ? (int) date('Y', strtotime($item->published_at)) : 0,
+                'category' => $item->category ?? '',
+                'summary'  => $item->summary ?? '',
+                'file_url' => $sd['file_url'] ?? null,
+            ];
+        });
+        return response()->json(['data' => $items]);
+    } catch (\Throwable $e) {
+        return response()->json(['data' => []]);
+    }
+});
+
+// ── Publications ───────────────────────────────────────────────────────────
+Route::get('/publications', function (Request $request) {
+    try {
+        $query = \DB::table('cms_content')
+            ->where('type', 'publication')
+            ->where('status', 'published')
+            ->where('is_deleted', 0)
+            ->orderByDesc('published_at');
+        if ($t = $request->query('type')) {
+            if ($t !== 'All') $query->where('category', $t);
+        }
+        if ($yr = $request->query('year')) {
+            $query->whereRaw("strftime('%Y', published_at) = ?", [$yr]);
+        }
+        if ($s = $request->query('search')) {
+            $query->where(function ($q) use ($s) {
+                $q->where('title', 'like', "%{$s}%")->orWhere('summary', 'like', "%{$s}%");
+            });
+        }
+        $items = $query->get()->map(function ($item) {
+            $sd = json_decode($item->structured_data ?? '{}', true) ?? [];
+            return [
+                'id'          => $item->slug,
+                'title'       => $item->title,
+                'type'        => $item->category ?? '',
+                'year'        => $item->published_at ? (int) date('Y', strtotime($item->published_at)) : 0,
+                'frequency'   => $sd['frequency'] ?? null,
+                'description' => $item->summary ?? '',
+                'cover_url'   => $item->featured_image ?? null,
+                'file_url'    => $sd['file_url'] ?? null,
+                'pages'       => $sd['pages'] ?? null,
+            ];
+        });
+        return response()->json(['data' => $items]);
+    } catch (\Throwable $e) {
+        return response()->json(['data' => []]);
+    }
+});
+
+// ── Videos ─────────────────────────────────────────────────────────────────
+Route::get('/videos', function (Request $request) {
+    try {
+        $query = \DB::table('cms_content')
+            ->where('type', 'video')
+            ->where('status', 'published')
+            ->where('is_deleted', 0)
+            ->orderByDesc('published_at');
+        if ($cat = $request->query('category')) {
+            if ($cat !== 'All') $query->where('category', $cat);
+        }
+        $items = $query->get()->map(function ($item) {
+            $sd = json_decode($item->structured_data ?? '{}', true) ?? [];
+            return [
+                'id'          => $item->slug,
+                'title'       => $item->title,
+                'category'    => $item->category ?? '',
+                'date'        => $item->published_at ? date('M Y', strtotime($item->published_at)) : '',
+                'duration'    => $sd['duration'] ?? '',
+                'youtube_id'  => $sd['youtube_id'] ?? '',
+                'description' => $item->summary ?? '',
+            ];
+        });
+        return response()->json(['data' => $items]);
+    } catch (\Throwable $e) {
+        return response()->json(['data' => []]);
+    }
+});
+
+// ── Downloads ──────────────────────────────────────────────────────────────
+Route::get('/downloads', function (Request $request) {
+    try {
+        $query = \DB::table('cms_content')
+            ->where('type', 'download')
+            ->where('status', 'published')
+            ->where('is_deleted', 0)
+            ->orderBy('category')
+            ->orderBy('title');
+        if ($cat = $request->query('category')) {
+            if ($cat !== 'All') $query->where('category', $cat);
+        }
+        if ($s = $request->query('search')) {
+            $query->where(function ($q) use ($s) {
+                $q->where('title', 'like', "%{$s}%")->orWhere('summary', 'like', "%{$s}%");
+            });
+        }
+        $items = $query->get()->map(function ($item) {
+            $sd = json_decode($item->structured_data ?? '{}', true) ?? [];
+            return [
+                'id'          => $item->slug,
+                'title'       => $item->title,
+                'category'    => $item->category ?? '',
+                'type'        => $sd['type'] ?? 'PDF',
+                'size'        => $sd['size'] ?? '',
+                'updated'     => $sd['updated'] ?? '',
+                'description' => $item->summary ?? '',
+                'file_url'    => $sd['file_url'] ?? '#',
+            ];
+        });
+        return response()->json(['data' => $items]);
+    } catch (\Throwable $e) {
+        return response()->json(['data' => []]);
+    }
+});
+
+// ── Archives ───────────────────────────────────────────────────────────────
+Route::get('/archives', function (Request $request) {
+    try {
+        $query = \DB::table('cms_content')
+            ->where('type', 'archive')
+            ->where('status', 'published')
+            ->where('is_deleted', 0)
+            ->orderByDesc('published_at');
+        if ($t = $request->query('type')) {
+            if ($t !== 'All') $query->where('category', $t);
+        }
+        if ($yr = $request->query('year')) {
+            $query->whereRaw("strftime('%Y', published_at) = ?", [$yr]);
+        }
+        if ($s = $request->query('search')) {
+            $query->where(function ($q) use ($s) {
+                $q->where('title', 'like', "%{$s}%")->orWhere('summary', 'like', "%{$s}%");
+            });
+        }
+        $items = $query->get()->map(function ($item) {
+            $sd = json_decode($item->structured_data ?? '{}', true) ?? [];
+            return [
+                'id'          => $item->slug,
+                'type'        => $item->category ?? 'notice',
+                'title'       => $item->title,
+                'date'        => $item->published_at ? substr($item->published_at, 0, 10) : '',
+                'year'        => $item->published_at ? (int) substr($item->published_at, 0, 4) : 0,
+                'description' => $item->summary ?? '',
+                'file_url'    => $sd['file_url'] ?? null,
+            ];
+        });
+        return response()->json(['data' => $items]);
+    } catch (\Throwable $e) {
+        return response()->json(['data' => []]);
+    }
+});
+
 Route::get('/directorates', function () {
     $hasType = \Illuminate\Support\Facades\Schema::hasColumn('directorates', 'type');
     $columns = ['id', 'name', 'slug', 'tagline', 'description', 'director_name', 'director_title', 'director_photo_url', 'position_order'];

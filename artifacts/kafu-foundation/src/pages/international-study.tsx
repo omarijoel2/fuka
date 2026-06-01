@@ -1,8 +1,9 @@
 import type { ReactElement } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { SeoHead } from "../components/seo-head";
 
-const WHY_KAFU: { icon: ReactElement; title: string; desc: string }[] = [
+const FALLBACK_WHY_KAFU: { icon: ReactElement; title: string; desc: string }[] = [
   {
     icon: (
       <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
@@ -59,7 +60,7 @@ const WHY_KAFU: { icon: ReactElement; title: string; desc: string }[] = [
   },
 ];
 
-const FEES_TABLE = [
+const FALLBACK_FEES_TABLE = [
   { level: "Certificate", ksh: "45,000–60,000", usd: "340–460" },
   { level: "Diploma",     ksh: "60,000–85,000", usd: "460–650" },
   { level: "Bachelor's Degree", ksh: "85,000–130,000", usd: "650–1,000" },
@@ -69,7 +70,7 @@ const FEES_TABLE = [
   { level: "PhD",                ksh: "180,000–250,000", usd: "1,380–1,920" },
 ];
 
-const SCHOOLS = [
+const FALLBACK_SCHOOLS = [
   { name: "School of Education", programmes: 12, highlight: "Teacher education, Educational management, Psychology" },
   { name: "School of Health Sciences", programmes: 8, highlight: "Nursing, Public Health, Community Health, Medical Lab" },
   { name: "School of Agriculture & Natural Resources", programmes: 7, highlight: "Agriculture, Agribusiness, Forestry, Environmental Science" },
@@ -77,7 +78,7 @@ const SCHOOLS = [
   { name: "School of Science, Technology & Engineering", programmes: 8, highlight: "Computer Science, IT, Mathematics, Physics" },
 ];
 
-const STEPS = [
+const FALLBACK_STEPS = [
   { step: "01", title: "Choose your Programme", desc: "Browse KAFU's catalogue across 5 schools and 44 accredited programmes." },
   { step: "02", title: "Check Entry Requirements", desc: "Confirm your qualifications meet the minimum requirements for your chosen programme." },
   { step: "03", title: "Prepare Documents", desc: "Gather certified transcripts, certificates, passport copy, and English proficiency evidence (if required)." },
@@ -88,6 +89,21 @@ const STEPS = [
 ];
 
 export default function InternationalStudyPage() {
+  const { data: pageData } = useQuery({
+    queryKey: ["page", "international-study"],
+    queryFn: () => fetch("/api/pages/international-study").then(r => r.json()),
+    staleTime: 10 * 60 * 1000,
+  });
+  const sd = pageData?.data?.structured_data ?? {};
+  const WHY_KAFU = (() => {
+    const dbItems = sd.why_kafu as Array<{ title: string; desc: string }> | undefined;
+    if (!dbItems?.length) return FALLBACK_WHY_KAFU;
+    return dbItems.map((item, i) => ({ icon: FALLBACK_WHY_KAFU[i]?.icon, ...item }));
+  })();
+  const FEES_TABLE = (sd.fees_table as typeof FALLBACK_FEES_TABLE) ?? FALLBACK_FEES_TABLE;
+  const SCHOOLS = (sd.schools as typeof FALLBACK_SCHOOLS) ?? FALLBACK_SCHOOLS;
+  const STEPS = (sd.steps as typeof FALLBACK_STEPS) ?? FALLBACK_STEPS;
+
   return (
     <div className="min-h-screen bg-white">
       <SeoHead

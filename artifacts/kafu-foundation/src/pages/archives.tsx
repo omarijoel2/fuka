@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { SeoHead } from "@/components/seo-head";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,7 @@ interface ArchiveRecord {
   file_url?: string;
 }
 
-const RECORDS: ArchiveRecord[] = [
+const FALLBACK_RECORDS: ArchiveRecord[] = [
   { id: "a001", type: "newsletter", title: "The KAFU Chronicle — Issue 12 (Jan–Mar 2025)", date: "2025-03-31", year: 2025, description: "Quarterly newsletter covering academic achievements, research highlights, staff news, and community activities for Q1 2025.", file_url: "#" },
   { id: "a002", type: "newsletter", title: "The KAFU Chronicle — Issue 11 (Oct–Dec 2024)", date: "2024-12-31", year: 2024, description: "Year-end edition featuring graduation highlights, 2024 research output summary, and alumni spotlight.", file_url: "#" },
   { id: "a003", type: "notice", title: "Academic Calendar 2024/2025 (Revised)", date: "2024-09-02", year: 2024, description: "Revised academic calendar for 2024/2025 incorporating semester dates, examination periods, and public holidays.", file_url: "#" },
@@ -46,135 +47,117 @@ const TYPE_META: Record<string, { label: string; icon: React.ElementType; colour
   circular:     { label: "Circular", icon: FileText, colour: "#8B1A1A" },
 };
 
-const YEARS = Array.from(new Set(RECORDS.map(r => r.year))).sort((a, b) => b - a);
-
-export default function Archives() {
+export default function ArchivesPage() {
   const [search, setSearch] = useState("");
-  const [type, setType] = useState("all");
-  const [year, setYear] = useState("all");
+  const [typeFilter, setTypeFilter] = useState("All");
+  const [yearFilter, setYearFilter] = useState("All");
 
-  const filtered = useMemo(() => RECORDS.filter(r => {
-    const matchType = type === "all" || r.type === type;
-    const matchYear = year === "all" || r.year === Number(year);
-    const matchSearch = !search || r.title.toLowerCase().includes(search.toLowerCase()) || r.description.toLowerCase().includes(search.toLowerCase());
-    return matchType && matchYear && matchSearch;
-  }).sort((a, b) => b.date.localeCompare(a.date)), [search, type, year]);
+  const { data: apiData } = useQuery<{ data: ArchiveRecord[] }>({
+    queryKey: ["archives"],
+    queryFn: () => fetch("/api/archives").then(r => r.json()),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const records = apiData?.data ?? FALLBACK_RECORDS;
+
+  const YEARS = useMemo(
+    () => Array.from(new Set(records.map(r => r.year))).sort((a, b) => b - a),
+    [records]
+  );
+
+  const filtered = useMemo(() => records.filter(r => {
+    if (typeFilter !== "All" && r.type !== typeFilter) return false;
+    if (yearFilter !== "All" && r.year !== Number(yearFilter)) return false;
+    if (search && !`${r.title} ${r.description}`.toLowerCase().includes(search.toLowerCase())) return false;
+    return true;
+  }), [records, typeFilter, yearFilter, search]);
 
   return (
     <div className="flex flex-col min-h-screen">
       <SeoHead
-        title="Archives — KAFU"
-        description="Searchable archive of historical notices, newsletters, leadership records, circulars, and announcements from Kaimosi Friends University."
-        path="/archives"
+        title="Archives — Kaimosi Friends University"
+        description="Historical notices, newsletters, circulars, leadership appointments, and announcements from Kaimosi Friends University."
       />
 
-      {/* Hero */}
       <PageHero
-        eyebrow="Records & History"
         title="University Archives"
-        subtitle="Historical notices, newsletters, leadership records, and official circulars from Kaimosi Friends University since our establishment in 2014."
-        photo="/imgs/image-82.jpeg"
+        subtitle="Historical notices, newsletters, circulars, leadership appointments, and announcements"
         breadcrumb={[
           { label: "Home", href: "/" },
           { label: "Archives" },
         ]}
       />
 
-      {/* Type stats */}
-      <section className="py-8 bg-secondary/30 border-b">
-        <div className="container mx-auto px-4 flex flex-wrap gap-4 justify-center">
-          {Object.entries(TYPE_META).map(([key, meta]) => {
-            const Icon = meta.icon;
-            const count = RECORDS.filter(r => r.type === key).length;
-            return (
-              <button
-                key={key}
-                onClick={() => setType(type === key ? "all" : key)}
-                data-testid={`archive-type-${key}`}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all ${
-                  type === key ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card hover:border-primary/40"
-                }`}
-              >
-                <Icon className="w-4 h-4" style={{ color: type === key ? undefined : meta.colour }} />
-                {meta.label} ({count})
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* Search + Year filter */}
-      <section className="py-6 bg-background border-b">
-        <div className="container mx-auto px-4 flex flex-col sm:flex-row gap-4 items-center">
+      <section className="max-w-5xl mx-auto px-4 py-12 w-full">
+        {/* Filters */}
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 mb-8 flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <Input
               placeholder="Search archives..."
               value={search}
               onChange={e => setSearch(e.target.value)}
               className="pl-9"
-              data-testid="input-archive-search"
+              data-testid="archive-search"
             />
           </div>
           <select
-            value={year}
-            onChange={e => setYear(e.target.value)}
-            className="border rounded-md px-3 py-2 text-sm bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-            data-testid="select-archive-year"
+            value={typeFilter}
+            onChange={e => setTypeFilter(e.target.value)}
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
+            data-testid="archive-filter-type"
           >
-            <option value="all">All Years</option>
+            <option value="All">All Types</option>
+            {Object.entries(TYPE_META).map(([k, v]) => (
+              <option key={k} value={k}>{v.label}</option>
+            ))}
+          </select>
+          <select
+            value={yearFilter}
+            onChange={e => setYearFilter(e.target.value)}
+            className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
+            data-testid="archive-filter-year"
+          >
+            <option value="All">All Years</option>
             {YEARS.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
-          <span className="text-sm text-muted-foreground shrink-0">{filtered.length} record{filtered.length !== 1 ? "s" : ""}</span>
         </div>
-      </section>
 
-      {/* Records */}
-      <section className="py-12 bg-background flex-1">
-        <div className="container mx-auto px-4">
-          {filtered.length === 0 ? (
-            <div className="text-center py-20 text-muted-foreground">No archive records match your search.</div>
-          ) : (
-            <div className="space-y-3 max-w-4xl mx-auto">
-              {filtered.map(r => {
-                const meta = TYPE_META[r.type];
-                const Icon = meta.icon;
-                return (
-                  <div
-                    key={r.id}
-                    className="group flex gap-4 p-5 rounded-xl border bg-card hover:shadow-md hover:border-primary/20 transition-all"
-                    data-testid={`archive-record-${r.id}`}
-                  >
-                    <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style={{ backgroundColor: meta.colour + "18" }}>
-                      <Icon className="w-5 h-5" style={{ color: meta.colour }} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1 flex-wrap">
-                        <span className="text-xs font-bold uppercase tracking-widest" style={{ color: meta.colour }}>{meta.label}</span>
-                        <span className="text-xs text-muted-foreground">·</span>
-                        <span className="text-xs text-muted-foreground">
-                          {new Date(r.date).toLocaleDateString("en-KE", { day: "numeric", month: "long", year: "numeric" })}
-                        </span>
-                      </div>
-                      <h3 className="font-semibold text-foreground mb-1 group-hover:text-primary transition-colors leading-snug">{r.title}</h3>
-                      <p className="text-sm text-muted-foreground line-clamp-2">{r.description}</p>
-                    </div>
-                    {r.file_url && (
-                      <div className="shrink-0 self-center">
-                        <Button size="sm" variant="ghost" className="gap-1.5 text-muted-foreground hover:text-primary" asChild data-testid={`archive-download-${r.id}`}>
-                          <a href={r.file_url} target="_blank" rel="noopener noreferrer">
-                            <Download className="w-4 h-4" />
-                            <span className="hidden sm:inline text-xs">Download</span>
-                          </a>
-                        </Button>
-                      </div>
-                    )}
+        <p className="text-sm text-gray-400 mb-6">{filtered.length} record{filtered.length !== 1 ? "s" : ""} found</p>
+
+        {filtered.length === 0 ? (
+          <div className="text-center py-20 text-gray-400">
+            <Archive className="w-12 h-12 mx-auto mb-3 opacity-40" />
+            <p>No archive records match your search.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {filtered.map(r => {
+              const meta = TYPE_META[r.type] ?? { label: r.type, icon: FileText, colour: "#555" };
+              const Icon = meta.icon;
+              return (
+                <div key={r.id} className="bg-white rounded-xl border border-gray-100 shadow-sm px-5 py-4 flex items-start gap-4 hover:border-primary/20 transition-colors" data-testid={`archive-card-${r.id}`}>
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5" style={{ backgroundColor: meta.colour + "15", color: meta.colour }}>
+                    <Icon className="w-4 h-4" />
                   </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ backgroundColor: meta.colour + "15", color: meta.colour }}>{meta.label}</span>
+                      <span className="text-xs text-gray-400">{r.date}</span>
+                    </div>
+                    <h3 className="font-medium text-gray-900 text-sm leading-snug">{r.title}</h3>
+                    <p className="text-xs text-gray-500 mt-1 line-clamp-2">{r.description}</p>
+                  </div>
+                  {r.file_url && r.file_url !== "#" && (
+                    <a href={r.file_url} className="inline-flex items-center gap-1 text-xs text-primary hover:underline whitespace-nowrap mt-1" data-testid={`archive-download-${r.id}`}>
+                      <Download className="w-3 h-3" /> Download
+                    </a>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </section>
     </div>
   );

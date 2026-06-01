@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { SeoHead } from "@/components/seo-head";
 import { PageHero } from "@/components/ui/page-hero";
 import { ChevronRight, CheckCircle, ExternalLink, FileText, Monitor, User, CreditCard, BookOpen, AlertCircle } from "lucide-react";
 
-const PHASES = [
+const FALLBACK_PHASES = [
   {
     id: "phase1",
     title: "Phase 1: Online Document Access (Pre-Reporting)",
@@ -103,7 +104,7 @@ const PHASES = [
   },
 ];
 
-const CHECKLIST = [
+const FALLBACK_CHECKLIST = [
   "Original academic certificates (KCSE, KCPE, or equivalent)",
   "Original national ID card (or birth certificate)",
   "Four recent passport-sized photographs",
@@ -116,6 +117,26 @@ const CHECKLIST = [
 
 export default function AdmissionsJoiningInstructions() {
   const [activePhase, setActivePhase] = useState<string>("phase1");
+
+  const { data: pageData } = useQuery({
+    queryKey: ["page", "admissions-joining-instructions"],
+    queryFn: () => fetch("/api/pages/admissions-joining-instructions").then(r => r.json()),
+    staleTime: 10 * 60 * 1000,
+  });
+  const sd = pageData?.data?.structured_data ?? {};
+  const PHASES = (() => {
+    const dbPhases = sd.phases as typeof FALLBACK_PHASES | undefined;
+    if (!dbPhases?.length) return FALLBACK_PHASES;
+    return dbPhases.map((p: any, i: number) => ({
+      ...FALLBACK_PHASES[i],
+      ...p,
+      steps: (p.steps ?? []).map((s: any, j: number) => ({
+        ...(FALLBACK_PHASES[i]?.steps?.[j] ?? {}),
+        ...s,
+      })),
+    }));
+  })();
+  const CHECKLIST = (sd.checklist as string[]) ?? FALLBACK_CHECKLIST;
   const current = PHASES.find((p) => p.id === activePhase)!;
 
   return (

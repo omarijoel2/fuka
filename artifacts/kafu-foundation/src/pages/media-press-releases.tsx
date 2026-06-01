@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { SeoHead } from "@/components/seo-head";
 import { PageHero } from "@/components/ui/page-hero";
 import { Input } from "@/components/ui/input";
@@ -14,7 +15,7 @@ interface PressRelease {
   file_url?: string;
 }
 
-const PRESS_RELEASES: PressRelease[] = [
+const FALLBACK_PRESS_RELEASES: PressRelease[] = [
   { id: "pr01", title: "KAFU Launches New School of Health Sciences Building", date: "12 May 2026", year: 2026, category: "Infrastructure", summary: "The Vice Chancellor officially opened the newly constructed School of Health Sciences laboratory block, a KES 120 million facility funded through government capitation and a USAID infrastructure grant.", file_url: "#" },
   { id: "pr02", title: "University Receives KES 50 Million Research Grant from Wellcome Trust", date: "28 Apr 2026", year: 2026, category: "Research", summary: "Kaimosi Friends University has been awarded a KES 50 million multi-year research grant by the Wellcome Trust to support health systems research in rural Western Kenya.", file_url: "#" },
   { id: "pr03", title: "KAFU Signs MOU with Masinde Muliro University of Science and Technology", date: "10 Apr 2026", year: 2026, category: "Partnerships", summary: "The memorandum of understanding covers joint research initiatives, staff exchange, and sharing of specialized laboratory equipment between the two institutions.", file_url: "#" },
@@ -30,7 +31,6 @@ const PRESS_RELEASES: PressRelease[] = [
 ];
 
 const CATEGORIES = ["All", "Infrastructure", "Research", "Partnerships", "Accreditation", "Events", "Leadership", "Rankings", "Quality", "Technology", "Awards", "Governance"];
-const YEARS = [2026, 2025, 2024];
 
 function formatForSearch(pr: PressRelease) {
   return `${pr.title} ${pr.summary} ${pr.category}`.toLowerCase();
@@ -41,12 +41,25 @@ export default function MediaPressReleasesPage() {
   const [category, setCategory] = useState("All");
   const [year, setYear] = useState("All");
 
-  const filtered = useMemo(() => PRESS_RELEASES.filter(pr => {
+  const { data: apiData } = useQuery<{ data: PressRelease[] }>({
+    queryKey: ["press-releases"],
+    queryFn: () => fetch("/api/press-releases").then(r => r.json()),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const pressReleases = apiData?.data ?? FALLBACK_PRESS_RELEASES;
+
+  const YEARS = useMemo(
+    () => Array.from(new Set(pressReleases.map(pr => pr.year))).sort((a, b) => b - a),
+    [pressReleases]
+  );
+
+  const filtered = useMemo(() => pressReleases.filter(pr => {
     if (category !== "All" && pr.category !== category) return false;
     if (year !== "All" && pr.year !== Number(year)) return false;
     if (search && !formatForSearch(pr).includes(search.toLowerCase())) return false;
     return true;
-  }), [search, category, year]);
+  }), [pressReleases, search, category, year]);
 
   return (
     <>
@@ -119,16 +132,16 @@ export default function MediaPressReleasesPage() {
                         <Calendar className="w-3 h-3" />{pr.date}
                       </span>
                     </div>
-                    <h3 className="font-serif font-semibold text-gray-900 text-lg mb-2">{pr.title}</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">{pr.summary}</p>
+                    <h3 className="font-semibold text-gray-900 mb-2 text-base leading-snug">{pr.title}</h3>
+                    <p className="text-sm text-gray-600 line-clamp-2">{pr.summary}</p>
                   </div>
-                  {pr.file_url && (
+                  {pr.file_url && pr.file_url !== "#" && (
                     <a
                       href={pr.file_url}
+                      className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 whitespace-nowrap"
                       data-testid={`press-download-${pr.id}`}
-                      className="flex-shrink-0 inline-flex items-center gap-2 bg-primary/5 hover:bg-primary/10 text-primary text-sm font-medium px-4 py-2 rounded-lg transition-colors"
                     >
-                      <Download className="w-4 h-4" /> PDF
+                      <Download className="w-4 h-4" /> Download
                     </a>
                   )}
                 </div>
@@ -136,16 +149,6 @@ export default function MediaPressReleasesPage() {
             ))}
           </div>
         )}
-
-        {/* Media contact */}
-        <div className="mt-12 bg-primary/5 border border-primary/20 rounded-2xl p-6">
-          <p className="text-sm text-gray-600">
-            <strong className="text-gray-900">Media enquiries:</strong>{" "}
-            Contact the Communications Office at{" "}
-            <a href="mailto:communications@kafu.ac.ke" className="text-primary hover:underline" data-testid="press-contact-email">communications@kafu.ac.ke</a>{" "}
-            or call <a href="tel:+254777373633" className="text-primary hover:underline" data-testid="press-contact-phone">+254 777 373 633</a>.
-          </p>
-        </div>
       </section>
     </>
   );

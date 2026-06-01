@@ -1,12 +1,13 @@
 import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { SeoHead } from "@/components/seo-head";
 import { PageHero } from "@/components/ui/page-hero";
 import { Download, Calendar, BookOpen, AlertCircle } from "lucide-react";
 
-const ACADEMIC_YEAR = "2025/2026";
+const FALLBACK_ACADEMIC_YEAR = "2025/2026";
 
-const TIMETABLE_SETS = [
+const FALLBACK_TIMETABLE_SETS = [
   {
     id: "sem2",
     label: "Semester II — 2025/2026",
@@ -79,6 +80,15 @@ const TYPE_COLOURS: Record<string, string> = {
 
 export default function AdmissionsTimetables() {
   const [activeSem, setActiveSem] = useState("sem2");
+
+  const { data: pageData } = useQuery({
+    queryKey: ["page", "admissions-timetables"],
+    queryFn: () => fetch("/api/pages/admissions-timetables").then(r => r.json()),
+    staleTime: 10 * 60 * 1000,
+  });
+  const sd = pageData?.data?.structured_data ?? {};
+  const ACADEMIC_YEAR = (sd.academic_year as string) ?? FALLBACK_ACADEMIC_YEAR;
+  const TIMETABLE_SETS = (sd.timetable_sets as typeof FALLBACK_TIMETABLE_SETS) ?? FALLBACK_TIMETABLE_SETS;
   const current = TIMETABLE_SETS.find((s) => s.id === activeSem)!;
 
   return (

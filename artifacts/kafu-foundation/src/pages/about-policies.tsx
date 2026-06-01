@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { SeoHead } from "@/components/seo-head";
 import { Button } from "@/components/ui/button";
@@ -17,7 +18,7 @@ interface Policy {
   description: string;
 }
 
-const POLICIES: Policy[] = [
+const FALLBACK_POLICIES: Policy[] = [
   {
     slug: "academic-policy",
     title: "Academic Policy",
@@ -140,11 +141,18 @@ const POLICIES: Policy[] = [
   },
 ];
 
-const CATEGORIES = ["All", ...Array.from(new Set(POLICIES.map(p => p.category))).sort()];
-
 export default function AboutPolicies() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
+
+  const { data: pageData } = useQuery({
+    queryKey: ["page", "about-policies"],
+    queryFn: () => fetch("/api/pages/about-policies").then(r => r.json()),
+    staleTime: 10 * 60 * 1000,
+  });
+  const sd = pageData?.data?.structured_data ?? {};
+  const POLICIES = (sd.policies as typeof FALLBACK_POLICIES) ?? FALLBACK_POLICIES;
+  const CATEGORIES = ["All", ...Array.from(new Set(POLICIES.map((p: any) => p.category))).sort()];
 
   const filtered = POLICIES.filter(p => {
     const matchCat = category === "All" || p.category === category;
