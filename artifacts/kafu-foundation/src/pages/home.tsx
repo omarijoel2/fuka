@@ -38,7 +38,6 @@ const SLIDES = [
     accent: "Excellence.",
     body: "KAFU is transforming lives through quality education, research, and innovation in Western Kenya.",
     cta1: { label: "Apply for Admissions", href: "/admissions", external: false },
-    cta2: { label: "About the VC", href: "/staff/prof-peter-n-mwita", external: false },
     testid: "hero-slide-0",
   },
   {
@@ -213,19 +212,21 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
                 <Link href={slide.cta1.href}>{slide.cta1.label}</Link>
               )}
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-primary text-primary hover:bg-primary/5 px-7 h-12 text-sm sm:text-base rounded-full"
-              asChild
-              data-testid="hero-button-secondary"
-            >
-              {slide.cta2.external ? (
-                <a href={slide.cta2.href} target="_blank" rel="noreferrer">{slide.cta2.label}</a>
-              ) : (
-                <Link href={slide.cta2.href}>{slide.cta2.label}</Link>
-              )}
-            </Button>
+            {slide.cta2 && (
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-primary text-primary hover:bg-primary/5 px-7 h-12 text-sm sm:text-base rounded-full"
+                asChild
+                data-testid="hero-button-secondary"
+              >
+                {slide.cta2.external ? (
+                  <a href={slide.cta2.href} target="_blank" rel="noreferrer">{slide.cta2.label}</a>
+                ) : (
+                  <Link href={slide.cta2.href}>{slide.cta2.label}</Link>
+                )}
+              </Button>
+            )}
           </div>
         </div>
 

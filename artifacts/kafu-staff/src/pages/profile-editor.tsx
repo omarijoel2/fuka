@@ -463,6 +463,56 @@ export default function ProfileEditorPage() {
         </div>
       )}
 
+      {/* Completeness progress bar */}
+      {submission && (
+        <div className="bg-white rounded-2xl border border-gray-200 px-6 py-4" data-testid="completeness-bar">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-xs font-semibold text-gray-700">Profile completeness</span>
+            <span className={`text-xs font-bold ${
+              (submission.completeness_score ?? 0) >= 80 ? "text-green-600" :
+              (submission.completeness_score ?? 0) >= 40 ? "text-amber-600" : "text-red-500"
+            }`}>
+              {submission.completeness_score ?? 0}%
+              {(submission.completeness_score ?? 0) < 40 && (
+                <span className="text-gray-400 font-normal ml-1">— 40% required to submit</span>
+              )}
+            </span>
+          </div>
+          <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden mb-3">
+            <div
+              className={`h-full rounded-full transition-all duration-500 ${
+                (submission.completeness_score ?? 0) >= 80 ? "bg-green-500" :
+                (submission.completeness_score ?? 0) >= 40 ? "bg-amber-400" : "bg-red-400"
+              }`}
+              style={{ width: `${submission.completeness_score ?? 0}%` }}
+            />
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {TABS.filter(t => t.key !== "uploads").map(tab => {
+              const pct = submission.section_completion?.[tab.key] ?? 0;
+              return (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  data-testid={`completeness-pill-${tab.key}`}
+                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium transition-colors ${
+                    pct >= 80 ? "bg-green-50 text-green-700 hover:bg-green-100" :
+                    pct >= 40 ? "bg-amber-50 text-amber-700 hover:bg-amber-100" :
+                    "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                  }`}
+                >
+                  <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${
+                    pct >= 80 ? "bg-green-500" : pct >= 40 ? "bg-amber-400" : "bg-gray-300"
+                  }`} />
+                  {tab.label}
+                  <span className="font-bold">{pct}%</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
         {/* Tabs */}
         <div className="flex overflow-x-auto border-b border-gray-200 bg-gray-50/50">
