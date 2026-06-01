@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiFetch } from "@/lib/api";
 import { Plus, Pencil, Trash2, X, Save, UserCog } from "lucide-react";
+import PhotoUploadField from "@/components/photo-upload-field";
 
 interface ManagementProfile {
   id?: number;
@@ -73,9 +74,11 @@ function ProfileModal({
                 className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
             </div>
             <div className="col-span-2">
-              <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1 block">Photo URL</label>
-              <input data-testid="input-photo" value={form.photo_url} onChange={e => set("photo_url", e.target.value)}
-                className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" placeholder="https://..." />
+              <PhotoUploadField
+                value={form.photo_url}
+                onChange={url => set("photo_url", url)}
+                personName={form.name}
+              />
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1 block">Email</label>
