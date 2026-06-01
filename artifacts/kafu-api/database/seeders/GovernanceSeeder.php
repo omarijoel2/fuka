@@ -12,7 +12,6 @@ class GovernanceSeeder extends Seeder
     public function run(): void
     {
         $this->seedCouncil();
-        $this->seedManagement();
         $this->seedDirectorates();
     }
 
@@ -100,11 +99,18 @@ class GovernanceSeeder extends Seeder
             ],
         ];
 
-        foreach ($profiles as $profile) {
-            ManagementProfile::firstOrCreate(
-                ['name' => $profile['name'], 'category' => $profile['category']],
-                $profile
-            );
+        foreach ($members as $member) {
+            if (array_key_exists('credentials', $member)) {
+                CouncilMember::firstOrCreate(
+                    ['name' => $member['name'], 'category' => $member['category']],
+                    $member
+                );
+            } else {
+                ManagementProfile::firstOrCreate(
+                    ['name' => $member['name'], 'category' => $member['category']],
+                    $member
+                );
+            }
         }
     }
 

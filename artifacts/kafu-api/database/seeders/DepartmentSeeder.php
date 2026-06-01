@@ -47,7 +47,6 @@ class DepartmentSeeder extends Seeder
                 'phone'           => '+254 700 100 310',
                 'sort_order'      => 2,
             ],
-<<<<<<< HEAD
             [
                 'school_code'     => 'SBE',
                 'name'            => 'Department of Economics',
@@ -65,8 +64,6 @@ class DepartmentSeeder extends Seeder
                 'sort_order'      => 3,
             ],
 
-=======
->>>>>>> 49b10222f2da04116c68a97941eeb0c8ee7f15db
             // ── SCIT ─────────────────────────────────────────────────────────
             [
                 'school_code'     => 'SCIT',
@@ -157,7 +154,7 @@ class DepartmentSeeder extends Seeder
         ];
 
         foreach ($departments as $dept) {
-            Department::create($dept);
+            Department::updateOrCreate(["slug" => $dept["slug"]], $dept);
         }
     }
 }

@@ -5048,3 +5048,35 @@ Route::middleware(['auth:sanctum'])->prefix('admin/hero-slides')->group(function
         }
     });
 });
+
+Route::get('/admissions/settings', function () {
+    return response()->json(['data' => [
+        [
+            'key' => 'is_open',
+            'value' => true,
+            'label' => 'Applications Open'
+        ],
+        [
+            'key' => 'current_intake',
+            'value' => 'May 2026',
+            'label' => 'Current Intake'
+        ],
+        [
+            'key' => 'application_deadline',
+            'value' => '2026-08-31',
+            'label' => 'Application Deadline'
+        ],
+        [
+            'key' => 'message',
+            'value' => 'Applications are currently open.',
+            'label' => 'Message'
+        ],
+        [
+            'key' => 'portal_url',
+            'value' => 'https://kafu.ac.ke/admissions',
+            'label' => 'Admissions Portal'
+        ]
+    ]]);
+});
+
+

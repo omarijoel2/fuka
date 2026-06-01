@@ -215,7 +215,7 @@ class AdmissionsModuleSeeder extends Seeder
 
 $id = DB::table('admission_programmes')
     ->where('programme_code', $code)
-    ->value('id');[201~DB::table('admission_programmes')->updateOrInsert(
+    ->value('id');DB::table('admission_programmes')->updateOrInsert(
     ['programme_code' => $code],
     [
         'programme_name'       => $name,
