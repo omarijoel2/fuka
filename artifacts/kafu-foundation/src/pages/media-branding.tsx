@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { SeoHead } from "@/components/seo-head";
 import { PageHero } from "@/components/ui/page-hero";
 import { Palette, Download, Copy, Check, Type, Image } from "lucide-react";
+import { useBranding, BRANDING_DEFAULTS } from "@/lib/api-hooks";
 
 interface ColourSwatch {
   name: string;
@@ -71,6 +72,17 @@ function CopyButton({ text, label }: { text: string; label: string }) {
 }
 
 export default function MediaBrandingPage() {
+  const { data: branding } = useBranding();
+  const b = branding ?? BRANDING_DEFAULTS;
+
+  const LOGOS_CMS: LogoVariant[] = [
+    { id: "logo-full-colour",   name: "Full Colour (Primary)",  description: "Primary logo on white background. Use wherever possible.",                                    preview_bg: "bg-white",          file_url: b.logo_full_color_url,  format: "SVG, PNG" },
+    { id: "logo-reversed-white", name: "Reversed White",        description: "White logo for use on Forest Green or dark backgrounds.",                                      preview_bg: "bg-[#1A5C38]",      file_url: b.logo_reversed_url,    format: "SVG, PNG" },
+    { id: "logo-gold",          name: "Gold Variant",           description: "Gold logo for use on white or light backgrounds in formal contexts.",                          preview_bg: "bg-white",          file_url: b.logo_gold_url,        format: "SVG, PNG" },
+    { id: "logo-monochrome",    name: "Monochrome Black",       description: "Single-colour black logo for single-colour print applications.",                               preview_bg: "bg-white",          file_url: b.logo_mono_url,        format: "SVG, PDF" },
+    { id: "logo-icon-only",     name: "Mark / Icon Only",       description: "Standalone crest/mark for social media avatars and favicon use.",                              preview_bg: "bg-white",          file_url: b.logo_icon_url,        format: "SVG, PNG, ICO" },
+  ];
+
   return (
     <>
       <SeoHead
@@ -101,11 +113,11 @@ export default function MediaBrandingPage() {
             </div>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {LOGOS.map(logo => (
+            {LOGOS_CMS.map(logo => (
               <div key={logo.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden" data-testid={`logo-card-${logo.id}`}>
                 <div className={`h-32 flex items-center justify-center ${logo.preview_bg}`}>
                   <img
-                    src="/images/uploads/logo-updated-750x126.png"
+                    src={b.logo_primary_url}
                     alt={logo.name}
                     className={`h-12 w-auto object-contain ${logo.preview_bg === "bg-[#1A5C38]" ? "brightness-0 invert" : ""}`}
                   />

@@ -1,10 +1,11 @@
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { SeoHead } from "@/components/seo-head";
 import { PageHero } from "@/components/ui/page-hero";
 import { Scale, FileText, Shield, CheckCircle, Mail, Phone, ChevronRight, Users } from "lucide-react";
 
-const FUNCTIONS = [
+const FALLBACK_FUNCTIONS = [
   "Providing legal advice and opinions to the Vice-Chancellor, University Management, and Governing Council",
   "Drafting, reviewing, and interpreting contracts, agreements, and Memoranda of Understanding (MoUs)",
   "Representing the university in legal proceedings and liaising with external counsel",
@@ -16,7 +17,7 @@ const FUNCTIONS = [
   "Overseeing the management and custody of university legal documents and instruments",
 ];
 
-const LEGAL_AREAS = [
+const FALLBACK_LEGAL_AREAS = [
   {
     title: "Contract Management",
     colour: "#1A5C38",
@@ -39,7 +40,7 @@ const LEGAL_AREAS = [
   },
 ];
 
-const LEGAL_BASIS = [
+const FALLBACK_LEGAL_BASIS = [
   { title: "Universities Act, 2012", description: "The primary legislation governing universities in Kenya. KAFU operates within this legal framework." },
   { title: "KAFU Charter", description: "Granted by the Cabinet Secretary for Education, the Charter establishes KAFU as a chartered university and confers its legal personality." },
   { title: "KAFU Statutes", description: "Statutes authorised by the Charter that govern the internal operations, governance structures, and disciplinary procedures of the university." },
@@ -47,6 +48,16 @@ const LEGAL_BASIS = [
 ];
 
 export default function AboutLegal() {
+  const { data: pageData } = useQuery({
+    queryKey: ["page", "about-legal"],
+    queryFn: () => fetch("/api/pages/about-legal").then(r => r.json()),
+    staleTime: 10 * 60 * 1000,
+  });
+  const sd = pageData?.data?.structured_data ?? {};
+  const FUNCTIONS = (sd.functions as string[]) ?? FALLBACK_FUNCTIONS;
+  const LEGAL_AREAS = (sd.legal_areas as typeof FALLBACK_LEGAL_AREAS) ?? FALLBACK_LEGAL_AREAS;
+  const LEGAL_BASIS = (sd.legal_basis as typeof FALLBACK_LEGAL_BASIS) ?? FALLBACK_LEGAL_BASIS;
+
   return (
     <div className="flex flex-col min-h-screen">
       <SeoHead

@@ -1,10 +1,11 @@
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { SeoHead } from "@/components/seo-head";
 import { PageHero } from "@/components/ui/page-hero";
 import { Users, Heart, BookOpen, Trophy, Brain, Shield, ChevronRight, Mail, Phone } from "lucide-react";
 
-const SERVICES = [
+const FALLBACK_SERVICES = [
   {
     title: "Accommodation",
     description: "KAFU provides on-campus accommodation facilities to support students throughout their studies. The hostels offer a safe, comfortable, and conducive environment for academic and personal development.",
@@ -55,7 +56,7 @@ const SERVICES = [
   },
 ];
 
-const MANDATE = [
+const FALLBACK_MANDATE = [
   "Champion student welfare and holistic development at all levels",
   "Act as a crucial link between students and the university administration",
   "Foster a positive, equitable, and supportive campus environment",
@@ -68,6 +69,19 @@ const MANDATE = [
 ];
 
 export default function StudentAffairs() {
+  const { data: pageData } = useQuery({
+    queryKey: ["page", "student-affairs"],
+    queryFn: () => fetch("/api/pages/student-affairs").then(r => r.json()),
+    staleTime: 10 * 60 * 1000,
+  });
+  const sd = pageData?.data?.structured_data ?? {};
+  const SERVICES = (() => {
+    const dbSvcs = sd.services as Array<Omit<(typeof FALLBACK_SERVICES)[0], "icon">> | undefined;
+    if (!dbSvcs?.length) return FALLBACK_SERVICES;
+    return dbSvcs.map((s, i) => ({ ...FALLBACK_SERVICES[i], ...s }));
+  })();
+  const MANDATE = (sd.mandate as string[]) ?? FALLBACK_MANDATE;
+
   return (
     <div className="flex flex-col min-h-screen">
       <SeoHead

@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { SeoHead } from "@/components/seo-head";
 import { PageHero } from "@/components/ui/page-hero";
 import { BookOpen, Download, Search, Calendar } from "lucide-react";
@@ -16,7 +17,7 @@ interface Publication {
   pages?: number;
 }
 
-const PUBLICATIONS: Publication[] = [
+const FALLBACK_PUBLICATIONS: Publication[] = [
   { id: "pub01", title: "KAFU Prospectus 2025/2026", type: "Prospectus", year: 2025, description: "The official university prospectus containing programme details, entry requirements, fees, facilities, and scholarship information for the 2025/2026 academic year.", cover_url: "/imgs/undergraduate.jpg", file_url: "#", pages: 112 },
   { id: "pub02", title: "The KAFU Chronicle — Issue 12 (Jan–Mar 2025)", type: "Newsletter", year: 2025, frequency: "Quarterly", description: "Quarterly newsletter covering academic achievements, research highlights, staff news, student activities, and community initiatives for Q1 2025.", cover_url: "/imgs/IMG_8696.jpg", file_url: "#", pages: 24 },
   { id: "pub03", title: "The KAFU Chronicle — Issue 11 (Oct–Dec 2024)", type: "Newsletter", year: 2024, frequency: "Quarterly", description: "Year-end edition featuring 2024 graduation highlights, annual research output summary, staff honours, and alumni spotlight.", cover_url: "/imgs/campus-main.jpg", file_url: "#", pages: 24 },
@@ -32,7 +33,6 @@ const PUBLICATIONS: Publication[] = [
 ];
 
 const TYPES = ["All", "Prospectus", "Newsletter", "Annual Report", "Research Publication", "Strategic Document", "Handbook", "Policy Document"];
-const YEARS = [2025, 2024, 2023];
 
 const TYPE_COLOURS: Record<string, string> = {
   "Prospectus": "bg-green-100 text-green-800",
@@ -49,12 +49,25 @@ export default function MediaPublicationsPage() {
   const [type, setType] = useState("All");
   const [year, setYear] = useState("All");
 
-  const filtered = useMemo(() => PUBLICATIONS.filter(p => {
+  const { data: apiData } = useQuery<{ data: Publication[] }>({
+    queryKey: ["publications"],
+    queryFn: () => fetch("/api/publications").then(r => r.json()),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const publications = apiData?.data ?? FALLBACK_PUBLICATIONS;
+
+  const YEARS = useMemo(
+    () => Array.from(new Set(publications.map(p => p.year))).sort((a, b) => b - a),
+    [publications]
+  );
+
+  const filtered = useMemo(() => publications.filter(p => {
     if (type !== "All" && p.type !== type) return false;
     if (year !== "All" && p.year !== Number(year)) return false;
     if (search && !`${p.title} ${p.description} ${p.type}`.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
-  }), [search, type, year]);
+  }), [publications, search, type, year]);
 
   return (
     <>
@@ -124,26 +137,27 @@ export default function MediaPublicationsPage() {
                       <BookOpen className="w-10 h-10 text-gray-300" />
                     </div>
                   )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                  <span className={`absolute top-3 left-3 text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLOURS[p.type] ?? "bg-gray-100 text-gray-700"}`}>
-                    {p.type}
-                  </span>
-                </div>
-
-                {/* Body */}
-                <div className="p-5 flex flex-col flex-1">
-                  <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
-                    <Calendar className="w-3 h-3" /> {p.year}
-                    {p.pages && <span>· {p.pages} pages</span>}
-                    {p.frequency && <span>· {p.frequency}</span>}
+                  <div className="absolute top-3 left-3">
+                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${TYPE_COLOURS[p.type] ?? "bg-gray-100 text-gray-600"}`}>
+                      {p.type}
+                    </span>
                   </div>
-                  <h3 className="font-serif font-semibold text-gray-900 line-clamp-2 mb-2">{p.title}</h3>
-                  <p className="text-sm text-gray-500 line-clamp-3 flex-1">{p.description}</p>
+                </div>
+                {/* Content */}
+                <div className="p-4 flex flex-col flex-1">
+                  <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
+                    <Calendar className="w-3 h-3" />
+                    <span>{p.year}</span>
+                    {p.frequency && <><span>·</span><span>{p.frequency}</span></>}
+                    {p.pages && <><span>·</span><span>{p.pages} pages</span></>}
+                  </div>
+                  <h3 className="font-semibold text-gray-900 text-sm leading-snug mb-2 flex-1">{p.title}</h3>
+                  <p className="text-xs text-gray-500 line-clamp-3 mb-4">{p.description}</p>
                   {p.file_url && (
                     <a
                       href={p.file_url}
+                      className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 mt-auto"
                       data-testid={`pub-download-${p.id}`}
-                      className="mt-4 inline-flex items-center justify-center gap-2 bg-primary text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
                     >
                       <Download className="w-4 h-4" /> Download PDF
                     </a>

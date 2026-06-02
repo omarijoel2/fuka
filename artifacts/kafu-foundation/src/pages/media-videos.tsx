@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { SeoHead } from "@/components/seo-head";
 import { PageHero } from "@/components/ui/page-hero";
 import { Play, ExternalLink } from "lucide-react";
@@ -13,7 +14,7 @@ interface VideoItem {
   description: string;
 }
 
-const VIDEOS: VideoItem[] = [
+const FALLBACK_VIDEOS: VideoItem[] = [
   { id: "v01", title: "KAFU Graduation Ceremony 2025 — Highlights", category: "Ceremony", date: "Nov 2025", duration: "8:24", youtube_id: "dQw4w9WgXcQ", description: "Highlights from the 2025 graduation ceremony celebrating over 800 graduates across all five schools." },
   { id: "v02", title: "KAFU Campus Tour — Kaimosi Main Campus", category: "Campus Life", date: "Oct 2025", duration: "5:12", youtube_id: "dQw4w9WgXcQ", description: "A guided tour of the main campus facilities including lecture halls, library, laboratories, and student accommodation." },
   { id: "v03", title: "Research & Innovation Week 2025", category: "Research", date: "Jul 2025", duration: "12:40", youtube_id: "dQw4w9WgXcQ", description: "Showcasing student and faculty research projects during the annual Research and Innovation Week." },
@@ -31,7 +32,14 @@ export default function MediaVideosPage() {
   const [active, setActive] = useState("All");
   const [playing, setPlaying] = useState<string | null>(null);
 
-  const filtered = active === "All" ? VIDEOS : VIDEOS.filter(v => v.category === active);
+  const { data: apiData } = useQuery<{ data: VideoItem[] }>({
+    queryKey: ["videos"],
+    queryFn: () => fetch("/api/videos").then(r => r.json()),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const allVideos = apiData?.data ?? FALLBACK_VIDEOS;
+  const filtered = active === "All" ? allVideos : allVideos.filter(v => v.category === active);
 
   return (
     <>
@@ -50,7 +58,7 @@ export default function MediaVideosPage() {
       >
         <div className="flex flex-wrap justify-center gap-8">
           {[
-            { label: "Videos", value: VIDEOS.length },
+            { label: "Videos", value: allVideos.length },
             { label: "Categories", value: CATEGORIES.length - 1 },
             { label: "Hours of Content", value: "2+" },
           ].map(s => (
@@ -120,21 +128,22 @@ export default function MediaVideosPage() {
                   </>
                 )}
               </div>
-
               {/* Info */}
               <div className="p-4">
-                <span className="text-xs font-semibold text-primary uppercase tracking-wide">{v.category}</span>
-                <h3 className="font-serif font-semibold text-gray-900 mt-1 line-clamp-2">{v.title}</h3>
-                <p className="text-xs text-gray-400 mt-1">{v.date}</p>
-                <p className="text-sm text-gray-500 mt-2 line-clamp-2">{v.description}</p>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary">{v.category}</span>
+                  <span className="text-xs text-gray-400">{v.date}</span>
+                </div>
+                <h3 className="font-semibold text-sm text-gray-900 leading-snug mb-1">{v.title}</h3>
+                <p className="text-xs text-gray-500 line-clamp-2">{v.description}</p>
                 <a
                   href={`https://www.youtube.com/watch?v=${v.youtube_id}`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 text-xs text-primary hover:underline mt-2"
                   data-testid={`youtube-${v.id}`}
-                  className="mt-3 inline-flex items-center gap-1 text-xs text-gray-400 hover:text-primary transition-colors"
                 >
-                  Watch on YouTube <ExternalLink className="w-3 h-3" />
+                  <ExternalLink className="w-3 h-3" /> Watch on YouTube
                 </a>
               </div>
             </div>

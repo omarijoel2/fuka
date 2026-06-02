@@ -1,0 +1,1 @@
+- [CMS content migration pattern](cms-content-migration.md) — FALLBACK_ rename + useQuery inside component + icon-merge IIFE for pages with JSX/Lucide icons in data arrays.

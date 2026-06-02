@@ -1,10 +1,11 @@
 import React, { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { SeoHead } from "@/components/seo-head";
 import { PageHero } from "@/components/ui/page-hero";
 import { MessageSquare, CheckCircle, Phone, Mail, FileText, Users, Clock, ChevronRight, AlertCircle } from "lucide-react";
 
-const PROCESS_STEPS = [
+const FALLBACK_PROCESS_STEPS = [
   {
     step: "01",
     title: "Submit Your Complaint",
@@ -32,7 +33,7 @@ const PROCESS_STEPS = [
   },
 ];
 
-const COMPLAINT_CATEGORIES = [
+const FALLBACK_COMPLAINT_CATEGORIES = [
   { label: "Academic Services", description: "Grading disputes, course delivery concerns, examination irregularities" },
   { label: "Administrative Services", description: "Registration delays, certificate issuance, fee statements" },
   { label: "Student Support Services", description: "Accommodation, health services, counselling, welfare" },
@@ -42,7 +43,7 @@ const COMPLAINT_CATEGORIES = [
   { label: "General Institutional Matters", description: "Any other matter not covered above" },
 ];
 
-const RIGHTS = [
+const FALLBACK_RIGHTS = [
   "Be treated with courtesy, dignity, and respect throughout the process",
   "Receive a fair and impartial investigation of your complaint",
   "Be kept informed of the progress of your complaint",
@@ -53,6 +54,16 @@ const RIGHTS = [
 
 export default function AboutComplaints() {
   const [open, setOpen] = useState<number | null>(null);
+
+  const { data: pageData } = useQuery({
+    queryKey: ["page", "about-complaints"],
+    queryFn: () => fetch("/api/pages/about-complaints").then(r => r.json()),
+    staleTime: 10 * 60 * 1000,
+  });
+  const sd = pageData?.data?.structured_data ?? {};
+  const PROCESS_STEPS = (sd.process_steps as typeof FALLBACK_PROCESS_STEPS) ?? FALLBACK_PROCESS_STEPS;
+  const COMPLAINT_CATEGORIES = (sd.complaint_categories as typeof FALLBACK_COMPLAINT_CATEGORIES) ?? FALLBACK_COMPLAINT_CATEGORIES;
+  const RIGHTS = (sd.rights as string[]) ?? FALLBACK_RIGHTS;
 
   return (
     <div className="flex flex-col min-h-screen">

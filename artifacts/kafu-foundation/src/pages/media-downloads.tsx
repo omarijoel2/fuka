@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { SeoHead } from "@/components/seo-head";
 import { PageHero } from "@/components/ui/page-hero";
 import { Download, Search, FileText, File, Sheet, Book } from "lucide-react";
@@ -15,7 +16,7 @@ interface DownloadItem {
   file_url: string;
 }
 
-const DOWNLOADS: DownloadItem[] = [
+const FALLBACK_DOWNLOADS: DownloadItem[] = [
   { id: "dl01", title: "Undergraduate Application Form 2025/2026", category: "Admissions", type: "PDF", size: "280 KB", updated: "Jan 2025", description: "Official application form for undergraduate degree programmes (Self-Sponsored Category).", file_url: "#" },
   { id: "dl02", title: "Postgraduate Application Form 2025/2026", category: "Admissions", type: "PDF", size: "310 KB", updated: "Jan 2025", description: "Official application form for Masters and PhD programmes.", file_url: "#" },
   { id: "dl03", title: "Fee Structure 2025/2026 — Undergraduate", category: "Finance", type: "PDF", size: "195 KB", updated: "Sep 2025", description: "Approved tuition and levies fee structure for all undergraduate programmes for the 2025/2026 academic year.", file_url: "#" },
@@ -54,11 +55,19 @@ export default function MediaDownloadsPage() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
 
-  const filtered = useMemo(() => DOWNLOADS.filter(d => {
+  const { data: apiData } = useQuery<{ data: DownloadItem[] }>({
+    queryKey: ["downloads"],
+    queryFn: () => fetch("/api/downloads").then(r => r.json()),
+    staleTime: 5 * 60 * 1000,
+  });
+
+  const downloads = apiData?.data ?? FALLBACK_DOWNLOADS;
+
+  const filtered = useMemo(() => downloads.filter(d => {
     if (category !== "All" && d.category !== category) return false;
     if (search && !`${d.title} ${d.description} ${d.category}`.toLowerCase().includes(search.toLowerCase())) return false;
     return true;
-  }), [search, category]);
+  }), [downloads, search, category]);
 
   return (
     <>
@@ -128,8 +137,8 @@ export default function MediaDownloadsPage() {
                   </div>
                   <a
                     href={d.file_url}
+                    className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:text-primary/80 whitespace-nowrap"
                     data-testid={`download-btn-${d.id}`}
-                    className="flex-shrink-0 inline-flex items-center gap-1.5 bg-primary/5 hover:bg-primary/10 text-primary text-sm font-medium px-3 py-2 rounded-lg transition-colors"
                   >
                     <Download className="w-4 h-4" /> Download
                   </a>

@@ -145,6 +145,11 @@ export const CONTENT_TYPE_LABELS: Record<string, string> = {
   document: "Document",
   research: "Research",
   partner: "Partner",
+  press_release: "Press Release",
+  publication: "Publication",
+  video: "Video",
+  download: "Download",
+  archive: "Archive",
 };
 
 export const CONTENT_TYPES = Object.keys(CONTENT_TYPE_LABELS);

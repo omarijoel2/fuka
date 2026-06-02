@@ -1,5 +1,57 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchApi } from "./api-types";
+
+// ─── Branding ────────────────────────────────────────────────────────────────
+export interface BrandingConfig {
+  logo_primary_url: string;
+  logo_white_url: string;
+  logo_alt: string;
+  favicon_url: string;
+  tagline: string;
+  site_description: string;
+  primary_color: string;
+  gold_color: string;
+  white_color: string;
+  dark_color: string;
+  logo_full_color_url: string;
+  logo_reversed_url: string;
+  logo_gold_url: string;
+  logo_mono_url: string;
+  logo_icon_url: string;
+  brand_guidelines_url: string;
+}
+
+export const BRANDING_DEFAULTS: BrandingConfig = {
+  logo_primary_url:     "/imgs/logo-updated.png",
+  logo_white_url:       "/imgs/logo-updated.png",
+  logo_alt:             "Kaimosi Friends University",
+  favicon_url:          "/favicon.ico",
+  tagline:              "Spring of Knowledge",
+  site_description:     "A Quaker-founded public university established in 2014, committed to truth, service, and academic excellence.",
+  primary_color:        "#1A5C38",
+  gold_color:           "#C9A227",
+  white_color:          "#FFFFFF",
+  dark_color:           "#111827",
+  logo_full_color_url:  "#",
+  logo_reversed_url:    "#",
+  logo_gold_url:        "#",
+  logo_mono_url:        "#",
+  logo_icon_url:        "#",
+  brand_guidelines_url: "#",
+};
+
+export function useBranding() {
+  return useQuery<BrandingConfig>({
+    queryKey: ["branding"],
+    queryFn: async () => {
+      const res = await fetch("/api/branding");
+      if (!res.ok) return BRANDING_DEFAULTS;
+      const data = await res.json();
+      return { ...BRANDING_DEFAULTS, ...data } as BrandingConfig;
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+}
 import type {
   Stat,
   NewsArticle,

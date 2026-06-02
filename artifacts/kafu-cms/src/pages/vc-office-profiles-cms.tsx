@@ -19,16 +19,13 @@ interface ManagementProfile {
 }
 
 const CATEGORY_OPTIONS = [
-  { value: "registrar", label: "Registrar" },
-  { value: "finance", label: "Finance" },
-  { value: "library", label: "Library" },
-  { value: "ict", label: "ICT" },
-  { value: "other", label: "Other Senior Officer" },
+  { value: "vc", label: "Vice-Chancellor" },
+  { value: "dvc", label: "Deputy Vice-Chancellor" },
 ];
 
 const BLANK: ManagementProfile = {
   name: "", title: "", photo_url: "", bio: "", email: "",
-  office: "", phone: "", category: "other", position_order: 0, is_active: true,
+  office: "", phone: "", category: "dvc", position_order: 0, is_active: true,
 };
 
 function ProfileModal({
@@ -41,7 +38,7 @@ function ProfileModal({
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
-          <h2 className="font-semibold text-foreground">{form.id ? "Edit Management Profile" : "Add Management Profile"}</h2>
+          <h2 className="font-semibold text-foreground">{form.id ? "Edit Profile" : "Add Profile"}</h2>
           <button onClick={onClose} data-testid="modal-close" className="text-muted-foreground hover:text-foreground">
             <X className="w-5 h-5" />
           </button>
@@ -72,11 +69,7 @@ function ProfileModal({
                 className="w-full border border-border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
             </div>
             <div className="col-span-2">
-              <PhotoUploadField
-                value={form.photo_url}
-                onChange={url => set("photo_url", url)}
-                personName={form.name}
-              />
+              <PhotoUploadField value={form.photo_url} onChange={url => set("photo_url", url)} personName={form.name} />
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1 block">Email</label>
@@ -118,7 +111,7 @@ function ProfileModal({
   );
 }
 
-export default function ManagementProfilesCmsPage() {
+export default function VcOfficeProfilesCmsPage() {
   const qc = useQueryClient();
   const [modal, setModal] = useState<ManagementProfile | null>(null);
   const [deleteId, setDeleteId] = useState<number | null>(null);
@@ -140,20 +133,24 @@ export default function ManagementProfilesCmsPage() {
     onSuccess: () => { qc.invalidateQueries({ queryKey: ["cms-management-profiles"] }); setDeleteId(null); },
   });
 
-  // Exclude VC and DVC — those are managed under Governance > VC Office
+  // Only show VC and DVC profiles on this page
   const profiles = (data?.data ?? [])
-    .filter(p => p.category !== "vc" && p.category !== "dvc")
+    .filter(p => p.category === "vc" || p.category === "dvc")
     .sort((a, b) => a.position_order - b.position_order);
-  const CATEGORY_LABEL: Record<string, string> = { registrar: "Registrar", finance: "Finance", library: "Library", ict: "ICT", other: "Other" };
+
+  const LABEL: Record<string, string> = { vc: "Vice-Chancellor", dvc: "Deputy Vice-Chancellor" };
 
   return (
     <div className="p-6 max-w-5xl">
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-2">
         <div>
           <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-            <UserCog className="w-5 h-5 text-primary" /> Management Profiles
+            <UserCog className="w-5 h-5 text-primary" /> VC Office Profiles
           </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Manage senior management profiles displayed on the website.</p>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Vice-Chancellor and Deputy Vice-Chancellors displayed on the
+            <strong className="text-foreground"> /about/vice-chancellor</strong> page.
+          </p>
         </div>
         <button onClick={() => setModal({ ...BLANK })} data-testid="add-profile-btn"
           className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm hover:bg-primary/90">
@@ -161,12 +158,17 @@ export default function ManagementProfilesCmsPage() {
         </button>
       </div>
 
+      <div className="mb-6 p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-800">
+        Profiles here are shown briefly on the Vice-Chancellor page. The VC's full academic credentials and
+        leadership history are displayed separately on the Management Board page.
+      </div>
+
       {isLoading ? (
         <div className="text-sm text-muted-foreground py-12 text-center">Loading profiles...</div>
       ) : profiles.length === 0 ? (
         <div className="border-2 border-dashed border-border rounded-xl py-16 text-center">
           <UserCog className="w-10 h-10 text-muted-foreground/40 mx-auto mb-3" />
-          <p className="text-sm text-muted-foreground mb-4">No management profiles yet.</p>
+          <p className="text-sm text-muted-foreground mb-4">No VC office profiles yet.</p>
           <button onClick={() => setModal({ ...BLANK })} data-testid="add-first-btn"
             className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-lg text-sm hover:bg-primary/90">
             <Plus className="w-4 h-4" /> Add First Profile
@@ -179,18 +181,18 @@ export default function ManagementProfilesCmsPage() {
               <tr>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Name</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden md:table-cell">Title</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden lg:table-cell">Category</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide hidden lg:table-cell">Role</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Status</th>
                 <th className="text-right px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {profiles.sort((a, b) => a.position_order - b.position_order).map(p => (
+              {profiles.map(p => (
                 <tr key={p.id} className="hover:bg-muted/20 transition-colors">
                   <td className="px-4 py-3 font-medium text-foreground">{p.name}</td>
                   <td className="px-4 py-3 text-muted-foreground hidden md:table-cell text-xs">{p.title}</td>
                   <td className="px-4 py-3 hidden lg:table-cell">
-                    <span className="inline-block text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">{CATEGORY_LABEL[p.category] ?? p.category}</span>
+                    <span className="inline-block text-xs bg-primary/10 text-primary px-2 py-0.5 rounded">{LABEL[p.category] ?? p.category}</span>
                   </td>
                   <td className="px-4 py-3">
                     <span className={`inline-block text-xs px-2 py-0.5 rounded font-medium ${p.is_active ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"}`}>
@@ -219,7 +221,7 @@ export default function ManagementProfilesCmsPage() {
       {deleteId !== null && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full">
-            <h3 className="font-semibold text-foreground mb-2">Remove Management Profile</h3>
+            <h3 className="font-semibold text-foreground mb-2">Remove Profile</h3>
             <p className="text-sm text-muted-foreground mb-5">This will remove the profile from the website.</p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteId(null)} data-testid="cancel-delete"

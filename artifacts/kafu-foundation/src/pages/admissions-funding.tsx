@@ -1,10 +1,11 @@
 import React from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { SeoHead } from "@/components/seo-head";
 import { PageHero } from "@/components/ui/page-hero";
 import { ExternalLink, ChevronRight, DollarSign, FileText, HelpCircle, CheckCircle, AlertCircle, Phone, Mail } from "lucide-react";
 
-const STEPS = [
+const FALLBACK_STEPS = [
   {
     number: "01",
     title: "Receive Admission Letter",
@@ -37,7 +38,7 @@ const STEPS = [
   },
 ];
 
-const FUNDING_TYPES = [
+const FALLBACK_FUNDING_TYPES = [
   {
     type: "Scholarship",
     colour: "#1A5C38",
@@ -58,7 +59,7 @@ const FUNDING_TYPES = [
   },
 ];
 
-const DOCUMENTS = [
+const FALLBACK_DOCUMENTS = [
   "National Identity Card (or Birth Certificate for those under 18)",
   "KAFU Admission Letter",
   "KCSE Certificate or Result Slip",
@@ -69,6 +70,16 @@ const DOCUMENTS = [
 ];
 
 export default function AdmissionsFunding() {
+  const { data: pageData } = useQuery({
+    queryKey: ["page", "admissions-funding"],
+    queryFn: () => fetch("/api/pages/admissions-funding").then(r => r.json()),
+    staleTime: 10 * 60 * 1000,
+  });
+  const sd = pageData?.data?.structured_data ?? {};
+  const STEPS = (sd.steps as typeof FALLBACK_STEPS) ?? FALLBACK_STEPS;
+  const FUNDING_TYPES = (sd.funding_types as typeof FALLBACK_FUNDING_TYPES) ?? FALLBACK_FUNDING_TYPES;
+  const DOCUMENTS = (sd.documents as string[]) ?? FALLBACK_DOCUMENTS;
+
   return (
     <div className="flex flex-col min-h-screen">
       <SeoHead

@@ -41,6 +41,7 @@ import ResearchProjectDetail from "@/pages/research-project-detail";
 import ResearchPublications from "@/pages/research-publications";
 import ResearchPublicationDetail from "@/pages/research-publication-detail";
 import ResearchPartnerships from "@/pages/research-partnerships";
+import ResearchJournal from "@/pages/research-journal";
 import InternationalPage from "@/pages/international";
 import InternationalStudy from "@/pages/international-study";
 import InternationalVisa from "@/pages/international-visa";
@@ -51,6 +52,7 @@ import RepositoryBrowse from "@/pages/repository-browse";
 import RepositoryItem from "@/pages/repository-item";
 import CouncilPage from "@/pages/council";
 import ManagementPage from "@/pages/management";
+import ViceChancellorPage from "@/pages/vice-chancellor";
 import StrategicPlan from "@/pages/about-strategic-plan";
 import AboutPolicies from "@/pages/about-policies";
 import ServiceCharter from "@/pages/about-service-charter";
@@ -60,6 +62,7 @@ import AboutCSR from "@/pages/about-csr";
 import StudentAffairs from "@/pages/student-affairs";
 import StudentsCouncil from "@/pages/students-council";
 import Archives from "@/pages/archives";
+import TermsOfService from "@/pages/terms";
 import AdmissionsApply from "@/pages/admissions-apply";
 import AdmissionsTrack from "@/pages/admissions-track";
 import AdmissionsCalendar from "@/pages/admissions-calendar";
@@ -132,6 +135,7 @@ function Router() {
             {(params) => <ResearchProjectDetail slug={params.slug ?? ""} />}
           </Route>
           <Route path="/research/publications" component={ResearchPublications} />
+          <Route path="/research/journal" component={ResearchJournal} />
           <Route path="/research/publications/:slug">
             {(params) => <ResearchPublicationDetail slug={params.slug ?? ""} />}
           </Route>
@@ -145,6 +149,7 @@ function Router() {
           <Route path="/repository/browse" component={RepositoryBrowse} />
           <Route path="/repository/items/:slug" component={RepositoryItem} />
           <Route path="/about/council" component={CouncilPage} />
+          <Route path="/about/vice-chancellor" component={ViceChancellorPage} />
           <Route path="/about/management" component={ManagementPage} />
           <Route path="/about/strategic-plan" component={StrategicPlan} />
           <Route path="/about/policies" component={AboutPolicies} />
@@ -155,6 +160,7 @@ function Router() {
           <Route path="/students/affairs" component={StudentAffairs} />
           <Route path="/students/council" component={StudentsCouncil} />
           <Route path="/archives" component={Archives} />
+          <Route path="/terms" component={TermsOfService} />
           <Route path="/admissions/apply" component={AdmissionsApply} />
           <Route path="/admissions/track" component={AdmissionsTrack} />
           <Route path="/admissions/calendar" component={AdmissionsCalendar} />

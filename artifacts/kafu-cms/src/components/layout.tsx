@@ -96,9 +96,13 @@ const navItems: NavItem[] = [
     roles: ADMIN_ROLES,
     children: [
       { label: "University Council", href: "/governance/council" },
-      { label: "Management Profiles", href: "/governance/management" },
+      { label: "VC Office (VC & DVCs)", href: "/governance/vc-office" },
+      { label: "Management Board", href: "/governance/management" },
       { label: "Directorates", href: "/governance/directorates" },
       { label: "Departments", href: "/departments" },
+      { label: "Strategic Plan", href: "/governance/strategic-plan" },
+      { label: "Policies & Regulations", href: "/governance/policies" },
+      { label: "Service Charter", href: "/governance/service-charter" },
     ],
   },
   {
@@ -116,6 +120,12 @@ const navItems: NavItem[] = [
     roles: ADMIN_ROLES,
     children: [
       { label: "Photo & Video Gallery", href: "/media/gallery" },
+      { label: "Media Hub", href: "/media-hub" },
+      { label: "Press Releases", href: "/media-hub?tab=press_release" },
+      { label: "Publications", href: "/media-hub?tab=publication" },
+      { label: "Videos", href: "/media-hub?tab=video" },
+      { label: "Downloads", href: "/media-hub?tab=download" },
+      { label: "Archives", href: "/media-hub?tab=archive" },
     ],
   },
   {
@@ -134,6 +144,8 @@ const navItems: NavItem[] = [
     children: [
       { label: "Homepage Manager", href: "/homepage" },
       { label: "Hero Slides", href: "/hero-slides" },
+      { label: "Pages Manager", href: "/pages-manager" },
+      { label: "Branding", href: "/branding-settings" },
       { label: "About Page", href: "/site/about" },
       { label: "Student Services", href: "/site/student-services" },
       { label: "Navigation Manager", href: "/navigation" },

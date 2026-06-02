@@ -35,6 +35,7 @@ import AboutCmsPage from "@/pages/about-cms";
 import StudentServicesCmsPage from "@/pages/student-services-cms";
 import CouncilMembersCmsPage from "@/pages/council-members-cms";
 import ManagementProfilesCmsPage from "@/pages/management-profiles-cms";
+import VcOfficeProfilesCmsPage from "@/pages/vc-office-profiles-cms";
 import DirectoratesCmsPage from "@/pages/directorates-cms";
 import GalleryCmsPage from "@/pages/gallery-cms";
 import DepartmentsCmsPage from "@/pages/departments-cms";
@@ -44,6 +45,12 @@ import ContentHealthPage from "@/pages/content-health";
 import WorkflowConsolePage from "@/pages/workflow-console";
 import AdmissionsCmsPage from "@/pages/admissions-cms";
 import KuccpsImportWizard from "@/pages/kuccps-import-wizard";
+import MediaHubCmsPage from "@/pages/media-hub-cms";
+import PagesManagerCmsPage from "@/pages/pages-manager-cms";
+import BrandingSettingsPage from "@/pages/branding-settings";
+import GovernanceStrategicPlanPage from "@/pages/governance-strategic-plan";
+import GovernancePoliciesPage from "@/pages/governance-policies";
+import GovernanceServiceCharterPage from "@/pages/governance-service-charter";
 
 // ─── Role constants ───────────────────────────────────────────────────────────
 const ADMIN_ROLES    = ["super_admin", "ict_admin", "communications_admin"];
@@ -148,6 +155,13 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <SiteSettingsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/branding-settings">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <BrandingSettingsPage />
             </RequireRole>
           )}
         </Route>
@@ -305,6 +319,13 @@ function AppRoutes() {
             </RequireRole>
           )}
         </Route>
+        <Route path="/governance/vc-office">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <VcOfficeProfilesCmsPage />
+            </RequireRole>
+          )}
+        </Route>
         <Route path="/governance/management">
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
@@ -316,6 +337,27 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <DirectoratesCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/governance/strategic-plan">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <GovernanceStrategicPlanPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/governance/policies">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <GovernancePoliciesPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/governance/service-charter">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <GovernanceServiceCharterPage />
             </RequireRole>
           )}
         </Route>
@@ -404,6 +446,31 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <AdmissionsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* Media Hub */}
+        <Route path="/media-hub">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <MediaHubCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/media-hub/:tab">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <MediaHubCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* Pages Manager */}
+        <Route path="/pages-manager">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <PagesManagerCmsPage />
             </RequireRole>
           )}
         </Route>

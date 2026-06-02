@@ -140,6 +140,26 @@ class SiteConfigSeeder extends Seeder
             'main_campus_lng' => '34.9085',
         ]);
 
+        // Branding — logo URLs, colours, tagline, and download links
+        SiteConfig::setGroup('branding', [
+            'logo_primary_url'     => '/imgs/logo-updated.png',
+            'logo_white_url'       => '/imgs/logo-updated.png',
+            'logo_alt'             => 'Kaimosi Friends University',
+            'favicon_url'          => '/favicon.ico',
+            'tagline'              => 'Spring of Knowledge',
+            'site_description'     => 'A Quaker-founded public university established in 2014, committed to truth, service, and academic excellence.',
+            'primary_color'        => '#1A5C38',
+            'gold_color'           => '#C9A227',
+            'white_color'          => '#FFFFFF',
+            'dark_color'           => '#111827',
+            'logo_full_color_url'  => '#',
+            'logo_reversed_url'    => '#',
+            'logo_gold_url'        => '#',
+            'logo_mono_url'        => '#',
+            'logo_icon_url'        => '#',
+            'brand_guidelines_url' => '#',
+        ]);
+
         // About page content
         SiteConfig::setGroup('about', [
             'hero_heading'      => 'About KAFU',

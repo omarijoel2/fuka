@@ -3,6 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Menu, X, ChevronDown, ChevronRight, MapPin, Phone, ExternalLink, Search } from "lucide-react";
 import { Button } from "./ui/button";
 import { SearchModal } from "./search-bar";
+import { useBranding, BRANDING_DEFAULTS } from "@/lib/api-hooks";
 
 // ─── Departments mega-menu data (grouped by school) ──────────────────────────
 // Slugs MUST match the `slug` column in the `departments` table (DepartmentSeeder)
@@ -96,7 +97,7 @@ const navItems: NavItem[] = [
         heading: "Governance",
         links: [
           { name: "University Council",     path: "/about/council" },
-          { name: "Vice-Chancellor",        path: "/about/management" },
+          { name: "Vice-Chancellor",        path: "/about/vice-chancellor" },
           { name: "University Management",  path: "/about/management" },
         ],
       },
@@ -656,6 +657,9 @@ export function Navbar() {
   const [mobileOpen,   setMobileOpen]   = React.useState(false);
   const [openDropdown, setOpenDropdown] = React.useState<string | null>(null);
   const [searchOpen,   setSearchOpen]   = useState(false);
+  const { data: branding } = useBranding();
+  const logoUrl = branding?.logo_primary_url ?? BRANDING_DEFAULTS.logo_primary_url;
+  const logoAlt = branding?.logo_alt         ?? BRANDING_DEFAULTS.logo_alt;
   const [location]                      = useLocation();
   const navRowRef                       = React.useRef<HTMLDivElement>(null);
 
@@ -713,8 +717,8 @@ export function Navbar() {
       <div className="container mx-auto px-4 h-[68px] flex items-center justify-between">
         <Link href="/" className="flex items-center shrink-0" data-testid="link-home-logo">
           <img
-            src="/imgs/logo-updated.png"
-            alt="Kaimosi Friends University"
+            src={logoUrl}
+            alt={logoAlt}
             className="h-11 object-contain"
             onError={(e) => {
               const img = e.target as HTMLImageElement;
