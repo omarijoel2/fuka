@@ -110,7 +110,7 @@ function Router() {
           <Route path="/programmes/compare" component={ProgrammeCompare} />
           <Route path="/programmes/:school/:code" component={ProgrammeDetail} />
           <Route path="/staff" component={StaffDirectory} />
-          <Route path="/staff/:slug" component={StaffProfilePage} />
+          <Route path="/images/uploads/:slug" component={StaffProfilePage} />
           <Route path="/admissions" component={Admissions} />
           <Route path="/kuccps-verify" component={KuccpsVerify} />
           <Route path="/admissions/eligibility" component={AdmissionsEligibility} />

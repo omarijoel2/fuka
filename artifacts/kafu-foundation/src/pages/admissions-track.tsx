@@ -75,7 +75,7 @@ export default function AdmissionsTrack() {
         eyebrow="Admissions"
         title="Track Your Application"
         subtitle="Enter your application reference number to check the status of your admissions application."
-        photo="/imgs/apply-now.jpg"
+        photo="/images/uploads/apply-now.jpg"
         align="center"
         breadcrumb={[
           { label: "Home", href: "/" },

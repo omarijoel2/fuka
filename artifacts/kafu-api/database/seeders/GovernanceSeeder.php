@@ -99,6 +99,40 @@ class GovernanceSeeder extends Seeder
                 'photo_url'      => '/images/uploads/Prof.-Amimo.jpg',
                 'position_order' => 3,
             ],
+
+[
+    'name'           => 'Prof. Thomas Kipkurgat',
+    'title'          => 'Deputy Vice Chancellor — Administration, Finance, Planning & Development',
+    'category'       => 'dvc',
+    'bio'            => 'Prof. Thomas Kipkurgat serves as the Deputy Vice Chancellor responsible for Administration, Finance, Planning and Development (DVC AFP&D) at Kaimosi Friends University. He oversees the university administrative operations, financial management, strategic planning, and campus infrastructure development.',
+    'email'          => 'dvc-afpd@kafu.ac.ke',
+    'office'         => 'DVC Administration, Finance, Planning & Development Office',
+    'phone'          => '+254 777 373 642',
+    'photo_url'      => '/images/uploads/Kipkurgat.jpg',
+    'position_order' => 4,
+],
+[
+    'name'           => 'Dr. Patrick Agesa',
+    'title'          => 'Acting Deputy Registrar',
+    'category'       => 'registrar',
+    'bio'            => 'Dr. Patrick Agesa serves as the Acting Deputy Registrar at Kaimosi Friends University, supporting registry functions including student admissions, records management, academic governance, and institutional compliance.',
+    'email'          => 'registrar@kafu.ac.ke',
+    'office'         => 'Registrar Office',
+    'phone'          => '+254 777 373 651',
+    'photo_url'      => '/images/uploads/Dr.-Agesa.jpg',
+    'position_order' => 6,
+],
+[
+    'name'           => 'Dr. Fredrick M. Nyambane',
+    'title'          => 'Dean of Students',
+    'category'       => 'other',
+    'bio'            => 'Dr. Fredrick M. Nyambane serves as the Dean of Students at Kaimosi Friends University, overseeing student welfare, counselling services, accommodation, clubs and societies, and student wellbeing.',
+    'email'          => 'dean.students@kafu.ac.ke',
+    'office'         => 'Dean of Students Office',
+    'phone'          => '+254 777 373 670',
+    'photo_url'      => '/images/uploads/dean-nyambane.jpg',
+    'position_order' => 8,
+],
             [
                 'name'           => 'Dr. Samuel Munda',
                 'title'          => 'Senior Assistant Registrar — Academic Affairs',
@@ -125,12 +159,12 @@ class GovernanceSeeder extends Seeder
 
         foreach ($members as $member) {
             if (array_key_exists('credentials', $member)) {
-                CouncilMember::firstOrCreate(
+                CouncilMember::updateOrCreate(
                     ['name' => $member['name'], 'category' => $member['category']],
                     $member
                 );
             } else {
-                ManagementProfile::firstOrCreate(
+                ManagementProfile::updateOrCreate(
                     ['name' => $member['name'], 'category' => $member['category']],
                     $member
                 );

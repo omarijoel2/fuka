@@ -137,7 +137,7 @@ export default function ResearchJournal() {
 
       {/* Hero */}
       <div className="relative bg-primary text-primary-foreground py-16 md:py-20 overflow-hidden">
-        <img src="/imgs/picture2.png" alt="" aria-hidden="true"
+        <img src="/images/uploads/picture2.png" alt="" aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover" style={{ filter: "brightness(0.2)" }} />
         <div className="absolute inset-0 bg-primary/80" />
         <div className="relative max-w-5xl mx-auto px-4">

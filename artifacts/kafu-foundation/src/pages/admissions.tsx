@@ -160,7 +160,7 @@ export default function Admissions() {
       {/* ─── HERO ─── */}
       <div className="bg-primary text-primary-foreground relative overflow-hidden">
         <img
-          src="/imgs/apply-now.jpg"
+          src="/images/uploads/apply-now.jpg"
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover object-center"

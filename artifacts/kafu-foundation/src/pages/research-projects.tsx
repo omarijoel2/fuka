@@ -52,7 +52,7 @@ export default function ResearchProjects() {
       />
       {/* Header */}
       <div className="relative bg-primary text-primary-foreground py-16 md:py-20 overflow-hidden">
-        <img src="/imgs/visual-acuity.jpg" alt="" aria-hidden="true"
+        <img src="/images/uploads/visual-acuity.jpg" alt="" aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover" style={{ filter: "brightness(0.2)" }} />
         <div className="absolute inset-0 bg-primary/80" />
         <div className="relative container mx-auto px-4 z-10">

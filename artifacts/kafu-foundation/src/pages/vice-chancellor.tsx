@@ -20,21 +20,21 @@ interface ManagementProfile {
 const FALLBACK: ManagementProfile[] = [
   {
     id: 1, name: "Prof. Peter N. Mwita", title: "Vice-Chancellor",
-    photo_url: "/vc-prof-mwita.jpg",
+    photo_url: "/images/uploads/prof-peter-mwita.jpg",
     bio: "Prof. Peter N. Mwita is a distinguished Kenyan academic leader and statistician with over 30 years' experience in higher education, research, and national development. As Vice-Chancellor of Kaimosi Friends University, he leads a transformative agenda anchored on academic excellence, research expansion, fiscal discipline, strong governance, and community-centred growth.",
     email: "vc@kafu.ac.ke", office: "Vice-Chancellor's Office, Administration Block",
     phone: "+254 777 373 633", category: "vc", position_order: 1, is_active: true,
   },
   {
     id: 2, name: "Prof. Fred. A. Amimo", title: "Deputy Vice-Chancellor — Academic, Student Affairs & Research",
-    photo_url: "/imgs/staff/Prof.-Amimo.jpg",
+    photo_url: "/images/uploads/Prof.-Amimo.jpg",
     bio: "Oversees all academic programmes, student welfare, curriculum development, quality assurance, and the university's research agenda across the five schools.",
     email: "dvc-asar@kafu.ac.ke", office: "DVC Academic Office, Administration Block",
     phone: "+254 777 373 640", category: "dvc", position_order: 2, is_active: true,
   },
   {
     id: 3, name: "Prof. Thomas Kipkurgat", title: "Deputy Vice-Chancellor — Administration, Finance, Planning & Development",
-    photo_url: "/imgs/staff/Kipkurgat.jpg",
+    photo_url: "/images/uploads/Kipkurgat.jpg",
     bio: "Oversees the university's administrative operations, financial management, strategic planning, and campus infrastructure development.",
     email: "dvc-afpd@kafu.ac.ke", office: "DVC Administration Office, Administration Block",
     phone: "+254 777 373 642", category: "dvc", position_order: 3, is_active: true,
@@ -142,7 +142,7 @@ export default function ViceChancellorPage() {
         eyebrow="Leadership"
         title="Office of the Vice-Chancellor"
         subtitle="The Vice-Chancellor provides overall academic, administrative, and strategic leadership of Kaimosi Friends University, supported by the Deputy Vice-Chancellors."
-        photo="/imgs/aerial-1.jpg"
+        photo="/images/uploads/aerial-1.jpg"
         align="center"
         breadcrumb={[
           { label: "Home", href: "/" },

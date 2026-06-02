@@ -22,8 +22,8 @@ export interface BrandingConfig {
 }
 
 export const BRANDING_DEFAULTS: BrandingConfig = {
-  logo_primary_url:     "/imgs/logo-updated.png",
-  logo_white_url:       "/imgs/logo-updated.png",
+  logo_primary_url:     "/images/uploads/logo-updated.png",
+  logo_white_url:       "/images/uploads/logo-updated.png",
   logo_alt:             "Kaimosi Friends University",
   favicon_url:          "/favicon.ico",
   tagline:              "Spring of Knowledge",
@@ -261,7 +261,7 @@ export function useStaff(params?: { school?: string; search?: string; designatio
 export function useStaffProfile(slug: string) {
   return useQuery({
     queryKey: ["staff", slug],
-    queryFn: () => fetchApi<StaffProfile>(`/staff/${slug}`),
+    queryFn: () => fetchApi<StaffProfile>(`/images/uploads/${slug}`),
     enabled: !!slug,
   });
 }

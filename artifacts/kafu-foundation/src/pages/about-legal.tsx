@@ -107,7 +107,7 @@ export default function AboutLegal() {
             </div>
             <div className="bg-primary text-white rounded-xl p-6">
               <img
-                src="/imgs/legal-officer-kethi.jpg"
+                src="/images/uploads/legal-officer-kethi.jpg"
                 alt="Harriet Kethi, Legal Officer"
                 className="w-20 h-20 rounded-full object-cover object-top mb-4 border-2 border-white/30"
               />

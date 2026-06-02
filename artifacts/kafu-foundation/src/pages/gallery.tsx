@@ -53,12 +53,12 @@ const CATEGORY_COLOURS: Record<string, string> = {
 };
 
 const FALLBACK_ALBUMS: GalleryAlbum[] = [
-  { id: 1, title: "Graduation Ceremony 2025", slug: "graduation-2025", description: "KAFU's 2025 graduation celebrated over 800 graduates.", category: "graduation", cover_image_url: "/imgs/campus-main.jpg", album_date: "2025-11-28", sort_order: 1 },
-  { id: 2, title: "Founder's Day 2025", slug: "founders-day-2025", description: "Founder's Day celebrations with academic and cultural events.", category: "events", cover_image_url: "/imgs/IMG_8696.jpg", album_date: "2025-09-15", sort_order: 2 },
-  { id: 3, title: "Campus Life", slug: "campus-life", description: "A glimpse into everyday life at the KAFU campus.", category: "campus", cover_image_url: "/imgs/aerial-1.jpg", album_date: "2025-10-01", sort_order: 3 },
-  { id: 4, title: "Research & Innovation Week 2025", slug: "research-week-2025", description: "Showcasing groundbreaking research from students and faculty.", category: "research", cover_image_url: "/imgs/health.jpg", album_date: "2025-07-10", sort_order: 4 },
-  { id: 5, title: "International Exchange 2025", slug: "international-exchange-2025", description: "Welcoming international students from partner universities.", category: "international", cover_image_url: "/imgs/undergraduate.jpg", album_date: "2025-06-20", sort_order: 5 },
-  { id: 6, title: "Sports Day 2025", slug: "sports-day-2025", description: "Athletics, team sports, and inter-school competitions.", category: "sports", cover_image_url: "/imgs/PIC1.jpg", album_date: "2025-08-05", sort_order: 6 },
+  { id: 1, title: "Graduation Ceremony 2025", slug: "graduation-2025", description: "KAFU's 2025 graduation celebrated over 800 graduates.", category: "graduation", cover_image_url: "/images/uploads/campus-main.jpg", album_date: "2025-11-28", sort_order: 1 },
+  { id: 2, title: "Founder's Day 2025", slug: "founders-day-2025", description: "Founder's Day celebrations with academic and cultural events.", category: "events", cover_image_url: "/images/uploads/IMG_8696.jpg", album_date: "2025-09-15", sort_order: 2 },
+  { id: 3, title: "Campus Life", slug: "campus-life", description: "A glimpse into everyday life at the KAFU campus.", category: "campus", cover_image_url: "/images/uploads/aerial-1.jpg", album_date: "2025-10-01", sort_order: 3 },
+  { id: 4, title: "Research & Innovation Week 2025", slug: "research-week-2025", description: "Showcasing groundbreaking research from students and faculty.", category: "research", cover_image_url: "/images/uploads/health.jpg", album_date: "2025-07-10", sort_order: 4 },
+  { id: 5, title: "International Exchange 2025", slug: "international-exchange-2025", description: "Welcoming international students from partner universities.", category: "international", cover_image_url: "/images/uploads/undergraduate.jpg", album_date: "2025-06-20", sort_order: 5 },
+  { id: 6, title: "Sports Day 2025", slug: "sports-day-2025", description: "Athletics, team sports, and inter-school competitions.", category: "sports", cover_image_url: "/images/uploads/PIC1.jpg", album_date: "2025-08-05", sort_order: 6 },
 ];
 
 const FILTERS = ["All", "Graduation", "Events", "Campus Life", "Sports", "Research", "International"];
@@ -104,7 +104,7 @@ export default function GalleryPage() {
         eyebrow="Media"
         title="Photo & Video Gallery"
         subtitle="Explore moments from KAFU's campus life, ceremonies, research activities, and community events."
-        photo="/imgs/art-culture.jpg"
+        photo="/images/uploads/art-culture.jpg"
         align="center"
         breadcrumb={[{ label: "Home", href: "/" }, { label: "Gallery" }]}
       >

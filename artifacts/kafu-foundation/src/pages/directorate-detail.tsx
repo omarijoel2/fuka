@@ -93,7 +93,7 @@ const STATIC_FALLBACKS: Record<string, Partial<Directorate>> = {
       "Performance Contracting (PC) is the cornerstone of Kaimosi Friends University's (KAFU) commitment to delivering high-quality public service. As a critical mechanism under the Public Sector Reforms agenda, the PC is a negotiated, legally-binding agreement between the Government of the Republic of Kenya (specifically through the Ministry of Education) and the University Management. This system ensures that our operations are not only mission-driven but also aligned with national development goals, providing a clear framework for measuring institutional success. Fundamentally, this process is geared toward three key outcomes: Ensuring Accountability and Integrity by institutionalizing a culture of accountability, transparency, and promoting the core values and principles of the public service; Enhancing Service Delivery by mandating impartiality, fairness, and responsiveness in the provision of public services; and Resource Optimization — guaranteeing the effective, efficient, and responsible use of public funds entrusted to the University.",
     director_name: "Dr. Metrine Sulungi",
     director_title: "Director, PPC",
-    director_photo_url: "/imgs/staff/Dr.-Sulungai.jpg",
+    director_photo_url: "/images/uploads/Dr.-Sulungai.jpg",
     director_bio: "Dr. Metrine Sulungai serves as Director of Performance Planning and Contracting at Kaimosi Friends University, overseeing the university's compliance with government performance contracting obligations and leading institutional strategic planning and monitoring.",
     director_email: "planning@kafu.ac.ke",
     director_phone: "+254 777 373 780",
@@ -118,7 +118,7 @@ const STATIC_FALLBACKS: Record<string, Partial<Directorate>> = {
       { label: "Contact Us",  url: "/contact" },
     ],
     staff_roster: [
-      { name: "Dr. Metrine Sulungi", title: "Director, PPC", photo_url: "/imgs/staff/Dr.-Sulungai.jpg", email: "planning@kafu.ac.ke" },
+      { name: "Dr. Metrine Sulungi", title: "Director, PPC", photo_url: "/images/uploads/Dr.-Sulungai.jpg", email: "planning@kafu.ac.ke" },
     ],
   },
   "university-linkages-alumni-career": {
@@ -322,7 +322,7 @@ export default function DirectorateDetail({ slug: propSlug }: { slug?: string })
         eyebrow="Directorate"
         title={d.name}
         subtitle={d.tagline ?? undefined}
-        photo="/imgs/staff/image-8-1.jpeg"
+        photo="/images/uploads/image-8-1.jpeg"
         breadcrumb={[
           { label: "Home", href: "/" },
           { label: "Directorates", href: "/directorates" },

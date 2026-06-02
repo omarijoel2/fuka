@@ -94,7 +94,7 @@ export default function MediaBrandingPage() {
         eyebrow="Media"
         title="Branding Resources"
         subtitle="Official logos, colour palette, typography, and usage guidelines for the KAFU brand identity."
-        photo="/imgs/campus-main.jpg"
+        photo="/images/uploads/campus-main.jpg"
         align="left"
         breadcrumb={[{ label: "Home", href: "/" }, { label: "Media", href: "/media" }, { label: "Branding" }]}
       />

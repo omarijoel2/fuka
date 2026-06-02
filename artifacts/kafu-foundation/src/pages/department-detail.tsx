@@ -288,7 +288,7 @@ export default function DepartmentDetailPage() {
               {deptStaff.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {deptStaff.map(s => (
-                    <Link key={s.slug} href={`/staff/${s.slug}`}>
+                    <Link key={s.slug} href={`/images/uploads/${s.slug}`}>
                       <div
                         className="group flex items-center gap-4 p-4 bg-card border rounded-xl hover:border-primary hover:shadow-sm transition-all cursor-pointer"
                         data-testid={`staff-card-${s.slug}`}

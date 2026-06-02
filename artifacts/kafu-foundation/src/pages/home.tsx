@@ -31,7 +31,7 @@ import {
 // No overlay on photos. Light background with decorative blobs.
 const SLIDES = [
   {
-    image: "/imgs/vc.jpeg",
+    image: "/images/uploads/vc.jpeg",
     objectPosition: "center top",
     badge: "Vice-Chancellor · Prof. Peter N. Mwita",
     headline: "Vision. Leadership.",
@@ -41,7 +41,7 @@ const SLIDES = [
     testid: "hero-slide-0",
   },
   {
-    image: "/imgs/vc-cbe-training.jpg",
+    image: "/images/uploads/vc-cbe-training.jpg",
     objectPosition: "center top",
     badge: "Teaching & Learning · Competency-Based Education",
     headline: "Leading from",
@@ -52,7 +52,7 @@ const SLIDES = [
     testid: "hero-slide-1",
   },
   {
-    image: "/imgs/kafu-kuccps-visit.jpeg",
+    image: "/images/uploads/kafu-kuccps-visit.jpeg",
     objectPosition: "center center",
     badge: "National Recognition · KUCCPS CEO Visit",
     headline: "A Rising",
@@ -63,7 +63,7 @@ const SLIDES = [
     testid: "hero-slide-2",
   },
   {
-    image: "/imgs/kafu-africa-pubservice.jpg",
+    image: "/images/uploads/kafu-africa-pubservice.jpg",
     objectPosition: "center center",
     badge: "Historic Milestone · Africa Public Service Day 2026",
     headline: "KAFU on the",
@@ -74,7 +74,7 @@ const SLIDES = [
     testid: "hero-slide-3",
   },
   {
-    image: "/imgs/kafu-kippra-conference.jpeg",
+    image: "/images/uploads/kafu-kippra-conference.jpeg",
     objectPosition: "center center",
     badge: "Research Leadership · KIPPRA Annual Conference",
     headline: "Advancing",
@@ -85,7 +85,7 @@ const SLIDES = [
     testid: "hero-slide-4",
   },
   {
-    image: "/imgs/kafu-innovation-week.jpeg",
+    image: "/images/uploads/kafu-innovation-week.jpeg",
     objectPosition: "center center",
     badge: "Innovation · Kenya Science and Innovation Week",
     headline: "Local Ideas,",
@@ -96,7 +96,7 @@ const SLIDES = [
     testid: "hero-slide-5",
   },
   {
-    image: "/imgs/kafu-ministry-health.jpg",
+    image: "/images/uploads/kafu-ministry-health.jpg",
     objectPosition: "center center",
     badge: "Community & Health · Ministry of Health Partnership",
     headline: "Serving",
@@ -442,7 +442,7 @@ export default function Home() {
 
   const whyKafuSlides = [
     {
-      image: "/imgs/image-99.jpeg",
+      image: "/images/uploads/image-99.jpeg",
       category: "Accreditation",
       title: "Accredited Quality",
       body: "Fully accredited by the Commission for University Education (CUE) with programmes meeting national and international standards.",
@@ -450,7 +450,7 @@ export default function Home() {
       testid: "why-slide-accredited",
     },
     {
-      image: "/imgs/posgraduate.jpg",
+      image: "/images/uploads/posgraduate.jpg",
       category: "Programmes",
       title: "Unique Programmes",
       body: "Home to rare and high-demand offerings — including one of only two institutions in Kenya offering Optometry up to PhD level.",
@@ -458,7 +458,7 @@ export default function Home() {
       testid: "why-slide-programmes",
     },
     {
-      image: "/imgs/visual-acuity.jpg",
+      image: "/images/uploads/visual-acuity.jpg",
       category: "Research",
       title: "Research & Innovation",
       body: "Driving solutions in health, environment, and development across Kenya — supported by national and international partnerships.",
@@ -466,7 +466,7 @@ export default function Home() {
       testid: "why-slide-research",
     },
     {
-      image: "/imgs/art-culture.jpg",
+      image: "/images/uploads/art-culture.jpg",
       category: "Campus Life",
       title: "Quaker Values",
       body: "Founded on principles of truth, integrity, and service to humanity — shaping leaders of character since 2014.",
@@ -474,7 +474,7 @@ export default function Home() {
       testid: "why-slide-values",
     },
     {
-      image: "/imgs/campus-main.jpg",
+      image: "/images/uploads/campus-main.jpg",
       category: "Community",
       title: "Community Impact",
       body: "Deeply rooted in Western Kenya, KAFU actively engages 47 counties through research, outreach, and partnerships.",
@@ -482,7 +482,7 @@ export default function Home() {
       testid: "why-slide-community",
     },
     {
-      image: "/imgs/undergraduate.jpg",
+      image: "/images/uploads/undergraduate.jpg",
       category: "Students",
       title: "Student Life",
       body: "Thousands of students discovering their potential through rigorous academics, hands-on learning, and vibrant campus community.",
@@ -490,7 +490,7 @@ export default function Home() {
       testid: "why-slide-students",
     },
     {
-      image: "/imgs/sports.jpg",
+      image: "/images/uploads/sports.jpg",
       category: "Sports",
       title: "Sports & Recreation",
       body: "From inter-university tournaments to fitness and wellness, KAFU nurtures the whole student beyond the classroom.",
@@ -498,7 +498,7 @@ export default function Home() {
       testid: "why-slide-sports",
     },
     {
-      image: "/imgs/vc-lecture.jpg",
+      image: "/images/uploads/vc-lecture.jpg",
       category: "Leadership",
       title: "Visionary Leadership",
       body: "Under Vice-Chancellor Prof. Peter Mwita, KAFU is transforming into a globally competitive university driven by innovation and integrity.",
@@ -924,10 +924,10 @@ export default function Home() {
       <section className="py-0 bg-background">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-0 h-56 md:h-72">
           {[
-            { src: "/imgs/undergraduate.jpg", label: "Undergraduate Life" },
-            { src: "/imgs/posgraduate.jpg", label: "Postgraduate Research" },
-            { src: "/imgs/art-culture.jpg", label: "Arts & Culture" },
-            { src: "/imgs/sports.jpg", label: "Sports & Recreation" },
+            { src: "/images/uploads/undergraduate.jpg", label: "Undergraduate Life" },
+            { src: "/images/uploads/posgraduate.jpg", label: "Postgraduate Research" },
+            { src: "/images/uploads/art-culture.jpg", label: "Arts & Culture" },
+            { src: "/images/uploads/sports.jpg", label: "Sports & Recreation" },
           ].map(({ src, label }, i) => (
             <div key={i} className="relative overflow-hidden group">
               <img
@@ -974,25 +974,25 @@ export default function Home() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
             {[
               {
-                image: "/imgs/image-99.jpeg",
+                image: "/images/uploads/image-99.jpeg",
                 label: "Library & Digital Resources",
                 desc: "50,000+ volumes and online research databases",
                 testid: "tour-tile-library",
               },
               {
-                image: "/imgs/visual-acuity.jpg",
+                image: "/images/uploads/visual-acuity.jpg",
                 label: "Science & Health Labs",
                 desc: "State-of-the-art optometry, computing and science labs",
                 testid: "tour-tile-labs",
               },
               {
-                image: "/imgs/undergraduate.jpg",
+                image: "/images/uploads/undergraduate.jpg",
                 label: "Student Residences",
                 desc: "On-campus accommodation in a safe, serene environment",
                 testid: "tour-tile-residences",
               },
               {
-                image: "/imgs/sports.jpg",
+                image: "/images/uploads/sports.jpg",
                 label: "Sports & Recreation",
                 desc: "Football, basketball, athletics and fitness facilities",
                 testid: "tour-tile-sports",
@@ -1324,7 +1324,7 @@ export default function Home() {
       {/* ─── CTA ─── */}
       <section className="relative py-16 md:py-24 overflow-hidden">
         <img
-          src="/imgs/apply-now.jpg"
+          src="/images/uploads/apply-now.jpg"
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover object-center"
