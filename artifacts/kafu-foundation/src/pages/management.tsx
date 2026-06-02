@@ -250,12 +250,10 @@ export default function ManagementPage() {
   });
 
   const all = apiData?.data ?? [];
-  const vc = all.find(p => p.category === "vc") ?? FALLBACK_VC;
+  const vc = all.find(p => p.category === "vc");
 
   // All non-VC profiles (DVCs + registrars + finance + others)
-  const boardProfiles = all.length > 0
-    ? all.filter(p => p.category !== "vc" && p.is_active)
-    : FALLBACK_OTHERS;
+  const boardProfiles = all.filter(p => p.category !== "vc" && p.is_active);
 
   const grouped = CATEGORY_ORDER.reduce((acc, cat) => {
     const items = boardProfiles.filter(p => p.category === cat);
@@ -290,7 +288,7 @@ export default function ManagementPage() {
           <h2 className="font-serif text-xl font-bold text-primary mb-5 pb-2 border-b border-border">
             Vice-Chancellor
           </h2>
-          <VCFullCard profile={vc} />
+          {vc && <VCFullCard profile={vc} />}
         </section>
 
         {/* Registrars, Finance, Others */}
