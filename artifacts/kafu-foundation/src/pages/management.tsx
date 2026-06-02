@@ -17,8 +17,9 @@ interface ManagementProfile {
   is_active: boolean;
 }
 
-const CATEGORY_ORDER = ["registrar", "finance", "library", "ict", "other"];
+const CATEGORY_ORDER = ["dvc", "registrar", "finance", "library", "ict", "other"];
 const CATEGORY_LABELS: Record<string, string> = {
+  dvc: "Deputy Vice-Chancellors",
   registrar: "Registrars",
   finance: "Finance",
   library: "Library",
@@ -64,6 +65,20 @@ const FALLBACK_VC: ManagementProfile = {
 };
 
 const FALLBACK_OTHERS: ManagementProfile[] = [
+  {
+    id: 2, name: "Prof. Fred. A. Amimo", title: "Deputy Vice-Chancellor — Academic, Student Affairs & Research",
+    photo_url: "/imgs/staff/Prof.-Amimo.jpg",
+    bio: "Oversees all academic programmes, student welfare, curriculum development, quality assurance, and the university's research agenda across the five schools.",
+    email: "dvc-asar@kafu.ac.ke", office: "DVC Academic Office, Administration Block",
+    phone: "+254 777 373 640", category: "dvc", position_order: 2, is_active: true,
+  },
+  {
+    id: 3, name: "Prof. Thomas Kipkurgat", title: "Deputy Vice-Chancellor — Administration, Finance, Planning & Development",
+    photo_url: "/imgs/staff/Kipkurgat.jpg",
+    bio: "Oversees the university's administrative operations, financial management, strategic planning, and campus infrastructure development.",
+    email: "dvc-afpd@kafu.ac.ke", office: "DVC Administration Office, Administration Block",
+    phone: "+254 777 373 642", category: "dvc", position_order: 3, is_active: true,
+  },
   {
     id: 4, name: "Dr. Samuel Munda", title: "Senior Assistant Registrar — Academic Affairs",
     photo_url: "/imgs/Dr.-Munda-1.jpg",
@@ -237,9 +252,9 @@ export default function ManagementPage() {
   const all = apiData?.data ?? [];
   const vc = all.find(p => p.category === "vc") ?? FALLBACK_VC;
 
-  // Only non-vc, non-dvc profiles on this page
+  // All non-VC profiles (DVCs + registrars + finance + others)
   const boardProfiles = all.length > 0
-    ? all.filter(p => p.category !== "vc" && p.category !== "dvc" && p.is_active)
+    ? all.filter(p => p.category !== "vc" && p.is_active)
     : FALLBACK_OTHERS;
 
   const grouped = CATEGORY_ORDER.reduce((acc, cat) => {
