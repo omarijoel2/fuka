@@ -7,7 +7,7 @@ id = "3B4_FFSkEVBkAeYMFRJ2e"
 [[services]]
 localPort = 8080
 name = "API Server"
-paths = ["/api"]
+paths = ["/api", "/storage"]
 
 [services.development]
 run = "cd /home/runner/workspace/artifacts/kafu-api/public && php -d upload_max_filesize=20M -d post_max_size=25M -S 0.0.0.0:$PORT /home/runner/workspace/artifacts/kafu-api/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php"

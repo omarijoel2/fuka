@@ -44,13 +44,26 @@ function mapCmsNews(CmsContent $item): array {
 }
 }
 
+if (!function_exists('normalizeAttachmentUrl')) {
+function normalizeAttachmentUrl(string $url): string {
+    // Strip any http://localhost:PORT prefix so stored URLs remain path-only
+    if (preg_match('#^https?://localhost(:\d+)?(/storage/.+)$#i', $url, $m)) {
+        return $m[2];
+    }
+    return $url;
+}
+}
+
 if (!function_exists('mapCmsNewsDetail')) {
 function mapCmsNewsDetail(CmsContent $item): array {
     $base = mapCmsNews($item);
     $sd = $item->structured_data ?? [];
     $base['content']     = $item->body ?? '<p>Content is being prepared. Please check back shortly.</p>';
     $base['related']     = $item->related_ids ?? [];
-    $base['attachments'] = $sd['attachments'] ?? [];
+    $base['attachments'] = array_map(function ($a) {
+        $a['url'] = normalizeAttachmentUrl($a['url'] ?? '');
+        return $a;
+    }, $sd['attachments'] ?? []);
     return $base;
 }
 }
@@ -110,7 +123,10 @@ function mapCmsAnnouncementDetail(CmsContent $item): array {
     $base = mapCmsAnnouncement($item);
     $sd = $item->structured_data ?? [];
     $base['content']     = $item->body ?? '<p>Full content is being prepared.</p>';
-    $base['attachments'] = $sd['attachments'] ?? [];
+    $base['attachments'] = array_map(function ($a) {
+        $a['url'] = normalizeAttachmentUrl($a['url'] ?? '');
+        return $a;
+    }, $sd['attachments'] ?? []);
     return $base;
 }
 }
@@ -268,7 +284,7 @@ function mapCmsOpportunityDetail(CmsContent $item): array {
             'title' => $a['title'] ?? '',
             'type'  => $a['type']  ?? 'FILE',
             'size'  => $size,
-            'url'   => $a['url']   ?? '',
+            'url'   => normalizeAttachmentUrl($a['url'] ?? ''),
         ];
     }, $sd['attachments'] ?? []);
     $base['documents'] = array_merge($legacyDocs, $uploaded);
@@ -5344,7 +5360,7 @@ Route::middleware(['auth:sanctum'])->post('/admin/content/upload-attachment', fu
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $safeName = Str::slug($originalName) . '-' . substr((string) Str::uuid(), 0, 8) . '.' . $ext;
         $path = $file->storeAs('content-attachments', $safeName, 'public');
-        $url = Storage::disk('public')->url($path);
+        $url = '/storage/' . $path;
         return response()->json([
             'url'     => $url,
             'title'   => $file->getClientOriginalName(),
