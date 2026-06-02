@@ -187,6 +187,53 @@ class SiteConfigSeeder extends Seeder
             ],
         ]);
 
+        // Admissions fees configuration (academic year, note, payment methods)
+        SiteConfig::setGroup('admissions_fees', [
+            'data' => json_encode([
+                'academic_year'            => '2025/2026',
+                'note'                     => 'All fees are reviewed annually. The figures above reflect 2025/2026 rates. Prospective students should confirm current rates with the Finance Office before payment.',
+                'payment_methods_visible'  => false,
+                'payment_methods'          => [
+                    [
+                        'method'  => 'M-Pesa',
+                        'details' => 'Paybill Number: [PENDING — confirm with Finance Office]. Use your student ID as account number.',
+                        'enabled' => false,
+                    ],
+                    [
+                        'method'  => 'Bank Deposit / Transfer',
+                        'details' => 'Kenya Commercial Bank (KCB) — Account: Kaimosi Friends University, A/C No: [PENDING], Branch: Kaimosi',
+                        'enabled' => false,
+                    ],
+                    [
+                        'method'  => 'Cooperative Bank',
+                        'details' => 'Cooperative Bank — Account: [PENDING], Branch: Kakamega',
+                        'enabled' => false,
+                    ],
+                    [
+                        'method'  => 'Cash (Finance Office)',
+                        'details' => 'Finance Office, Ground Floor, Administration Block. Mon–Fri, 8:00 AM – 4:00 PM.',
+                        'enabled' => false,
+                    ],
+                ],
+            ]),
+        ]);
+
+        // RBAC permissions matrix (role → feature → bool)
+        SiteConfig::setGroup('permissions', [
+            'matrix' => json_encode([
+                'super_admin'          => ['content_management' => true,  'review_queue' => true,  'research_office' => true,  'international_office' => true,  'governance' => true,  'admissions' => true,  'media_library' => true,  'site_controls' => true,  'seo_redirects' => true,  'reports' => true,  'user_management' => true,  'taxonomy' => true,  'settings' => true],
+                'ict_admin'            => ['content_management' => true,  'review_queue' => true,  'research_office' => true,  'international_office' => true,  'governance' => true,  'admissions' => true,  'media_library' => true,  'site_controls' => true,  'seo_redirects' => true,  'reports' => true,  'user_management' => false, 'taxonomy' => true,  'settings' => true],
+                'communications_admin' => ['content_management' => true,  'review_queue' => true,  'research_office' => true,  'international_office' => true,  'governance' => true,  'admissions' => true,  'media_library' => true,  'site_controls' => true,  'seo_redirects' => false, 'reports' => true,  'user_management' => false, 'taxonomy' => true,  'settings' => false],
+                'reviewer'             => ['content_management' => false, 'review_queue' => true,  'research_office' => false, 'international_office' => false, 'governance' => false, 'admissions' => false, 'media_library' => false, 'site_controls' => false, 'seo_redirects' => false, 'reports' => false, 'user_management' => false, 'taxonomy' => false, 'settings' => false],
+                'admissions_owner'     => ['content_management' => false, 'review_queue' => false, 'research_office' => false, 'international_office' => false, 'governance' => false, 'admissions' => true,  'media_library' => false, 'site_controls' => false, 'seo_redirects' => false, 'reports' => false, 'user_management' => false, 'taxonomy' => false, 'settings' => false],
+                'academic_owner'       => ['content_management' => true,  'review_queue' => true,  'research_office' => false, 'international_office' => false, 'governance' => false, 'admissions' => false, 'media_library' => false, 'site_controls' => false, 'seo_redirects' => false, 'reports' => false, 'user_management' => false, 'taxonomy' => false, 'settings' => false],
+                'procurement_owner'    => ['content_management' => true,  'review_queue' => false, 'research_office' => false, 'international_office' => false, 'governance' => false, 'admissions' => false, 'media_library' => false, 'site_controls' => false, 'seo_redirects' => false, 'reports' => false, 'user_management' => false, 'taxonomy' => false, 'settings' => false],
+                'hr_owner'             => ['content_management' => true,  'review_queue' => false, 'research_office' => false, 'international_office' => false, 'governance' => false, 'admissions' => false, 'media_library' => false, 'site_controls' => false, 'seo_redirects' => false, 'reports' => false, 'user_management' => false, 'taxonomy' => false, 'settings' => false],
+                'staff_user'           => ['content_management' => false, 'review_queue' => false, 'research_office' => false, 'international_office' => false, 'governance' => false, 'admissions' => false, 'media_library' => false, 'site_controls' => false, 'seo_redirects' => false, 'reports' => false, 'user_management' => false, 'taxonomy' => false, 'settings' => false],
+                'dept_editor'          => ['content_management' => true,  'review_queue' => false, 'research_office' => false, 'international_office' => false, 'governance' => false, 'admissions' => false, 'media_library' => true,  'site_controls' => false, 'seo_redirects' => false, 'reports' => false, 'user_management' => false, 'taxonomy' => false, 'settings' => false],
+            ]),
+        ]);
+
         // Student services page content
         SiteConfig::setGroup('student-services', [
             'hero_heading'        => 'Student Life & Services',
