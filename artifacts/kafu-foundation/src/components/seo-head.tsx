@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 
 export const SITE_URL = typeof window !== "undefined" ? window.location.origin : "";
-const DEFAULT_IMAGE = "/imgs/logo-updated.png";
+const DEFAULT_IMAGE = "/images/uploads/logo-updated.png";
 const SITE_NAME = "Kaimosi Friends University";
 const DEFAULT_DESCRIPTION =
   "Kaimosi Friends University (KAFU) — Spring of Knowledge. A Quaker-founded public university in Kaimosi, Western Kenya offering undergraduate, postgraduate, and doctoral programmes.";

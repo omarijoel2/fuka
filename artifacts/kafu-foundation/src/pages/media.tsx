@@ -73,7 +73,7 @@ export default function MediaPage() {
         eyebrow="Media Centre"
         title="News, Media & Resources"
         subtitle="Your one-stop source for KAFU's photos, videos, press releases, publications, and official branding materials."
-        photo="/imgs/campus-main.jpg"
+        photo="/images/uploads/campus-main.jpg"
         align="center"
         breadcrumb={[{ label: "Home", href: "/" }, { label: "Media" }]}
       />

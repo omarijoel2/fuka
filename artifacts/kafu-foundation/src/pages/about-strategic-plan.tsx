@@ -109,7 +109,7 @@ export default function StrategicPlan() {
       {/* Hero */}
       <section
         className="relative py-24 bg-primary text-primary-foreground overflow-hidden"
-        style={{ backgroundImage: "url(/imgs/aerial-1.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}
+        style={{ backgroundImage: "url(/images/uploads/aerial-1.jpg)", backgroundSize: "cover", backgroundPosition: "center" }}
       >
         <div className="absolute inset-0 bg-primary/85" />
         <div className="relative container mx-auto px-4">

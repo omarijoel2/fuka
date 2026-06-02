@@ -336,7 +336,7 @@ export default function CampusesCmsPage() {
                 <div>
                   <label className="block text-xs font-medium text-gray-600 mb-1">Hero Image URL</label>
                   <input type="text" value={form.hero_image} onChange={e => setField("hero_image", e.target.value)}
-                    placeholder="/img8696.jpg" data-testid="input-campus-hero"
+                    placeholder="/images/uploads/IMG_8696.jpg" data-testid="input-campus-hero"
                     className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
                 </div>
                 <div>

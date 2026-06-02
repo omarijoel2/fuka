@@ -19,7 +19,7 @@ class CampusSeeder extends Seeder
             'region'          => 'Western Kenya',
             'latitude'        => 0.1295,
             'longitude'       => 34.9085,
-            'hero_image'      => '/img8696.jpg',
+            'hero_image'      => '/images/uploads/IMG_8696.jpg',
             'gallery_images'  => ['/img6424.jpg', '/pic1.jpg'],
             'contact_email'   => 'info@kafu.ac.ke',
             'contact_phone'   => '+254 700 000 000',

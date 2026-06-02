@@ -11,7 +11,7 @@ const FALLBACK_SERVICES = [
     description: "KAFU provides on-campus accommodation facilities to support students throughout their studies. The hostels offer a safe, comfortable, and conducive environment for academic and personal development.",
     icon: Shield,
     colour: "#1A5C38",
-    img: "/imgs/sa-accommodation.jpg",
+    img: "/images/uploads/sa-accommodation.jpg",
     path: "/student-services#accommodation",
   },
   {
@@ -19,7 +19,7 @@ const FALLBACK_SERVICES = [
     description: "The university's catering facilities serve nutritious and affordable meals to students and staff. Our dining halls are designed to foster community and provide a welcoming space for students.",
     icon: Heart,
     colour: "#C9A227",
-    img: "/imgs/sa-catering.jpg",
+    img: "/images/uploads/sa-catering.jpg",
     path: "/student-services#catering",
   },
   {
@@ -27,7 +27,7 @@ const FALLBACK_SERVICES = [
     description: "KAFU facilitates access to government bursaries, Higher Education Loans Board (HELB) funding, and university-based scholarships to ensure no student is excluded due to financial constraints.",
     icon: BookOpen,
     colour: "#1B3A6B",
-    img: "/imgs/sa-bursary.jpg",
+    img: "/images/uploads/sa-bursary.jpg",
     path: "/admissions/funding",
   },
   {
@@ -35,7 +35,7 @@ const FALLBACK_SERVICES = [
     description: "The office coordinates intercollegiate and intramural sports programmes, supporting student athletes and promoting physical wellness, teamwork, and competitive excellence across a range of disciplines.",
     icon: Trophy,
     colour: "#8B1A1A",
-    img: "/imgs/sa-games.jpg",
+    img: "/images/uploads/sa-games.jpg",
     path: "/student-services#sports",
   },
   {
@@ -43,7 +43,7 @@ const FALLBACK_SERVICES = [
     description: "Confidential counselling services are available to all students. Our trained counsellors provide support for academic stress, personal challenges, mental health, and career guidance.",
     icon: Brain,
     colour: "#2D6A4F",
-    img: "/imgs/sa-counselling.jpg",
+    img: "/images/uploads/sa-counselling.jpg",
     path: "/student-services#counselling",
   },
   {
@@ -51,7 +51,7 @@ const FALLBACK_SERVICES = [
     description: "The KAFU Student Governing Council is the principal representative body for students. It channels student voices to the university administration, organises student activities, and promotes student leadership.",
     icon: Users,
     colour: "#5B4FCF",
-    img: "/imgs/sa-leadership.jpg",
+    img: "/images/uploads/sa-leadership.jpg",
     path: "/student-services#council",
   },
 ];
@@ -134,7 +134,7 @@ export default function StudentAffairs() {
             {/* Dean profile card */}
             <div className="bg-primary text-white rounded-xl p-6">
               <img
-                src="/imgs/dean-nyambane.jpg"
+                src="/images/uploads/dean-nyambane.jpg"
                 alt="Dr. Fredrick M. Nyambane, Dean of Students"
                 className="w-24 h-24 rounded-full object-cover object-top mb-4 border-2 border-white/30"
               />

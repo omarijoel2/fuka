@@ -52,7 +52,7 @@ export default function MediaVideosPage() {
         eyebrow="Media"
         title="Video Gallery"
         subtitle="Official videos from graduation ceremonies, campus life, research events, sports, and more."
-        photo="/imgs/art-culture.jpg"
+        photo="/images/uploads/art-culture.jpg"
         align="center"
         breadcrumb={[{ label: "Home", href: "/" }, { label: "Media", href: "/media" }, { label: "Videos" }]}
       >

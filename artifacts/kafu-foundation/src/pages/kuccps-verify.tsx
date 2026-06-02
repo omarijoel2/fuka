@@ -92,7 +92,7 @@ export default function KuccpsVerifyPage() {
       {/* Hero banner */}
       <div style={{ background: "linear-gradient(135deg, #228B22 0%, #0e3a24 100%)", color: "#fff", padding: "48px 24px", textAlign: "center" }}>
         <img
-          src="/imgs/logo-updated.png"
+          src="/images/uploads/logo-updated.png"
           alt="KAFU Logo"
           style={{ height: 50, marginBottom: 20, filter: "brightness(10)" }}
         />

@@ -24,43 +24,43 @@ const CATEGORY_LABELS: Record<string, string> = {
 const FALLBACK: CouncilMember[] = [
   {
     id: 1, name: "Prof. Stanley O. Khainga", title: "Chairman of the Council",
-    photo_url: "/imgs/staff/Prof.-Khainga.jpg", category: "chairperson", position_order: 1,
+    photo_url: "/images/uploads/Prof.-Khainga.jpg", category: "chairperson", position_order: 1,
     credentials: [],
     bio: "Prof. Stanley O. Khainga chairs the University Council, providing strategic leadership and ensuring sound governance in accordance with the Universities Act, 2012 and the KAFU Charter.",
   },
   {
     id: 2, name: "Prof. Peter N. Mwita", title: "Vice Chancellor & Secretary to the Council",
-    photo_url: "/vc-prof-mwita.jpg", category: "ex_officio", position_order: 2,
+    photo_url: "/images/uploads/prof-peter-mwita.jpg", category: "ex_officio", position_order: 2,
     credentials: ["PhD Statistics"],
     bio: "Prof. Peter N. Mwita serves as an ex-officio member and Secretary to the University Council by virtue of his office as Vice Chancellor. A Full Professor of Statistics, he brings over three decades of academic and institutional leadership as the chief executive and principal academic officer of Kaimosi Friends University.",
   },
   {
     id: 3, name: "Ms. Rose Chepkoech Langat", title: "Member, University Council",
-    photo_url: "/imgs/staff/Ms.-Langat.jpg", category: "member", position_order: 3, credentials: [], bio: null,
+    photo_url: "/images/uploads/Ms.-Langat.jpg", category: "member", position_order: 3, credentials: [], bio: null,
   },
   {
     id: 4, name: "Mr. David Mongosi Sigano", title: "Member, University Council",
-    photo_url: "/imgs/staff/Mr.-Mongosi.jpg", category: "member", position_order: 4, credentials: [], bio: null,
+    photo_url: "/images/uploads/Mr.-Mongosi.jpg", category: "member", position_order: 4, credentials: [], bio: null,
   },
   {
     id: 5, name: "Dr. Moses Osia Mwanje", title: "Member, University Council",
-    photo_url: "/imgs/staff/Dr.-Mwanje.jpg", category: "member", position_order: 5, credentials: ["PhD"], bio: null,
+    photo_url: "/images/uploads/Dr.-Mwanje.jpg", category: "member", position_order: 5, credentials: ["PhD"], bio: null,
   },
   {
     id: 6, name: "Mr. Yussuf Kala", title: "Member, University Council",
-    photo_url: "/imgs/staff/Mr.-Kala.jpg", category: "member", position_order: 6, credentials: [], bio: null,
+    photo_url: "/images/uploads/Mr.-Kala.jpg", category: "member", position_order: 6, credentials: [], bio: null,
   },
   {
     id: 7, name: "CPA Gilbert K. Kangogo", title: "Member, University Council",
-    photo_url: "/imgs/staff/CPA-Kangogo.jpg", category: "member", position_order: 7, credentials: ["CPA (K)"], bio: null,
+    photo_url: "/images/uploads/CPA-Kangogo.jpg", category: "member", position_order: 7, credentials: ["CPA (K)"], bio: null,
   },
   {
     id: 8, name: "Dr. Thaddaeus W. Egondi", title: "Member, University Council",
-    photo_url: "/imgs/staff/Dr.-Egondi.jpg", category: "member", position_order: 8, credentials: ["PhD"], bio: null,
+    photo_url: "/images/uploads/Dr.-Egondi.jpg", category: "member", position_order: 8, credentials: ["PhD"], bio: null,
   },
   {
     id: 9, name: "Dr. Milton Njuki", title: "Member, University Council",
-    photo_url: "/imgs/staff/Dr.-Njuki.jpg", category: "member", position_order: 9, credentials: ["PhD"], bio: null,
+    photo_url: "/images/uploads/Dr.-Njuki.jpg", category: "member", position_order: 9, credentials: ["PhD"], bio: null,
   },
 ];
 
@@ -148,7 +148,7 @@ export default function CouncilPage() {
         eyebrow="Governance"
         title="University Council"
         subtitle="The supreme governing body of Kaimosi Friends University, responsible for strategic leadership, financial oversight, and institutional integrity under the Universities Act, 2012."
-        photo="/imgs/aerial-1.jpg"
+        photo="/images/uploads/aerial-1.jpg"
         align="center"
         breadcrumb={[
           { label: "Home", href: "/" },

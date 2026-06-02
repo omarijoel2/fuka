@@ -36,7 +36,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <div className="p-6">
           <div className="mb-8">
             <img
-              src="/imgs/logo-updated.png"
+              src="/images/uploads/logo-updated.png"
               alt="Kaimosi Friends University"
               className="h-10 w-auto mb-3 object-contain"
               onError={(e) => {

@@ -77,7 +77,7 @@ export default function AdmissionsCalendar() {
       {/* Hero */}
       <section
         className="relative py-20 bg-primary text-primary-foreground overflow-hidden"
-        style={{ backgroundImage: "url('/imgs/image-94.jpeg')", backgroundSize: "cover", backgroundPosition: "center" }}
+        style={{ backgroundImage: "url('/images/uploads/image-94.jpeg')", backgroundSize: "cover", backgroundPosition: "center" }}
       >
         <div className="absolute inset-0 bg-primary/85" />
         <div className="relative container mx-auto px-4 text-center">

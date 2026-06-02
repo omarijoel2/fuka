@@ -52,5 +52,6 @@ class DatabaseSeeder extends Seeder
 
         // ── Site-wide configuration (CMS back-office settings) ────────────────
         $this->call(SiteConfigSeeder::class);
+        $this->call(CanonicalImagePathsSeeder::class);
     }
 }

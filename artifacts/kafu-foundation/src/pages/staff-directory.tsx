@@ -102,7 +102,7 @@ function StaffCard({ member, search }: { member: StaffMember; search: string }) 
 
   return (
     <Link
-      href={`/staff/${member.slug}`}
+      href={`/images/uploads/${member.slug}`}
       className="group bg-card border rounded-xl overflow-hidden hover:border-primary hover:shadow-md transition-all flex flex-col"
       data-testid={`staff-card-${member.slug}`}
     >
@@ -210,7 +210,7 @@ function SearchSuggestions({
       {suggestions.map((s) => (
         <Link
           key={s.slug}
-          href={`/staff/${s.slug}`}
+          href={`/images/uploads/${s.slug}`}
           className="flex items-center gap-3 px-4 py-3 hover:bg-accent/10 transition-colors border-b last:border-b-0"
           onClick={onSelect}
           data-testid={`suggestion-${s.slug}`}

@@ -80,7 +80,7 @@ export default function MediaDownloadsPage() {
         eyebrow="Media"
         title="Downloads"
         subtitle="Official forms, fee structures, academic calendars, regulations, and other documents for students, staff, and the public."
-        photo="/imgs/campus-main.jpg"
+        photo="/images/uploads/campus-main.jpg"
         align="left"
         breadcrumb={[{ label: "Home", href: "/" }, { label: "Media", href: "/media" }, { label: "Downloads" }]}
       />

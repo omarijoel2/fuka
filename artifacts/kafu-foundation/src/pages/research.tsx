@@ -48,7 +48,7 @@ export default function Research() {
       {/* Hero */}
       <div className="relative bg-primary text-primary-foreground py-20 md:py-28 overflow-hidden">
         <img
-          src="/imgs/health.jpg"
+          src="/images/uploads/health.jpg"
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover object-center"
@@ -108,16 +108,16 @@ export default function Research() {
         </div>
         <div className="flex gap-3 overflow-x-auto pb-3 px-4 md:px-[max(1rem,calc((100vw-1280px)/2+1rem))] scrollbar-hide snap-x snap-mandatory">
           {[
-            { src: "/imgs/health.jpg",                             alt: "Health sciences research" },
-            { src: "/imgs/visual-acuity.jpg",   alt: "Optometry and visual acuity research" },
-            { src: "/imgs/picture2.png",                   alt: "Laboratory research" },
-            { src: "/imgs/image-82.jpeg",                          alt: "Research collaboration" },
-            { src: "/imgs/image-87.jpeg",                          alt: "Academic research activity" },
-            { src: "/imgs/image-93.jpeg",                          alt: "Research and innovation" },
-            { src: "/imgs/image-31.jpeg",                          alt: "Research event" },
-            { src: "/imgs/image-39.jpeg",                          alt: "Research community" },
-            { src: "/imgs/image-43.jpeg",                          alt: "Research activity" },
-            { src: "/imgs/staff/image-8-1.jpeg",                 alt: "Recent research highlight" },
+            { src: "/images/uploads/health.jpg",                             alt: "Health sciences research" },
+            { src: "/images/uploads/visual-acuity.jpg",   alt: "Optometry and visual acuity research" },
+            { src: "/images/uploads/picture2.png",                   alt: "Laboratory research" },
+            { src: "/images/uploads/image-82.jpeg",                          alt: "Research collaboration" },
+            { src: "/images/uploads/image-87.jpeg",                          alt: "Academic research activity" },
+            { src: "/images/uploads/image-93.jpeg",                          alt: "Research and innovation" },
+            { src: "/images/uploads/image-31.jpeg",                          alt: "Research event" },
+            { src: "/images/uploads/image-39.jpeg",                          alt: "Research community" },
+            { src: "/images/uploads/image-43.jpeg",                          alt: "Research activity" },
+            { src: "/images/uploads/image-8-1.jpeg",                 alt: "Recent research highlight" },
           ].map((img, i) => (
             <div
               key={i}

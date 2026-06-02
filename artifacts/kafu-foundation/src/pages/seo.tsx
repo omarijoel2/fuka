@@ -27,7 +27,7 @@ export default function SEO() {
                 ["Academic Programme", "/bachelor-of-commerce/", "/academic-programmes/sbe/bachelor-of-commerce"],
                 ["School Page", "/school-of-education-social-sciences/", "/schools/sess"],
                 ["Events", "/events/examination-schedule-2025-2026/", "/events/2026/examination-schedule-semester-2"],
-                ["Staff Profile", "(Not available)", "/staff/sess/dr-nabeta-sangili"],
+                ["Staff Profile", "(Not available)", "/images/uploads/sess/dr-nabeta-sangili"],
                 ["Opportunities / Tenders", "(Not structured)", "/opportunities/tenders/2026/ref-kafu-001"],
                 ["Vacancies", "(Not structured)", "/opportunities/vacancies/2026/lecturer-computer-science"],
               ].map(([type, current, recommended]) => (

@@ -294,7 +294,7 @@ export default function SchoolDetails() {
                   <TabsContent value="faculty" data-testid="faculty-tab-content">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {allSchoolStaff.map(member => (
-                        <Link key={member.slug} href={`/staff/${member.slug}`}>
+                        <Link key={member.slug} href={`/images/uploads/${member.slug}`}>
                           <div
                             className="group flex items-center gap-4 p-4 bg-card border rounded-xl hover:border-primary hover:shadow-sm transition-all cursor-pointer"
                             data-testid={`faculty-card-${member.slug}`}

@@ -114,7 +114,7 @@ export default function DesignSystem() {
         <div className="grid md:grid-cols-2 gap-6">
           <div className="p-8 border border-border rounded-lg bg-white flex flex-col items-center gap-4">
             <img
-              src="/imgs/logo-updated.png"
+              src="/images/uploads/logo-updated.png"
               alt="Kaimosi Friends University — Primary Logo"
               className="max-h-16 w-auto object-contain"
             />
@@ -122,7 +122,7 @@ export default function DesignSystem() {
           </div>
           <div className="p-8 border border-border rounded-lg bg-primary flex flex-col items-center gap-4">
             <img
-              src="/imgs/logo-footer.png"
+              src="/images/uploads/logo-footer.png"
               alt="Kaimosi Friends University — Footer Logo"
               className="max-h-16 w-auto object-contain brightness-0 invert"
             />
@@ -140,7 +140,7 @@ export default function DesignSystem() {
             <li>Favicon: University crest mark only, at 32×32px and 192×192px.</li>
           </ul>
           <div className="mt-4 flex gap-4 text-xs font-mono">
-            <div><span className="text-muted-foreground">Primary: </span>/imgs/logo-updated.png</div>
+            <div><span className="text-muted-foreground">Primary: </span>/images/uploads/logo-updated.png</div>
           </div>
         </div>
       </section>

@@ -58,7 +58,7 @@ const VC_PROFILE = {
 
 const FALLBACK_VC: ManagementProfile = {
   id: 1, name: "Prof. Peter N. Mwita", title: "Vice-Chancellor",
-  photo_url: "/vc-prof-mwita.jpg",
+  photo_url: "/images/uploads/prof-peter-mwita.jpg",
   bio: "Prof. Peter N. Mwita is a distinguished Kenyan academic leader and statistician with over 30 years' experience in higher education, research, and national development. As Vice-Chancellor of Kaimosi Friends University, he leads a transformative agenda anchored on academic excellence, research expansion, fiscal discipline, strong governance, and community-centred growth.",
   email: "vc@kafu.ac.ke", office: "Vice-Chancellor's Office, Administration Block",
   phone: "+254 777 373 633", category: "vc", position_order: 1, is_active: true,
@@ -67,42 +67,42 @@ const FALLBACK_VC: ManagementProfile = {
 const FALLBACK_OTHERS: ManagementProfile[] = [
   {
     id: 2, name: "Prof. Fred. A. Amimo", title: "Deputy Vice-Chancellor — Academic, Student Affairs & Research",
-    photo_url: "/imgs/staff/Prof.-Amimo.jpg",
+    photo_url: "/images/uploads/Prof.-Amimo.jpg",
     bio: "Oversees all academic programmes, student welfare, curriculum development, quality assurance, and the university's research agenda across the five schools.",
     email: "dvc-asar@kafu.ac.ke", office: "DVC Academic Office, Administration Block",
     phone: "+254 777 373 640", category: "dvc", position_order: 2, is_active: true,
   },
   {
     id: 3, name: "Prof. Thomas Kipkurgat", title: "Deputy Vice-Chancellor — Administration, Finance, Planning & Development",
-    photo_url: "/imgs/staff/Kipkurgat.jpg",
+    photo_url: "/images/uploads/Kipkurgat.jpg",
     bio: "Oversees the university's administrative operations, financial management, strategic planning, and campus infrastructure development.",
     email: "dvc-afpd@kafu.ac.ke", office: "DVC Administration Office, Administration Block",
     phone: "+254 777 373 642", category: "dvc", position_order: 3, is_active: true,
   },
   {
     id: 4, name: "Dr. Samuel Munda", title: "Senior Assistant Registrar — Academic Affairs",
-    photo_url: "/imgs/Dr.-Munda-1.jpg",
+    photo_url: "/images/uploads/Dr.-Munda-1.jpg",
     bio: "Responsible for academic registration, examinations management, student records, and compliance with Commission for University Education (CUE) standards.",
     email: "registrar-aa@kafu.ac.ke", office: "Academic Registrar's Office, Administration Block",
     phone: "+254 777 373 650", category: "registrar", position_order: 4, is_active: true,
   },
   {
     id: 5, name: "Dr. Patrick Agesa", title: "Acting Deputy Registrar",
-    photo_url: "/imgs/staff/Dr.-Agesa.jpg",
+    photo_url: "/images/uploads/Dr.-Agesa.jpg",
     bio: "Supports overall registry functions including student admissions, records management, academic governance, and institutional compliance.",
     email: "registrar@kafu.ac.ke", office: "Registry, Administration Block",
     phone: "+254 777 373 651", category: "registrar", position_order: 5, is_active: true,
   },
   {
     id: 6, name: "CPA Emmanuel M. Momanyi", title: "Finance Officer",
-    photo_url: "/imgs/IMGPSP_001.png",
+    photo_url: "/images/uploads/IMGPSP_001.png",
     bio: "Responsible for financial governance, budgeting, financial reporting, fee collection, procurement oversight, and compliance with the Public Finance Management Act.",
     email: "finance@kafu.ac.ke", office: "Finance Department, Administration Block",
     phone: "+254 777 373 660", category: "finance", position_order: 6, is_active: true,
   },
   {
     id: 7, name: "Dr. Fredrick M. Nyambane", title: "Dean of Students",
-    photo_url: "/imgs/staff/Monanti.jpg",
+    photo_url: "/images/uploads/Monanti.jpg",
     bio: "Oversees student welfare, counselling services, accommodation, clubs and societies, and the general wellbeing of the student body.",
     email: "dean.students@kafu.ac.ke", office: "Dean of Students Office, Student Centre",
     phone: "+254 777 373 670", category: "other", position_order: 7, is_active: true,
@@ -272,7 +272,7 @@ export default function ManagementPage() {
         eyebrow="Administration"
         title="Management Board"
         subtitle="Senior officers responsible for the day-to-day academic, financial, and administrative operations of Kaimosi Friends University."
-        photo="/imgs/aerial-1.jpg"
+        photo="/images/uploads/aerial-1.jpg"
         align="center"
         breadcrumb={[
           { label: "Home", href: "/" },

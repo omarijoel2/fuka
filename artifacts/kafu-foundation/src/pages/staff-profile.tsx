@@ -116,7 +116,7 @@ function CompletenessBar({ score }: { score: number }) {
 }
 
 export default function StaffProfilePage() {
-  const [, params] = useRoute("/staff/:slug");
+  const [, params] = useRoute("/images/uploads/:slug");
   const slug = params?.slug ?? "";
   const { data: profile, isLoading, isError } = useStaffProfile(slug);
   const [activeTab, setActiveTab] = useState("overview");
@@ -234,14 +234,14 @@ export default function StaffProfilePage() {
   const personJsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
-    "@id": `${SITE_URL}/staff/${slug}`,
+    "@id": `${SITE_URL}/images/uploads/${slug}`,
     name: profile.name,
     jobTitle: profile.title,
     description: profile.biography ?? undefined,
     email: profile.email ?? undefined,
     affiliation: { "@id": `${SITE_URL}/#organization` },
     worksFor: { "@id": `${SITE_URL}/#organization` },
-    url: `${SITE_URL}/staff/${slug}`,
+    url: `${SITE_URL}/images/uploads/${slug}`,
     sameAs: [
       ...(profile.orcid_id ? [`https://orcid.org/${profile.orcid_id}`] : []),
       ...(profile.google_scholar_url ? [profile.google_scholar_url] : []),
@@ -258,7 +258,7 @@ export default function StaffProfilePage() {
       <SeoHead
         title={`${profile.name} — ${profile.title} | KAFU`}
         description={profile.biography ? profile.biography.slice(0, 160) : `${profile.name} is ${profile.title} at the ${SCHOOL_NAMES[profile.school ?? ""] ?? profile.school}, Kaimosi Friends University.`}
-        path={`/staff/${slug}`}
+        path={`/images/uploads/${slug}`}
         type="profile"
         breadcrumbs={[
           { name: "Staff Directory", path: "/staff" },

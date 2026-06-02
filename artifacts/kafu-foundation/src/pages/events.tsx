@@ -102,7 +102,7 @@ export default function Events() {
       {/* Header */}
       <div className="relative bg-primary text-primary-foreground py-16 md:py-20 overflow-hidden">
         <img
-          src="/imgs/sports.jpg"
+          src="/images/uploads/sports.jpg"
           alt=""
           aria-hidden="true"
           className="absolute inset-0 w-full h-full object-cover object-center"

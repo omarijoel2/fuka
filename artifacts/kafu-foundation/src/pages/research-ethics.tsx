@@ -111,7 +111,7 @@ export default function ResearchEthics() {
             </div>
             <div className="bg-primary text-white rounded-xl p-6">
               <img
-                src="/imgs/serc-chairman-okenwa.jpg"
+                src="/images/uploads/serc-chairman-okenwa.jpg"
                 alt="Dr. Emmanuel Okenwa-Vincent, Chairman KAFUSERC"
                 className="w-20 h-20 rounded-full object-cover object-top mb-4 border-2 border-white/30"
               />

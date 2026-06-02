@@ -363,7 +363,7 @@ export default function RepositoryItemPage() {
                     </div>
                     <div>
                       {a.staff_slug ? (
-                        <Link to={`/staff/${a.staff_slug}`} data-testid={`author-link-${a.staff_slug}`} className="text-sm font-medium text-green-700 hover:underline">
+                        <Link to={`/images/uploads/${a.staff_slug}`} data-testid={`author-link-${a.staff_slug}`} className="text-sm font-medium text-green-700 hover:underline">
                           {a.name}
                         </Link>
                       ) : (

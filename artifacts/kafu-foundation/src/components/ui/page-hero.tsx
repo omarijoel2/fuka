@@ -4,7 +4,7 @@ import { ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const DEFAULT_PHOTO =
-  "/imgs/campus-main.jpg";
+  "/images/uploads/campus-main.jpg";
 
 interface Crumb {
   label: string;

@@ -400,7 +400,7 @@ export default function ProgrammeDetailPage() {
                   {staff.slice(0, 4).map((member, i) => (
                     <Link
                       key={i}
-                      href={`/staff/${member.slug}`}
+                      href={`/images/uploads/${member.slug}`}
                       className="group flex items-center gap-4 p-4 bg-card border rounded-xl hover:border-primary hover:shadow-sm transition-all"
                       data-testid={`faculty-${i}`}
                     >
