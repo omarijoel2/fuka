@@ -258,7 +258,20 @@ function mapCmsOpportunityDetail(CmsContent $item): array {
     $base['requirements']     = $sd['requirements'] ?? [];
     $base['submission_info']  = $sd['submission_info'] ?? '';
     $base['contact']          = $sd['contact'] ?? ['office'=>'Registry','email'=>'info@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'Main Campus, Kaimosi'];
-    $base['documents']        = $sd['documents'] ?? [];
+    // Merge legacy documents[] with new attachments[] (uploaded via CMS file picker).
+    // Normalise attachments to the same {title,type,size,url} shape the frontend expects.
+    $legacyDocs = $sd['documents'] ?? [];
+    $uploaded   = array_map(function ($a) {
+        $kb   = isset($a['size_kb']) ? (float) $a['size_kb'] : 0;
+        $size = $kb >= 1024 ? round($kb / 1024, 1) . ' MB' : round($kb) . ' KB';
+        return [
+            'title' => $a['title'] ?? '',
+            'type'  => $a['type']  ?? 'FILE',
+            'size'  => $size,
+            'url'   => $a['url']   ?? '',
+        ];
+    }, $sd['attachments'] ?? []);
+    $base['documents'] = array_merge($legacyDocs, $uploaded);
     return $base;
 }
 }
