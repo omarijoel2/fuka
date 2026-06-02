@@ -9,6 +9,8 @@ import ContentEditorPage from "@/pages/content-editor";
 import ReviewQueuePage from "@/pages/review-queue";
 import MediaLibraryPage from "@/pages/media-library";
 import UsersPage from "@/pages/users";
+import PermissionsMatrixPage from "@/pages/permissions-matrix";
+import AdmissionsFeesAdminPage from "@/pages/admissions-fees-cms";
 import TaxonomyPage from "@/pages/taxonomy";
 import AuditLogPage from "@/pages/audit-log";
 import SettingsPage from "@/pages/settings";
@@ -134,6 +136,20 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <UsersPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/permissions">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <PermissionsMatrixPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/admissions/fees">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <AdmissionsFeesAdminPage />
             </RequireRole>
           )}
         </Route>

@@ -9,9 +9,6 @@ import {
   Home,
   BookOpen,
   Award,
-  CreditCard,
-  Smartphone,
-  Building2,
   Info,
   ExternalLink,
   AlertCircle,
@@ -28,20 +25,12 @@ export default function AdmissionsFeesPage() {
   const fees = (data as any)?.data ?? data;
   const pathways = fees?.pathways ?? [];
   const currentPathway = pathways.find((p: any) => p.id === activePathway);
-  const paymentMethods = fees?.payment_methods ?? [];
 
   const PATHWAY_ICONS: Record<string, React.ReactNode> = {
     government: <Award className="w-5 h-5" />,
     "self-sponsored": <BookOpen className="w-5 h-5" />,
     postgraduate: <BookOpen className="w-5 h-5" />,
     international: <Banknote className="w-5 h-5" />,
-  };
-
-  const PAYMENT_ICONS: Record<string, React.ReactNode> = {
-    "M-Pesa": <Smartphone className="w-5 h-5" />,
-    "Bank Deposit / Transfer": <Building2 className="w-5 h-5" />,
-    "Cooperative Bank": <Building2 className="w-5 h-5" />,
-    "Cash (Finance Office)": <CreditCard className="w-5 h-5" />,
   };
 
   return (
@@ -226,26 +215,7 @@ export default function AdmissionsFeesPage() {
           </div>
         ) : null}
 
-        {/* Payment Methods */}
-        {!isLoading && paymentMethods.length > 0 && (
-          <div className="max-w-3xl mx-auto mt-6 pt-8 border-t">
-            <h3 className="font-serif font-bold text-xl text-foreground mb-2">How to Pay</h3>
-            <p className="text-muted-foreground text-sm mb-6">KAFU accepts fee payments through the following channels.</p>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {paymentMethods.map((pm: any, i: number) => (
-                <div key={i} className="flex items-start gap-4 p-5 bg-card border rounded-xl hover:border-primary/50 transition-colors" data-testid={`payment-method-${i}`}>
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                    {PAYMENT_ICONS[pm.method] ?? <CreditCard className="w-5 h-5" />}
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-sm text-foreground">{pm.method}</h4>
-                    <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">{pm.details}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Payment details are managed by the Finance Office — contact them directly for payment channels */}
 
         {/* Note */}
         {!isLoading && fees?.note && (

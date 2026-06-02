@@ -7,7 +7,7 @@ import {
   ChevronDown, ChevronRight, BookOpen, UserCog, AlertTriangle, Newspaper, SlidersHorizontal,
   FlaskConical, Globe, Banknote, HeartHandshake, MapPin, Building2,
   Home, Navigation, ToggleRight, ArrowRightLeft, Activity, GitBranch, Search, GraduationCap,
-  Landmark, Camera
+  Landmark, Camera, ShieldCheck
 } from "lucide-react";
 
 interface NavItem {
@@ -86,6 +86,7 @@ const navItems: NavItem[] = [
     roles: ADMIN_ROLES,
     children: [
       { label: "Document Uploads", href: "/admissions" },
+      { label: "Fees & Payments", href: "/admissions/fees" },
       { label: "Postgraduate Programmes", href: "/admissions/programmes" },
       { label: "Eligibility Settings", href: "/admissions/settings" },
     ],
@@ -173,6 +174,7 @@ const navItems: NavItem[] = [
   },
   { label: "Media Library", icon: <Image className="w-4 h-4" />, href: "/media" },
   { label: "Users", icon: <UserCog className="w-4 h-4" />, href: "/users", roles: ADMIN_ROLES },
+  { label: "Permissions Matrix", icon: <ShieldCheck className="w-4 h-4" />, href: "/permissions", roles: ADMIN_ROLES },
   { label: "Taxonomy Manager", icon: <Tag className="w-4 h-4" />, href: "/taxonomy", roles: ADMIN_ROLES },
   { label: "Settings", icon: <Settings className="w-4 h-4" />, href: "/settings", roles: ADMIN_ROLES },
 ];

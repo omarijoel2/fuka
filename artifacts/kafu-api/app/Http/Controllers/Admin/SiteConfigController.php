@@ -8,10 +8,11 @@ use Illuminate\Http\Request;
 
 class SiteConfigController extends Controller
 {
+    private const ALLOWED = ['homepage', 'navigation', 'site', 'seo', 'contact', 'branding', 'admissions_fees', 'permissions'];
+
     public function getGroup(string $group)
     {
-        $allowed = ['homepage', 'navigation', 'site', 'seo', 'contact', 'branding'];
-        if (!in_array($group, $allowed)) {
+        if (!in_array($group, self::ALLOWED)) {
             return response()->json(['message' => 'Unknown config group'], 404);
         }
         return response()->json(SiteConfig::getGroup($group));
@@ -19,8 +20,7 @@ class SiteConfigController extends Controller
 
     public function updateGroup(Request $request, string $group)
     {
-        $allowed = ['homepage', 'navigation', 'site', 'seo', 'contact', 'branding'];
-        if (!in_array($group, $allowed)) {
+        if (!in_array($group, self::ALLOWED)) {
             return response()->json(['message' => 'Unknown config group'], 404);
         }
         $data = $request->all();
@@ -30,9 +30,8 @@ class SiteConfigController extends Controller
 
     public function all()
     {
-        $groups = ['homepage', 'navigation', 'site', 'seo', 'contact', 'branding'];
         $result = [];
-        foreach ($groups as $g) {
+        foreach (self::ALLOWED as $g) {
             $result[$g] = SiteConfig::getGroup($g);
         }
         return response()->json($result);
