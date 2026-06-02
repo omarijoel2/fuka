@@ -97,7 +97,7 @@ const navItems: NavItem[] = [
         heading: "Governance",
         links: [
           { name: "University Council",     path: "/about/council" },
-          { name: "Vice-Chancellor",        path: "/about/management" },
+          { name: "Vice-Chancellor",        path: "/about/vice-chancellor" },
           { name: "University Management",  path: "/about/management" },
         ],
       },

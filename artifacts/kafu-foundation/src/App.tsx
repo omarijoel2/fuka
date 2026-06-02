@@ -52,6 +52,7 @@ import RepositoryBrowse from "@/pages/repository-browse";
 import RepositoryItem from "@/pages/repository-item";
 import CouncilPage from "@/pages/council";
 import ManagementPage from "@/pages/management";
+import ViceChancellorPage from "@/pages/vice-chancellor";
 import StrategicPlan from "@/pages/about-strategic-plan";
 import AboutPolicies from "@/pages/about-policies";
 import ServiceCharter from "@/pages/about-service-charter";
@@ -148,6 +149,7 @@ function Router() {
           <Route path="/repository/browse" component={RepositoryBrowse} />
           <Route path="/repository/items/:slug" component={RepositoryItem} />
           <Route path="/about/council" component={CouncilPage} />
+          <Route path="/about/vice-chancellor" component={ViceChancellorPage} />
           <Route path="/about/management" component={ManagementPage} />
           <Route path="/about/strategic-plan" component={StrategicPlan} />
           <Route path="/about/policies" component={AboutPolicies} />

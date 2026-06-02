@@ -35,6 +35,7 @@ import AboutCmsPage from "@/pages/about-cms";
 import StudentServicesCmsPage from "@/pages/student-services-cms";
 import CouncilMembersCmsPage from "@/pages/council-members-cms";
 import ManagementProfilesCmsPage from "@/pages/management-profiles-cms";
+import VcOfficeProfilesCmsPage from "@/pages/vc-office-profiles-cms";
 import DirectoratesCmsPage from "@/pages/directorates-cms";
 import GalleryCmsPage from "@/pages/gallery-cms";
 import DepartmentsCmsPage from "@/pages/departments-cms";
@@ -315,6 +316,13 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <CouncilMembersCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/governance/vc-office">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <VcOfficeProfilesCmsPage />
             </RequireRole>
           )}
         </Route>

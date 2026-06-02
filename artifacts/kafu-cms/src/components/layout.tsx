@@ -96,7 +96,8 @@ const navItems: NavItem[] = [
     roles: ADMIN_ROLES,
     children: [
       { label: "University Council", href: "/governance/council" },
-      { label: "Management Profiles", href: "/governance/management" },
+      { label: "VC Office (VC & DVCs)", href: "/governance/vc-office" },
+      { label: "Management Board", href: "/governance/management" },
       { label: "Directorates", href: "/governance/directorates" },
       { label: "Departments", href: "/departments" },
       { label: "Strategic Plan", href: "/governance/strategic-plan" },
