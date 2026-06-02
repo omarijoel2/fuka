@@ -21,7 +21,7 @@ class CanonicalImagePathsSeeder extends Seeder
 
             // Department HODs / staff
             'Dr. Constance Amusala' => '/images/uploads/Dr.-Constance.jpg',
-            'Dr. Felix Saouma' => '/images/uploads/Dr.-Saouma.jpg',
+            'Dr. Felix Saouma' => '/images/uploads/saouma.jpg',
             'Dr. Aggrey A. Amugune' => '/images/uploads/Dr.-Amugune.jpg',
             "Ms. Margaret Thang'wa" => '/images/uploads/Thangwa.jpg',
             'Mr. Ahmed K. Wangara' => '/images/uploads/Wangara.jpg',
