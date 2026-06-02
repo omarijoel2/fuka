@@ -8,31 +8,31 @@ use Illuminate\Support\Facades\DB;
 class DepartmentsPhotoSeeder extends Seeder
 {
     /**
-     * Set hod_photo_url for all departments to local /imgs/staff/ paths.
+     * Set hod_photo_url for all departments to local /images/uploads/ paths.
      * Safe to run on production — only updates the photo field.
      */
     public function run(): void
     {
         $photos = [
             // SBE
-            'business-administration-management'            => '/imgs/staff/Obed-Tanda.jpg',
-            'accounting-finance'                            => '/imgs/staff/Opanyi.jpg',
-            'economics'                                     => '/imgs/staff/Dr.-Mackton.jpg',
+            'business-administration-management'            => '/images/uploads/Obed-Tanda.jpg',
+            'accounting-finance'                            => '/images/uploads/Opanyi.jpg',
+            'economics'                                     => '/images/uploads/Dr.-Mackton.jpg',
             // SCIT
-            'computer-science'                              => '/imgs/staff/Dr.-Ronoh.jpg',
-            'information-technology'                        => '/imgs/staff/Mr.-Shirandula.jpg',
+            'computer-science'                              => '/images/uploads/Dr.-Ronoh.jpg',
+            'information-technology'                        => '/images/uploads/Mr.-Shirandula.jpg',
             // SESS
-            'educational-foundations-psychology-management' => '/imgs/staff/Dr.-Constance.jpg',
-            'curriculum-instruction'                        => '/imgs/staff/Dr.-Amugune.jpg',
-            'languages-literature'                          => '/imgs/staff/Thangwa.jpg',
-            'social-sciences'                               => '/imgs/staff/Wangara.jpg',
+            'educational-foundations-psychology-management' => '/images/uploads/Dr.-Constance.jpg',
+            'curriculum-instruction'                        => '/images/uploads/Dr.-Amugune.jpg',
+            'languages-literature'                          => '/images/uploads/Thangwa.jpg',
+            'social-sciences'                               => '/images/uploads/Wangara.jpg',
             // SHS
-            'optometry-vision-sciences'                     => '/imgs/staff/Dr.-Mabonga.jpg',
-            'nursing'                                       => '/imgs/staff/Dr.-Asiko.jpg',
-            'clinical-medicine-community-health'            => '/imgs/staff/Dr.-Papa.jpg',
+            'optometry-vision-sciences'                     => '/images/uploads/Dr.-Mabonga.jpg',
+            'nursing'                                       => '/images/uploads/Dr.-Asiko.jpg',
+            'clinical-medicine-community-health'            => '/images/uploads/Dr.-Papa.jpg',
             // SOS
-            'physical-biological-sciences'                  => '/imgs/staff/Dr.-Saouma.jpg',
-            'mathematics-statistics'                        => '/imgs/staff/Dr.-Apima.jpg',
+            'physical-biological-sciences'                  => '/images/uploads/Dr.-Saouma.jpg',
+            'mathematics-statistics'                        => '/images/uploads/Dr.-Apima.jpg',
         ];
 
         $updated = 0;

@@ -342,7 +342,7 @@ class ContentMigrationSeeder extends Seeder
             ['slug'=>'dr-linda-mangeni','school_code'=>'SESS','title'=>'Dr. Linda Mangeni',
              'structured_data'=>['title_prefix'=>'Dr.','first_name'=>'Linda','middle_name'=>null,'last_name'=>'Mangeni','rank'=>'Assistant Lecturer','designation'=>'Assistant Lecturer','department'=>'Social Sciences','email'=>'l.mangeni@kafu.ac.ke','photo'=>'/images/uploads/wangara.jpg','specializations'=>[],'qualifications'=>[],'experience'=>[],'research_interests'=>[],'teaching_areas'=>[],'memberships'=>[],'publications'=>[],'awards'=>[]]],
             ['slug'=>'dr-aggrey-a-amugune','school_code'=>'SESS','title'=>'Dr. Aggrey A. Amugune',
-             'structured_data'=>['title_prefix'=>'Dr.','first_name'=>'Aggrey','middle_name'=>'A.','last_name'=>'Amugune','rank'=>'Senior Lecturer','designation'=>'Chair, Curriculum and Instruction','department'=>'Curriculum & Instruction','email'=>'a.amugune@kafu.ac.ke','photo'=>'/staff/amugune.jpg','specializations'=>[],'qualifications'=>[],'experience'=>[],'research_interests'=>[],'teaching_areas'=>[],'memberships'=>[],'publications'=>[],'awards'=>[]]],
+             'structured_data'=>['title_prefix'=>'Dr.','first_name'=>'Aggrey','middle_name'=>'A.','last_name'=>'Amugune','rank'=>'Senior Lecturer','designation'=>'Chair, Curriculum and Instruction','department'=>'Curriculum & Instruction','email'=>'a.amugune@kafu.ac.ke','photo'=>'/images/uploads/amugune.jpg','specializations'=>[],'qualifications'=>[],'experience'=>[],'research_interests'=>[],'teaching_areas'=>[],'memberships'=>[],'publications'=>[],'awards'=>[]]],
             ['slug'=>'dr-eric-okwako','school_code'=>'SESS','title'=>'Dr. Eric Okwako',
              'structured_data'=>['title_prefix'=>'Dr.','first_name'=>'Eric','middle_name'=>null,'last_name'=>'Okwako','rank'=>'Senior Lecturer','designation'=>'Senior Lecturer','department'=>'Curriculum & Instruction','email'=>'e.okwako@kafu.ac.ke','photo'=>'/images/uploads/DR.-OKWAKO-300x300.jpg','specializations'=>[],'qualifications'=>[],'experience'=>[],'research_interests'=>[],'teaching_areas'=>[],'memberships'=>[],'publications'=>[],'awards'=>[]]],
             ['slug'=>'prof-remmy-shiundu','school_code'=>'SESS','title'=>'Prof. Remmy Shiundu',
@@ -354,7 +354,7 @@ class ContentMigrationSeeder extends Seeder
             ['slug'=>'dr-constance-amusala','school_code'=>'SESS','title'=>'Dr. Constance Amusala',
              'structured_data'=>['title_prefix'=>'Dr.','first_name'=>'Constance','middle_name'=>null,'last_name'=>'Amusala','rank'=>'Senior Lecturer','designation'=>'Chair, EFPM Department','department'=>'Educational Foundations','email'=>'c.amusala@kafu.ac.ke','photo'=>'/images/uploads/DR.-CONSTANCE-300x300.jpg','specializations'=>[],'qualifications'=>[],'experience'=>[],'research_interests'=>[],'teaching_areas'=>[],'memberships'=>[],'publications'=>[],'awards'=>[]]],
             ['slug'=>'ms-margaret-thangwa','school_code'=>'SESS','title'=>"Ms. Margaret Thang'wa",
-             'structured_data'=>['title_prefix'=>'Ms.','first_name'=>'Margaret','middle_name'=>null,'last_name'=>"Thang'wa",'rank'=>'Lecturer','designation'=>'Chair, Languages & Literature Department','department'=>'Languages & Literature','email'=>'m.thangwa@kafu.ac.ke','photo'=>'/staff/thangwa.jpg','specializations'=>[],'qualifications'=>[],'experience'=>[],'research_interests'=>[],'teaching_areas'=>[],'memberships'=>[],'publications'=>[],'awards'=>[]]],
+             'structured_data'=>['title_prefix'=>'Ms.','first_name'=>'Margaret','middle_name'=>null,'last_name'=>"Thang'wa",'rank'=>'Lecturer','designation'=>'Chair, Languages & Literature Department','department'=>'Languages & Literature','email'=>'m.thangwa@kafu.ac.ke','photo'=>'/images/uploads/thangwa.jpg','specializations'=>[],'qualifications'=>[],'experience'=>[],'research_interests'=>[],'teaching_areas'=>[],'memberships'=>[],'publications'=>[],'awards'=>[]]],
             // ── SBE ────────────────────────────────────────────────
             [
                 'slug'        => 'dr-atieno-margaret-otieno',
@@ -732,7 +732,7 @@ class ContentMigrationSeeder extends Seeder
                     'department'  => 'Physical & Biological Sciences',
                     'unit'        => null,
                     'email'       => 'f.saouma@kafu.ac.ke',
-                    'photo'       => '/staff/saouma.jpg',
+                    'photo'       => '/images/uploads/saouma.jpg',
                     'biography'   => 'Dr. Felix Saouma chairs the Department of Physical & Biological Sciences at the School of Science, Kaimosi Friends University, leading a dynamic team dedicated to excellence in Physics, Chemistry, Biology, Microbiology, and Agriculture. The department is committed to equipping graduates for impactful careers across education, research, industry, and NGOs.',
                     'specializations' => ['Physics', 'Chemistry', 'Biology', 'Microbiology', 'Agriculture'],
                     'qualifications'  => [],

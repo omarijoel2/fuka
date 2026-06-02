@@ -21,9 +21,9 @@ class DirectoratesPhotoSeeder extends Seeder
     public function run(): void
     {
         $photos = [
-            'graduate-studies'                   => '/imgs/staff/Prof.-Ojwang.jpg',
-            'open-distance-elearning'            => '/imgs/staff/Dr.-Ronoh.jpg',
-            'planning-performance-contracting'   => '/imgs/staff/Dr.-Sulungai.jpg',
+            'graduate-studies'                   => '/images/uploads/Prof.-Ojwang.jpg',
+            'open-distance-elearning'            => '/images/uploads/Dr.-Ronoh.jpg',
+            'planning-performance-contracting'   => '/images/uploads/Dr.-Sulungai.jpg',
 
             // No confirmed real photos available for these — show initials avatar
             'research-innovation'                => null,

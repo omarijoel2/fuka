@@ -93,7 +93,7 @@ class DepartmentSeeder extends Seeder
                 'hod_title'       => 'Chair, Department of Physical & Biological Sciences',
                 'hod_email'       => 'f.saouma@kafu.ac.ke',
                 'hod_phone'       => '+254 700 100 511',
-                'hod_photo_url'   => '/staff/saouma.jpg',
+                'hod_photo_url'   => '/images/uploads/saouma.jpg',
                 'hod_bio'         => 'Dr. Felix Saouma chairs the Department of Physical & Biological Sciences at the School of Science, Kaimosi Friends University, leading a dynamic team dedicated to excellence in Physics, Chemistry, Biology, Microbiology, and Agriculture. The department is committed to equipping graduates for impactful careers across education, research, industry, and NGOs.',
                 'office_location' => 'Science Block B, Room 204, KAFU Main Campus',
                 'email'           => 'dept.pbs@kafu.ac.ke',
