@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 use App\Models\CmsContent;
 
 if (!function_exists('mapHeroSlide')) {
@@ -45,8 +47,10 @@ function mapCmsNews(CmsContent $item): array {
 if (!function_exists('mapCmsNewsDetail')) {
 function mapCmsNewsDetail(CmsContent $item): array {
     $base = mapCmsNews($item);
-    $base['content'] = $item->body ?? '<p>Content is being prepared. Please check back shortly.</p>';
-    $base['related'] = $item->related_ids ?? [];
+    $sd = $item->structured_data ?? [];
+    $base['content']     = $item->body ?? '<p>Content is being prepared. Please check back shortly.</p>';
+    $base['related']     = $item->related_ids ?? [];
+    $base['attachments'] = $sd['attachments'] ?? [];
     return $base;
 }
 }
@@ -5314,6 +5318,31 @@ Route::get('/admissions/settings', function () {
             'label' => 'Admissions Portal'
         ]
     ]]);
+});
+
+// ── Admin: attachment document upload ─────────────────────────────────────────
+Route::middleware(['auth:sanctum'])->post('/admin/content/upload-attachment', function (Request $request) {
+    try {
+        $request->validate([
+            'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,zip|max:20480',
+        ]);
+        $file = $request->file('file');
+        $ext = strtolower($file->getClientOriginalExtension());
+        $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+        $safeName = Str::slug($originalName) . '-' . substr((string) Str::uuid(), 0, 8) . '.' . $ext;
+        $path = $file->storeAs('content-attachments', $safeName, 'public');
+        $url = Storage::disk('public')->url($path);
+        return response()->json([
+            'url'     => $url,
+            'title'   => $file->getClientOriginalName(),
+            'type'    => strtoupper($ext),
+            'size_kb' => round($file->getSize() / 1024, 1),
+        ]);
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json(['message' => collect($e->errors())->flatten()->first()], 422);
+    } catch (\Throwable $e) {
+        return response()->json(['message' => $e->getMessage()], 500);
+    }
 });
 
 // ── Public branding endpoint (no auth — used by frontend) ─────────────────────

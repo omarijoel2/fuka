@@ -1,7 +1,7 @@
 import { Link, useParams } from "wouter";
 import { useNewsDetail, useNews } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
-import { Calendar, User, Tag, ChevronRight, ArrowLeft, ArrowRight, Share2 } from "lucide-react";
+import { Calendar, User, Tag, ChevronRight, ArrowLeft, ArrowRight, Share2, Download } from "lucide-react";
 import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 
 function formatDate(d: string) {
@@ -120,6 +120,35 @@ export default function NewsDetail() {
               className="prose prose-lg max-w-none text-foreground leading-relaxed space-y-4 [&_p]:text-muted-foreground [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:text-muted-foreground [&_li]:mb-1 [&_strong]:text-foreground"
               dangerouslySetInnerHTML={{ __html: article.content }}
             />
+
+            {/* Attachments */}
+            {(() => {
+              const attachments = ((article as unknown as Record<string, unknown>).attachments as Array<{ url: string; title: string; type: string }> | undefined) ?? [];
+              if (!attachments.length) return null;
+              return (
+                <div className="mt-8 pt-6 border-t">
+                  <h3 className="font-serif font-bold text-base mb-4 flex items-center gap-2">
+                    <Download className="w-4 h-4 text-primary" /> Attachments
+                  </h3>
+                  <div className="space-y-2">
+                    {attachments.map((att, i) => (
+                      <a
+                        key={i}
+                        href={att.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:border-primary hover:bg-primary/5 transition-all group"
+                        data-testid={`attachment-${i}`}
+                      >
+                        <Download className="w-4 h-4 text-primary shrink-0" />
+                        <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{att.title}</span>
+                        <span className="text-xs text-muted-foreground ml-auto uppercase">{att.type}</span>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
 
             {/* Tags */}
             {article.tags?.length > 0 && (

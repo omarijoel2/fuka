@@ -83,6 +83,9 @@ export default function ContentEditorPage({ id }: { id?: string }) {
   const [uploadingFeaturedImage, setUploadingFeaturedImage] = useState(false);
   const [featuredImageUploadError, setFeaturedImageUploadError] = useState("");
   const featuredImageInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingAttachment, setUploadingAttachment] = useState(false);
+  const [attachmentUploadError, setAttachmentUploadError] = useState("");
+  const attachmentInputRef = useRef<HTMLInputElement>(null);
 
   const load = useCallback(async () => {
     if (isNew) return;
@@ -165,6 +168,43 @@ export default function ContentEditorPage({ id }: { id?: string }) {
       setUploadingFeaturedImage(false);
       if (featuredImageInputRef.current) featuredImageInputRef.current.value = "";
     }
+  };
+
+  const handleAttachmentUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAttachment(true);
+    setAttachmentUploadError("");
+    try {
+      const token = localStorage.getItem("kafu_cms_token");
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/admin/content/upload-attachment", {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body: formData,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.message || `Upload failed (${res.status})`);
+      }
+      const data = await res.json();
+      const existing = ((sd["attachments"] as Array<{ url: string; title: string; type: string; size_kb: number }>) ?? []);
+      setSd("attachments", [...existing, { url: data.url, title: data.title, type: data.type, size_kb: data.size_kb }]);
+    } catch (err: unknown) {
+      setAttachmentUploadError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setUploadingAttachment(false);
+      if (attachmentInputRef.current) attachmentInputRef.current.value = "";
+    }
+  };
+
+  const removeAttachment = (idx: number) => {
+    const existing = ((sd["attachments"] as Array<{ url: string; title: string; type: string; size_kb: number }>) ?? []);
+    setSd("attachments", existing.filter((_, i) => i !== idx));
   };
 
   const save = async (e?: React.FormEvent) => {
@@ -886,6 +926,58 @@ export default function ContentEditorPage({ id }: { id?: string }) {
                   />
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* ATTACHMENTS — news, announcement, event, opportunity */}
+          {["news", "announcement", "event", "opportunity"].includes(form.type) && (
+            <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">
+              <h3 className="text-sm font-bold text-foreground">Attachments</h3>
+              <p className="text-xs text-muted-foreground">Upload documents (PDF, Word, Excel, PowerPoint) that will appear as downloadable files on this content's public page.</p>
+
+              {/* Hidden file input */}
+              <input
+                ref={attachmentInputRef}
+                type="file"
+                accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.zip"
+                className="hidden"
+                onChange={handleAttachmentUpload}
+                data-testid="input-attachment-file"
+              />
+
+              {/* Existing attachments list */}
+              {((sd["attachments"] as Array<{ url: string; title: string; type: string; size_kb: number }>) ?? []).map((att, i) => (
+                <div key={i} className="flex items-center gap-3 p-3 rounded-lg border bg-secondary/30">
+                  <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded uppercase shrink-0">{att.type}</span>
+                  <span className="text-sm text-foreground flex-1 truncate">{att.title}</span>
+                  {att.size_kb > 0 && <span className="text-xs text-muted-foreground shrink-0">{att.size_kb < 1024 ? `${att.size_kb} KB` : `${(att.size_kb / 1024).toFixed(1)} MB`}</span>}
+                  <button
+                    type="button"
+                    onClick={() => removeAttachment(i)}
+                    className="p-1 rounded hover:bg-red-50 hover:text-red-600 text-muted-foreground transition shrink-0"
+                    data-testid={`btn-remove-attachment-${i}`}
+                    title="Remove attachment"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+
+              {/* Upload button */}
+              <button
+                type="button"
+                onClick={() => attachmentInputRef.current?.click()}
+                disabled={uploadingAttachment}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg border border-dashed border-border text-sm text-muted-foreground hover:border-primary hover:text-primary hover:bg-primary/5 transition disabled:opacity-60 w-full justify-center"
+                data-testid="btn-upload-attachment"
+              >
+                <Upload className="w-4 h-4" />
+                {uploadingAttachment ? "Uploading..." : "Upload Document"}
+              </button>
+
+              {attachmentUploadError && (
+                <p className="text-xs text-red-600" data-testid="attachment-upload-error">{attachmentUploadError}</p>
+              )}
             </div>
           )}
 
