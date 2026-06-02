@@ -66,3 +66,13 @@ artifacts/kafu-staff/.env
 # Replit
 .cache/
 .local/
+
+# Build outputs
+artifacts/kafu-foundation/dist/
+artifacts/kafu-cms/dist/
+artifacts/kafu-staff/dist/
+
+# Optional caches
+artifacts/kafu-foundation/node_modules/
+artifacts/kafu-cms/node_modules/
+artifacts/kafu-staff/node_modules/
