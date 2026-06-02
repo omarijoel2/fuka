@@ -10,11 +10,17 @@ interface DocumentPreviewModalProps {
   onClose: () => void;
 }
 
+function resolveAbsoluteUrl(url: string): string {
+  if (url.startsWith("http://") || url.startsWith("https://")) return url;
+  return `${window.location.origin}${url.startsWith("/") ? "" : "/"}${url}`;
+}
+
 function getPreviewUrl(url: string, type: string): string | null {
+  const abs = resolveAbsoluteUrl(url);
   const ext = type.toLowerCase().replace(".", "");
-  if (ext === "pdf") return url;
+  if (ext === "pdf") return abs;
   if (["doc", "docx", "xls", "xlsx", "ppt", "pptx"].includes(ext)) {
-    return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+    return `https://docs.google.com/viewer?url=${encodeURIComponent(abs)}&embedded=true`;
   }
   return null;
 }
