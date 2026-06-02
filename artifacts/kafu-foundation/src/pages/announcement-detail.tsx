@@ -1,8 +1,10 @@
+import { useState } from "react";
 import { Link, useParams } from "wouter";
 import { useAnnouncementDetail } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
-import { Calendar, Building2, Tag, ChevronRight, ArrowLeft, AlertTriangle, Bell, Download, ArrowRight } from "lucide-react";
+import { Calendar, Building2, Tag, ChevronRight, ArrowLeft, AlertTriangle, Bell, Download, Eye, ArrowRight } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
+import { DocumentPreviewModal } from "@/components/document-preview-modal";
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -12,6 +14,7 @@ export default function AnnouncementDetail() {
   const params = useParams<{ slug: string }>();
   const slug = params.slug ?? "";
   const { data: announcement, isLoading, isError } = useAnnouncementDetail(slug);
+  const [previewDoc, setPreviewDoc] = useState<{ url: string; title: string; type: string } | null>(null);
 
   if (isLoading) {
     return (
@@ -41,6 +44,7 @@ export default function AnnouncementDetail() {
   const isUrgent = announcement.priority === "urgent";
 
   return (
+    <>
     <div className="flex flex-col min-h-screen bg-background">
       <SeoHead
         title={`${announcement.title} — KAFU Announcements`}
@@ -111,18 +115,24 @@ export default function AnnouncementDetail() {
                 </h3>
                 <div className="space-y-2">
                   {announcement.attachments.map((att, i) => (
-                    <a
+                    <div
                       key={i}
-                      href={att.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:border-primary hover:bg-primary/5 transition-all group"
+                      className="flex items-center gap-3 p-3 rounded-lg border bg-card"
                       data-testid={`attachment-${i}`}
                     >
-                      <Download className="w-4 h-4 text-primary shrink-0" />
-                      <span className="text-sm font-medium group-hover:text-primary transition-colors">{att.title}</span>
-                      <span className="text-xs text-muted-foreground ml-auto">{att.type}</span>
-                    </a>
+                      <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded uppercase shrink-0">{att.type}</span>
+                      <span className="text-sm font-medium text-foreground flex-1 truncate">{att.title}</span>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Button variant="ghost" size="sm" className="gap-1.5 h-8 px-3" onClick={() => setPreviewDoc({ url: att.url, title: att.title, type: att.type })} data-testid={`btn-preview-${i}`}>
+                          <Eye className="w-3.5 h-3.5" /> Preview
+                        </Button>
+                        <Button variant="outline" size="sm" className="gap-1.5 h-8 px-3" asChild data-testid={`btn-download-${i}`}>
+                          <a href={att.url} download target="_blank" rel="noreferrer">
+                            <Download className="w-3.5 h-3.5" /> Download
+                          </a>
+                        </Button>
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
@@ -190,5 +200,15 @@ export default function AnnouncementDetail() {
         </div>
       </div>
     </div>
+
+    {previewDoc && (
+      <DocumentPreviewModal
+        url={previewDoc.url}
+        title={previewDoc.title}
+        type={previewDoc.type}
+        onClose={() => setPreviewDoc(null)}
+      />
+    )}
+    </>
   );
 }

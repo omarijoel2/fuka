@@ -1,6 +1,8 @@
+import { useState } from "react";
 import { Link } from "wouter";
 import { useParams } from "wouter";
 import { useOpportunityDetail } from "@/lib/api-hooks";
+import { DocumentPreviewModal } from "@/components/document-preview-modal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
@@ -24,6 +26,7 @@ import {
   Bell,
   Info,
   Send,
+  Eye,
 } from "lucide-react";
 
 function categoryIcon(category: string) {
@@ -72,6 +75,7 @@ function formatDate(date: string) {
 export default function OpportunityDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { data: opp, isLoading, isError } = useOpportunityDetail(slug ?? "");
+  const [previewDoc, setPreviewDoc] = useState<{ url: string; title: string; type: string; size: string } | null>(null);
 
   if (isLoading) {
     return (
@@ -127,6 +131,7 @@ export default function OpportunityDetail() {
     : undefined;
 
   return (
+    <>
     <div className="min-h-screen bg-background">
       <SeoHead
         title={opp.title}
@@ -248,12 +253,18 @@ export default function OpportunityDetail() {
                           <p className="text-xs text-muted-foreground">{doc.size}</p>
                         </div>
                       </div>
-                      <Button variant="outline" size="sm" className="gap-1.5 shrink-0" asChild data-testid={`btn-download-${i}`}>
-                        <a href={doc.url} download>
-                          <FileDown className="w-3.5 h-3.5" />
-                          Download
-                        </a>
-                      </Button>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => setPreviewDoc({ url: doc.url, title: doc.title, type: doc.type, size: doc.size })} data-testid={`btn-preview-${i}`}>
+                          <Eye className="w-3.5 h-3.5" />
+                          Preview
+                        </Button>
+                        <Button variant="outline" size="sm" className="gap-1.5" asChild data-testid={`btn-download-${i}`}>
+                          <a href={doc.url} download target="_blank" rel="noreferrer">
+                            <FileDown className="w-3.5 h-3.5" />
+                            Download
+                          </a>
+                        </Button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -335,5 +346,16 @@ export default function OpportunityDetail() {
         </div>
       </div>
     </div>
+
+    {previewDoc && (
+      <DocumentPreviewModal
+        url={previewDoc.url}
+        title={previewDoc.title}
+        type={previewDoc.type}
+        size={previewDoc.size}
+        onClose={() => setPreviewDoc(null)}
+      />
+    )}
+    </>
   );
 }
