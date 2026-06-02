@@ -153,7 +153,7 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
 
   React.useEffect(() => {
     if (paused) return;
-    const t = setInterval(() => goTo(current + 1), 7000);
+    const t = setInterval(() => goTo(current + 1), 1500);
     return () => clearInterval(t);
   }, [current, paused, goTo]);
 
