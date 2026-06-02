@@ -41,6 +41,7 @@ import ResearchProjectDetail from "@/pages/research-project-detail";
 import ResearchPublications from "@/pages/research-publications";
 import ResearchPublicationDetail from "@/pages/research-publication-detail";
 import ResearchPartnerships from "@/pages/research-partnerships";
+import ResearchJournal from "@/pages/research-journal";
 import InternationalPage from "@/pages/international";
 import InternationalStudy from "@/pages/international-study";
 import InternationalVisa from "@/pages/international-visa";
@@ -132,6 +133,7 @@ function Router() {
             {(params) => <ResearchProjectDetail slug={params.slug ?? ""} />}
           </Route>
           <Route path="/research/publications" component={ResearchPublications} />
+          <Route path="/research/journal" component={ResearchJournal} />
           <Route path="/research/publications/:slug">
             {(params) => <ResearchPublicationDetail slug={params.slug ?? ""} />}
           </Route>
