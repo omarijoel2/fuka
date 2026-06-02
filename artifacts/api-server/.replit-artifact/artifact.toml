@@ -10,7 +10,7 @@ name = "API Server"
 paths = ["/api"]
 
 [services.development]
-run = "cd /home/runner/workspace/artifacts/kafu-api && php artisan serve --host=0.0.0.0 --port=$PORT"
+run = "cd /home/runner/workspace/artifacts/kafu-api/public && php -d upload_max_filesize=20M -d post_max_size=25M -S 0.0.0.0:$PORT /home/runner/workspace/artifacts/kafu-api/vendor/laravel/framework/src/Illuminate/Foundation/resources/server.php"
 
 [services.env]
 PORT = "8080"
