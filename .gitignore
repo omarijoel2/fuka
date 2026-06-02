@@ -76,3 +76,5 @@ artifacts/kafu-staff/dist/
 artifacts/kafu-foundation/node_modules/
 artifacts/kafu-cms/node_modules/
 artifacts/kafu-staff/node_modules/
+attached_assets/*.sql
+attached_assets/*.txt
