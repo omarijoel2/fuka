@@ -24,6 +24,8 @@ class DatabaseSeeder extends Seeder
 
         // ── Content (all depend on author_id = 1 from CmsSeeder) ──────────────
         $this->call(ContentMigrationSeeder::class);
+        $this->call(ContentPagesSeeder::class);   // Structured page content (policies, strategic plan, service charter, etc.)
+        $this->call(ContentMediaSeeder::class);   // Press releases, publications, videos, brand assets
         $this->call(NewsEventsAnnouncementsSeeder::class);
         $this->call(OpportunitiesSeeder::class);
 
