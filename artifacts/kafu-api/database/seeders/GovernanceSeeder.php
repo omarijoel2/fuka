@@ -130,7 +130,7 @@ class GovernanceSeeder extends Seeder
     'email'          => 'dean.students@kafu.ac.ke',
     'office'         => 'Dean of Students Office',
     'phone'          => '+254 777 373 670',
-    'photo_url'      => '/images/uploads/Dr.-Nyambane.jpg',
+    'photo_url'      => '/images/uploads/dean-nyambane.jpg',
     'position_order' => 8,
 ],
             [
