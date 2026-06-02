@@ -10,7 +10,7 @@ class SiteConfigController extends Controller
 {
     public function getGroup(string $group)
     {
-        $allowed = ['homepage', 'navigation', 'site', 'seo', 'contact'];
+        $allowed = ['homepage', 'navigation', 'site', 'seo', 'contact', 'branding'];
         if (!in_array($group, $allowed)) {
             return response()->json(['message' => 'Unknown config group'], 404);
         }
@@ -19,7 +19,7 @@ class SiteConfigController extends Controller
 
     public function updateGroup(Request $request, string $group)
     {
-        $allowed = ['homepage', 'navigation', 'site', 'seo', 'contact'];
+        $allowed = ['homepage', 'navigation', 'site', 'seo', 'contact', 'branding'];
         if (!in_array($group, $allowed)) {
             return response()->json(['message' => 'Unknown config group'], 404);
         }
@@ -30,7 +30,7 @@ class SiteConfigController extends Controller
 
     public function all()
     {
-        $groups = ['homepage', 'navigation', 'site', 'seo', 'contact'];
+        $groups = ['homepage', 'navigation', 'site', 'seo', 'contact', 'branding'];
         $result = [];
         foreach ($groups as $g) {
             $result[$g] = SiteConfig::getGroup($g);

@@ -1,7 +1,14 @@
 import React from "react";
 import { Link } from "wouter";
+import { useBranding, BRANDING_DEFAULTS } from "@/lib/api-hooks";
 
 export function Footer() {
+  const { data: branding } = useBranding();
+  const logoUrl     = branding?.logo_primary_url ?? BRANDING_DEFAULTS.logo_primary_url;
+  const logoAlt     = branding?.logo_alt          ?? BRANDING_DEFAULTS.logo_alt;
+  const tagline     = branding?.tagline           ?? BRANDING_DEFAULTS.tagline;
+  const description = branding?.site_description  ?? BRANDING_DEFAULTS.site_description;
+
   return (
     <footer className="bg-primary text-primary-foreground pt-16 pb-8">
       <div className="container mx-auto px-4">
@@ -10,8 +17,8 @@ export function Footer() {
           {/* Col 1 — Brand */}
           <div className="lg:col-span-1">
             <img
-              src="/imgs/logo-updated.png"
-              alt="Kaimosi Friends University"
+              src={logoUrl}
+              alt={logoAlt}
               className="h-10 object-contain mb-4 brightness-0 invert"
               onError={(e) => {
                 const img = e.target as HTMLImageElement;
@@ -19,7 +26,7 @@ export function Footer() {
               }}
             />
             <p className="text-primary-foreground/75 mb-5 text-sm leading-relaxed">
-              Spring of Knowledge. A Quaker-founded public university established in 2014, committed to truth, service, and academic excellence.
+              {tagline}. {description}
             </p>
             <div className="space-y-1.5 text-sm text-primary-foreground/70">
               <p>P.O BOX 385 – 50309, Kaimosi</p>

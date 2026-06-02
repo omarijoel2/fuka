@@ -5279,4 +5279,26 @@ Route::get('/admissions/settings', function () {
     ]]);
 });
 
-
+// ── Public branding endpoint (no auth — used by frontend) ─────────────────────
+Route::get('/branding', function () {
+    $branding = \App\Models\SiteConfig::getGroup('branding');
+    $defaults = [
+        'logo_primary_url'     => '/imgs/logo-updated.png',
+        'logo_white_url'       => '/imgs/logo-updated.png',
+        'logo_alt'             => 'Kaimosi Friends University',
+        'favicon_url'          => '/favicon.ico',
+        'tagline'              => 'Spring of Knowledge',
+        'site_description'     => 'A Quaker-founded public university established in 2014, committed to truth, service, and academic excellence.',
+        'primary_color'        => '#1A5C38',
+        'gold_color'           => '#C9A227',
+        'white_color'          => '#FFFFFF',
+        'dark_color'           => '#111827',
+        'logo_full_color_url'  => '#',
+        'logo_reversed_url'    => '#',
+        'logo_gold_url'        => '#',
+        'logo_mono_url'        => '#',
+        'logo_icon_url'        => '#',
+        'brand_guidelines_url' => '#',
+    ];
+    return response()->json(array_merge($defaults, $branding ?: []));
+});

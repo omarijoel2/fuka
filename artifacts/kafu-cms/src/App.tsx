@@ -46,6 +46,7 @@ import AdmissionsCmsPage from "@/pages/admissions-cms";
 import KuccpsImportWizard from "@/pages/kuccps-import-wizard";
 import MediaHubCmsPage from "@/pages/media-hub-cms";
 import PagesManagerCmsPage from "@/pages/pages-manager-cms";
+import BrandingSettingsPage from "@/pages/branding-settings";
 
 // ─── Role constants ───────────────────────────────────────────────────────────
 const ADMIN_ROLES    = ["super_admin", "ict_admin", "communications_admin"];
@@ -150,6 +151,13 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <SiteSettingsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/branding-settings">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <BrandingSettingsPage />
             </RequireRole>
           )}
         </Route>

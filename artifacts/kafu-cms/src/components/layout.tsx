@@ -141,6 +141,7 @@ const navItems: NavItem[] = [
       { label: "Homepage Manager", href: "/homepage" },
       { label: "Hero Slides", href: "/hero-slides" },
       { label: "Pages Manager", href: "/pages-manager" },
+      { label: "Branding", href: "/branding-settings" },
       { label: "About Page", href: "/site/about" },
       { label: "Student Services", href: "/site/student-services" },
       { label: "Navigation Manager", href: "/navigation" },
