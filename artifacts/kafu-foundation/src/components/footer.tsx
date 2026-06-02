@@ -166,7 +166,7 @@ export function Footer() {
           <p>&copy; {new Date().getFullYear()} Kaimosi Friends University. All rights reserved.</p>
           <div className="flex gap-5">
             <Link href="/about/policies" className="hover:text-white transition-colors" data-testid="footer-privacy">Privacy Policy</Link>
-            <a href="#" className="hover:text-white transition-colors" data-testid="footer-terms">Terms of Service</a>
+            <a href="/terms" className="hover:text-white transition-colors" data-testid="footer-terms">Terms of Service</a>
             <Link href="/about/service-charter" className="hover:text-white transition-colors" data-testid="footer-charter-link">Service Charter</Link>
           </div>
         </div>

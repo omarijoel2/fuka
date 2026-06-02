@@ -5015,6 +5015,43 @@ Route::get('/archives', function (Request $request) {
     return response()->json(['data' => array_values($filtered), 'total' => count($filtered)]);
 });
 
+// ─── Admin: Page structured_data editor ─────────────────────────────────────
+Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
+    Route::get('/pages/{slug}', function (string $slug) {
+        $item = \DB::table('cms_content')
+            ->where('type', 'page')
+            ->where('slug', $slug)
+            ->where('is_deleted', 0)
+            ->first();
+        if (!$item) {
+            return response()->json(['error' => 'Page not found.'], 404);
+        }
+        $sd = is_string($item->structured_data)
+            ? json_decode($item->structured_data, true) ?? []
+            : ($item->structured_data ?? []);
+        return response()->json(['data' => ['slug' => $item->slug, 'title' => $item->title, 'structured_data' => $sd]]);
+    });
+
+    Route::put('/pages/{slug}', function (Request $request, string $slug) {
+        $item = \DB::table('cms_content')
+            ->where('type', 'page')
+            ->where('slug', $slug)
+            ->where('is_deleted', 0)
+            ->first();
+        if (!$item) {
+            return response()->json(['error' => 'Page not found.'], 404);
+        }
+        $sd = $request->input('structured_data', []);
+        \DB::table('cms_content')
+            ->where('id', $item->id)
+            ->update([
+                'structured_data' => json_encode($sd),
+                'updated_at'      => now()->toDateTimeString(),
+            ]);
+        return response()->json(['success' => true, 'message' => 'Page updated.']);
+    });
+});
+
 // ─── About sub-pages ───────────────────────────────────────────────────────
 Route::get('/about/strategic-plan', function () {
     return response()->json(['data' => [

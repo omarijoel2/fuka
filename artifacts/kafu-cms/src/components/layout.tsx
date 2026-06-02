@@ -99,6 +99,9 @@ const navItems: NavItem[] = [
       { label: "Management Profiles", href: "/governance/management" },
       { label: "Directorates", href: "/governance/directorates" },
       { label: "Departments", href: "/departments" },
+      { label: "Strategic Plan", href: "/governance/strategic-plan" },
+      { label: "Policies & Regulations", href: "/governance/policies" },
+      { label: "Service Charter", href: "/governance/service-charter" },
     ],
   },
   {

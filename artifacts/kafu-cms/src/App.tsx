@@ -47,6 +47,9 @@ import KuccpsImportWizard from "@/pages/kuccps-import-wizard";
 import MediaHubCmsPage from "@/pages/media-hub-cms";
 import PagesManagerCmsPage from "@/pages/pages-manager-cms";
 import BrandingSettingsPage from "@/pages/branding-settings";
+import GovernanceStrategicPlanPage from "@/pages/governance-strategic-plan";
+import GovernancePoliciesPage from "@/pages/governance-policies";
+import GovernanceServiceCharterPage from "@/pages/governance-service-charter";
 
 // ─── Role constants ───────────────────────────────────────────────────────────
 const ADMIN_ROLES    = ["super_admin", "ict_admin", "communications_admin"];
@@ -326,6 +329,27 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <DirectoratesCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/governance/strategic-plan">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <GovernanceStrategicPlanPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/governance/policies">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <GovernancePoliciesPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/governance/service-charter">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <GovernanceServiceCharterPage />
             </RequireRole>
           )}
         </Route>
