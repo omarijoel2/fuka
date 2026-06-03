@@ -24,7 +24,7 @@ class CanonicalImagePathsSeeder extends Seeder
             'Dr. Felix Saouma' => '/images/uploads/saouma.jpg',
             'Dr. Aggrey A. Amugune' => '/images/uploads/Dr.-Amugune.jpg',
             "Ms. Margaret Thang'wa" => '/images/uploads/Thangwa.jpg',
-            'Mr. Ahmed K. Wangara' => '/images/uploads/Wangara.jpg',
+            'Mr. Ahmed K. Wangara' => '/images/uploads/wangara.jpg',
             'Mr. Obed Tanda Monayo' => '/images/uploads/Obed-Tanda.jpg',
             'Dr. Lilian Ronoh' => '/images/uploads/Dr.-Ronoh.jpg',
             'Dr. Ayub H. Shirandula' => '/images/uploads/Mr.-Shirandula.jpg',
