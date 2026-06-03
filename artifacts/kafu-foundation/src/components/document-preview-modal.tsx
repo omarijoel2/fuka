@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { X, Download, FileDown, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { resolveStorageUrl } from "@/lib/api-types";
 
 interface DocumentPreviewModalProps {
   url: string;
@@ -11,8 +12,7 @@ interface DocumentPreviewModalProps {
 }
 
 function resolveAbsoluteUrl(url: string): string {
-  if (url.startsWith("http://") || url.startsWith("https://")) return url;
-  return `${window.location.origin}${url.startsWith("/") ? "" : "/"}${url}`;
+  return resolveStorageUrl(url);
 }
 
 function getPreviewUrl(url: string, type: string): string | null {

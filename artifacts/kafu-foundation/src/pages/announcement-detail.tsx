@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useParams } from "wouter";
 import { useAnnouncementDetail } from "@/lib/api-hooks";
+import { resolveStorageUrl } from "@/lib/api-types";
 import { Button } from "@/components/ui/button";
 import { Calendar, Building2, Tag, ChevronRight, ArrowLeft, AlertTriangle, Bell, Download, Eye, ArrowRight } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
@@ -127,7 +128,7 @@ export default function AnnouncementDetail() {
                           <Eye className="w-3.5 h-3.5" /> Preview
                         </Button>
                         <Button variant="outline" size="sm" className="gap-1.5 h-8 px-3" asChild data-testid={`btn-download-${i}`}>
-                          <a href={att.url} download target="_blank" rel="noreferrer">
+                          <a href={resolveStorageUrl(att.url)} download target="_blank" rel="noreferrer">
                             <Download className="w-3.5 h-3.5" /> Download
                           </a>
                         </Button>
