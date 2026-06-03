@@ -11,30 +11,29 @@ interface CampusChampion {
   email?: string;
 }
 
-const CAMPUS_CHAMPIONS: Record<string, { title: string; director?: string; champions: CampusChampion[] }> = {
+const CAMPUS_CHAMPIONS: Record<string, { title: string; champions: CampusChampion[] }> = {
   "kobujoi": {
-    title: "Kobujoi Campus Leadership",
-    director: "Prof. Remmy Shiundu",
+    title: "Kobujoi Campus — Web Content Team",
     champions: [
-      { name: "Prof. Remmy Shiundu", role: "Campus Director", email: "r.shiundu@kafu.ac.ke" },
-      { name: "To be appointed", role: "Academic Affairs Champion", department: "Teaching & Learning" },
-      { name: "To be appointed", role: "Student Affairs Champion", department: "Student Welfare" },
-      { name: "To be appointed", role: "Finance Champion", department: "Finance & Accounts" },
-      { name: "To be appointed", role: "ICT Champion", department: "Information Technology" },
-      { name: "To be appointed", role: "Library Champion", department: "Library & Information Services" },
-      { name: "To be appointed", role: "Research & Innovation Champion", department: "Research Office" },
+      { name: "To be appointed", role: "Campus Webmaster", department: "Overall site content & coordination", email: "webmaster.kobujoi@kafu.ac.ke" },
+      { name: "To be appointed", role: "Academics Content Manager", department: "Programmes, timetables & academic notices" },
+      { name: "To be appointed", role: "Student Affairs Content Manager", department: "Student news, welfare & events" },
+      { name: "To be appointed", role: "Finance Content Manager", department: "Fees, payments & finance notices" },
+      { name: "To be appointed", role: "ICT Content Manager", department: "Systems, e-learning & ICT updates" },
+      { name: "To be appointed", role: "Library Content Manager", department: "Library resources & catalogue updates" },
+      { name: "To be appointed", role: "Research Content Manager", department: "Research projects, grants & publications" },
     ],
   },
   "vokoli": {
-    title: "Vokoli Campus Leadership",
+    title: "Vokoli Campus — Web Content Team",
     champions: [
-      { name: "To be appointed", role: "Campus Principal / Director" },
-      { name: "To be appointed", role: "Academic Affairs Champion", department: "Teaching & Learning" },
-      { name: "To be appointed", role: "Student Affairs Champion", department: "Student Welfare" },
-      { name: "To be appointed", role: "Finance Champion", department: "Finance & Accounts" },
-      { name: "To be appointed", role: "ICT Champion", department: "Information Technology" },
-      { name: "To be appointed", role: "Library Champion", department: "Library & Information Services" },
-      { name: "To be appointed", role: "Research & Innovation Champion", department: "Research Office" },
+      { name: "To be appointed", role: "Campus Webmaster", department: "Overall site content & coordination", email: "webmaster.vokoli@kafu.ac.ke" },
+      { name: "To be appointed", role: "Academics Content Manager", department: "Programmes, timetables & academic notices" },
+      { name: "To be appointed", role: "Student Affairs Content Manager", department: "Student news, welfare & events" },
+      { name: "To be appointed", role: "Finance Content Manager", department: "Fees, payments & finance notices" },
+      { name: "To be appointed", role: "ICT Content Manager", department: "Systems, e-learning & ICT updates" },
+      { name: "To be appointed", role: "Library Content Manager", department: "Library resources & catalogue updates" },
+      { name: "To be appointed", role: "Research Content Manager", department: "Research projects, grants & publications" },
     ],
   },
 };
@@ -192,10 +191,11 @@ export default function CampusDetailPage() {
               const champ = CAMPUS_CHAMPIONS[campus.slug!];
               return (
                 <section data-testid="section-campus-champions">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <h2 className="text-xl font-bold text-gray-900 mb-1 flex items-center gap-2">
                     <Users className="w-5 h-5" style={{ color: "#1A5C38" }} />
                     {champ.title}
                   </h2>
+                  <p className="text-sm text-gray-500 mb-4">These staff members manage and update web content for this campus. Contact them to submit news, events, or updates.</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {champ.champions.map((c, i) => (
                       <div key={i} className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex items-start gap-3" data-testid={`champion-card-${i}`}>
