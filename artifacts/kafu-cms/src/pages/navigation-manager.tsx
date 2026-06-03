@@ -406,7 +406,37 @@ export default function NavigationManagerPage() {
 
   useEffect(() => {
     apiGet("/site-config/navigation")
-      .then((d) => { setCfg(d || {}); setLoading(false); })
+      .then((d) => {
+        const raw: NavConfig = d || {};
+        // Migrate legacy flat children[] → mega_groups[] format.
+        // The original seeder used {children:[{label,url},...]} but the editor
+        // expects {mega_groups:[{heading,links:[...]}]}. Migrate on load so
+        // existing live-server data becomes editable immediately. Once the user
+        // saves the page the migrated format is written back.
+        if (raw.primary_nav) {
+          raw.primary_nav = raw.primary_nav.map((item) => {
+            const hasOldChildren = (item.children?.length ?? 0) > 0;
+            const hasNewGroups  = (item.mega_groups?.length ?? 0) > 0;
+            if (hasOldChildren && !hasNewGroups) {
+              return {
+                label:       item.label,
+                url:         item.url,
+                type:        "mega" as const,
+                mega_width:  item.mega_width ?? 480,
+                mega_cols:   item.mega_cols  ?? 2,
+                // Wrap the flat children list into a single unnamed group so
+                // every link is visible. The editor can then be used to split
+                // them into labelled groups before saving.
+                mega_groups: [{ heading: "", links: item.children! }],
+                mega_footer: item.mega_footer ?? [],
+              };
+            }
+            return item;
+          });
+        }
+        setCfg(raw);
+        setLoading(false);
+      })
       .catch(() => { setError("Failed to load"); setLoading(false); });
   }, []);
 
