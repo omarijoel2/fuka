@@ -36,6 +36,7 @@ const navItems: NavItem[] = [
       { label: "Staff Profiles", href: "/content?type=staff_profile" },
       { label: "Pages", href: "/content?type=page" },
       { label: "Documents", href: "/content?type=document" },
+      { label: "Notices & Memos", href: "/notices" },
     ],
   },
   { label: "Review Queue", icon: <ClipboardList className="w-4 h-4" />, href: "/review-queue", roles: REVIEWER_ROLES },

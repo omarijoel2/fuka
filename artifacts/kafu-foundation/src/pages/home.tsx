@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { useStats, useNews, useSchools, useEvents, useOpportunities, useProgrammes, useHeroSlides, type HeroSlide } from "@/lib/api-hooks";
+import { NoticeBoardSection } from "@/components/notice-board";
 import { IntakeBanner } from "@/components/intake-banner";
 import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import {
@@ -744,6 +745,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ─── NOTICE BOARD ─── */}
+      <NoticeBoardSection />
 
       {/* ─── ADMISSIONS PATHWAYS ─── */}
       <section className="py-12 md:py-20 bg-primary/5 border-y" id="admissions-pathways">

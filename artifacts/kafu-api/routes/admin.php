@@ -2309,6 +2309,16 @@ Route::prefix('admin')->group(function () {
         });
     });
 
+    // ─── Notices & Memos ─────────────────────────────────────────────────────
+    Route::prefix('notices')->group(function () {
+        Route::get('/', [\App\Http\Controllers\NoticesController::class, 'adminIndex']);
+        Route::post('/', [\App\Http\Controllers\NoticesController::class, 'store']);
+        Route::get('/{id}', [\App\Http\Controllers\NoticesController::class, 'show']);
+        Route::put('/{id}', [\App\Http\Controllers\NoticesController::class, 'update']);
+        Route::delete('/{id}', [\App\Http\Controllers\NoticesController::class, 'destroy']);
+        Route::post('/upload', [\App\Http\Controllers\NoticesController::class, 'upload']);
+    });
+
 });
 
 if (!function_exists('updateApplicationStatus')) {

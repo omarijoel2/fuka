@@ -491,6 +491,20 @@ function AppRoutes() {
           )}
         </Route>
 
+        {/* Notices & Memos */}
+        <Route path="/notices">
+          {() => {
+            const NoticesManagerPage = React.lazy(() => import("./pages/notices-manager"));
+            return (
+              <RequireRole roles={ADMIN_ROLES}>
+                <React.Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading...</div>}>
+                  <NoticesManagerPage />
+                </React.Suspense>
+              </RequireRole>
+            );
+          }}
+        </Route>
+
         <Route>{() => <DashboardPage />}</Route>
       </Switch>
     </CmsLayout>

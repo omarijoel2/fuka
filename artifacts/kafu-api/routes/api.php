@@ -5407,3 +5407,7 @@ Route::get('/branding', function () {
     ];
     return response()->json(array_merge($defaults, $branding ?: []));
 });
+
+// ─── Notices (public) ────────────────────────────────────────────────────────
+Route::get('/notices', [\App\Http\Controllers\NoticesController::class, 'index']);
+Route::get('/notices/{id}', [\App\Http\Controllers\NoticesController::class, 'show']);
