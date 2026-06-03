@@ -71,22 +71,25 @@ DB_PASSWORD=<password>
 Then run: `php artisan migrate --seed`
 
 ### Deployment Checklist (University cPanel Hosting)
-**Backend (Laravel API) — deploy to `api.kafu.ac.ke` or a subdirectory:**
-1. Upload `artifacts/kafu-api/` to the hosting server (exclude `.git`, `node_modules`)
+The frontend, API, and storage all live on the **same domain** (`kafu.ac.ke`). There is no separate `api.kafu.ac.ke` subdomain. The API is served from the same host via Apache/cPanel routing.
+
+**Backend (Laravel API) — deploy under `kafu.ac.ke`:**
+1. Upload `artifacts/kafu-api/` to the hosting server (exclude `.git`, `node_modules`, `storage/logs`)
 2. Run `composer install --no-dev --optimize-autoloader` on the server
-3. Copy `.env.example` to `.env` and fill in all values (database, mail, app URL, app key)
+3. Copy `.env.example` to `.env` and fill in all values — set `APP_URL=https://kafu.ac.ke`
 4. Run `php artisan key:generate`
 5. Create MySQL database + user in cPanel → MySQL Databases
 6. Run `php artisan migrate --seed`
-7. Point `DocumentRoot` to `public/` (or use `.htaccess` for subdirectory installs)
+7. Point `DocumentRoot` to `public/` (or configure an Apache alias for `/api/`)
 8. Run `php artisan config:cache && php artisan route:cache`
-9. Set up a cron job for the scheduler: `* * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1`
+9. Run `php artisan storage:link` to create the `/storage` symlink inside `public/`
+10. Set up a cron job: `* * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1`
 
-**Frontend (React/Vite) — deploy to `www.kafu.ac.ke`:**
-1. Set `VITE_API_URL=https://api.kafu.ac.ke` in the frontend `.env`
+**Frontend (React/Vite) — deploy to `kafu.ac.ke`:**
+1. Leave `VITE_API_URL=` **empty** in the frontend `.env` — the frontend and API share the same domain, so all `/api/` and `/storage/` paths resolve correctly without a prefix
 2. Run `pnpm --filter @workspace/kafu-foundation run build`
 3. Upload the `dist/` folder contents to `public_html/`
-4. Configure Apache/Nginx to serve `index.html` for all routes (SPA fallback)
+4. Configure Apache to serve `index.html` for all routes (SPA fallback via `.htaccess`)
 
 **CMS Admin — deploy to `cms.kafu.ac.ke`:**
 1. Run `pnpm --filter @workspace/kafu-cms run build`
