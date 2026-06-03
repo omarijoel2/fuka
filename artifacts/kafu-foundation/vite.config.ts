@@ -54,8 +54,8 @@ export default defineConfig({
     host: "0.0.0.0",
     allowedHosts: true,
     proxy: {
-      // Forward /storage/... to the PHP dev server.
-      // In production this is served by api.kafu.ac.ke; VITE_API_URL handles that.
+      // Forward /storage/... to the PHP dev server (dev only).
+      // In production, an Apache Alias maps /storage/ to kafu-api/storage/app/public.
       "/storage": {
         target: `http://localhost:${process.env.API_PORT ?? "8080"}`,
         changeOrigin: true,

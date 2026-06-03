@@ -5,16 +5,19 @@ import { fetchApi } from "./api-types";
  * Resolves a storage URL so it works in both dev (Vite proxy) and production.
  *
  * Production layout:
- *  - Frontend:  kafu.ac.ke  (root domain)
- *  - API:       api.kafu.ac.ke  (separate virtual server)
- *  - Storage:   https://api.kafu.ac.ke/storage/content-attachments/...
+ *  - Frontend + API share kafu.ac.ke (no separate API subdomain).
+ *  - Storage files are served at kafu.ac.ke/storage/... via an Apache Alias:
+ *      Alias /storage /home/kafu/kafu-platform/artifacts/kafu-api/storage/app/public
+ *  - VITE_API_URL is left empty; /storage/... paths work as relative URLs.
  *
- * Set VITE_API_URL=https://api.kafu.ac.ke in the production frontend .env.
- * In dev (VITE_API_URL empty), the Vite proxy forwards /storage/ → PHP server.
+ * Dev: Vite proxy forwards /storage/ → local PHP server. VITE_API_URL is empty.
+ *
+ * If VITE_API_URL is set (e.g. a separate API domain), it is used to prefix
+ * relative /storage/... paths and to normalise absolute URLs with a wrong base.
  *
  * Rules:
- *  - /storage/...              → <VITE_API_URL>/storage/...   (relative path)
- *  - https://any-host/storage/ → <VITE_API_URL>/storage/...   (wrong base baked in — normalise)
+ *  - /storage/...              → <VITE_API_URL>/storage/...  (or unchanged if empty)
+ *  - https://any-host/storage/ → <VITE_API_URL>/storage/...  (normalise wrong base)
  *  - Already absolute with correct origin → unchanged
  */
 export function resolveStorageUrl(url: string): string {

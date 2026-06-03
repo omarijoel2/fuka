@@ -71,25 +71,41 @@ DB_PASSWORD=<password>
 Then run: `php artisan migrate --seed`
 
 ### Deployment Checklist (University cPanel Hosting)
-The frontend lives at `kafu.ac.ke`. The API and its file storage run on a **separate virtual server** at `api.kafu.ac.ke` (Virtualmin-managed cPanel hosting).
+The frontend (`kafu.ac.ke`) and API (`kafu-api/`) share the same server. The API is
+proxied at `/api/` via Apache ProxyPass. Storage files are served at `/storage/` via
+Apache Alias — both pointing into the `kafu-api` project folder.
 
-**Backend (Laravel API) — deploy to `api.kafu.ac.ke`:**
+**Backend (Laravel API):**
 1. Upload `artifacts/kafu-api/` to `/home/kafu/kafu-platform/artifacts/kafu-api/` on the server (exclude `.git`, `node_modules`, `storage/logs`)
 2. Run `composer install --no-dev --optimize-autoloader` on the server
-3. Copy `.env.example` to `.env` and fill in all values — set `APP_URL=https://api.kafu.ac.ke`
+3. Copy `.env.example` to `.env` and fill in all values — set `APP_URL=https://kafu.ac.ke`
 4. Run `php artisan key:generate`
 5. Create MySQL database + user in cPanel → MySQL Databases
 6. Run `php artisan migrate --seed`
-7. Point Virtualmin `DocumentRoot` to `public/`
-8. Run `php artisan config:cache && php artisan route:cache`
-9. Run `php artisan storage:link` to create the `/storage` symlink inside `public/`
-10. Set up a cron job: `* * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1`
+7. Run `php artisan config:cache && php artisan route:cache`
+8. Run `php artisan storage:link` — creates `public/storage` symlink (one-time setup, already done)
+9. Set up a cron job: `* * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1`
+
+**Apache config for `kafu.ac.ke` — add these directives in Virtualmin:**
+```apache
+# API: proxy /api/ to Laravel
+ProxyPass /api/ http://127.0.0.1:<laravel-port>/api/
+ProxyPassReverse /api/ http://127.0.0.1:<laravel-port>/api/
+
+# Storage: serve uploaded files directly from kafu-api storage
+Alias /storage /home/kafu/kafu-platform/artifacts/kafu-api/storage/app/public
+<Directory /home/kafu/kafu-platform/artifacts/kafu-api/storage/app/public>
+    Options FollowSymLinks
+    AllowOverride None
+    Require all granted
+</Directory>
+```
 
 **Frontend (React/Vite) — deploy to `kafu.ac.ke`:**
-1. Set `VITE_API_URL=https://api.kafu.ac.ke` in the frontend `.env` — this is required so that storage file download links (PDFs, docs) resolve to the correct API subdomain
+1. Leave `VITE_API_URL=` empty — storage and API are on the same domain
 2. Run `pnpm --filter @workspace/kafu-foundation run build`
 3. Upload the `dist/` folder contents to `public_html/`
-4. Configure Apache to serve `index.html` for all routes (SPA fallback via `.htaccess`)
+4. The `.htaccess` (included in `dist/`) handles SPA fallback and excludes `/api/` and `/storage/`
 
 **CMS Admin — deploy to `cms.kafu.ac.ke`:**
 1. Run `pnpm --filter @workspace/kafu-cms run build`

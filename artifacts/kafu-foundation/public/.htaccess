@@ -11,6 +11,10 @@
     RewriteCond %{REQUEST_URI} ^/api(/|$)
     RewriteRule ^ - [L]
 
+    # Do NOT rewrite /storage/* — served via Apache Alias to kafu-api storage
+    RewriteCond %{REQUEST_URI} ^/storage(/|$)
+    RewriteRule ^ - [L]
+
     # SPA fallback: route all other requests to index.html
     RewriteRule ^ index.html [L]
 </IfModule>
