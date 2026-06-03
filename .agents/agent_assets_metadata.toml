@@ -113,3 +113,15 @@ id = "qgqKHTLMpM3WIqWnKJ1ZN"
 uri = "file://docs/kafu-comprehensive-manual.zip"
 type = "unspecified"
 title = "KAFU Comprehensive Manual — System Administration & Website User Guide (with 12 Screenshots)"
+
+[[outputs]]
+id = "onmyQ6zKQc89aRvGF3w0W"
+uri = "file://docs/kafu-training-manual.pdf"
+type = "pdf"
+title = "KAFU Training Manual — CMS & Staff Portal User Guide (PDF)"
+
+[[outputs]]
+id = "xcqbRXF44wciPAB_5NcT2"
+uri = "file://docs/kafu-comprehensive-manual.pdf"
+type = "pdf"
+title = "KAFU Comprehensive Manual — System Administration & Website User Guide (PDF, 1.2 MB)"
