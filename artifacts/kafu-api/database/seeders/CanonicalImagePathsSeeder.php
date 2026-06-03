@@ -124,6 +124,19 @@ class CanonicalImagePathsSeeder extends Seeder
             }
         }
 
+
+        // Department alias fixes
+        DB::table('departments')
+            ->where('slug', 'information-technology')
+            ->update([
+                'hod_name' => 'Dr. Ayub H. Shirandula',
+                'hod_title' => 'Chair, Department of Information Technology',
+                'hod_email' => 'dept.it@kafu.ac.ke',
+                'hod_phone' => '+254 700 100 415',
+                'hod_photo_url' => '/images/uploads/Mr.-Shirandula.jpg',
+                'updated_at' => now(),
+            ]);
+
         $this->command?->info('Canonical image paths applied.');
     }
 }
