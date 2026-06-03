@@ -4,6 +4,7 @@ import { Menu, X, ChevronDown, ChevronRight, MapPin, Phone, ExternalLink, Search
 import { Button } from "./ui/button";
 import { SearchModal } from "./search-bar";
 import { useBranding, BRANDING_DEFAULTS, useNavConfig } from "@/lib/api-hooks";
+import type { CmsPrimaryNavItem } from "@/lib/api-hooks";
 
 // ─── Departments mega-menu data (grouped by school) ──────────────────────────
 // Slugs MUST match the `slug` column in the `departments` table (DepartmentSeeder)
@@ -70,303 +71,53 @@ type NavItem = {
   megaType?: "departments";
   megaGroups?: MegaGroup[];
   megaWidth?: number;
-  megaCols?: 2 | 3;
+  megaCols?: 2 | 3 | 4;
   megaFooter?: MegaFooterLink[];
 };
 
-// ─── Nav structure ────────────────────────────────────────────────────────────
-const navItems: NavItem[] = [
-  { name: "Home", path: "/" },
-  {
-    name: "About",
-    path: "/about",
-    megaWidth: 420, megaCols: 2,
-    megaGroups: [
-      {
-        heading: "The University",
-        links: [
-          { name: "About KAFU",              path: "/about" },
-          { name: "Vision & Mission",        path: "/about#vision" },
-          { name: "Strategic Plan",          path: "/about/strategic-plan" },
-          { name: "Policies & Regulations",  path: "/about/policies" },
-          { name: "Service Charter",         path: "/about/service-charter" },
-          { name: "Our Campuses",            path: "/campuses" },
-        ],
-      },
-      {
-        heading: "Governance",
-        links: [
-          { name: "University Council",     path: "/about/council" },
-          { name: "Vice-Chancellor",        path: "/about/vice-chancellor" },
-          { name: "University Management",  path: "/about/management" },
-        ],
-      },
-      {
-        heading: "Institutional",
-        links: [
-          { name: "Complaints & Resolution", path: "/about/complaints" },
-          { name: "Legal Office",            path: "/about/legal" },
-          { name: "Corporate Social Responsibility", path: "/about/csr" },
-        ],
-      },
-    ],
-    megaFooter: [{ label: "University overview", path: "/about", testid: "nav-about-overview" }],
-  },
-  {
-    name: "Academics",
-    path: "/schools",
-    megaWidth: 620, megaCols: 3,
-    megaGroups: [
-      {
-        heading: "Schools & Faculties",
-        links: [
-          { name: "All Schools",                        path: "/schools" },
-          { name: "SESS — Education & Social Sciences", path: "/schools/SESS" },
-          { name: "SBE — Business & Economics",         path: "/schools/SBE" },
-          { name: "SCIT — Computing & IT",              path: "/schools/SCIT" },
-          { name: "SOS — Science",                      path: "/schools/SOS" },
-          { name: "SHS — Health Sciences",              path: "/schools/SHS" },
-          { name: "ODeL — Open, Distance & E-Learning", path: "/directorates/open-distance-elearning" },
-          { name: "Kobujoi Campus",                     path: "/campuses/kobujoi" },
-        ],
-      },
-      {
-        heading: "Programmes",
-        links: [
-          { name: "Programme Catalogue", path: "/programmes" },
-          { name: "Compare Programmes",  path: "/programmes/compare" },
-        ],
-      },
-      {
-        heading: "Research & Knowledge",
-        links: [
-          { name: "Research Overview",        path: "/research" },
-          { name: "Research Projects",        path: "/research/projects" },
-          { name: "Publications",             path: "/research/publications" },
-          { name: "Institutional Repository", path: "/repository" },
-        ],
-      },
-    ],
-    megaFooter: [
-      { label: "Schools overview", path: "/schools",    testid: "nav-academics-schools" },
-      { label: "All programmes",   path: "/programmes", testid: "nav-academics-programmes" },
-    ],
-  },
-  { name: "Departments", path: "/schools", megaType: "departments" },
-  {
-    name: "Admissions",
-    path: "/admissions",
-    megaWidth: 700, megaCols: 4,
-    megaGroups: [
-      {
-        heading: "Apply",
-        links: [
-          { name: "Admissions Overview",    path: "/admissions" },
-          { name: "Apply Online",           path: "/admissions/apply" },
-          { name: "Track Application",      path: "/admissions/track" },
-          { name: "Joining Instructions",   path: "/admissions/joining-instructions" },
-        ],
-      },
-      {
-        heading: "Pathways",
-        links: [
-          { name: "Undergraduate (KUCCPS)", path: "/admissions#undergraduate" },
-          { name: "Postgraduate",           path: "/admissions#postgraduate" },
-          { name: "Self-Sponsored",         path: "/admissions#self-sponsored" },
-          { name: "Eligibility",            path: "/admissions/eligibility" },
-        ],
-      },
-      {
-        heading: "Fees & Funding",
-        links: [
-          { name: "Fees & Financing",       path: "/admissions/fees" },
-          { name: "Access to Funding",      path: "/admissions/funding" },
-          { name: "Scholarships",           path: "/opportunities?category=scholarship" },
-          { name: "Intake Calendar",        path: "/admissions/calendar" },
-          { name: "Timetables",             path: "/admissions/timetables" },
-        ],
-      },
-      {
-        heading: "International",
-        links: [
-          { name: "International Overview", path: "/international" },
-          { name: "Study at KAFU",          path: "/international/study" },
-          { name: "Visa & Immigration",     path: "/international/visa" },
-          { name: "Exchange Programmes",    path: "/international/exchange" },
-          { name: "Our Partners",           path: "/international/partnerships" },
-        ],
-      },
-    ],
-    megaFooter: [{ label: "Apply now", path: "/admissions/apply", testid: "nav-admissions-apply" }],
-  },
-  {
-    name: "Students",
-    path: "/student-services",
-    megaWidth: 380, megaCols: 2,
-    megaGroups: [
-      {
-        heading: "Student Life",
-        links: [
-          { name: "Student Services",   path: "/student-services" },
-          { name: "Dean of Students",   path: "/students/affairs" },
-          { name: "Student Council",    path: "/students/council" },
-        ],
-      },
-      {
-        heading: "Online Services",
-        links: [
-          { name: "Student Portal", path: "https://portal.kafu.ac.ke",    external: true },
-          { name: "E-Learning",     path: "https://elearning.kafu.ac.ke", external: true },
-        ],
-      },
-    ],
-  },
-  {
-    name: "News",
-    path: "/news",
-    megaWidth: 420, megaCols: 2,
-    megaGroups: [
-      {
-        heading: "News & Updates",
-        links: [
-          { name: "Latest News",   path: "/news" },
-          { name: "Announcements", path: "/announcements" },
-          { name: "Archives",      path: "/archives" },
-        ],
-      },
-      {
-        heading: "Events",
-        links: [{ name: "Events Calendar", path: "/events" }],
-      },
-    ],
-    megaFooter: [{ label: "All news", path: "/news", testid: "nav-news-all" }],
-  },
-  {
-    name: "Media",
-    path: "/media",
-    megaWidth: 660, megaCols: 3,
-    megaGroups: [
-      {
-        heading: "Media",
-        links: [
-          { name: "Media Overview",  path: "/media" },
-          { name: "Photo Gallery",   path: "/gallery" },
-          { name: "Video Gallery",   path: "/media/videos" },
-          { name: "Press Releases",  path: "/media/press-releases" },
-          { name: "Publications",    path: "/media/publications" },
-          { name: "Downloads",       path: "/media/downloads" },
-          { name: "Branding",        path: "/media/branding" },
-        ],
-      },
-      {
-        heading: "Gallery — Events",
-        links: [
-          { name: "Graduation Ceremony 2025",         path: "/gallery/graduation-2025" },
-          { name: "Founder's Day 2025",               path: "/gallery/founders-day-2025" },
-          { name: "Arts & Culture Festival 2025",     path: "/gallery/arts-culture-festival-2025" },
-          { name: "Admissions Open Day 2025",         path: "/gallery/admissions-open-day-2025" },
-          { name: "CBE Teacher Training 2025",        path: "/gallery/cbe-teacher-training-2025" },
-          { name: "Health Sciences Week 2025",        path: "/gallery/health-sciences-week-2025" },
-        ],
-      },
-      {
-        heading: "Gallery — Campus & Research",
-        links: [
-          { name: "Campus Life",                      path: "/gallery/campus-life" },
-          { name: "Campus Activities — May 2026",     path: "/gallery/campus-may-2026" },
-          { name: "Research & Innovation Week 2025",  path: "/gallery/research-week-2025" },
-          { name: "International Exchange 2025",      path: "/gallery/international-exchange-2025" },
-          { name: "Sports Day 2025",                  path: "/gallery/sports-day-2025" },
-        ],
-      },
-    ],
-    megaFooter: [
-      { label: "All galleries", path: "/gallery", testid: "nav-media-gallery" },
-      { label: "Media centre",  path: "/media",   testid: "nav-media-overview" },
-    ],
-  },
-  {
-    name: "Research",
-    path: "/research",
-    megaWidth: 440, megaCols: 2,
-    megaGroups: [
-      {
-        heading: "Our Research",
-        links: [
-          { name: "Research Overview", path: "/research" },
-          { name: "Research Projects", path: "/research/projects" },
-          { name: "Publications",      path: "/research/publications" },
-          { name: "KAFU Journal",      path: "/research/journal" },
-        ],
-      },
-      {
-        heading: "Resources",
-        links: [
-          { name: "Partnerships & Grants",         path: "/research/partnerships" },
-          { name: "Institutional Repository",      path: "/repository" },
-          { name: "Ethics Review Committee",       path: "/research/ethics" },
-          { name: "Innovation & Incubation Hub",   path: "https://kafu-iihub.com", external: true },
-        ],
-      },
-    ],
-  },
-  {
-    name: "Directorates",
-    path: "/directorates",
-    megaWidth: 620, megaCols: 3,
-    megaGroups: [
-      {
-        heading: "Academic",
-        links: [
-          { name: "Graduate Studies",              path: "/directorates/graduate-studies" },
-          { name: "Quality Assurance (DQA&MS)",   path: "/directorates/quality-assurance" },
-          { name: "Open, Distance & e-Learning",  path: "/directorates/open-distance-elearning" },
-        ],
-      },
-      {
-        heading: "Research & Partnerships",
-        links: [
-          { name: "Research, Innovation & Outreach",      path: "/directorates/research-innovation" },
-          { name: "University Linkages, Alumni & Career", path: "/directorates/university-linkages-alumni-career" },
-        ],
-      },
-      {
-        heading: "Administration",
-        links: [
-          { name: "ICT Services",                        path: "/directorates/ict" },
-          { name: "Corporate Affairs",                   path: "/directorates/corporate-affairs" },
-          { name: "Planning & Performance Contracting",  path: "/directorates/planning-performance-contracting" },
-          { name: "Enterprise & Resource Mobilization",  path: "/directorates/enterprises-resource-mobilization" },
-        ],
-      },
-    ],
-    megaFooter: [{ label: "All directorates", path: "/directorates", testid: "nav-directorates-all" }],
-  },
-  { name: "Contact", path: "/contact" },
-];
+// ─── CMS → NavItem mapper ─────────────────────────────────────────────────────
 
-// ─── CMS merge helper ─────────────────────────────────────────────────────────
-// If the CMS config provides children for a nav item (matched by label), override
-// the hardcoded mega-menu with a CMS-managed dropdown. Items with megaType
-// "departments" are always kept as-is.
-function mergeWithCms(
-  defaults: NavItem[],
-  cmsItems: Array<{ label: string; url: string; children?: Array<{ label: string; url: string; external?: boolean }> }> | undefined
-): NavItem[] {
-  if (!cmsItems?.length) return defaults;
-  return defaults.map((def) => {
-    if (def.megaType === "departments") return def;
-    const cms = cmsItems.find((c) => c.label.toLowerCase() === def.name.toLowerCase());
-    if (!cms?.children?.length) return def;
-    return {
-      name: def.name,
-      path: def.path,
-      children: cms.children.map((c) => ({
-        name: c.label,
-        path: c.url,
-        external: c.external ?? c.url.startsWith("http"),
-      })),
-    };
+function cmsToNavItems(items: CmsPrimaryNavItem[]): NavItem[] {
+  if (!items?.length) return [];
+  return items.map((item) => {
+    const name = item.label;
+    const path = item.url;
+
+    if (item.type === "departments") {
+      return { name, path, megaType: "departments" as const };
+    }
+
+    if (item.mega_groups?.length) {
+      return {
+        name,
+        path,
+        megaWidth: item.mega_width,
+        megaCols: item.mega_cols as (2 | 3 | 4 | undefined),
+        megaGroups: item.mega_groups.map((g) => ({
+          heading: g.heading,
+          links: g.links.map((l) => ({ name: l.label, path: l.url, external: l.external })),
+        })),
+        megaFooter: item.mega_footer?.map((f, i) => ({
+          label: f.label,
+          path: f.url,
+          testid: `nav-${name.toLowerCase().replace(/\s+/g, "-")}-footer-${i}`,
+        })),
+      };
+    }
+
+    if (item.children?.length) {
+      return {
+        name,
+        path,
+        children: item.children.map((c) => ({
+          name: c.label,
+          path: c.url,
+          external: c.external ?? c.url.startsWith("http"),
+        })),
+      };
+    }
+
+    return { name, path };
   });
 }
 
@@ -469,7 +220,7 @@ function GenericMegaPanel({ item, onClose }: { item: NavItem; onClose: () => voi
     >
       <div
         className={`grid gap-0 divide-x divide-gray-100 p-4 ${
-          cols === 3 ? "grid-cols-3" : "grid-cols-2"
+          cols === 4 ? "grid-cols-4" : cols === 3 ? "grid-cols-3" : "grid-cols-2"
         }`}
       >
         {groups.map((group) => (
@@ -698,7 +449,7 @@ export function Navbar() {
   const logoUrl = branding?.logo_primary_url ?? BRANDING_DEFAULTS.logo_primary_url;
   const logoAlt = branding?.logo_alt         ?? BRANDING_DEFAULTS.logo_alt;
   const resolvedNavItems = React.useMemo(
-    () => mergeWithCms(navItems, navConfig?.primary_nav),
+    () => cmsToNavItems(navConfig?.primary_nav ?? []),
     [navConfig]
   );
   const [location]                      = useLocation();

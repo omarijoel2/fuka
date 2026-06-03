@@ -558,15 +558,24 @@ export function useServicePointDetail(slug: string) {
 }
 
 // ─── Navigation Config (public) ──────────────────────────────────────────────
-export interface CmsNavChild {
+export interface CmsNavLink {
   label: string;
   url: string;
   external?: boolean;
 }
+export interface CmsMegaGroup {
+  heading: string;
+  links: CmsNavLink[];
+}
 export interface CmsPrimaryNavItem {
   label: string;
   url: string;
-  children?: CmsNavChild[];
+  type?: "link" | "mega" | "departments";
+  mega_width?: number;
+  mega_cols?: 2 | 3 | 4;
+  mega_groups?: CmsMegaGroup[];
+  mega_footer?: Array<{ label: string; url: string }>;
+  children?: CmsNavLink[];
 }
 export interface CmsNavConfig {
   primary_nav?: CmsPrimaryNavItem[];

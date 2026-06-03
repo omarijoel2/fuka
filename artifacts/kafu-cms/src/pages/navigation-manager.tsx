@@ -1,28 +1,223 @@
 import { useState, useEffect } from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight, Plus, Trash2, GripVertical } from "lucide-react";
 import { apiGet, apiPut } from "../lib/api";
 
-interface NavChild {
+interface CmsNavLink {
   label: string;
   url: string;
   external?: boolean;
 }
 
+interface CmsMegaGroup {
+  heading: string;
+  links: CmsNavLink[];
+}
+
 interface NavItem {
   label: string;
   url: string;
-  children?: NavChild[];
+  type?: "link" | "mega" | "departments";
+  mega_width?: number;
+  mega_cols?: 2 | 3 | 4;
+  mega_groups?: CmsMegaGroup[];
+  mega_footer?: Array<{ label: string; url: string }>;
+  children?: CmsNavLink[];
 }
 
 interface FooterGroup {
   group: string;
-  items: NavItem[];
+  items: Array<{ label: string; url: string }>;
 }
 
 interface NavConfig {
   primary_nav?: NavItem[];
-  utility_nav?: NavItem[];
+  utility_nav?: Array<{ label: string; url: string }>;
   footer_nav?: FooterGroup[];
+}
+
+const TYPE_LABELS: Record<string, string> = {
+  link: "Plain Link",
+  mega: "Mega Menu",
+  departments: "Departments (auto)",
+};
+
+function MegaGroupEditor({
+  groups,
+  onChange,
+}: {
+  groups: CmsMegaGroup[];
+  onChange: (g: CmsMegaGroup[]) => void;
+}) {
+  const addGroup = () =>
+    onChange([...groups, { heading: "", links: [] }]);
+
+  const removeGroup = (gi: number) =>
+    onChange(groups.filter((_, i) => i !== gi));
+
+  const updateHeading = (gi: number, val: string) => {
+    const g = [...groups];
+    g[gi] = { ...g[gi], heading: val };
+    onChange(g);
+  };
+
+  const addLink = (gi: number) => {
+    const g = [...groups];
+    g[gi] = { ...g[gi], links: [...g[gi].links, { label: "", url: "" }] };
+    onChange(g);
+  };
+
+  const updateLink = (gi: number, li: number, field: keyof CmsNavLink, val: string | boolean) => {
+    const g = [...groups];
+    const links = [...g[gi].links];
+    links[li] = { ...links[li], [field]: val };
+    g[gi] = { ...g[gi], links };
+    onChange(g);
+  };
+
+  const removeLink = (gi: number, li: number) => {
+    const g = [...groups];
+    g[gi] = { ...g[gi], links: g[gi].links.filter((_, i) => i !== li) };
+    onChange(g);
+  };
+
+  return (
+    <div className="space-y-3 mt-3">
+      {groups.map((group, gi) => (
+        <div key={gi} className="border border-gray-200 rounded-lg overflow-hidden">
+          <div className="flex items-center gap-2 bg-gray-50 px-3 py-2 border-b border-gray-200">
+            <GripVertical className="w-3.5 h-3.5 text-gray-300 shrink-0" />
+            <input
+              data-testid={`mega-group-heading-${gi}`}
+              type="text"
+              placeholder="Group heading (e.g. Apply)"
+              value={group.heading}
+              onChange={(e) => updateHeading(gi, e.target.value)}
+              className="flex-1 border border-gray-300 rounded px-2 py-1 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#228B22]"
+            />
+            <button
+              data-testid={`btn-remove-group-${gi}`}
+              onClick={() => removeGroup(gi)}
+              className="text-red-400 hover:text-red-600 p-1"
+              title="Remove group"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+            </button>
+          </div>
+          <div className="px-3 py-2 space-y-1.5">
+            {group.links.map((link, li) => (
+              <div key={li} className="flex items-center gap-2 bg-white border border-gray-100 rounded px-2 py-1.5">
+                <input
+                  data-testid={`mega-link-label-${gi}-${li}`}
+                  type="text"
+                  placeholder="Label"
+                  value={link.label}
+                  onChange={(e) => updateLink(gi, li, "label", e.target.value)}
+                  className="w-40 border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-[#228B22]"
+                />
+                <input
+                  data-testid={`mega-link-url-${gi}-${li}`}
+                  type="text"
+                  placeholder="URL (e.g. /about or https://...)"
+                  value={link.url}
+                  onChange={(e) => updateLink(gi, li, "url", e.target.value)}
+                  className="flex-1 border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-[#228B22]"
+                />
+                <label className="flex items-center gap-1 text-xs text-gray-500 whitespace-nowrap">
+                  <input
+                    data-testid={`mega-link-external-${gi}-${li}`}
+                    type="checkbox"
+                    checked={!!link.external}
+                    onChange={(e) => updateLink(gi, li, "external", e.target.checked)}
+                    className="rounded"
+                  />
+                  External
+                </label>
+                <button
+                  data-testid={`btn-remove-mega-link-${gi}-${li}`}
+                  onClick={() => removeLink(gi, li)}
+                  className="text-red-400 hover:text-red-600 p-0.5"
+                >
+                  <Trash2 className="w-3 h-3" />
+                </button>
+              </div>
+            ))}
+            <button
+              data-testid={`btn-add-mega-link-${gi}`}
+              onClick={() => addLink(gi)}
+              className="flex items-center gap-1 text-xs text-[#228B22] hover:underline mt-1"
+            >
+              <Plus className="w-3 h-3" /> Add Link
+            </button>
+          </div>
+        </div>
+      ))}
+      <button
+        data-testid="btn-add-mega-group"
+        onClick={addGroup}
+        className="flex items-center gap-1.5 text-xs text-[#228B22] font-medium hover:underline"
+      >
+        <Plus className="w-3.5 h-3.5" /> Add Group
+      </button>
+    </div>
+  );
+}
+
+function MegaFooterEditor({
+  footer,
+  onChange,
+}: {
+  footer: Array<{ label: string; url: string }>;
+  onChange: (f: Array<{ label: string; url: string }>) => void;
+}) {
+  return (
+    <div className="mt-3">
+      <p className="text-xs font-semibold text-gray-500 mb-1.5">Footer quick-links</p>
+      <div className="space-y-1.5">
+        {footer.map((f, fi) => (
+          <div key={fi} className="flex items-center gap-2">
+            <input
+              data-testid={`mega-footer-label-${fi}`}
+              type="text"
+              placeholder="Label"
+              value={f.label}
+              onChange={(e) => {
+                const nf = [...footer];
+                nf[fi] = { ...nf[fi], label: e.target.value };
+                onChange(nf);
+              }}
+              className="w-36 border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-[#228B22]"
+            />
+            <input
+              data-testid={`mega-footer-url-${fi}`}
+              type="text"
+              placeholder="URL"
+              value={f.url}
+              onChange={(e) => {
+                const nf = [...footer];
+                nf[fi] = { ...nf[fi], url: e.target.value };
+                onChange(nf);
+              }}
+              className="flex-1 border border-gray-200 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-[#228B22]"
+            />
+            <button
+              data-testid={`btn-remove-footer-link-${fi}`}
+              onClick={() => onChange(footer.filter((_, i) => i !== fi))}
+              className="text-red-400 hover:text-red-600 p-0.5"
+            >
+              <Trash2 className="w-3 h-3" />
+            </button>
+          </div>
+        ))}
+        <button
+          data-testid="btn-add-footer-link"
+          onClick={() => onChange([...footer, { label: "", url: "" }])}
+          className="flex items-center gap-1 text-xs text-[#228B22] hover:underline"
+        >
+          <Plus className="w-3 h-3" /> Add Footer Link
+        </button>
+      </div>
+    </div>
+  );
 }
 
 function PrimaryNavItemRow({
@@ -30,100 +225,131 @@ function PrimaryNavItemRow({
   index,
   onUpdate,
   onRemove,
-  onAddChild,
-  onUpdateChild,
-  onRemoveChild,
 }: {
   item: NavItem;
   index: number;
-  onUpdate: (i: number, field: "label" | "url", val: string) => void;
+  onUpdate: (i: number, updated: NavItem) => void;
   onRemove: (i: number) => void;
-  onAddChild: (i: number) => void;
-  onUpdateChild: (i: number, ci: number, field: "label" | "url", val: string) => void;
-  onRemoveChild: (i: number, ci: number) => void;
 }) {
   const [expanded, setExpanded] = useState(false);
-  const childCount = item.children?.length ?? 0;
+  const type = item.type ?? (item.mega_groups?.length ? "mega" : item.children?.length ? "mega" : "link");
+
+  const updateField = (field: keyof NavItem, val: unknown) =>
+    onUpdate(index, { ...item, [field]: val });
+
+  const setType = (t: "link" | "mega" | "departments") => {
+    const updated: NavItem = { label: item.label, url: item.url, type: t };
+    if (t === "mega") {
+      updated.mega_groups = item.mega_groups ?? [];
+      updated.mega_footer = item.mega_footer ?? [];
+      updated.mega_width = item.mega_width ?? 480;
+      updated.mega_cols = item.mega_cols ?? 2;
+    }
+    onUpdate(index, updated);
+  };
+
+  const typeBadgeColor: Record<string, string> = {
+    link: "bg-gray-100 text-gray-600",
+    mega: "bg-green-100 text-green-700",
+    departments: "bg-blue-100 text-blue-700",
+  };
+
   return (
     <div className="bg-gray-50 border border-gray-200 rounded-xl overflow-hidden">
       <div className="flex items-center gap-2 px-3 py-2">
+        <GripVertical className="w-4 h-4 text-gray-300 shrink-0" />
         <input
           data-testid={`nav-label-${index}`}
           type="text"
           placeholder="Label"
           value={item.label}
-          onChange={(e) => onUpdate(index, "label", e.target.value)}
-          className="w-32 border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
+          onChange={(e) => updateField("label", e.target.value)}
+          className="w-28 border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
         />
         <input
           data-testid={`nav-url-${index}`}
           type="text"
           placeholder="URL"
           value={item.url}
-          onChange={(e) => onUpdate(index, "url", e.target.value)}
+          onChange={(e) => updateField("url", e.target.value)}
           className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
         />
-        <button
-          data-testid={`btn-toggle-children-${index}`}
-          onClick={() => setExpanded((e) => !e)}
-          className="flex items-center gap-1 text-xs text-[#228B22] font-medium bg-green-50 hover:bg-green-100 px-2 py-1.5 rounded border border-green-200 transition-colors whitespace-nowrap"
+        <select
+          data-testid={`nav-type-${index}`}
+          value={type}
+          onChange={(e) => setType(e.target.value as "link" | "mega" | "departments")}
+          className={`border border-gray-300 rounded px-2 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-[#228B22] ${typeBadgeColor[type] ?? ""}`}
         >
-          {childCount} submenu {childCount === 1 ? "item" : "items"}
-          {expanded
-            ? <ChevronDown className="w-3 h-3" />
-            : <ChevronRight className="w-3 h-3" />
-          }
-        </button>
+          <option value="link">Plain Link</option>
+          <option value="mega">Mega Menu</option>
+          <option value="departments">Departments</option>
+        </select>
+        {type === "mega" && (
+          <button
+            data-testid={`btn-toggle-mega-${index}`}
+            onClick={() => setExpanded((e) => !e)}
+            className="flex items-center gap-1 text-xs text-[#228B22] font-medium bg-green-50 hover:bg-green-100 px-2 py-1.5 rounded border border-green-200 transition-colors whitespace-nowrap"
+          >
+            {(item.mega_groups?.length ?? 0)} groups
+            {expanded ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+          </button>
+        )}
         <button
           data-testid={`btn-remove-nav-${index}`}
           onClick={() => onRemove(index)}
-          className="text-red-500 hover:text-red-700 text-xs px-2 whitespace-nowrap"
+          className="text-red-500 hover:text-red-700 p-1"
+          title="Remove item"
         >
-          Remove
+          <Trash2 className="w-4 h-4" />
         </button>
       </div>
-      {expanded && (
-        <div className="border-t border-gray-200 bg-white px-4 pt-3 pb-3 space-y-2">
-          <p className="text-xs text-gray-500 font-medium mb-1">Submenu links for <strong>{item.label || "(untitled)"}</strong></p>
-          {(item.children || []).length === 0 && (
-            <p className="text-xs text-gray-400 italic py-1">
-              No submenu items yet — falls back to the mega-menu layout. Add items below to create a custom dropdown.
-            </p>
-          )}
-          {(item.children || []).map((child, ci) => (
-            <div key={ci} className="flex items-center gap-2 bg-gray-50 rounded-lg px-2 py-1.5">
+
+      {type === "mega" && expanded && (
+        <div className="border-t border-gray-200 bg-white px-4 pt-3 pb-4">
+          <div className="flex items-center gap-4 mb-3">
+            <label className="flex items-center gap-1.5 text-xs text-gray-600">
+              Width (px):
               <input
-                data-testid={`nav-child-label-${index}-${ci}`}
-                type="text"
-                placeholder="Link label"
-                value={child.label}
-                onChange={(e) => onUpdateChild(index, ci, "label", e.target.value)}
-                className="w-40 border border-gray-300 rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#228B22]"
+                data-testid={`nav-mega-width-${index}`}
+                type="number"
+                value={item.mega_width ?? 480}
+                onChange={(e) => updateField("mega_width", Number(e.target.value))}
+                className="w-20 border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-[#228B22]"
               />
-              <input
-                data-testid={`nav-child-url-${index}-${ci}`}
-                type="text"
-                placeholder="URL (e.g. /about or https://...)"
-                value={child.url}
-                onChange={(e) => onUpdateChild(index, ci, "url", e.target.value)}
-                className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-[#228B22]"
-              />
-              <button
-                data-testid={`btn-remove-child-${index}-${ci}`}
-                onClick={() => onRemoveChild(index, ci)}
-                className="text-red-400 hover:text-red-600 text-xs px-1.5"
+            </label>
+            <label className="flex items-center gap-1.5 text-xs text-gray-600">
+              Columns:
+              <select
+                data-testid={`nav-mega-cols-${index}`}
+                value={item.mega_cols ?? 2}
+                onChange={(e) => updateField("mega_cols", Number(e.target.value))}
+                className="border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-[#228B22]"
               >
-                Remove
-              </button>
-            </div>
-          ))}
-          <button
-            data-testid={`btn-add-child-${index}`}
-            onClick={() => onAddChild(index)}
-            className="text-xs text-[#228B22] font-medium hover:underline mt-1"
-          >
-            + Add Submenu Link
-          </button>
+                <option value={2}>2</option>
+                <option value={3}>3</option>
+                <option value={4}>4</option>
+              </select>
+            </label>
+          </div>
+          <p className="text-xs font-semibold text-gray-600 mb-1">Menu Groups</p>
+          <MegaGroupEditor
+            groups={item.mega_groups ?? []}
+            onChange={(g) => updateField("mega_groups", g)}
+          />
+          <div className="border-t border-gray-100 mt-3 pt-3">
+            <MegaFooterEditor
+              footer={item.mega_footer ?? []}
+              onChange={(f) => updateField("mega_footer", f)}
+            />
+          </div>
+        </div>
+      )}
+
+      {type === "departments" && (
+        <div className="border-t border-gray-100 px-4 py-2 bg-blue-50">
+          <p className="text-xs text-blue-600">
+            This item renders the auto-generated departments mega-menu (grouped by school from the database). No manual editing needed.
+          </p>
         </div>
       )}
     </div>
@@ -136,9 +362,9 @@ function NavItemRow({
   onUpdate,
   onRemove,
 }: {
-  item: NavItem;
+  item: { label: string; url: string };
   index: number;
-  onUpdate: (i: number, field: keyof NavItem, val: string) => void;
+  onUpdate: (i: number, field: "label" | "url", val: string) => void;
   onRemove: (i: number) => void;
 }) {
   return (
@@ -162,9 +388,9 @@ function NavItemRow({
       <button
         data-testid={`btn-remove-nav-${index}`}
         onClick={() => onRemove(index)}
-        className="text-red-500 hover:text-red-700 text-xs px-2"
+        className="text-red-500 hover:text-red-700 p-1"
       >
-        Remove
+        <Trash2 className="w-4 h-4" />
       </button>
     </div>
   );
@@ -190,42 +416,24 @@ export default function NavigationManagerPage() {
       await apiPut("/site-config/navigation", cfg);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Save failed");
     } finally {
       setSaving(false);
     }
   };
 
-  const updatePrimary = (i: number, field: "label" | "url", val: string) => {
+  const updatePrimary = (i: number, updated: NavItem) => {
     const items = [...(cfg.primary_nav || [])];
-    items[i] = { ...items[i], [field]: val };
+    items[i] = updated;
     setCfg({ ...cfg, primary_nav: items });
   };
   const addPrimary = () =>
-    setCfg({ ...cfg, primary_nav: [...(cfg.primary_nav || []), { label: "", url: "", children: [] }] });
+    setCfg({ ...cfg, primary_nav: [...(cfg.primary_nav || []), { label: "", url: "", type: "link" }] });
   const removePrimary = (i: number) =>
     setCfg({ ...cfg, primary_nav: (cfg.primary_nav || []).filter((_, idx) => idx !== i) });
 
-  const addPrimaryChild = (i: number) => {
-    const items = [...(cfg.primary_nav || [])];
-    items[i] = { ...items[i], children: [...(items[i].children || []), { label: "", url: "" }] };
-    setCfg({ ...cfg, primary_nav: items });
-  };
-  const updatePrimaryChild = (i: number, ci: number, field: "label" | "url", val: string) => {
-    const items = [...(cfg.primary_nav || [])];
-    const children = [...(items[i].children || [])];
-    children[ci] = { ...children[ci], [field]: val };
-    items[i] = { ...items[i], children };
-    setCfg({ ...cfg, primary_nav: items });
-  };
-  const removePrimaryChild = (i: number, ci: number) => {
-    const items = [...(cfg.primary_nav || [])];
-    items[i] = { ...items[i], children: (items[i].children || []).filter((_, idx) => idx !== ci) };
-    setCfg({ ...cfg, primary_nav: items });
-  };
-
-  const updateUtility = (i: number, field: keyof NavItem, val: string) => {
+  const updateUtility = (i: number, field: "label" | "url", val: string) => {
     const items = [...(cfg.utility_nav || [])];
     items[i] = { ...items[i], [field]: val };
     setCfg({ ...cfg, utility_nav: items });
@@ -240,7 +448,7 @@ export default function NavigationManagerPage() {
     groups[gi] = { ...groups[gi], group: val };
     setCfg({ ...cfg, footer_nav: groups });
   };
-  const updateFooterItem = (gi: number, ii: number, field: keyof NavItem, val: string) => {
+  const updateFooterItem = (gi: number, ii: number, field: "label" | "url", val: string) => {
     const groups = [...(cfg.footer_nav || [])];
     const items = [...(groups[gi].items || [])];
     items[ii] = { ...items[ii], [field]: val };
@@ -276,7 +484,7 @@ export default function NavigationManagerPage() {
         <div>
           <h1 className="text-xl font-bold text-gray-900">Navigation Manager</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Manage primary menu, utility links, and footer navigation structure.
+            Manage primary menu groups and links, utility links, and footer navigation.
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -293,7 +501,6 @@ export default function NavigationManagerPage() {
         </div>
       </div>
 
-      {/* Tabs */}
       <div className="flex border-b border-gray-200">
         {tabs.map((t) => (
           <button
@@ -311,40 +518,44 @@ export default function NavigationManagerPage() {
         ))}
       </div>
 
-      {/* Primary Nav */}
       {activeTab === "primary" && (
-        <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-3">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm text-gray-600">
-              Top-level navigation items shown in the main site header.
+        <div className="space-y-3">
+          <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-2.5">
+            <p className="text-xs text-amber-700">
+              <strong>Mega Menu</strong> items render grouped columns with headings on the live site.
+              Set type to <strong>Plain Link</strong> for top-level links with no dropdown.
+              The <strong>Departments</strong> type auto-generates from the university database.
             </p>
-            <button
-              data-testid="btn-add-primary-nav"
-              onClick={addPrimary}
-              className="text-sm text-[#228B22] font-medium hover:underline"
-            >
-              + Add Item
-            </button>
           </div>
-          {(cfg.primary_nav || []).map((item, i) => (
-            <PrimaryNavItemRow
-              key={i}
-              item={item}
-              index={i}
-              onUpdate={updatePrimary}
-              onRemove={removePrimary}
-              onAddChild={addPrimaryChild}
-              onUpdateChild={updatePrimaryChild}
-              onRemoveChild={removePrimaryChild}
-            />
-          ))}
-          {(cfg.primary_nav || []).length === 0 && (
-            <p className="text-sm text-gray-400 text-center py-4">No primary nav items.</p>
-          )}
+          <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-3">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-sm text-gray-600">
+                Top-level navigation items. Expand any Mega Menu item to edit its groups and links.
+              </p>
+              <button
+                data-testid="btn-add-primary-nav"
+                onClick={addPrimary}
+                className="flex items-center gap-1 text-sm text-[#228B22] font-medium hover:underline"
+              >
+                <Plus className="w-4 h-4" /> Add Item
+              </button>
+            </div>
+            {(cfg.primary_nav || []).map((item, i) => (
+              <PrimaryNavItemRow
+                key={i}
+                item={item}
+                index={i}
+                onUpdate={updatePrimary}
+                onRemove={removePrimary}
+              />
+            ))}
+            {(cfg.primary_nav || []).length === 0 && (
+              <p className="text-sm text-gray-400 text-center py-4">No primary nav items.</p>
+            )}
+          </div>
         </div>
       )}
 
-      {/* Utility Nav */}
       {activeTab === "utility" && (
         <div className="bg-white border border-gray-200 rounded-xl p-6 space-y-3">
           <div className="flex items-center justify-between mb-2">
@@ -354,9 +565,9 @@ export default function NavigationManagerPage() {
             <button
               data-testid="btn-add-utility-nav"
               onClick={addUtility}
-              className="text-sm text-[#228B22] font-medium hover:underline"
+              className="flex items-center gap-1 text-sm text-[#228B22] font-medium hover:underline"
             >
-              + Add Item
+              <Plus className="w-4 h-4" /> Add Item
             </button>
           </div>
           {(cfg.utility_nav || []).map((item, i) => (
@@ -368,7 +579,6 @@ export default function NavigationManagerPage() {
         </div>
       )}
 
-      {/* Footer Nav */}
       {activeTab === "footer" && (
         <div className="space-y-4">
           {(cfg.footer_nav || []).map((group, gi) => (
@@ -388,9 +598,9 @@ export default function NavigationManagerPage() {
                   <button
                     data-testid={`btn-add-footer-item-${gi}`}
                     onClick={() => addFooterItem(gi)}
-                    className="text-sm text-[#228B22] font-medium hover:underline"
+                    className="flex items-center gap-1 text-sm text-[#228B22] font-medium hover:underline"
                   >
-                    + Add Link
+                    <Plus className="w-4 h-4" /> Add Link
                   </button>
                   <button
                     data-testid={`btn-remove-footer-group-${gi}`}
@@ -422,9 +632,9 @@ export default function NavigationManagerPage() {
                   <button
                     data-testid={`btn-remove-footer-item-${gi}-${ii}`}
                     onClick={() => removeFooterItem(gi, ii)}
-                    className="text-red-500 hover:text-red-700 text-xs px-2"
+                    className="text-red-500 hover:text-red-700 p-1"
                   >
-                    Remove
+                    <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
               ))}
