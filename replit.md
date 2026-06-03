@@ -86,7 +86,7 @@ The frontend, API, and storage all live on the **same domain** (`kafu.ac.ke`). T
 10. Set up a cron job: `* * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1`
 
 **Frontend (React/Vite) — deploy to `kafu.ac.ke`:**
-1. Leave `VITE_API_URL=` **empty** in the frontend `.env` — the frontend and API share the same domain, so all `/api/` and `/storage/` paths resolve correctly without a prefix
+1. Leave `VITE_API_URL=` **empty** — no configuration needed. The frontend hard-codes `/api/storage/` as the prefix for all file downloads, which matches the production layout. Do not set this variable.
 2. Run `pnpm --filter @workspace/kafu-foundation run build`
 3. Upload the `dist/` folder contents to `public_html/`
 4. Configure Apache to serve `index.html` for all routes (SPA fallback via `.htaccess`)

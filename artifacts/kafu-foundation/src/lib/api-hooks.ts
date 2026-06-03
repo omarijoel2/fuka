@@ -3,14 +3,29 @@ import { fetchApi } from "./api-types";
 
 /**
  * Resolves a storage URL so it works in both dev (Vite proxy) and production.
- * In dev (VITE_API_URL is empty), relative /storage/... paths are forwarded
- * to the API server by the Vite dev proxy.
- * In production (VITE_API_URL=https://api.kafu.ac.ke), returns an absolute URL.
+ *
+ * The API and its storage symlink live at /api/storage/ on the production server
+ * (kafu.ac.ke/api/storage/...). The frontend is served from the root domain, so
+ * relative /storage/... paths would resolve to the wrong location.
+ *
+ * Rules:
+ *  - /storage/...          → /api/storage/...   (relative path — add prefix)
+ *  - https://host/storage/ → /api/storage/...   (absolute with wrong base — extract path)
+ *  - /api/storage/...      → unchanged           (already correct)
+ *  - https://host/api/storage/ → unchanged       (already correct absolute)
+ *
+ * In dev, the Vite proxy forwards /api/storage/ → PHP server (stripping /api).
  */
 export function resolveStorageUrl(url: string): string {
   if (!url) return url;
-  const apiBase = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
-  if (apiBase && url.startsWith("/storage/")) return apiBase + url;
+  // Already correct
+  if (url.startsWith("/api/storage/") || url.includes("/api/storage/")) return url;
+  // Relative /storage/... — add the /api prefix
+  if (url.startsWith("/storage/")) return "/api" + url;
+  // Absolute URL whose path has /storage/ but lacks /api/storage/
+  // e.g. https://kafu.ac.ke/storage/content-attachments/file.pdf
+  const pathMatch = url.match(/\/storage\/.+$/);
+  if (pathMatch) return "/api" + pathMatch[0];
   return url;
 }
 
