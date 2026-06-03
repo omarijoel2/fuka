@@ -71,22 +71,22 @@ DB_PASSWORD=<password>
 Then run: `php artisan migrate --seed`
 
 ### Deployment Checklist (University cPanel Hosting)
-The frontend, API, and storage all live on the **same domain** (`kafu.ac.ke`). There is no separate `api.kafu.ac.ke` subdomain. The API is served from the same host via Apache/cPanel routing.
+The frontend lives at `kafu.ac.ke`. The API and its file storage run on a **separate virtual server** at `api.kafu.ac.ke` (Virtualmin-managed cPanel hosting).
 
-**Backend (Laravel API) — deploy under `kafu.ac.ke`:**
-1. Upload `artifacts/kafu-api/` to the hosting server (exclude `.git`, `node_modules`, `storage/logs`)
+**Backend (Laravel API) — deploy to `api.kafu.ac.ke`:**
+1. Upload `artifacts/kafu-api/` to `/home/kafu/kafu-platform/artifacts/kafu-api/` on the server (exclude `.git`, `node_modules`, `storage/logs`)
 2. Run `composer install --no-dev --optimize-autoloader` on the server
-3. Copy `.env.example` to `.env` and fill in all values — set `APP_URL=https://kafu.ac.ke/api` (critical: storage URLs are built from this, so it must include the `/api` subdirectory path)
+3. Copy `.env.example` to `.env` and fill in all values — set `APP_URL=https://api.kafu.ac.ke`
 4. Run `php artisan key:generate`
 5. Create MySQL database + user in cPanel → MySQL Databases
 6. Run `php artisan migrate --seed`
-7. Point `DocumentRoot` to `public/` (or configure an Apache alias for `/api/`)
+7. Point Virtualmin `DocumentRoot` to `public/`
 8. Run `php artisan config:cache && php artisan route:cache`
 9. Run `php artisan storage:link` to create the `/storage` symlink inside `public/`
 10. Set up a cron job: `* * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1`
 
 **Frontend (React/Vite) — deploy to `kafu.ac.ke`:**
-1. Leave `VITE_API_URL=` **empty** — no configuration needed. The frontend hard-codes `/api/storage/` as the prefix for all file downloads, which matches the production layout. Do not set this variable.
+1. Set `VITE_API_URL=https://api.kafu.ac.ke` in the frontend `.env` — this is required so that storage file download links (PDFs, docs) resolve to the correct API subdomain
 2. Run `pnpm --filter @workspace/kafu-foundation run build`
 3. Upload the `dist/` folder contents to `public_html/`
 4. Configure Apache to serve `index.html` for all routes (SPA fallback via `.htaccess`)

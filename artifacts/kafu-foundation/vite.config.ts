@@ -54,14 +54,8 @@ export default defineConfig({
     host: "0.0.0.0",
     allowedHosts: true,
     proxy: {
-      // /api/storage/... → PHP dev server at /storage/... (strip /api prefix)
-      // This matches the production layout where the API lives at /api/
-      "/api/storage": {
-        target: `http://localhost:${process.env.API_PORT ?? "8080"}`,
-        changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ""),
-      },
-      // Keep the bare /storage/ rule as a fallback for any edge cases
+      // Forward /storage/... to the PHP dev server.
+      // In production this is served by api.kafu.ac.ke; VITE_API_URL handles that.
       "/storage": {
         target: `http://localhost:${process.env.API_PORT ?? "8080"}`,
         changeOrigin: true,

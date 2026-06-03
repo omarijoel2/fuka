@@ -4,28 +4,33 @@ import { fetchApi } from "./api-types";
 /**
  * Resolves a storage URL so it works in both dev (Vite proxy) and production.
  *
- * The API and its storage symlink live at /api/storage/ on the production server
- * (kafu.ac.ke/api/storage/...). The frontend is served from the root domain, so
- * relative /storage/... paths would resolve to the wrong location.
+ * Production layout:
+ *  - Frontend:  kafu.ac.ke  (root domain)
+ *  - API:       api.kafu.ac.ke  (separate virtual server)
+ *  - Storage:   https://api.kafu.ac.ke/storage/content-attachments/...
+ *
+ * Set VITE_API_URL=https://api.kafu.ac.ke in the production frontend .env.
+ * In dev (VITE_API_URL empty), the Vite proxy forwards /storage/ → PHP server.
  *
  * Rules:
- *  - /storage/...          → /api/storage/...   (relative path — add prefix)
- *  - https://host/storage/ → /api/storage/...   (absolute with wrong base — extract path)
- *  - /api/storage/...      → unchanged           (already correct)
- *  - https://host/api/storage/ → unchanged       (already correct absolute)
- *
- * In dev, the Vite proxy forwards /api/storage/ → PHP server (stripping /api).
+ *  - /storage/...              → <VITE_API_URL>/storage/...   (relative path)
+ *  - https://any-host/storage/ → <VITE_API_URL>/storage/...   (wrong base baked in — normalise)
+ *  - Already absolute with correct origin → unchanged
  */
 export function resolveStorageUrl(url: string): string {
   if (!url) return url;
-  // Already correct
-  if (url.startsWith("/api/storage/") || url.includes("/api/storage/")) return url;
-  // Relative /storage/... — add the /api prefix
-  if (url.startsWith("/storage/")) return "/api" + url;
-  // Absolute URL whose path has /storage/ but lacks /api/storage/
-  // e.g. https://kafu.ac.ke/storage/content-attachments/file.pdf
-  const pathMatch = url.match(/\/storage\/.+$/);
-  if (pathMatch) return "/api" + pathMatch[0];
+  const apiOrigin = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
+  // Relative /storage/... path — prefix with API origin when known
+  if (url.startsWith("/storage/")) {
+    return apiOrigin ? `${apiOrigin}${url}` : url;
+  }
+  // Absolute URL: if it has /storage/ but the origin doesn't match apiOrigin,
+  // strip the wrong origin and rebuild with the correct one.
+  // This fixes URLs where APP_URL was baked in incorrectly on the server.
+  if (apiOrigin && /^https?:\/\//.test(url)) {
+    const pathMatch = url.match(/\/storage\/.+$/);
+    if (pathMatch && !url.startsWith(apiOrigin)) return `${apiOrigin}${pathMatch[0]}`;
+  }
   return url;
 }
 
