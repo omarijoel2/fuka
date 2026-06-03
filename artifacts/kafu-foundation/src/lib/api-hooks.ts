@@ -773,6 +773,11 @@ const FALLBACK_NAV_CONFIG: CmsNavConfig = {
     },
     { label: "Contact", url: "/contact" },
   ],
+  utility_nav: [
+    { label: "Student Portal", url: "https://portal.kafu.ac.ke" },
+    { label: "E-Learning",     url: "https://elearning.kafu.ac.ke" },
+    { label: "Staff Login",    url: "https://staff.kafu.ac.ke" },
+  ],
 };
 
 export function useNavConfig() {

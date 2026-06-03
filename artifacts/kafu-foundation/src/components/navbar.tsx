@@ -487,15 +487,20 @@ export function Navbar() {
             </span>
           </div>
           <div className="flex items-center gap-3 font-medium">
-            <a href="https://portal.kafu.ac.ke" target="_blank" rel="noreferrer"
-               className="hover:text-accent transition-colors" data-testid="link-student-portal">
-              Student Portal
-            </a>
-            <span className="opacity-40">|</span>
-            <a href="https://elearning.kafu.ac.ke" target="_blank" rel="noreferrer"
-               className="hover:text-accent transition-colors" data-testid="link-elearning">
-              E-Learning
-            </a>
+            {(navConfig?.utility_nav ?? []).map((item, i) => (
+              <React.Fragment key={i}>
+                {i > 0 && <span className="opacity-40">|</span>}
+                <a
+                  href={item.url}
+                  target={item.url.startsWith("http") ? "_blank" : undefined}
+                  rel={item.url.startsWith("http") ? "noreferrer" : undefined}
+                  className="hover:text-accent transition-colors"
+                  data-testid={`link-utility-${i}`}
+                >
+                  {item.label}
+                </a>
+              </React.Fragment>
+            ))}
             <span className="opacity-40 hidden md:inline">|</span>
             <a href="mailto:info@kafu.ac.ke"
                className="hover:text-accent transition-colors hidden md:inline" data-testid="link-email">
@@ -626,9 +631,19 @@ export function Navbar() {
             <div className="bg-primary px-5 py-3 flex items-center justify-between">
               <span className="text-white font-semibold text-sm">Menu</span>
               <div className="flex gap-3 text-xs text-white/80">
-                <a href="https://portal.kafu.ac.ke" target="_blank" rel="noreferrer" className="hover:text-accent">Portal</a>
-                <span className="opacity-40">|</span>
-                <a href="https://elearning.kafu.ac.ke" target="_blank" rel="noreferrer" className="hover:text-accent">E-Learning</a>
+                {(navConfig?.utility_nav ?? []).slice(0, 2).map((item, i) => (
+                  <React.Fragment key={i}>
+                    {i > 0 && <span className="opacity-40">|</span>}
+                    <a
+                      href={item.url}
+                      target={item.url.startsWith("http") ? "_blank" : undefined}
+                      rel={item.url.startsWith("http") ? "noreferrer" : undefined}
+                      className="hover:text-accent"
+                    >
+                      {item.label}
+                    </a>
+                  </React.Fragment>
+                ))}
               </div>
             </div>
             <div className="flex-1">
