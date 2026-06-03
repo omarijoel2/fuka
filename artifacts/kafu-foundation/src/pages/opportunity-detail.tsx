@@ -1,6 +1,6 @@
 import { useParams } from "wouter";
 import { Link } from "wouter";
-import { useOpportunityDetail } from "@/lib/api-hooks";
+import { useOpportunityDetail, resolveStorageUrl } from "@/lib/api-hooks";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
@@ -314,7 +314,7 @@ export default function OpportunityDetail() {
               <div className="rounded-xl border bg-card p-5" data-testid="action-card">
                 <h3 className="font-semibold text-sm mb-3">Get Started</h3>
                 <Button className="w-full gap-2" asChild data-testid="btn-download-main">
-                  <a href={opp.documents[0].url} download>
+                  <a href={resolveStorageUrl(opp.documents[0].url)} download>
                     <FileDown className="w-4 h-4" />
                     Download {opp.category === "vacancy" ? "Job Description" : opp.category === "tender" ? "Tender Document" : "Application Form"}
                   </a>

@@ -1,6 +1,19 @@
 import { useQuery } from "@tanstack/react-query";
 import { fetchApi } from "./api-types";
 
+/**
+ * Resolves a storage URL so it works in both dev (Vite proxy) and production.
+ * In dev (VITE_API_URL is empty), relative /storage/... paths are forwarded
+ * to the API server by the Vite dev proxy.
+ * In production (VITE_API_URL=https://api.kafu.ac.ke), returns an absolute URL.
+ */
+export function resolveStorageUrl(url: string): string {
+  if (!url) return url;
+  const apiBase = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
+  if (apiBase && url.startsWith("/storage/")) return apiBase + url;
+  return url;
+}
+
 // ─── Branding ────────────────────────────────────────────────────────────────
 export interface BrandingConfig {
   logo_primary_url: string;

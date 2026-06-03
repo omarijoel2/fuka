@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useParams } from "wouter";
-import { useAnnouncementDetail } from "@/lib/api-hooks";
+import { useAnnouncementDetail, resolveStorageUrl } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
 import { Calendar, Building2, Tag, ChevronRight, ArrowLeft, AlertTriangle, Bell, Download, Eye, ArrowRight } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
@@ -123,11 +123,11 @@ export default function AnnouncementDetail() {
                       <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded uppercase shrink-0">{att.type}</span>
                       <span className="text-sm font-medium text-foreground flex-1 truncate">{att.title}</span>
                       <div className="flex items-center gap-2 shrink-0">
-                        <Button variant="ghost" size="sm" className="gap-1.5 h-8 px-3" onClick={() => setPreviewDoc({ url: att.url, title: att.title, type: att.type })} data-testid={`btn-preview-${i}`}>
+                        <Button variant="ghost" size="sm" className="gap-1.5 h-8 px-3" onClick={() => setPreviewDoc({ url: resolveStorageUrl(att.url), title: att.title, type: att.type })} data-testid={`btn-preview-${i}`}>
                           <Eye className="w-3.5 h-3.5" /> Preview
                         </Button>
                         <Button variant="outline" size="sm" className="gap-1.5 h-8 px-3" asChild data-testid={`btn-download-${i}`}>
-                          <a href={att.url} download target="_blank" rel="noreferrer">
+                          <a href={resolveStorageUrl(att.url)} download target="_blank" rel="noreferrer">
                             <Download className="w-3.5 h-3.5" /> Download
                           </a>
                         </Button>
