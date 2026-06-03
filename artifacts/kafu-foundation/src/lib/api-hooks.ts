@@ -583,11 +583,174 @@ export interface CmsNavConfig {
   footer_nav?: Array<{ group: string; items: Array<{ label: string; url: string }> }>;
 }
 
+const FALLBACK_NAV_CONFIG: CmsNavConfig = {
+  primary_nav: [
+    { label: "Home", url: "/" },
+    {
+      label: "About",
+      url: "/about",
+      type: "mega",
+      mega_width: 520,
+      mega_cols: 2,
+      mega_groups: [
+        {
+          heading: "The University",
+          links: [
+            { label: "About KAFU", url: "/about" },
+            { label: "Vice-Chancellor", url: "/about/vice-chancellor" },
+            { label: "Management Board", url: "/about/management" },
+            { label: "University Council", url: "/about/council" },
+            { label: "Strategic Plan", url: "/about/strategic-plan" },
+          ],
+        },
+        {
+          heading: "Governance",
+          links: [
+            { label: "Policies & Regulations", url: "/about/policies" },
+            { label: "Service Charter", url: "/about/service-charter" },
+            { label: "Directorates", url: "/directorates" },
+            { label: "Campuses", url: "/campuses" },
+            { label: "Contacts & Offices", url: "/contact" },
+          ],
+        },
+      ],
+      mega_footer: [
+        { label: "Our History", url: "/about/history" },
+        { label: "Contact Us", url: "/contact" },
+      ],
+    },
+    {
+      label: "Academics",
+      url: "/academics",
+      type: "mega",
+      mega_width: 560,
+      mega_cols: 2,
+      mega_groups: [
+        {
+          heading: "Study",
+          links: [
+            { label: "Schools & Faculties", url: "/schools" },
+            { label: "All Programmes", url: "/programmes" },
+            { label: "Postgraduate", url: "/programmes?level=postgraduate" },
+            { label: "Diploma & Certificate", url: "/programmes?level=diploma" },
+            { label: "ODeL (Online & Distance)", url: "/odel" },
+          ],
+        },
+        {
+          heading: "Resources",
+          links: [
+            { label: "Academic Calendar", url: "/academic-calendar" },
+            { label: "Examination Timetables", url: "/exams" },
+            { label: "Library", url: "https://library.kafu.ac.ke", },
+            { label: "E-Learning", url: "https://elearning.kafu.ac.ke" },
+          ],
+        },
+      ],
+      mega_footer: [
+        { label: "All Programmes", url: "/programmes" },
+        { label: "Compare Programmes", url: "/programmes/compare" },
+      ],
+    },
+    { label: "Departments", url: "/departments", type: "departments" },
+    {
+      label: "Admissions",
+      url: "/admissions",
+      type: "mega",
+      mega_width: 480,
+      mega_cols: 2,
+      mega_groups: [
+        {
+          heading: "Apply",
+          links: [
+            { label: "Undergraduate (KUCCPS)", url: "/admissions/undergraduate" },
+            { label: "Self-Sponsored (Mod. II)", url: "/admissions/module-ii" },
+            { label: "Postgraduate", url: "/admissions/postgraduate" },
+            { label: "International Students", url: "/admissions/international" },
+            { label: "KUCCPS Verification", url: "/kuccps-verify" },
+          ],
+        },
+        {
+          heading: "Information",
+          links: [
+            { label: "Entry Requirements", url: "/admissions/requirements" },
+            { label: "Fees & Funding", url: "/admissions/fees" },
+            { label: "Scholarships", url: "/opportunities?type=scholarship" },
+            { label: "Hostel & Accommodation", url: "/students/accommodation" },
+          ],
+        },
+      ],
+      mega_footer: [{ label: "Apply Now", url: "/admissions" }],
+    },
+    {
+      label: "Students",
+      url: "/student-services",
+      children: [
+        { label: "Student Services", url: "/student-services" },
+        { label: "Student Portal", url: "https://portal.kafu.ac.ke" },
+        { label: "E-Learning Platform", url: "https://elearning.kafu.ac.ke" },
+        { label: "Library", url: "https://library.kafu.ac.ke" },
+        { label: "Accommodation", url: "/students/accommodation" },
+        { label: "Clubs & Societies", url: "/students/clubs" },
+        { label: "Health & Welfare", url: "/students/welfare" },
+        { label: "Graduation", url: "/students/graduation" },
+      ],
+    },
+    {
+      label: "News",
+      url: "/news",
+      children: [
+        { label: "University News", url: "/news" },
+        { label: "Events Calendar", url: "/events" },
+        { label: "Announcements", url: "/announcements" },
+        { label: "Opportunities", url: "/opportunities" },
+        { label: "Media Gallery", url: "/media" },
+        { label: "Press Releases", url: "/news?category=press-release" },
+      ],
+    },
+    {
+      label: "Research",
+      url: "/research",
+      type: "mega",
+      mega_width: 480,
+      mega_cols: 2,
+      mega_groups: [
+        {
+          heading: "Research",
+          links: [
+            { label: "Research Overview", url: "/research" },
+            { label: "Research Projects", url: "/research/projects" },
+            { label: "Publications", url: "/research/publications" },
+            { label: "Grants & Funding", url: "/research/grants" },
+          ],
+        },
+        {
+          heading: "Innovation",
+          links: [
+            { label: "Research Partnerships", url: "/research/partnerships" },
+            { label: "KAFU Journal", url: "/research/journal" },
+            { label: "Innovation Hub", url: "/research/innovation" },
+            { label: "International", url: "/international" },
+          ],
+        },
+      ],
+      mega_footer: [{ label: "Research & Innovation Hub", url: "/research" }],
+    },
+    { label: "Contact", url: "/contact" },
+  ],
+};
+
 export function useNavConfig() {
   return useQuery<CmsNavConfig>({
     queryKey: ["nav-config"],
-    queryFn: () => fetch("/api/navigation").then((r) => r.json()),
+    queryFn: () =>
+      fetch("/api/navigation")
+        .then((r) => {
+          if (!r.ok) throw new Error("nav fetch failed");
+          return r.json();
+        })
+        .catch(() => FALLBACK_NAV_CONFIG),
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
+    placeholderData: FALLBACK_NAV_CONFIG,
   });
 }
