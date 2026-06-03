@@ -226,6 +226,25 @@ class CampusSeeder extends Seeder
             ],
         ];
 
+        Campus::firstOrCreate(['slug' => 'vokoli'], [
+            'name'            => 'Vokoli Campus',
+            'summary'         => 'KAFU\'s Vokoli Campus brings higher education to Vihiga County, extending the university\'s reach and providing accessible academic opportunities to communities in the region.',
+            'description'     => "Kaimosi Friends University's Vokoli Campus is part of the university's strategic expansion plan to improve access to quality higher education across Western Kenya. Located in Vihiga County, the campus serves students from the surrounding communities and is committed to the university's mission of transformative education, research, and community service.\n\nThe campus offers programmes aligned with local development priorities and is developing into a centre for community engagement and skills development for the region.",
+            'address'         => 'Vokoli, Vihiga County, Kenya',
+            'county'          => 'Vihiga',
+            'region'          => 'Western',
+            'latitude'        => 0.0847,
+            'longitude'       => 34.7218,
+            'hero_image'      => null,
+            'gallery_images'  => [],
+            'contact_email'   => 'vokoli@kafu.ac.ke',
+            'contact_phone'   => '+254 700 000 003',
+            'visitor_notes'   => 'Please contact the campus office in advance to arrange visits.',
+            'transport_notes' => 'From Kisumu: Take a matatu towards Vihiga and alight at Vokoli. From Kakamega: Direct matatus run towards Vihiga County. The campus is accessible from the main Kisumu–Kakamega road.',
+            'sort_order'      => 4,
+            'status'          => 'active',
+        ]);
+
         foreach ($offices as $office) {
             ServicePoint::firstOrCreate(['slug' => $office['slug']], $office);
         }

@@ -2,7 +2,42 @@ import { Link, useParams } from "wouter";
 import { useCampusDetail } from "@/lib/api-hooks";
 import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import { CampusMap } from "@/components/campus-map";
-import { MapPin, Phone, Mail, Clock, ChevronRight, Building2, ArrowRight, Bus, Info } from "lucide-react";
+import { MapPin, Phone, Mail, Clock, ChevronRight, Building2, ArrowRight, Bus, Info, Users } from "lucide-react";
+
+interface CampusChampion {
+  name: string;
+  role: string;
+  department?: string;
+  email?: string;
+}
+
+const CAMPUS_CHAMPIONS: Record<string, { title: string; director?: string; champions: CampusChampion[] }> = {
+  "kobujoi": {
+    title: "Kobujoi Campus Leadership",
+    director: "Prof. Remmy Shiundu",
+    champions: [
+      { name: "Prof. Remmy Shiundu", role: "Campus Director", email: "r.shiundu@kafu.ac.ke" },
+      { name: "To be appointed", role: "Academic Affairs Champion", department: "Teaching & Learning" },
+      { name: "To be appointed", role: "Student Affairs Champion", department: "Student Welfare" },
+      { name: "To be appointed", role: "Finance Champion", department: "Finance & Accounts" },
+      { name: "To be appointed", role: "ICT Champion", department: "Information Technology" },
+      { name: "To be appointed", role: "Library Champion", department: "Library & Information Services" },
+      { name: "To be appointed", role: "Research & Innovation Champion", department: "Research Office" },
+    ],
+  },
+  "vokoli": {
+    title: "Vokoli Campus Leadership",
+    champions: [
+      { name: "To be appointed", role: "Campus Principal / Director" },
+      { name: "To be appointed", role: "Academic Affairs Champion", department: "Teaching & Learning" },
+      { name: "To be appointed", role: "Student Affairs Champion", department: "Student Welfare" },
+      { name: "To be appointed", role: "Finance Champion", department: "Finance & Accounts" },
+      { name: "To be appointed", role: "ICT Champion", department: "Information Technology" },
+      { name: "To be appointed", role: "Library Champion", department: "Library & Information Services" },
+      { name: "To be appointed", role: "Research & Innovation Champion", department: "Research Office" },
+    ],
+  },
+};
 
 const CATEGORY_ICONS: Record<string, string> = {
   admissions: "🎓", registrar: "📋", finance: "💳",
@@ -151,6 +186,36 @@ export default function CampusDetailPage() {
                 </div>
               </section>
             )}
+
+            {/* Campus Champions */}
+            {CAMPUS_CHAMPIONS[campus.slug ?? ""] && (() => {
+              const champ = CAMPUS_CHAMPIONS[campus.slug!];
+              return (
+                <section data-testid="section-campus-champions">
+                  <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                    <Users className="w-5 h-5" style={{ color: "#1A5C38" }} />
+                    {champ.title}
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {champ.champions.map((c, i) => (
+                      <div key={i} className="bg-white border border-gray-100 rounded-xl p-4 shadow-sm flex items-start gap-3" data-testid={`champion-card-${i}`}>
+                        <div className="w-9 h-9 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-sm" style={{ backgroundColor: "#1A5C38" }}>
+                          {c.name === "To be appointed" ? "?" : c.name.split(" ").map(w => w[0]).slice(0, 2).join("")}
+                        </div>
+                        <div className="min-w-0">
+                          <p className={`text-sm font-semibold leading-snug ${c.name === "To be appointed" ? "text-gray-400 italic" : "text-gray-900"}`}>{c.name}</p>
+                          <p className="text-xs font-medium mt-0.5" style={{ color: "#1A5C38" }}>{c.role}</p>
+                          {c.department && <p className="text-xs text-gray-400 mt-0.5">{c.department}</p>}
+                          {c.email && (
+                            <a href={`mailto:${c.email}`} className="text-xs text-blue-600 hover:underline mt-0.5 block">{c.email}</a>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              );
+            })()}
 
             {/* Offices on campus */}
             {officesOnCampus.length > 0 && (
