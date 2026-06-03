@@ -139,7 +139,7 @@ class SiteConfigSeeder extends Seeder
             'utility_nav' => [
                 ['label' => 'Student Portal', 'url' => 'https://portal.kafu.ac.ke'],
                 ['label' => 'E-Learning',     'url' => 'https://elearning.kafu.ac.ke'],
-                ['label' => 'Staff Login',    'url' => '/kafu-staff/'],
+                ['label' => 'Staff Login',    'url' => 'https://staff.kafu.ac.ke'],
             ],
             'footer_nav' => [
                 [

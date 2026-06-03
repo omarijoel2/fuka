@@ -205,7 +205,7 @@ export default function OpportunityDetail() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 md:gap-8">
-          <div className="md:col-span-2 space-y-8 order-2 md:order-1">
+          <div className="md:col-span-2 space-y-8 order-2 md:order-1 min-w-0">
             <section data-testid="section-overview">
               <h2 className="text-xl font-serif font-bold mb-4">Overview</h2>
               <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{opp.description}</p>
