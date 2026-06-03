@@ -154,6 +154,28 @@ class CanonicalImagePathsSeeder extends Seeder
                 'updated_at' => now(),
             ]);
 
+
+        // Directorate photo fixes
+        $directoratePhotos = [
+            'Silas' => '/images/directors/silas-rugut.jpg',
+            'Nicholas' => '/images/directors/nicholas-khasoha.jpg',
+            'Victor' => '/images/directors/victor-shikuku.jpg',
+            'Otsyulah' => '/images/directors/joseph-otsyulah.png',
+            'Damianus' => '/images/directors/damianus-okaka.jpg',
+            'Caroline' => '/images/uploads/Dr.-Mulinya-Caroline-300x300.jpeg',
+            'Hillan' => '/images/uploads/Dr.-Ronoh.jpg',
+            'Obiye' => '/images/uploads/yohana-obiye.jpg',
+        ];
+
+        foreach ($directoratePhotos as $name => $photo) {
+            DB::table('directorates')
+                ->where('director_name', 'like', '%' . $name . '%')
+                ->update([
+                    'director_photo_url' => $photo,
+                    'updated_at' => now(),
+                ]);
+        }
+
         $this->command?->info('Canonical image paths applied.');
     }
 }
