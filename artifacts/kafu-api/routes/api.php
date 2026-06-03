@@ -46,9 +46,11 @@ function mapCmsNews(CmsContent $item): array {
 
 if (!function_exists('normalizeAttachmentUrl')) {
 function normalizeAttachmentUrl(string $url): string {
-    // Strip any http://localhost:PORT prefix so stored URLs remain path-only
-    if (preg_match('#^https?://localhost(:\d+)?(/storage/.+)$#i', $url, $m)) {
-        return $m[2];
+    // If the URL contains /storage/content-attachments/, extract just that path segment.
+    // This handles localhost dev URLs (http://localhost:8000/storage/...) and any host
+    // that was baked in when APP_URL was set to a domain (e.g. https://kafu.ac.ke/storage/...).
+    if (preg_match('#(/storage/content-attachments/.+)$#i', $url, $m)) {
+        return $m[1];
     }
     return $url;
 }
@@ -276,7 +278,10 @@ function mapCmsOpportunityDetail(CmsContent $item): array {
     $base['contact']          = $sd['contact'] ?? ['office'=>'Registry','email'=>'info@kafu.ac.ke','phone'=>'+254 777 373 633','location'=>'Main Campus, Kaimosi'];
     // Merge legacy documents[] with new attachments[] (uploaded via CMS file picker).
     // Normalise attachments to the same {title,type,size,url} shape the frontend expects.
-    $legacyDocs = $sd['documents'] ?? [];
+    $legacyDocs = array_map(function ($d) {
+        if (isset($d['url'])) $d['url'] = normalizeAttachmentUrl($d['url']);
+        return $d;
+    }, $sd['documents'] ?? []);
     $uploaded   = array_map(function ($a) {
         $kb   = isset($a['size_kb']) ? (float) $a['size_kb'] : 0;
         $size = $kb >= 1024 ? round($kb / 1024, 1) . ' MB' : round($kb) . ' KB';
