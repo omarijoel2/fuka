@@ -137,6 +137,15 @@ class CanonicalImagePathsSeeder extends Seeder
                 'updated_at' => now(),
             ]);
 
+
+        // Directorate photo fixes
+        DB::table('directorates')
+            ->where('director_name', 'like', '%Hillan%')
+            ->update([
+                'director_photo_url' => '/images/uploads/Dr.-Ronoh.jpg',
+                'updated_at' => now(),
+            ]);
+
         $this->command?->info('Canonical image paths applied.');
     }
 }
