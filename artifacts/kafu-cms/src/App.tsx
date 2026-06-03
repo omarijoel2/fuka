@@ -1,3 +1,4 @@
+import React, { lazy, Suspense } from "react";
 import { Switch, Route, Router as WouterRouter } from "wouter";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { CmsLayout } from "@/components/layout";
@@ -53,6 +54,7 @@ import BrandingSettingsPage from "@/pages/branding-settings";
 import GovernanceStrategicPlanPage from "@/pages/governance-strategic-plan";
 import GovernancePoliciesPage from "@/pages/governance-policies";
 import GovernanceServiceCharterPage from "@/pages/governance-service-charter";
+const NoticesManagerPage = lazy(() => import("./pages/notices-manager"));
 
 // ─── Role constants ───────────────────────────────────────────────────────────
 const ADMIN_ROLES    = ["super_admin", "ict_admin", "communications_admin"];
@@ -493,16 +495,13 @@ function AppRoutes() {
 
         {/* Notices & Memos */}
         <Route path="/notices">
-          {() => {
-            const NoticesManagerPage = React.lazy(() => import("./pages/notices-manager"));
-            return (
-              <RequireRole roles={ADMIN_ROLES}>
-                <React.Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading...</div>}>
-                  <NoticesManagerPage />
-                </React.Suspense>
-              </RequireRole>
-            );
-          }}
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading...</div>}>
+                <NoticesManagerPage />
+              </Suspense>
+            </RequireRole>
+          )}
         </Route>
 
         <Route>{() => <DashboardPage />}</Route>
