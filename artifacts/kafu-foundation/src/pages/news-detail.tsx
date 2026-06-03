@@ -1,6 +1,5 @@
 import { Link, useParams } from "wouter";
 import { useNewsDetail, useNews } from "@/lib/api-hooks";
-import { resolveStorageUrl } from "@/lib/api-types";
 import { Button } from "@/components/ui/button";
 import { Calendar, User, Tag, ChevronRight, ArrowLeft, ArrowRight, Share2, Download } from "lucide-react";
 import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
@@ -135,7 +134,7 @@ export default function NewsDetail() {
                     {attachments.map((att, i) => (
                       <a
                         key={i}
-                        href={resolveStorageUrl(att.url)}
+                        href={att.url}
                         target="_blank"
                         rel="noreferrer"
                         className="flex items-center gap-3 p-3 rounded-lg border bg-card hover:border-primary hover:bg-primary/5 transition-all group"

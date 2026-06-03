@@ -413,18 +413,6 @@ export interface AdmissionsData {
 
 const API_ORIGIN = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
 
-/**
- * Resolve a server-relative storage path (e.g. /storage/content-attachments/file.pdf)
- * to an absolute URL using the API server's origin from VITE_API_URL.
- * Falls back to window.location.origin in dev (Replit) where both are on the same domain.
- */
-export function resolveStorageUrl(url: string): string {
-  if (!url) return url;
-  if (/^https?:\/\//i.test(url)) return url;
-  const storageOrigin = API_ORIGIN.replace(/\/api$/i, "") || window.location.origin;
-  return `${storageOrigin}${url.startsWith("/") ? "" : "/"}${url}`;
-}
-
 export async function fetchApi<T>(endpoint: string): Promise<T> {
 const API_BASE = API_ORIGIN.endsWith("/api")
   ? API_ORIGIN
