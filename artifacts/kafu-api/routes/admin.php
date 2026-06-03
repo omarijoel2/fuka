@@ -496,7 +496,7 @@ Route::prefix('admin')->group(function () {
                 'extension'     => $file->getClientOriginalExtension(),
                 'size'          => $file->getSize(),
                 'path'          => $path,
-                'url'           => asset("storage/{$path}"),
+                'url'           => "/storage/{$path}",
                 'folder'        => $folder,
                 'alt_text'      => $request->alt_text,
                 'uploaded_by'   => $user->id,
