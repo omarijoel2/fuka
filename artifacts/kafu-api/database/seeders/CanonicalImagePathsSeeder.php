@@ -146,6 +146,14 @@ class CanonicalImagePathsSeeder extends Seeder
                 'updated_at' => now(),
             ]);
 
+
+        DB::table('directorates')
+            ->where('director_name', 'like', '%Obiye%')
+            ->update([
+                'director_photo_url' => '/images/uploads/yohana-obiye.jpg',
+                'updated_at' => now(),
+            ]);
+
         $this->command?->info('Canonical image paths applied.');
     }
 }
