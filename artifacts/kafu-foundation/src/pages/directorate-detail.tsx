@@ -205,6 +205,52 @@ const STATIC_FALLBACKS: Record<string, Partial<Directorate>> = {
       { name: "Dr. Damianus Okaka", title: "Director, Enterprise & Resource Mobilization", photo_url: null, email: "enterprises@kafu.ac.ke" },
     ],
   },
+  "open-distance-elearning": {
+    id: 10,
+    name: "Directorate of Open, Distance and E-Learning",
+    slug: "open-distance-elearning",
+    tagline: "Expanding Access to Quality Higher Education",
+    description:
+      "Kaimosi Friends University (KAFU) has been at the forefront of modern education, seamlessly blending traditional on-campus excellence with a dynamic Open, Distance & e-Learning (ODeL) platform. The ODeL Directorate was established with a clear mandate to dismantle the barriers of the conventional classroom by focusing on three core pillars: accessibility, flexibility, and innovation. By widening the reach of quality higher education and adapting to the modern student's lifestyle, the Directorate ensures that a KAFU education is not confined to geography or rigid schedules.",
+    director_message:
+      "Kaimosi Friends University (KAFU) has been at the forefront of modern education, seamlessly blending traditional on-campus excellence with a dynamic Open, Distance & e-Learning (ODeL) platform. The ODeL Directorate was established with a clear mandate to dismantle the barriers of the conventional classroom by focusing on three core pillars: accessibility, flexibility, and innovation. By widening the reach of quality higher education and adapting to the modern student's lifestyle, the Directorate ensures that a KAFU education is not confined to geography or rigid schedules.",
+    director_name: "Dr. Hillan Ronoh",
+    director_title: "Director, Directorate of Open, Distance and E-Learning",
+    director_photo_url: null,
+    director_bio:
+      "Dr. Hillan Ronoh serves as Director of the Directorate of Open, Distance and E-Learning at Kaimosi Friends University. He leads the University's efforts to make quality higher education accessible to students regardless of location or schedule, overseeing the LMS platform, distance programme delivery, learner support services, and academic staff capacity building in online teaching.",
+    director_email: "odel@kafu.ac.ke",
+    director_phone: "+254 777 373 770",
+    functions: [
+      "Synchronous and Asynchronous Teaching Support: Providing tools and sessions for live interaction (chat, video conferencing, virtual classrooms) and asynchronous resources (recorded lectures, readings, assignments)",
+      "Learner Support Services: Including orientation, enrolment to the LMS and courses, tutorials, library and resource support, issuing reports, and maintaining student records",
+      "Technical Support and Help Desk: Helping students and faculty with access to the platform, navigation, software/hardware issues, and troubleshooting connectivity",
+      "Module Development and Production: Facilitating and supporting the designing, development, and uploading of course materials (digital and multimedia) for online or blended learning",
+      "Learning Management System (LMS) Administration: Managing and maintaining the LMS platform — uploading materials, managing user access, ensuring uptime, configuring interactive tools (forums, quizzes, live sessions)",
+      "Assessment and Examinations: Managing continuous assessments, assignments, quizzes, exams, grading, and feedback mechanisms",
+      "Quality Assurance and Monitoring: Collaboration with DQAMS to ensure that course materials, delivery, learner support, and tools maintain required standards",
+      "Capacity Building: Training academic staff and tutors on effective online and blended course design, facilitation, and assessment",
+    ],
+    services: [
+      "ODeL programme information and application guidance",
+      "Distance learner registration and LMS enrolment support",
+      "E-learning platform access and technical support",
+      "Online study materials and digital resource access",
+      "Assessment, examination management and grading support",
+      "Online examination registration and invigilation support",
+      "ODeL fee structure advisory",
+    ],
+    quick_links: [
+      { label: "E-Learning Platform",      url: "https://elearning.kafu.ac.ke", external: true },
+      { label: "ODeL Programmes",          url: "/programmes?mode=odel" },
+      { label: "Student Portal",           url: "https://portal.kafu.ac.ke",    external: true },
+      { label: "Apply for ODeL Programme", url: "/admissions" },
+      { label: "Contact",                  url: "/contact" },
+    ],
+    staff_roster: [
+      { name: "Dr. Hillan Ronoh", title: "Director, ODeL", photo_url: null, email: "odel@kafu.ac.ke", phone: "+254 777 373 770" },
+    ],
+  },
   "corporate-affairs": {
     id: 11,
     name: "Directorate of Corporate Affairs",
