@@ -194,7 +194,7 @@ export default function OpportunityDetail() {
         </div>
       )}
 
-      <div className="container mx-auto px-4 py-10 max-w-5xl">
+      <div className="container mx-auto px-4 py-8 md:py-10 max-w-5xl">
         <div className="mb-5">
           <Link href="/opportunities" data-testid="back-link">
             <button className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors group">
@@ -204,8 +204,8 @@ export default function OpportunityDetail() {
           </Link>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          <div className="md:col-span-2 space-y-8">
+        <div className="grid md:grid-cols-3 gap-6 md:gap-8">
+          <div className="md:col-span-2 space-y-8 order-2 md:order-1">
             <section data-testid="section-overview">
               <h2 className="text-xl font-serif font-bold mb-4">Overview</h2>
               <p className="text-muted-foreground leading-relaxed whitespace-pre-line">{opp.description}</p>
@@ -240,7 +240,7 @@ export default function OpportunityDetail() {
                 <h2 className="text-xl font-serif font-bold mb-4">Downloads</h2>
                 <div className="space-y-3">
                   {opp.documents.map((doc, i) => (
-                    <div key={i} className="flex items-center justify-between gap-4 border rounded-xl px-5 py-3.5 bg-card hover:border-primary/40 transition-colors" data-testid={`doc-${i}`}>
+                    <div key={i} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 border rounded-xl px-4 py-3.5 bg-card hover:border-primary/40 transition-colors" data-testid={`doc-${i}`}>
                       <div className="flex items-center gap-3 min-w-0">
                         <div className="w-9 h-9 rounded bg-primary/10 text-primary flex items-center justify-center text-xs font-bold flex-shrink-0">
                           {doc.type}
@@ -271,7 +271,7 @@ export default function OpportunityDetail() {
             )}
           </div>
 
-          <div className="space-y-5">
+          <div className="space-y-5 order-1 md:order-2">
             {opp.deadline && (
               <div className={`rounded-xl border p-5 ${opp.status === "closing-soon" ? "border-destructive/40 bg-destructive/5" : opp.status === "closed" ? "border-border bg-muted/40" : "border-primary/20 bg-primary/5"}`} data-testid="deadline-card">
                 <h3 className="font-semibold text-sm mb-3 flex items-center gap-2">
