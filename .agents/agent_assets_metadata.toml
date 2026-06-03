@@ -107,3 +107,9 @@ id = "4knbfAKX6RteyX36ioELF"
 uri = "file://docs/kafu-training-manual.zip"
 type = "unspecified"
 title = "KAFU Digital Systems Training Manual v1.0 (with Screenshots)"
+
+[[outputs]]
+id = "qgqKHTLMpM3WIqWnKJ1ZN"
+uri = "file://docs/kafu-comprehensive-manual.zip"
+type = "unspecified"
+title = "KAFU Comprehensive Manual — System Administration & Website User Guide (with 12 Screenshots)"

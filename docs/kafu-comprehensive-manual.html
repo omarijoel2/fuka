@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KAFU Digital Platform — Comprehensive Manual</title>
+<style>
+  :root {
+    --green:       #1A5C38;
+    --green-mid:   #2d7a52;
+    --green-light: #e8f5ee;
+    --gold:        #C9A227;
+    --gold-light:  #fdf8e7;
+    --navy:        #1e293b;
+    --gray:        #64748b;
+    --border:      #e2e8f0;
+    --light:       #f8fafc;
+    --red:         #dc2626;
+    --blue:        #2563eb;
+    --blue-light:  #eff6ff;
+    --amber:       #d97706;
+    --amber-light: #fffbeb;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 1.75; color: var(--navy); background: #fff; }
+
+  /* ── COVER ─────────────────────────────────────────────── */
+  .cover {
+    min-height: 100vh; background: var(--green); color: #fff;
+    display: flex; flex-direction: column; align-items: center;
+    justify-content: center; text-align: center; padding: 60px 40px;
+    page-break-after: always;
+  }
+  .cover-seal {
+    width: 80px; height: 80px; border-radius: 50%;
+    border: 3px solid rgba(255,255,255,.3);
+    background: rgba(255,255,255,.1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 36px; font-weight: 900; color: var(--gold); margin: 0 auto 20px;
+  }
+  .cover-univ  { font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,.7); margin-bottom: 4px; }
+  .cover-motto { font-style: italic; color: var(--gold); font-size: 16px; margin-bottom: 40px; }
+  .cover-badge {
+    display: inline-block; background: var(--gold); color: #fff;
+    font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 2px; padding: 5px 18px; border-radius: 20px; margin-bottom: 24px;
+  }
+  .cover h1 { font-size: 38px; font-weight: 800; line-height: 1.15; margin-bottom: 14px; }
+  .cover .sub { font-size: 17px; color: rgba(255,255,255,.8); margin-bottom: 48px; }
+  .cover-rule { width: 60px; height: 3px; background: var(--gold); margin: 0 auto 24px; }
+  .cover-meta { font-size: 12.5px; color: rgba(255,255,255,.55); }
+  .cover-meta span { margin: 0 10px; }
+  .cover-parts {
+    display: flex; gap: 16px; justify-content: center; margin-bottom: 40px; flex-wrap: wrap;
+  }
+  .cover-part {
+    border: 1px solid rgba(255,255,255,.25); border-radius: 8px;
+    padding: 14px 22px; text-align: left; min-width: 200px;
+  }
+  .cover-part .pnum { font-size: 11px; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; }
+  .cover-part .ptitle { font-size: 15px; font-weight: 600; }
+
+  /* ── LAYOUT ─────────────────────────────────────────────── */
+  .page { max-width: 940px; margin: 0 auto; padding: 40px 52px; }
+
+  /* ── TOC ─────────────────────────────────────────────────── */
+  .toc { page-break-after: always; }
+  .toc-h { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: var(--gray); margin-bottom: 6px; margin-top: 24px; }
+  .toc a { display: flex; justify-content: space-between; align-items: baseline; text-decoration: none; color: var(--navy); padding: 5px 0; border-bottom: 1px dotted #cbd5e1; font-size: 13.5px; }
+  .toc a:hover { color: var(--green); }
+  .toc .num { color: var(--gold); font-weight: 700; min-width: 32px; }
+  .toc .pg  { color: var(--gray); font-size: 12px; }
+  .toc .sub { padding-left: 32px; font-size: 12.5px; color: var(--gray); }
+  .toc-section-title {
+    font-size: 22px; font-weight: 700; color: var(--green);
+    border-bottom: 3px solid var(--gold); padding-bottom: 8px; margin-bottom: 20px;
+  }
+
+  /* ── PART BANNER ─────────────────────────────────────────── */
+  .part-banner {
+    background: var(--green); color: #fff; padding: 36px 52px;
+    margin: 0 -52px 40px; page-break-before: always;
+  }
+  .part-banner .pl { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,.55); margin-bottom: 6px; }
+  .part-banner h2 { font-size: 30px; font-weight: 800; }
+  .part-banner p  { color: rgba(255,255,255,.8); font-size: 15px; margin-top: 8px; }
+
+  /* ── HEADINGS ─────────────────────────────────────────────── */
+  h2.st {
+    font-size: 22px; color: var(--green); border-bottom: 2px solid var(--border);
+    padding-bottom: 8px; margin: 44px 0 18px;
+  }
+  h3.sub {
+    font-size: 16px; color: var(--green-mid); margin: 30px 0 12px;
+    padding-left: 14px; border-left: 4px solid var(--gold);
+  }
+  h4 { font-size: 14px; font-weight: 700; color: var(--navy); margin: 18px 0 8px; }
+  p  { margin-bottom: 12px; }
+  ul, ol { margin: 0 0 14px 22px; }
+  li { margin-bottom: 6px; }
+
+  /* ── SCREENSHOT ─────────────────────────────────────────────── */
+  .ss { margin: 20px 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.07); }
+  .ss img { display: block; width: 100%; }
+  .ss-cap { background: var(--light); border-top: 1px solid var(--border); padding: 9px 16px; font-size: 12px; color: var(--gray); font-style: italic; }
+
+  /* ── CALLOUT ─────────────────────────────────────────────────── */
+  .box { border-left: 4px solid; padding: 13px 18px; border-radius: 0 8px 8px 0; margin: 18px 0; font-size: 13.5px; }
+  .box strong { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; margin-bottom: 5px; }
+  .box.tip  { border-color: #10b981; background: #f0fdf4; }  .box.tip  strong { color: #059669; }
+  .box.warn { border-color: var(--amber); background: var(--amber-light); } .box.warn strong { color: var(--amber); }
+  .box.info { border-color: var(--blue);  background: var(--blue-light); }  .box.info strong { color: var(--blue); }
+  .box.danger { border-color: var(--red); background: #fef2f2; }  .box.danger strong { color: var(--red); }
+  .box.note { border-color: var(--green); background: var(--green-light); } .box.note strong { color: var(--green); }
+
+  /* ── TABLE ──────────────────────────────────────────────────── */
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+  th { background: var(--green); color: #fff; padding: 11px 14px; text-align: left; font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: var(--light); }
+
+  /* ── CODE ───────────────────────────────────────────────────── */
+  code { background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 4px; padding: 1px 6px; font-family: 'Courier New', monospace; font-size: 12.5px; color: #be185d; }
+  pre {
+    background: #0f172a; color: #e2e8f0; border-radius: 8px; padding: 18px 20px;
+    font-family: 'Courier New', monospace; font-size: 12.5px; line-height: 1.6;
+    overflow-x: auto; margin: 14px 0;
+  }
+  pre .c { color: #64748b; }
+  pre .k { color: #93c5fd; }
+  pre .s { color: #86efac; }
+  pre .v { color: #fde68a; }
+
+  /* ── STEP LIST ──────────────────────────────────────────────── */
+  .steps { counter-reset: s; list-style: none; margin: 16px 0; padding: 0; }
+  .steps li { counter-increment: s; display: flex; gap: 16px; margin-bottom: 18px; align-items: flex-start; }
+  .steps li::before {
+    content: counter(s); flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
+    background: var(--green); color: #fff; font-size: 13px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; margin-top: 2px;
+  }
+  .steps li .sb { flex: 1; }
+  .steps li strong { display: block; font-size: 14px; margin-bottom: 4px; }
+  .steps li p { margin: 0; color: #475569; font-size: 13.5px; }
+
+  /* ── BADGE ──────────────────────────────────────────────────── */
+  .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 12px; text-transform: uppercase; letter-spacing: .4px; }
+  .b-g  { background: #dcfce7; color: #166534; }
+  .b-y  { background: #fef9c3; color: #92400e; }
+  .b-b  { background: #dbeafe; color: #1e40af; }
+  .b-r  { background: #fee2e2; color: #991b1b; }
+  .b-p  { background: #f3e8ff; color: #6b21a8; }
+  .b-gr { background: #f1f5f9; color: #475569; }
+
+  /* ── GRID ───────────────────────────────────────────────────── */
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 16px 0; }
+  .card {
+    border: 1px solid var(--border); border-radius: 10px; padding: 18px;
+    background: var(--light);
+  }
+  .card h4 { margin-top: 0; color: var(--green); }
+
+  /* ── ARCH DIAGRAM ───────────────────────────────────────────── */
+  .arch {
+    border: 1px solid var(--border); border-radius: 10px; padding: 24px;
+    margin: 20px 0; background: var(--light); text-align: center;
+  }
+  .arch-row { display: flex; justify-content: center; gap: 12px; margin: 10px 0; flex-wrap: wrap; }
+  .arch-box {
+    border: 2px solid; border-radius: 8px; padding: 10px 18px;
+    font-size: 13px; font-weight: 600; min-width: 140px; text-align: center;
+  }
+  .arch-box.green { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .arch-box.gold  { border-color: var(--gold);  background: var(--gold-light); color: #78501a; }
+  .arch-box.blue  { border-color: var(--blue);  background: var(--blue-light); color: var(--blue); }
+  .arch-box.gray  { border-color: #94a3b8; background: #f8fafc; color: #475569; }
+  .arch-arrow { font-size: 22px; color: #94a3b8; display: flex; align-items: center; }
+  .arch-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--gray); margin: 12px 0 4px; }
+
+  /* ── CHECKLIST ──────────────────────────────────────────────── */
+  .chk { list-style: none; padding: 0; }
+  .chk li { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13.5px; }
+  .chk li::before { content: "☐"; font-size: 16px; color: var(--green); flex-shrink: 0; margin-top: 1px; }
+
+  /* ── PRINT ──────────────────────────────────────────────────── */
+  @media print {
+    .cover       { page-break-after: always; }
+    .toc         { page-break-after: always; }
+    .part-banner { page-break-before: always; }
+    h2.st        { page-break-after: avoid; }
+    .ss, table, .box, .card { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     COVER
+══════════════════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-seal">K</div>
+  <div class="cover-univ">Kaimosi Friends University</div>
+  <div class="cover-motto">Spring of Knowledge</div>
+  <div class="cover-badge">Comprehensive Technical Manual</div>
+  <h1>KAFU Digital Platform<br>Administration &amp; User Guide</h1>
+  <div class="sub">System Administration Manual &nbsp;|&nbsp; Website User Manual</div>
+  <div class="cover-rule"></div>
+  <div class="cover-parts">
+    <div class="cover-part">
+      <div class="pnum">Part I</div>
+      <div class="ptitle">System Administration</div>
+    </div>
+    <div class="cover-part">
+      <div class="pnum">Part II</div>
+      <div class="ptitle">Website User Guide</div>
+    </div>
+  </div>
+  <div class="cover-meta">
+    <span>ICT Directorate</span>
+    <span>|</span>
+    <span>Version 1.0</span>
+    <span>|</span>
+    <span>June 2026</span>
+    <span>|</span>
+    <span>CONFIDENTIAL — Internal Use Only</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     TABLE OF CONTENTS
+══════════════════════════════════════════════════════════════════════ -->
+<div class="page toc">
+  <div class="toc-section-title">Table of Contents</div>
+
+  <div class="toc-h">Part I — System Administration Manual</div>
+  <a href="#arch"><span class="num">1.</span> System Architecture Overview</a>
+  <a class="sub" href="#tech-stack"><span class="num"></span> Technology Stack &amp; Components</a>
+  <a href="#server-req"><span class="num">2.</span> Server &amp; Hosting Requirements</a>
+  <a href="#initial-setup"><span class="num">3.</span> Initial Server Setup</a>
+  <a class="sub" href="#backend-install"><span class="num"></span> Backend API Installation (Laravel)</a>
+  <a class="sub" href="#frontend-build"><span class="num"></span> Frontend Build &amp; Deployment</a>
+  <a class="sub" href="#apache-config"><span class="num"></span> Apache / Web Server Configuration</a>
+  <a href="#env-config"><span class="num">4.</span> Environment Configuration (.env)</a>
+  <a href="#database"><span class="num">5.</span> Database Administration</a>
+  <a class="sub" href="#db-setup"><span class="num"></span> Database Setup (MySQL/MariaDB)</a>
+  <a class="sub" href="#migrations"><span class="num"></span> Running Migrations &amp; Seeders</a>
+  <a class="sub" href="#db-backup"><span class="num"></span> Backup Procedures</a>
+  <a href="#api-admin"><span class="num">6.</span> API Server Administration</a>
+  <a class="sub" href="#artisan"><span class="num"></span> Key Artisan Commands</a>
+  <a class="sub" href="#api-routes"><span class="num"></span> API Endpoint Reference</a>
+  <a href="#user-admin"><span class="num">7.</span> CMS User Account Administration</a>
+  <a href="#cron"><span class="num">8.</span> Scheduled Tasks &amp; Cron Jobs</a>
+  <a href="#monitoring"><span class="num">9.</span> Monitoring, Logs &amp; Troubleshooting</a>
+  <a href="#security"><span class="num">10.</span> Security Hardening Checklist</a>
+  <a href="#maintenance"><span class="num">11.</span> Maintenance Procedures</a>
+  <a href="#deployment-checklist"><span class="num">12.</span> Full Deployment Checklist</a>
+
+  <div class="toc-h" style="margin-top: 20px;">Part II — Website User Manual</div>
+  <a href="#website-intro"><span class="num">13.</span> Introduction to the KAFU Website</a>
+  <a href="#navigation"><span class="num">14.</span> Navigating the Website</a>
+  <a class="sub" href="#navbar"><span class="num"></span> The Navigation Bar</a>
+  <a class="sub" href="#search"><span class="num"></span> Using the Search Function</a>
+  <a href="#homepage-guide"><span class="num">15.</span> Homepage</a>
+  <a href="#about-guide"><span class="num">16.</span> About KAFU</a>
+  <a href="#academics-guide"><span class="num">17.</span> Academics — Schools &amp; Programmes</a>
+  <a href="#admissions-guide"><span class="num">18.</span> Admissions</a>
+  <a href="#news-guide"><span class="num">19.</span> News, Events &amp; Announcements</a>
+  <a href="#research-guide"><span class="num">20.</span> Research &amp; Innovation</a>
+  <a href="#staff-guide"><span class="num">21.</span> Staff Directory</a>
+  <a href="#contact-guide"><span class="num">22.</span> Contact &amp; Campuses</a>
+  <a href="#students-guide"><span class="num">23.</span> Student Services &amp; Digital Portals</a>
+  <a href="#accessibility"><span class="num">24.</span> Accessibility &amp; Browser Support</a>
+
+  <div class="toc-h" style="margin-top: 20px;">Appendix</div>
+  <a href="#glossary"><span class="num">A.</span> Glossary of Terms</a>
+  <a href="#contacts-ref"><span class="num">B.</span> Key Contacts Reference</a>
+  <a href="#changelog"><span class="num">C.</span> Document Change Log</a>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     PART I — SYSTEM ADMINISTRATION
+══════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-banner">
+    <div class="pl">Part I</div>
+    <h2>System Administration Manual</h2>
+    <p>For ICT Directorate staff responsible for deploying, configuring, and maintaining the KAFU digital platform infrastructure.</p>
+  </div>
+
+  <!-- ─── 1. ARCHITECTURE ─── -->
+  <h2 class="st" id="arch">1. System Architecture Overview</h2>
+  <p>The KAFU Digital Platform is a multi-component web application comprising four independently deployable units that work together to form the university's digital presence.</p>
+
+  <div class="arch">
+    <div class="arch-label">Public Internet</div>
+    <div class="arch-row">
+      <div class="arch-box gray">Browser / Visitor</div>
+    </div>
+    <div class="arch-arrow" style="justify-content:center;">&#8595;</div>
+    <div class="arch-label">Web Server (Apache / Nginx)</div>
+    <div class="arch-row">
+      <div class="arch-box green">www.kafu.ac.ke<br><small style="font-weight:400">React SPA (static files)</small></div>
+      <div class="arch-box gold">cms.kafu.ac.ke<br><small style="font-weight:400">CMS Admin React SPA</small></div>
+      <div class="arch-box blue">portal-update.kafu.ac.ke<br><small style="font-weight:400">Staff Portal React SPA</small></div>
+    </div>
+    <div class="arch-arrow" style="justify-content:center;">&#8595; API Calls (/api/*)</div>
+    <div class="arch-row">
+      <div class="arch-box green">api.kafu.ac.ke<br><small style="font-weight:400">Laravel 11 PHP API</small></div>
+    </div>
+    <div class="arch-arrow" style="justify-content:center;">&#8595;</div>
+    <div class="arch-row">
+      <div class="arch-box gray">MySQL / MariaDB Database</div>
+      <div class="arch-box gray">File Storage (uploads/)</div>
+    </div>
+  </div>
+
+  <h3 class="sub" id="tech-stack">Technology Stack &amp; Components</h3>
+  <table>
+    <tr><th>Component</th><th>Technology</th><th>Version</th><th>Deploy Path</th></tr>
+    <tr><td><strong>Public Website</strong></td><td>React + Vite + TypeScript</td><td>React 18, Vite 5</td><td><code>www.kafu.ac.ke</code></td></tr>
+    <tr><td><strong>CMS Administration</strong></td><td>React + Vite + TypeScript</td><td>React 18, Vite 5</td><td><code>cms.kafu.ac.ke</code></td></tr>
+    <tr><td><strong>Staff Portal</strong></td><td>React + Vite + TypeScript</td><td>React 18, Vite 5</td><td><code>portal-update.kafu.ac.ke</code></td></tr>
+    <tr><td><strong>Backend API</strong></td><td>Laravel + PHP</td><td>Laravel 11, PHP 8.2</td><td><code>api.kafu.ac.ke</code></td></tr>
+    <tr><td><strong>Database</strong></td><td>MySQL / MariaDB</td><td>MySQL 8.0+ / MariaDB 10.6+</td><td>Local to API server</td></tr>
+    <tr><td><strong>Auth</strong></td><td>Laravel Sanctum</td><td>4.x</td><td>Token-based, per-app</td></tr>
+    <tr><td><strong>Package Manager</strong></td><td>pnpm (monorepo)</td><td>8.x</td><td>Workspace root</td></tr>
+  </table>
+
+  <div class="box info">
+    <strong>Architecture Note</strong>
+    All three React applications are <strong>Single Page Applications (SPAs)</strong> built to static files. They make API calls to the Laravel backend. There is no server-side rendering — the web server only serves static HTML/JS/CSS files for the frontends.
+  </div>
+
+  <!-- ─── 2. SERVER REQUIREMENTS ─── -->
+  <h2 class="st" id="server-req">2. Server &amp; Hosting Requirements</h2>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>Minimum Specifications</h4>
+      <ul>
+        <li>PHP 8.2 or higher</li>
+        <li>MySQL 8.0 / MariaDB 10.6+</li>
+        <li>Apache 2.4+ with <code>mod_rewrite</code>, <code>mod_proxy</code>, <code>mod_headers</code></li>
+        <li>Composer 2.x</li>
+        <li>Node.js 18+ (for building frontends)</li>
+        <li>pnpm 8.x</li>
+        <li>2 GB RAM minimum (4 GB recommended)</li>
+        <li>10 GB disk space (for uploads and logs)</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>PHP Extensions Required</h4>
+      <ul>
+        <li><code>php8.2-fpm</code> or <code>mod_php</code></li>
+        <li><code>php8.2-mysql</code> (PDO MySQL driver)</li>
+        <li><code>php8.2-mbstring</code></li>
+        <li><code>php8.2-xml</code></li>
+        <li><code>php8.2-curl</code></li>
+        <li><code>php8.2-zip</code></li>
+        <li><code>php8.2-gd</code> (image processing)</li>
+        <li><code>php8.2-intl</code></li>
+        <li><code>php8.2-fileinfo</code></li>
+      </ul>
+    </div>
+  </div>
+
+  <table>
+    <tr><th>Subdomain</th><th>Document Root</th><th>SSL Required</th></tr>
+    <tr><td><code>www.kafu.ac.ke</code></td><td><code>/public_html/</code> — React dist files</td><td>Yes (Let's Encrypt or purchased cert)</td></tr>
+    <tr><td><code>api.kafu.ac.ke</code></td><td><code>/public_html/api/public/</code> — Laravel public dir</td><td>Yes</td></tr>
+    <tr><td><code>cms.kafu.ac.ke</code></td><td>Separate subdomain document root — React dist</td><td>Yes</td></tr>
+    <tr><td><code>portal-update.kafu.ac.ke</code></td><td>Separate subdomain document root — React dist</td><td>Yes</td></tr>
+  </table>
+
+  <!-- ─── 3. INITIAL SETUP ─── -->
+  <h2 class="st" id="initial-setup">3. Initial Server Setup</h2>
+
+  <h3 class="sub" id="backend-install">3a. Backend API Installation (Laravel)</h3>
+
+  <ol class="steps">
+    <li>
+      <div class="sb">
+        <strong>Upload the API files</strong>
+        <p>Upload the contents of <code>artifacts/kafu-api/</code> to your server. Exclude: <code>.git/</code>, <code>node_modules/</code>, <code>database/database.sqlite</code>. The recommended server path is <code>/var/www/kafu-api/</code>.</p>
+      </div>
+    </li>
+    <li>
+      <div class="sb">
+        <strong>Install PHP dependencies</strong>
+        <p>SSH into the server and run:</p>
+        <pre>cd /var/www/kafu-api
+composer install --no-dev --optimize-autoloader</pre>
+      </div>
+    </li>
+    <li>
+      <div class="sb">
+        <strong>Configure the environment file</strong>
+        <p>Copy the example environment file and edit it (see Section 4 for all values):</p>
+        <pre>cp .env.example .env
+nano .env     <span class="c"># or use your preferred editor</span></pre>
+      </div>
+    </li>
+    <li>
+      <div class="sb">
+        <strong>Generate the application key</strong>
+        <p>This is critical — it encrypts sessions and tokens. Run once per installation:</p>
+        <pre>php artisan key:generate</pre>
+      </div>
+    </li>
+    <li>
+      <div class="sb">
+        <strong>Set correct file permissions</strong>
+        <pre>chmod -R 755 /var/www/kafu-api
+chmod -R 775 /var/www/kafu-api/storage
+chmod -R 775 /var/www/kafu-api/bootstrap/cache
+chown -R www-data:www-data /var/www/kafu-api</pre>
+      </div>
+    </li>
+    <li>
+      <div class="sb">
+        <strong>Run database migrations and seed data</strong>
+        <p>This creates all tables and populates them with initial data:</p>
+        <pre>php artisan migrate --seed</pre>
+      </div>
+    </li>
+    <li>
+      <div class="sb">
+        <strong>Create storage symlink</strong>
+        <p>Allows uploaded files to be accessed publicly:</p>
+        <pre>php artisan storage:link</pre>
+      </div>
+    </li>
+    <li>
+      <div class="sb">
+        <strong>Cache configuration for production</strong>
+        <pre>php artisan config:cache
+php artisan route:cache
+php artisan view:cache</pre>
+      </div>
+    </li>
+  </ol>
+
+  <h3 class="sub" id="frontend-build">3b. Building &amp; Deploying the Frontend Applications</h3>
+
+  <p>All three frontends are built using the same process. Run these commands from the <strong>monorepo root</strong> (the workspace directory containing <code>pnpm-workspace.yaml</code>).</p>
+
+  <h4>1. Install all dependencies (one command for the whole monorepo)</h4>
+  <pre>pnpm install</pre>
+
+  <h4>2. Build the Public Website</h4>
+  <pre><span class="c"># Set the API URL environment variable first</span>
+echo "VITE_API_URL=https://api.kafu.ac.ke" > artifacts/kafu-foundation/.env.production
+pnpm --filter @workspace/kafu-foundation run build</pre>
+  <p>Upload the contents of <code>artifacts/kafu-foundation/dist/</code> to <code>www.kafu.ac.ke</code> document root.</p>
+
+  <h4>3. Build the CMS Admin</h4>
+  <pre>echo "VITE_API_URL=https://api.kafu.ac.ke" > artifacts/kafu-cms/.env.production
+pnpm --filter @workspace/kafu-cms run build</pre>
+  <p>Upload contents of <code>artifacts/kafu-cms/dist/</code> to <code>cms.kafu.ac.ke</code> document root.</p>
+
+  <h4>4. Build the Staff Portal</h4>
+  <pre>echo "VITE_API_URL=https://api.kafu.ac.ke" > artifacts/kafu-staff/.env.production
+pnpm --filter @workspace/kafu-staff run build</pre>
+  <p>Upload contents of <code>artifacts/kafu-staff/dist/</code> to <code>portal-update.kafu.ac.ke</code> document root.</p>
+
+  <h3 class="sub" id="apache-config">3c. Web Server Configuration</h3>
+  <p>Each frontend SPA requires a catch-all rule to serve <code>index.html</code> for all routes (client-side routing).</p>
+
+  <h4>Apache — <code>.htaccess</code> for each React app</h4>
+  <pre>Options -MultiViews
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.html [QSA,L]</pre>
+
+  <h4>Apache VirtualHost — API (Laravel)</h4>
+  <pre>&lt;VirtualHost *:443&gt;
+    ServerName api.kafu.ac.ke
+    DocumentRoot /var/www/kafu-api/public
+
+    &lt;Directory /var/www/kafu-api/public&gt;
+        Options -Indexes +FollowSymLinks
+        AllowOverride All
+        Require all granted
+    &lt;/Directory&gt;
+
+    <span class="c"># CORS headers for the React frontends</span>
+    Header always set Access-Control-Allow-Origin "https://www.kafu.ac.ke"
+    Header always set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, OPTIONS"
+    Header always set Access-Control-Allow-Headers "Content-Type, Authorization, X-Requested-With"
+
+    SSLEngine on
+    SSLCertificateFile /etc/ssl/kafu.ac.ke.crt
+    SSLCertificateKeyFile /etc/ssl/kafu.ac.ke.key
+&lt;/VirtualHost&gt;</pre>
+
+  <div class="box warn">
+    <strong>CORS Configuration</strong>
+    If you deploy frontends on different subdomains (www, cms, portal-update), you must update the <code>config/cors.php</code> file in the Laravel project to list all allowed origins. Otherwise API requests will be blocked by the browser.
+  </div>
+
+  <!-- ─── 4. ENV CONFIG ─── -->
+  <h2 class="st" id="env-config">4. Environment Configuration (.env)</h2>
+  <p>The <code>.env</code> file in <code>artifacts/kafu-api/</code> controls all runtime behaviour of the API. <strong>Never commit this file to version control.</strong></p>
+
+  <pre><span class="c"># Application Identity</span>
+APP_NAME=<span class="s">"KAFU API"</span>
+APP_ENV=<span class="s">production</span>          <span class="c"># local | staging | production</span>
+APP_KEY=                        <span class="c"># Generated by: php artisan key:generate</span>
+APP_DEBUG=<span class="s">false</span>               <span class="c"># MUST be false in production</span>
+APP_URL=<span class="s">https://api.kafu.ac.ke</span>
+
+<span class="c"># Logging</span>
+LOG_LEVEL=<span class="s">warning</span>             <span class="c"># warning or error in production</span>
+
+<span class="c"># Database (MySQL)</span>
+DB_CONNECTION=<span class="s">mysql</span>
+DB_HOST=<span class="s">127.0.0.1</span>
+DB_PORT=<span class="s">3306</span>
+DB_DATABASE=<span class="s">kafu_website</span>
+DB_USERNAME=<span class="s">kafu_db_user</span>
+DB_PASSWORD=<span class="s">your_strong_password_here</span>
+
+<span class="c"># Session &amp; Cache</span>
+SESSION_DRIVER=<span class="s">file</span>
+SESSION_LIFETIME=<span class="s">120</span>
+SESSION_SECURE_COOKIE=<span class="s">true</span>    <span class="c"># true when HTTPS is active</span>
+CACHE_STORE=<span class="s">file</span>
+
+<span class="c"># Mail (SMTP)</span>
+MAIL_MAILER=<span class="s">smtp</span>
+MAIL_HOST=<span class="s">mail.kafu.ac.ke</span>
+MAIL_PORT=<span class="s">587</span>
+MAIL_USERNAME=<span class="s">noreply@kafu.ac.ke</span>
+MAIL_PASSWORD=<span class="s">your_email_password</span>
+MAIL_FROM_ADDRESS=<span class="s">"noreply@kafu.ac.ke"</span>
+MAIL_FROM_NAME=<span class="s">"Kaimosi Friends University"</span>
+
+<span class="c"># File uploads</span>
+FILESYSTEM_DISK=<span class="s">public</span>
+APP_URL=<span class="s">https://api.kafu.ac.ke</span></pre>
+
+  <table>
+    <tr><th>Setting</th><th>Value in Development</th><th>Value in Production</th></tr>
+    <tr><td><code>APP_ENV</code></td><td><code>local</code></td><td><code>production</code></td></tr>
+    <tr><td><code>APP_DEBUG</code></td><td><code>true</code></td><td><code>false</code> — critical for security</td></tr>
+    <tr><td><code>DB_CONNECTION</code></td><td><code>sqlite</code></td><td><code>mysql</code> or <code>mariadb</code></td></tr>
+    <tr><td><code>SESSION_SECURE_COOKIE</code></td><td><code>false</code></td><td><code>true</code> — requires HTTPS</td></tr>
+    <tr><td><code>LOG_LEVEL</code></td><td><code>debug</code></td><td><code>warning</code></td></tr>
+  </table>
+
+  <!-- ─── 5. DATABASE ─── -->
+  <h2 class="st" id="database">5. Database Administration</h2>
+
+  <h3 class="sub" id="db-setup">5a. Database Setup (MySQL / MariaDB)</h3>
+  <p>On cPanel hosting, use <strong>MySQL Databases</strong> to create the database and user. Via command line:</p>
+  <pre><span class="c"># Log into MySQL as root</span>
+mysql -u root -p
+
+<span class="c"># Create database</span>
+CREATE DATABASE kafu_website CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+<span class="c"># Create a dedicated user (never use root for the app)</span>
+CREATE USER 'kafu_db_user'@'localhost' IDENTIFIED BY 'your_strong_password';
+
+<span class="c"># Grant permissions</span>
+GRANT ALL PRIVILEGES ON kafu_website.* TO 'kafu_db_user'@'localhost';
+FLUSH PRIVILEGES;</pre>
+
+  <div class="box warn">
+    <strong>cPanel Prefix Note</strong>
+    On shared cPanel hosting, database and username are often prefixed automatically with your cPanel account name (e.g. <code>kafuuser_kafu_website</code> and <code>kafuuser_kafu_db_user</code>). Use the <em>exact</em> prefixed names in your <code>.env</code> file.
+  </div>
+
+  <h3 class="sub" id="migrations">5b. Running Migrations &amp; Seeders</h3>
+
+  <table>
+    <tr><th>Command</th><th>Purpose</th><th>When to Use</th></tr>
+    <tr><td><code>php artisan migrate</code></td><td>Creates/updates all database tables</td><td>After initial setup, or after updates that include new migrations</td></tr>
+    <tr><td><code>php artisan migrate --seed</code></td><td>Migrates + runs all seeders (demo/initial data)</td><td>Initial installation only — will overwrite existing data</td></tr>
+    <tr><td><code>php artisan migrate:fresh --seed</code></td><td>Drops all tables, recreates them, seeds data</td><td>Development reset only — destroys all data</td></tr>
+    <tr><td><code>php artisan migrate:rollback</code></td><td>Reverses the last batch of migrations</td><td>To undo the most recent schema change</td></tr>
+    <tr><td><code>php artisan migrate:status</code></td><td>Shows which migrations have been run</td><td>Diagnostics</td></tr>
+    <tr><td><code>php artisan db:seed --class=SiteConfigSeeder</code></td><td>Runs a specific seeder</td><td>Resetting CMS site configuration defaults</td></tr>
+  </table>
+
+  <div class="box danger">
+    <strong>NEVER run on production</strong>
+    <code>php artisan migrate:fresh</code> and <code>php artisan migrate:fresh --seed</code> drop all existing data. Never run these on the live production database. Always take a backup before running any migration on production.
+  </div>
+
+  <h3 class="sub" id="db-backup">5c. Backup Procedures</h3>
+  <p>Take a full database backup before any system update, migration, or major content operation.</p>
+
+  <h4>Manual Backup via mysqldump</h4>
+  <pre><span class="c"># Full database dump</span>
+mysqldump -u kafu_db_user -p kafu_website > backup_$(date +%Y%m%d_%H%M%S).sql
+
+<span class="c"># Compress the dump</span>
+gzip backup_$(date +%Y%m%d_%H%M%S).sql</pre>
+
+  <h4>Automated Weekly Backup (Cron)</h4>
+  <pre><span class="c"># Add to crontab (crontab -e)</span>
+0 2 * * 0 mysqldump -u kafu_db_user -p'password' kafu_website | gzip > /backups/kafu_$(date +\%Y\%m\%d).sql.gz</pre>
+
+  <p>Also back up the <strong>uploaded files</strong>:</p>
+  <pre>tar -czf /backups/uploads_$(date +%Y%m%d).tar.gz /var/www/kafu-api/storage/app/public</pre>
+
+  <!-- ─── 6. API ADMIN ─── -->
+  <h2 class="st" id="api-admin">6. API Server Administration</h2>
+
+  <h3 class="sub" id="artisan">6a. Key Artisan Commands</h3>
+  <table>
+    <tr><th>Command</th><th>Purpose</th></tr>
+    <tr><td><code>php artisan serve</code></td><td>Start development server (local use only, not for production)</td></tr>
+    <tr><td><code>php artisan config:cache</code></td><td>Cache configuration files — run after any <code>.env</code> change</td></tr>
+    <tr><td><code>php artisan config:clear</code></td><td>Clear configuration cache (run before <code>config:cache</code>)</td></tr>
+    <tr><td><code>php artisan route:cache</code></td><td>Cache route list — speeds up routing in production</td></tr>
+    <tr><td><code>php artisan route:list</code></td><td>Show all registered API routes with HTTP methods</td></tr>
+    <tr><td><code>php artisan cache:clear</code></td><td>Clear application cache</td></tr>
+    <tr><td><code>php artisan queue:work</code></td><td>Process background jobs (email notifications etc.)</td></tr>
+    <tr><td><code>php artisan schedule:run</code></td><td>Run scheduled tasks (called by cron every minute)</td></tr>
+    <tr><td><code>php artisan sanctum:prune-expired</code></td><td>Remove expired authentication tokens</td></tr>
+    <tr><td><code>php artisan tinker</code></td><td>Interactive PHP shell for debugging — admin use only</td></tr>
+  </table>
+
+  <h3 class="sub" id="api-routes">6b. API Endpoint Reference</h3>
+  <table>
+    <tr><th>Prefix</th><th>Purpose</th><th>Authentication</th></tr>
+    <tr><td><code>GET /api/stats</code></td><td>University statistics (student count, staff, programmes)</td><td>Public</td></tr>
+    <tr><td><code>GET /api/news</code></td><td>Published news articles</td><td>Public</td></tr>
+    <tr><td><code>GET /api/events</code></td><td>Events listing</td><td>Public</td></tr>
+    <tr><td><code>GET /api/schools</code></td><td>Schools and faculties</td><td>Public</td></tr>
+    <tr><td><code>GET /api/programmes</code></td><td>Academic programmes</td><td>Public</td></tr>
+    <tr><td><code>GET /api/staff</code></td><td>Published staff profiles</td><td>Public</td></tr>
+    <tr><td><code>GET /api/navigation</code></td><td>CMS-managed navigation menus</td><td>Public</td></tr>
+    <tr><td><code>POST /api/cms/login</code></td><td>CMS admin authentication</td><td>Public (rate-limited)</td></tr>
+    <tr><td><code>/api/admin/*</code></td><td>CMS content management (full CRUD)</td><td>Sanctum token (CMS role)</td></tr>
+    <tr><td><code>POST /api/staff/login</code></td><td>Staff portal authentication</td><td>Public (rate-limited)</td></tr>
+    <tr><td><code>/api/staff/*</code></td><td>Staff profile management</td><td>Sanctum token (staff role)</td></tr>
+    <tr><td><code>/api/reviewer/*</code></td><td>Content review actions</td><td>Sanctum token (reviewer role)</td></tr>
+  </table>
+
+  <div class="box info">
+    <strong>Rate Limiting</strong>
+    Login endpoints are rate-limited to <strong>5 attempts per minute per IP address</strong>. After 5 failed attempts, the IP is locked out for 1 minute. This is configured in <code>app/Http/Middleware/</code> and the Sanctum configuration.
+  </div>
+
+  <!-- ─── 7. USER ADMIN ─── -->
+  <h2 class="st" id="user-admin">7. CMS User Account Administration</h2>
+  <p>CMS users are managed through the CMS interface (see CMS Manual, Section 23) or directly via the database/Tinker for emergency access.</p>
+
+  <h4>Creating a Super Admin via command line (emergency use)</h4>
+  <pre>php artisan tinker
+<span class="c"># Inside Tinker:</span>
+$user = new App\Models\CmsUser;
+$user->name = 'Admin Name';
+$user->email = 'admin@kafu.ac.ke';
+$user->password = bcrypt('TemporaryPassword123!');
+$user->role = 'super_admin';
+$user->save();
+exit</pre>
+
+  <h4>Default Seeded Accounts</h4>
+  <p>After running <code>php artisan migrate --seed</code>, the following test accounts are created. <strong>Change all passwords immediately after first login in production.</strong></p>
+  <table>
+    <tr><th>Email</th><th>Default Password</th><th>Role</th></tr>
+    <tr><td><code>super@kafu.ac.ke</code></td><td><code>password</code></td><td><span class="badge b-r">Super Admin</span></td></tr>
+    <tr><td><code>ict@kafu.ac.ke</code></td><td><code>password</code></td><td><span class="badge b-b">ICT Admin</span></td></tr>
+    <tr><td><code>comms@kafu.ac.ke</code></td><td><code>password</code></td><td><span class="badge b-p">Comms Admin</span></td></tr>
+    <tr><td><code>reviewer@kafu.ac.ke</code></td><td><code>password</code></td><td><span class="badge b-g">Reviewer</span></td></tr>
+    <tr><td><code>john.doe@kafu.ac.ke</code></td><td><code>password</code></td><td><span class="badge b-gr">Staff User</span></td></tr>
+  </table>
+
+  <div class="box danger">
+    <strong>Security — Change Default Passwords Immediately</strong>
+    All seeded accounts use the password <code>password</code>. This must be changed before the system goes live. Log in with each account and change the password, or use User Management in the CMS to reset them all.
+  </div>
+
+  <!-- ─── 8. CRON ─── -->
+  <h2 class="st" id="cron">8. Scheduled Tasks &amp; Cron Jobs</h2>
+  <p>Laravel's task scheduler handles background processes. Only <strong>one cron entry</strong> is needed — it runs every minute and Laravel decides which tasks to execute.</p>
+
+  <h4>Add to server crontab (<code>crontab -e</code> as www-data or root)</h4>
+  <pre>* * * * * php /var/www/kafu-api/artisan schedule:run >> /dev/null 2>&amp;1</pre>
+
+  <table>
+    <tr><th>Scheduled Task</th><th>Frequency</th><th>Purpose</th></tr>
+    <tr><td>Publish Scheduled Content</td><td>Every minute</td><td>Automatically publishes content items whose <code>published_at</code> datetime has passed</td></tr>
+    <tr><td>Expire Content</td><td>Hourly</td><td>Marks content as expired when <code>expiry_date</code> is passed</td></tr>
+    <tr><td>Prune Sanctum Tokens</td><td>Daily</td><td>Removes expired API authentication tokens from the database</td></tr>
+    <tr><td>Database Backup</td><td>Weekly (Sunday 02:00)</td><td>Auto-backup of the database if configured</td></tr>
+  </table>
+
+  <!-- ─── 9. MONITORING ─── -->
+  <h2 class="st" id="monitoring">9. Monitoring, Logs &amp; Troubleshooting</h2>
+
+  <h3 class="sub">Log File Locations</h3>
+  <table>
+    <tr><th>Log</th><th>Path</th><th>Contents</th></tr>
+    <tr><td>Laravel Application Log</td><td><code>storage/logs/laravel.log</code></td><td>PHP errors, exceptions, custom log messages</td></tr>
+    <tr><td>Apache Access Log</td><td><code>/var/log/apache2/access.log</code></td><td>All HTTP requests to the API</td></tr>
+    <tr><td>Apache Error Log</td><td><code>/var/log/apache2/error.log</code></td><td>PHP fatal errors, Apache configuration issues</td></tr>
+    <tr><td>CMS Audit Log</td><td>Database table: <code>audit_logs</code></td><td>All CMS user actions (viewable in CMS Admin UI)</td></tr>
+  </table>
+
+  <h3 class="sub">Common Issues &amp; Solutions</h3>
+  <table>
+    <tr><th>Symptom</th><th>Likely Cause</th><th>Solution</th></tr>
+    <tr><td>API returns 500 error</td><td>PHP exception or missing config</td><td>Check <code>storage/logs/laravel.log</code>. Set <code>APP_DEBUG=true</code> temporarily to see error details (revert after diagnosing).</td></tr>
+    <tr><td>Website shows blank / white screen</td><td>React JS error or missing API</td><td>Open browser developer tools → Console tab. Check for JS errors. Verify <code>VITE_API_URL</code> is correct.</td></tr>
+    <tr><td>API returns 403 Forbidden</td><td>File permissions or Apache config</td><td>Run <code>chmod -R 755 /var/www/kafu-api</code> and <code>chmod -R 775 storage/</code>. Check Apache <code>AllowOverride All</code>.</td></tr>
+    <tr><td>Uploaded files not displaying</td><td>Missing storage symlink</td><td>Run <code>php artisan storage:link</code> again.</td></tr>
+    <tr><td>Login returns "CSRF mismatch"</td><td>Session domain mismatch</td><td>Set <code>SESSION_DOMAIN=.kafu.ac.ke</code> in <code>.env</code> and run <code>php artisan config:cache</code>.</td></tr>
+    <tr><td>Changes not reflected after update</td><td>Cached config or routes</td><td>Run <code>php artisan config:clear &amp;&amp; php artisan route:clear &amp;&amp; php artisan cache:clear</code></td></tr>
+    <tr><td>Database connection refused</td><td>Wrong DB credentials in .env</td><td>Check <code>DB_HOST</code>, <code>DB_USERNAME</code>, <code>DB_PASSWORD</code>. Test: <code>mysql -u kafu_db_user -p kafu_website</code>.</td></tr>
+  </table>
+
+  <!-- ─── 10. SECURITY ─── -->
+  <h2 class="st" id="security">10. Security Hardening Checklist</h2>
+  <ul class="chk">
+    <li>Change all default seeded passwords before going live</li>
+    <li>Set <code>APP_DEBUG=false</code> in production</li>
+    <li>Ensure <code>APP_ENV=production</code></li>
+    <li>Enable HTTPS on all subdomains (SSL certificate installed)</li>
+    <li>Set <code>SESSION_SECURE_COOKIE=true</code> once HTTPS is live</li>
+    <li>Configure CORS to only allow the three known frontend origins</li>
+    <li>Set file upload limits in PHP (<code>upload_max_filesize=20M</code>, <code>post_max_size=25M</code>)</li>
+    <li>Disable PHP error display in production (<code>display_errors = Off</code> in <code>php.ini</code>)</li>
+    <li>Keep Laravel, PHP, and all Composer packages up to date</li>
+    <li>Block direct access to <code>.env</code>, <code>.git/</code>, and <code>storage/</code> via Apache rules</li>
+    <li>Use a dedicated MySQL user with only necessary database privileges (not root)</li>
+    <li>Configure rate limiting on all authentication endpoints (already set in Laravel)</li>
+    <li>Enable Apache <code>mod_headers</code> and set security headers: X-Frame-Options, X-XSS-Protection, Content-Security-Policy</li>
+    <li>Review the CMS Audit Log monthly for unusual activity</li>
+    <li>Take and test weekly database backups</li>
+    <li>Store backups off-server (e.g. separate storage location)</li>
+  </ul>
+
+  <h4>Apache Security Headers Block (add to VirtualHost)</h4>
+  <pre>Header always set X-Frame-Options "SAMEORIGIN"
+Header always set X-Content-Type-Options "nosniff"
+Header always set Referrer-Policy "strict-origin-when-cross-origin"
+Header always set X-XSS-Protection "1; mode=block"
+Header always set Strict-Transport-Security "max-age=63072000; includeSubDomains"</pre>
+
+  <!-- ─── 11. MAINTENANCE ─── -->
+  <h2 class="st" id="maintenance">11. Maintenance Procedures</h2>
+
+  <h3 class="sub">Putting the Site into Maintenance Mode</h3>
+  <p><strong>Option 1 — CMS Site Controls (preferred):</strong> Log into the CMS → Site Controls → and toggle <strong>Maintenance Mode</strong>. This shows a maintenance page to visitors while keeping the CMS accessible to admins.</p>
+  <p><strong>Option 2 — Laravel command (full API maintenance):</strong></p>
+  <pre>php artisan down --message="Scheduled maintenance. Back at 14:00 EAT." --retry=600
+<span class="c"># After maintenance is complete:</span>
+php artisan up</pre>
+
+  <h3 class="sub">Applying System Updates</h3>
+  <ol class="steps">
+    <li><div class="sb"><strong>Take a full backup</strong><p>Database dump + storage files. Never update without a backup you can restore from.</p></div></li>
+    <li><div class="sb"><strong>Enable maintenance mode</strong><p>Notify users via email or announcement before starting.</p></div></li>
+    <li><div class="sb"><strong>Pull the latest code</strong><p><code>git pull origin main</code> in the project directory.</p></div></li>
+    <li><div class="sb"><strong>Update PHP dependencies</strong><p><code>composer install --no-dev --optimize-autoloader</code></p></div></li>
+    <li><div class="sb"><strong>Run database migrations</strong><p><code>php artisan migrate</code> (not <code>migrate:fresh</code>)</p></div></li>
+    <li><div class="sb"><strong>Rebuild frontends</strong><p>Rebuild and re-upload the React apps for www, cms, and portal-update.</p></div></li>
+    <li><div class="sb"><strong>Clear and re-cache</strong><p><code>php artisan config:cache &amp;&amp; php artisan route:cache &amp;&amp; php artisan cache:clear</code></p></div></li>
+    <li><div class="sb"><strong>Disable maintenance mode &amp; verify</strong><p>Test all three frontends and key API endpoints before announcing the system is back.</p></div></li>
+  </ol>
+
+  <!-- ─── 12. DEPLOYMENT CHECKLIST ─── -->
+  <h2 class="st" id="deployment-checklist">12. Full Deployment Checklist</h2>
+  <p>Use this checklist for the initial go-live deployment. Tick each item only when verified.</p>
+
+  <h4>Infrastructure</h4>
+  <ul class="chk">
+    <li>DNS records configured: A records for www, api, cms, portal-update all pointing to server IP</li>
+    <li>SSL certificates installed and auto-renewing (Let's Encrypt recommended)</li>
+    <li>Apache virtualhost configured for each subdomain</li>
+    <li>PHP 8.2+ installed with all required extensions</li>
+    <li>MySQL/MariaDB running and accessible</li>
+  </ul>
+
+  <h4>Backend API</h4>
+  <ul class="chk">
+    <li>Files uploaded (excluding .git, node_modules, .env)</li>
+    <li><code>composer install --no-dev --optimize-autoloader</code> completed successfully</li>
+    <li><code>.env</code> configured with production values (not development defaults)</li>
+    <li><code>php artisan key:generate</code> run (APP_KEY is set)</li>
+    <li>Database created and credentials in .env are correct</li>
+    <li><code>php artisan migrate --seed</code> completed — all tables exist</li>
+    <li><code>php artisan storage:link</code> run — symlink created</li>
+    <li>File permissions set: storage/ and bootstrap/cache/ are writable by www-data</li>
+    <li><code>php artisan config:cache &amp;&amp; php artisan route:cache</code> run</li>
+    <li>Cron job added for scheduler</li>
+    <li>API health check: <code>https://api.kafu.ac.ke/api/stats</code> returns JSON (not HTML)</li>
+  </ul>
+
+  <h4>Frontend Applications</h4>
+  <ul class="chk">
+    <li>Public website built with <code>VITE_API_URL=https://api.kafu.ac.ke</code> and uploaded</li>
+    <li>CMS admin built and uploaded</li>
+    <li>Staff portal built and uploaded</li>
+    <li><code>.htaccess</code> catch-all rules in place for all three SPAs</li>
+    <li>www.kafu.ac.ke homepage loads correctly</li>
+    <li>cms.kafu.ac.ke login page loads correctly</li>
+    <li>portal-update.kafu.ac.ke login page loads correctly</li>
+  </ul>
+
+  <h4>Security &amp; Go-Live</h4>
+  <ul class="chk">
+    <li>All seeded default passwords changed</li>
+    <li><code>APP_DEBUG=false</code> confirmed</li>
+    <li>HTTPS enforced on all subdomains (HTTP redirects to HTTPS)</li>
+    <li>CORS configured to allow only the three known origins</li>
+    <li>Content reviewed by Communications — homepage and About page are accurate</li>
+    <li>Smoke test: create news item in CMS → verify it appears on www.kafu.ac.ke/news</li>
+    <li>Smoke test: staff login to portal → update a field → submit → verify in CMS review queue</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     PART II — WEBSITE USER MANUAL
+══════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-banner">
+    <div class="pl">Part II</div>
+    <h2>KAFU Website User Manual</h2>
+    <p>A complete guide to navigating and using www.kafu.ac.ke — for prospective students, current students, academic staff, and the general public.</p>
+  </div>
+
+  <!-- ─── 13. INTRO ─── -->
+  <h2 class="st" id="website-intro">13. Introduction to the KAFU Website</h2>
+  <p>The Kaimosi Friends University website at <strong>www.kafu.ac.ke</strong> is the official digital home of the university. It provides comprehensive information about academic programmes, admissions, research activities, staff, news, and services for the entire university community.</p>
+
+  <div class="ss">
+    <img src="../screenshots/site-homepage.jpg" alt="KAFU Website Homepage">
+    <div class="ss-cap">Figure 13.1 — The KAFU website homepage at www.kafu.ac.ke. The navigation bar provides access to all major sections.</div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h4>What You Can Find on the Website</h4>
+      <ul>
+        <li>All academic programmes and entry requirements</li>
+        <li>Admissions information, deadlines, and application links</li>
+        <li>University news, events, and announcements</li>
+        <li>Staff directory with academic profiles</li>
+        <li>Research projects, publications, and grants</li>
+        <li>Contact details and campus locations</li>
+        <li>Student services information</li>
+        <li>Governance and leadership information</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4>What the Website Is Not For</h4>
+      <ul>
+        <li>Submitting assignment work or exam results (use the Student Portal)</li>
+        <li>Accessing your student account (go to portal.kafu.ac.ke)</li>
+        <li>Paying fees online (use the student portal)</li>
+        <li>Emailing lecturers (use the contact details on their profile pages)</li>
+        <li>Editing content — editing is done through the CMS by authorised staff only</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ─── 14. NAVIGATION ─── -->
+  <h2 class="st" id="navigation">14. Navigating the Website</h2>
+
+  <h3 class="sub" id="navbar">The Navigation Bar</h3>
+  <p>The navigation bar runs across the top of every page. It is divided into two areas:</p>
+
+  <table>
+    <tr><th>Area</th><th>Contents</th></tr>
+    <tr>
+      <td><strong>Utility Bar</strong> (top strip)</td>
+      <td>
+        Contact information (phone and email), and three quick-access links:
+        <strong>Student Portal</strong> (portal.kafu.ac.ke) — for registered students,
+        <strong>E-Learning</strong> — online learning platform,
+        <strong>Info@kafu.ac.ke</strong> — general enquiries email
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Main Navigation</strong></td>
+      <td>
+        Logo (click to return to homepage) + the main menu links:
+        Home, About, Academics, Departments, Admissions, Students, News, Media, Research, Directorates, Contact
+      </td>
+    </tr>
+    <tr>
+      <td><strong>Action Buttons</strong></td>
+      <td>Search icon and the gold <strong>Apply Now</strong> button (takes you to the admissions application)</td>
+    </tr>
+  </table>
+
+  <p>Menu items with a <strong>dropdown arrow (&#8964;)</strong> open a mega-menu panel with sub-section links when clicked or hovered. For example, clicking <strong>Academics</strong> reveals links to Schools, Programmes, and academic resources.</p>
+
+  <h3 class="sub" id="search">Using the Search Function</h3>
+  <ol class="steps">
+    <li><div class="sb"><strong>Click the search icon</strong><p>The magnifying glass icon in the top-right of the navigation bar opens the search bar.</p></div></li>
+    <li><div class="sb"><strong>Type your query</strong><p>Type any keyword — a programme name, a staff member's name, a topic, or a news headline. Results appear as you type.</p></div></li>
+    <li><div class="sb"><strong>Click a result</strong><p>Click any result to go directly to that page. Results are grouped by type (Programmes, News, Staff, Pages).</p></div></li>
+  </ol>
+
+  <!-- ─── 15. HOMEPAGE ─── -->
+  <h2 class="st" id="homepage-guide">15. Homepage</h2>
+  <p>The homepage is your starting point. It summarises the most important information and provides quick routes to the most-visited sections of the site.</p>
+
+  <table>
+    <tr><th>Homepage Section</th><th>What It Shows</th></tr>
+    <tr><td><strong>Hero Slideshow</strong></td><td>Rotating banner featuring key messages from university leadership, with links to Admissions and key pages.</td></tr>
+    <tr><td><strong>Admissions Banner</strong></td><td>Current application status and key deadline dates. Shows countdowns to application closing dates.</td></tr>
+    <tr><td><strong>Programme Discovery</strong></td><td>Quick filter to find programmes by school and level. Enter a keyword to search all 38+ programmes.</td></tr>
+    <tr><td><strong>Why KAFU</strong></td><td>Key facts about the university — accreditation, graduate outcomes, research output, and community impact.</td></tr>
+    <tr><td><strong>Schools &amp; Faculties</strong></td><td>Cards for each of the five schools, linking to their detailed pages.</td></tr>
+    <tr><td><strong>Latest News &amp; Events</strong></td><td>The four most recent published news articles and upcoming events.</td></tr>
+    <tr><td><strong>Opportunities</strong></td><td>Current scholarships, job vacancies, tenders, and partnerships.</td></tr>
+    <tr><td><strong>Digital Services Hub</strong></td><td>Quick links to the Student Portal, E-Learning, Staff Portal, and Library resources.</td></tr>
+  </table>
+
+  <!-- ─── 16. ABOUT ─── -->
+  <h2 class="st" id="about-guide">16. About KAFU</h2>
+
+  <div class="ss">
+    <img src="../screenshots/site-about.jpg" alt="About KAFU Page">
+    <div class="ss-cap">Figure 16.1 — The About KAFU page showing campus imagery and the university's history and mission.</div>
+  </div>
+
+  <p>The <strong>About</strong> section provides background information about the university. Access it from the <strong>About</strong> menu in the navigation bar.</p>
+
+  <table>
+    <tr><th>About Sub-page</th><th>What to Find There</th><th>URL</th></tr>
+    <tr><td>About KAFU</td><td>History, mission, vision, core values of the university</td><td>/about</td></tr>
+    <tr><td>Vice-Chancellor</td><td>Profile and message from the Vice-Chancellor</td><td>/about/vice-chancellor</td></tr>
+    <tr><td>Management</td><td>University Management Board members</td><td>/about/management</td></tr>
+    <tr><td>University Council</td><td>Council members and governance structure</td><td>/about/council</td></tr>
+    <tr><td>Strategic Plan</td><td>Current strategic plan document</td><td>/about/strategic-plan</td></tr>
+    <tr><td>Policies</td><td>University policies and regulations</td><td>/about/policies</td></tr>
+    <tr><td>Service Charter</td><td>Service delivery standards and commitments</td><td>/about/service-charter</td></tr>
+  </table>
+
+  <!-- ─── 17. ACADEMICS ─── -->
+  <h2 class="st" id="academics-guide">17. Academics — Schools &amp; Programmes</h2>
+
+  <div class="ss">
+    <img src="../screenshots/site-programmes.jpg" alt="Programmes Page">
+    <div class="ss-cap">Figure 17.1 — The Programmes catalogue showing 39 programmes with search, school filter, level filter, and compare function.</div>
+  </div>
+
+  <h3 class="sub">Schools &amp; Faculties</h3>
+
+  <div class="ss">
+    <img src="../screenshots/site-schools.jpg" alt="Schools Page">
+    <div class="ss-cap">Figure 17.2 — The Schools page listing all five academic schools and the ODeL Directorate.</div>
+  </div>
+
+  <p>KAFU has five academic schools. Click on any school card to view its departments, teaching staff, and the programmes it offers.</p>
+
+  <table>
+    <tr><th>Abbreviation</th><th>School Name</th><th>Key Disciplines</th></tr>
+    <tr><td><span class="badge b-g">SESS</span></td><td>School of Education &amp; Social Sciences</td><td>Education, Curriculum Studies, Criminology, Psychology</td></tr>
+    <tr><td><span class="badge b-b">SBE</span></td><td>School of Business &amp; Economics</td><td>Commerce, Business Administration, Finance, Economics</td></tr>
+    <tr><td><span class="badge b-y">SCIT</span></td><td>School of Computing &amp; Information Technology</td><td>Computer Science, Information Technology, Data Science</td></tr>
+    <tr><td><span class="badge b-p">SOS</span></td><td>School of Science</td><td>Biology, Chemistry, Physics, Environmental Science</td></tr>
+    <tr><td><span class="badge b-r">SHS</span></td><td>School of Health Sciences</td><td>Nursing, Public Health, Nutrition, Medical Sciences</td></tr>
+  </table>
+
+  <h3 class="sub">Finding a Programme</h3>
+  <ol class="steps">
+    <li><div class="sb"><strong>Go to Programmes</strong><p>Click <strong>Academics</strong> in the navigation then select <strong>All Programmes</strong>, or go directly to <strong>/programmes</strong>.</p></div></li>
+    <li><div class="sb"><strong>Search or filter</strong><p>Use the search box to type a keyword (e.g. "nursing", "data", "commerce"). Use the <strong>School</strong> dropdown to narrow by school, and the <strong>Level</strong> dropdown to filter by Certificate, Diploma, Degree, or Postgraduate.</p></div></li>
+    <li><div class="sb"><strong>View programme details</strong><p>Click <strong>View Details</strong> on any programme card to see the full description, duration, entry requirements, and fee structure.</p></div></li>
+    <li><div class="sb"><strong>Compare programmes</strong><p>Click <strong>Compare</strong> on up to 3 programmes, then visit <strong>/programmes/compare</strong> to see them side by side.</p></div></li>
+    <li><div class="sb"><strong>Apply for a programme</strong><p>Click the gold <strong>Apply</strong> button on any programme — this takes you to the online application portal.</p></div></li>
+  </ol>
+
+  <!-- ─── 18. ADMISSIONS ─── -->
+  <h2 class="st" id="admissions-guide">18. Admissions</h2>
+
+  <div class="ss">
+    <img src="../screenshots/site-admissions.jpg" alt="Admissions Page">
+    <div class="ss-cap">Figure 18.1 — The Admissions page with key deadline countdown timers and application pathways.</div>
+  </div>
+
+  <p>The Admissions section is the primary destination for anyone considering joining KAFU. Access it via the <strong>Admissions</strong> menu or by clicking the gold <strong>Apply Now</strong> button in the navigation bar.</p>
+
+  <h3 class="sub">Admissions Pathways</h3>
+  <table>
+    <tr><th>Pathway</th><th>Who It Is For</th><th>Link</th></tr>
+    <tr><td><strong>KUCCPS (Government)</strong></td><td>Kenya Certificate of Secondary Education (KCSE) students placed through the Joint Admissions Board via KUCCPS</td><td>/admissions → Apply Undergraduate</td></tr>
+    <tr><td><strong>Module II (Self-Sponsored)</strong></td><td>Self-sponsored undergraduate applicants who were not placed through KUCCPS</td><td>/admissions → Apply Undergraduate</td></tr>
+    <tr><td><strong>Postgraduate</strong></td><td>Holders of a first degree applying for Masters or PhD programmes</td><td>/admissions → Apply Masters / PhD</td></tr>
+    <tr><td><strong>International Students</strong></td><td>Students from outside Kenya applying for any programme</td><td>/international/study</td></tr>
+    <tr><td><strong>KUCCPS Verification</strong></td><td>Verify your KUCCPS placement status at KAFU</td><td>/kuccps-verify</td></tr>
+  </table>
+
+  <h3 class="sub">Key Dates Bar</h3>
+  <p>The coloured deadline cards at the top of the Admissions page show all current and upcoming application deadlines with countdown timers. Cards shown in red mean the deadline has passed; amber means the deadline is approaching; green means there is time remaining.</p>
+
+  <h3 class="sub">Entry Requirements</h3>
+  <p>General minimum entry requirements for undergraduate programmes:</p>
+  <ul>
+    <li><strong>Government-sponsored (KUCCPS):</strong> Kenya Certificate of Secondary Education (KCSE) with a minimum mean grade as set by the Joint Admissions Board (JAB).</li>
+    <li><strong>Module II (Self-sponsored):</strong> KCSE with minimum grade C+, or equivalent qualification recognised by KAFU.</li>
+    <li><strong>Diploma programmes:</strong> KCSE with minimum grade C, or a relevant certificate qualification.</li>
+  </ul>
+  <p>Use the <strong>Eligibility Checker</strong> at <code>/admissions/eligibility</code> to check your qualifications against specific programme requirements.</p>
+
+  <div class="box tip">
+    <strong>Application Tip</strong>
+    Always check the Admissions page for the most current deadline dates — they change each academic year. The Key Dates bar at the top is updated by the university's Admissions Office through the CMS.
+  </div>
+
+  <!-- ─── 19. NEWS ─── -->
+  <h2 class="st" id="news-guide">19. News, Events &amp; Announcements</h2>
+
+  <div class="ss">
+    <img src="../screenshots/site-news.jpg" alt="News Page">
+    <div class="ss-cap">Figure 19.1 — The News page with category filters. The top article is featured; others are listed below.</div>
+  </div>
+
+  <h3 class="sub">News</h3>
+  <p>Access via <strong>News → University News</strong> in the navigation, or go directly to <code>/news</code>.</p>
+  <ul>
+    <li>Use the <strong>category buttons</strong> (Research &amp; Innovation, Institutional, Academic, Outreach, Partnerships, Leadership, Events) to filter news by topic.</li>
+    <li>Use the <strong>search box</strong> to find articles by keyword.</li>
+    <li>Click <strong>Read Full Story</strong> to open the full article.</li>
+    <li>Each article page shows the author, date, category, and related articles at the bottom.</li>
+  </ul>
+
+  <h3 class="sub">Events Calendar</h3>
+
+  <div class="ss">
+    <img src="../screenshots/site-events.jpg" alt="Events Page">
+    <div class="ss-cap">Figure 19.2 — The Events Calendar showing upcoming university events with dates, times, and venue information.</div>
+  </div>
+
+  <p>Access via <strong>News → Events</strong> or go to <code>/events</code>.</p>
+  <ul>
+    <li>Toggle between <strong>Upcoming</strong> and <strong>Past Events</strong> using the buttons at the top.</li>
+    <li>Filter by type: Examinations, Academic, Administration, Graduation, Student Life.</li>
+    <li>Each event card shows the date, time, venue, and a brief description.</li>
+    <li>Click an event to open its full detail page.</li>
+  </ul>
+
+  <h3 class="sub">Announcements</h3>
+  <p>Official university announcements (exam timetables, fee notices, policy updates) are at <code>/announcements</code>. You can also access them via <strong>News → Announcements</strong>.</p>
+
+  <h3 class="sub">Opportunities</h3>
+  <p>Job vacancies, scholarships, tenders, and research grant opportunities are at <code>/opportunities</code>. Filter by type to find what is relevant to you.</p>
+
+  <!-- ─── 20. RESEARCH ─── -->
+  <h2 class="st" id="research-guide">20. Research &amp; Innovation</h2>
+
+  <div class="ss">
+    <img src="../screenshots/site-research.jpg" alt="Research Page">
+    <div class="ss-cap">Figure 20.1 — The Research &amp; Innovation overview page showing key statistics and research focus areas.</div>
+  </div>
+
+  <p>Access via <strong>Research</strong> in the navigation bar, or go to <code>/research</code>. The Research section showcases KAFU's academic and scientific contributions.</p>
+
+  <table>
+    <tr><th>Research Sub-section</th><th>What to Find</th><th>URL</th></tr>
+    <tr><td>Research Overview</td><td>Statistics, themes, and featured research achievements</td><td>/research</td></tr>
+    <tr><td>Research Projects</td><td>Active and completed research projects with principal investigators</td><td>/research/projects</td></tr>
+    <tr><td>Publications</td><td>Searchable catalogue of journal articles, books, and conference papers by KAFU researchers</td><td>/research/publications</td></tr>
+    <tr><td>Research Partnerships</td><td>International and local research collaborations and partner institutions</td><td>/research/partnerships</td></tr>
+    <tr><td>KAFU Journal</td><td>The university's own peer-reviewed academic journal</td><td>/research/journal</td></tr>
+  </table>
+
+  <!-- ─── 21. STAFF DIRECTORY ─── -->
+  <h2 class="st" id="staff-guide">21. Staff Directory</h2>
+
+  <div class="ss">
+    <img src="../screenshots/site-staff.jpg" alt="Staff Directory">
+    <div class="ss-cap">Figure 21.1 — The Staff Directory showing all 57 academic staff members with search and filter controls.</div>
+  </div>
+
+  <p>The Staff Directory at <code>/staff</code> lists all published academic and administrative staff profiles. Access via <strong>About → Academic Staff</strong> or by clicking <strong>Staff Directory</strong> in the footer.</p>
+
+  <h3 class="sub">Searching for a Staff Member</h3>
+  <ol class="steps">
+    <li><div class="sb"><strong>Use the search box</strong><p>Type the staff member's name, their role (e.g. "Lecturer", "Professor"), or their specialisation (e.g. "Machine Learning", "Public Health").</p></div></li>
+    <li><div class="sb"><strong>Filter by school</strong><p>Use the <strong>All Schools</strong> dropdown to narrow the list to staff in a specific school.</p></div></li>
+    <li><div class="sb"><strong>Filter by rank</strong><p>Use the <strong>All Ranks</strong> dropdown to show only Professors, Associate Professors, Senior Lecturers, or Lecturers.</p></div></li>
+    <li><div class="sb"><strong>Browse research themes</strong><p>Click any tag in the Research row (e.g. "Artificial Intelligence", "Eye Health") to filter staff by research specialisation.</p></div></li>
+    <li><div class="sb"><strong>Open a profile</strong><p>Click on any staff card to open their full academic profile page, which includes their biography, qualifications, courses taught, publications, and contact details.</p></div></li>
+  </ol>
+
+  <h3 class="sub">What a Staff Profile Contains</h3>
+  <table>
+    <tr><th>Profile Section</th><th>Contents</th></tr>
+    <tr><td>Header</td><td>Photo, name, title, designation, school, and department</td></tr>
+    <tr><td>Biography</td><td>Academic background, areas of expertise, and career highlights</td></tr>
+    <tr><td>Academic Identifiers</td><td>ORCID iD, Google Scholar, Scopus links (where provided)</td></tr>
+    <tr><td>Research Interests</td><td>Tags showing key research areas</td></tr>
+    <tr><td>Qualifications</td><td>Degrees and certifications with awarding institution and year</td></tr>
+    <tr><td>Teaching</td><td>Courses and units the staff member currently teaches</td></tr>
+    <tr><td>Research</td><td>Publications, active projects, grants, and PhD supervision</td></tr>
+    <tr><td>Contact</td><td>Office location, phone, email, and consultation hours</td></tr>
+  </table>
+
+  <!-- ─── 22. CONTACT ─── -->
+  <h2 class="st" id="contact-guide">22. Contact &amp; Campuses</h2>
+
+  <div class="ss">
+    <img src="../screenshots/site-contact.jpg" alt="Contact Page">
+    <div class="ss-cap">Figure 22.1 — The Contact &amp; Campuses page with key numbers, email, location, and an interactive map.</div>
+  </div>
+
+  <p>Access via <strong>Contact</strong> in the main navigation or go to <code>/contact</code>.</p>
+
+  <h3 class="sub">Key Contact Details</h3>
+  <table>
+    <tr><th>Channel</th><th>Details</th><th>Hours</th></tr>
+    <tr><td>Main Switchboard</td><td>+254 777 373 633</td><td>Mon–Fri, 8:00 AM – 5:00 PM</td></tr>
+    <tr><td>General Enquiries Email</td><td>info@kafu.ac.ke</td><td>Response within 2 business days</td></tr>
+    <tr><td>Main Campus Location</td><td>Kaimosi, Vihiga County — P.O. Box 27 – 50309, Kenya</td><td>—</td></tr>
+    <tr><td>ICT Support</td><td>ict@kafu.ac.ke</td><td>Mon–Fri, 8:00 AM – 5:00 PM</td></tr>
+    <tr><td>Admissions Office</td><td>admissions@kafu.ac.ke</td><td>Mon–Fri, 8:00 AM – 5:00 PM</td></tr>
+  </table>
+
+  <h3 class="sub">Campuses</h3>
+  <p>The Contact page includes an interactive map showing all KAFU campus locations. Click <strong>All Campuses</strong> for a full listing with individual campus contact details, or go to <code>/campuses</code>.</p>
+
+  <h3 class="sub">Office Directory</h3>
+  <p>The <strong>Office Directory</strong> at <code>/offices</code> lists all university offices and directorates with their functions and contact details. Useful for directing specific queries to the right department.</p>
+
+  <!-- ─── 23. STUDENT SERVICES ─── -->
+  <h2 class="st" id="students-guide">23. Student Services &amp; Digital Portals</h2>
+  <p>The <strong>Students</strong> section in the navigation provides links to student-specific resources and digital services.</p>
+
+  <table>
+    <tr><th>Service</th><th>Purpose</th><th>How to Access</th></tr>
+    <tr><td><strong>Student Portal</strong></td><td>Student academic records, registration, fee payments, exam results, timetables</td><td>portal.kafu.ac.ke — uses your student number and password</td></tr>
+    <tr><td><strong>E-Learning Platform</strong></td><td>Course materials, assignments, online lectures, discussion forums</td><td>elearning.kafu.ac.ke — uses your student email and password</td></tr>
+    <tr><td><strong>Library Catalogue</strong></td><td>Search physical and digital library resources, reserve books</td><td>Via Students → Library or library.kafu.ac.ke</td></tr>
+    <tr><td><strong>Student Services Page</strong></td><td>Information about counselling, health services, clubs, accommodation, and welfare</td><td>/student-services</td></tr>
+    <tr><td><strong>International Students</strong></td><td>Visa guidance, housing, orientation, and international student support</td><td>/international</td></tr>
+  </table>
+
+  <div class="box info">
+    <strong>Important</strong>
+    The KAFU website at www.kafu.ac.ke is an <em>information website</em>. To access your personal student records, register for units, pay fees, or download results, you must log in to the <strong>Student Portal</strong> at <strong>portal.kafu.ac.ke</strong> using your student number and portal password.
+  </div>
+
+  <!-- ─── 24. ACCESSIBILITY ─── -->
+  <h2 class="st" id="accessibility">24. Accessibility &amp; Browser Support</h2>
+
+  <h3 class="sub">Supported Browsers</h3>
+  <table>
+    <tr><th>Browser</th><th>Minimum Version</th><th>Support Level</th></tr>
+    <tr><td>Google Chrome</td><td>Version 90+</td><td>Full support — recommended</td></tr>
+    <tr><td>Mozilla Firefox</td><td>Version 88+</td><td>Full support</td></tr>
+    <tr><td>Microsoft Edge</td><td>Version 90+</td><td>Full support</td></tr>
+    <tr><td>Safari (macOS/iOS)</td><td>Version 14+</td><td>Full support</td></tr>
+    <tr><td>Chrome (Android)</td><td>Latest</td><td>Full support — mobile responsive</td></tr>
+    <tr><td>Internet Explorer</td><td>Any version</td><td>Not supported</td></tr>
+  </table>
+
+  <h3 class="sub">Accessibility Features</h3>
+  <ul>
+    <li>The website is designed to work with screen readers (ARIA labels are used throughout).</li>
+    <li>Colour contrast meets WCAG 2.1 AA standards for readability.</li>
+    <li>All images have descriptive alt text for users who cannot see images.</li>
+    <li>The website is fully responsive — it adjusts automatically for phone, tablet, and desktop screens.</li>
+    <li>All interactive elements are keyboard-navigable (Tab key to move, Enter to activate).</li>
+  </ul>
+
+  <h3 class="sub">Internet Connection</h3>
+  <p>The website is optimised for low-bandwidth connections. Images are compressed and content loads progressively. However, for the best experience, a minimum connection speed of <strong>1 Mbps</strong> is recommended. Interactive maps may require a stronger connection.</p>
+
+  <h3 class="sub">Reporting Website Problems</h3>
+  <p>If you find content that is incorrect, outdated, or a page that is broken, please report it:</p>
+  <ul>
+    <li><strong>Email:</strong> ict@kafu.ac.ke — include the URL of the page and a description of the issue.</li>
+    <li><strong>Staff:</strong> Contact the Communications Office at communications@kafu.ac.ke for content-related issues.</li>
+  </ul>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     APPENDIX
+══════════════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-banner">
+    <div class="pl">Appendix</div>
+    <h2>Reference Material</h2>
+  </div>
+
+  <!-- GLOSSARY -->
+  <h2 class="st" id="glossary">A. Glossary of Terms</h2>
+  <table>
+    <tr><th>Term</th><th>Definition</th></tr>
+    <tr><td><strong>API</strong></td><td>Application Programming Interface — the backend system that the three React frontends talk to in order to fetch and update content.</td></tr>
+    <tr><td><strong>Artisan</strong></td><td>Laravel's command-line tool. Used by ICT to run migrations, clear caches, and manage the application from the server terminal.</td></tr>
+    <tr><td><strong>CMS</strong></td><td>Content Management System — the administration interface (cms.kafu.ac.ke) used by authorised staff to create and manage website content.</td></tr>
+    <tr><td><strong>Composer</strong></td><td>PHP package manager — used to install and update the Laravel API's dependencies.</td></tr>
+    <tr><td><strong>CORS</strong></td><td>Cross-Origin Resource Sharing — a browser security mechanism. Must be configured on the API to allow the React frontends to make requests.</td></tr>
+    <tr><td><strong>cPanel</strong></td><td>University hosting control panel — used to manage databases, email accounts, file manager, and subdomains on shared hosting.</td></tr>
+    <tr><td><strong>Migration</strong></td><td>A version-controlled database schema change. Running <code>php artisan migrate</code> applies all pending schema changes to the database.</td></tr>
+    <tr><td><strong>Monorepo</strong></td><td>A single code repository containing all four applications (website, CMS, staff portal, API). Managed with pnpm workspaces.</td></tr>
+    <tr><td><strong>pnpm</strong></td><td>Node.js package manager used for the JavaScript/React parts of the project.</td></tr>
+    <tr><td><strong>Sanctum</strong></td><td>Laravel's API authentication system. Issues tokens to CMS and staff portal users when they log in.</td></tr>
+    <tr><td><strong>Seeder</strong></td><td>A script that populates the database with initial or demo data. Run once during setup.</td></tr>
+    <tr><td><strong>SPA</strong></td><td>Single Page Application — a web app where navigation happens in the browser without full page reloads. All three React apps are SPAs.</td></tr>
+    <tr><td><strong>SSL/TLS</strong></td><td>Security certificate that enables HTTPS (the padlock in the browser). Required for all KAFU subdomains.</td></tr>
+    <tr><td><strong>Vite</strong></td><td>The build tool that compiles the React TypeScript code into static HTML/JS/CSS files for deployment.</td></tr>
+    <tr><td><strong>KUCCPS</strong></td><td>Kenya Universities and Colleges Central Placement Service — the government body that places students in universities after KCSE.</td></tr>
+    <tr><td><strong>ORCID</strong></td><td>Open Researcher and Contributor ID — a unique identifier for academic researchers, used to link a staff member's profile to their full publication record.</td></tr>
+  </table>
+
+  <!-- CONTACTS -->
+  <h2 class="st" id="contacts-ref">B. Key Contacts Reference</h2>
+  <table>
+    <tr><th>Department / Role</th><th>Email</th><th>Purpose</th></tr>
+    <tr><td>ICT Directorate</td><td>ict@kafu.ac.ke</td><td>System access, technical issues, CMS accounts, staff portal accounts</td></tr>
+    <tr><td>Communications Office</td><td>communications@kafu.ac.ke</td><td>Website content corrections, news &amp; media enquiries</td></tr>
+    <tr><td>Admissions Office</td><td>admissions@kafu.ac.ke</td><td>Application queries, entry requirements, deadline information</td></tr>
+    <tr><td>Human Resources</td><td>hr@kafu.ac.ke</td><td>Staff profile corrections, employment verification</td></tr>
+    <tr><td>Research Office</td><td>research@kafu.ac.ke</td><td>Research publications, grants, and partnerships information</td></tr>
+    <tr><td>International Office</td><td>international@kafu.ac.ke</td><td>International student enquiries, exchange programmes, visa support</td></tr>
+    <tr><td>General Enquiries</td><td>info@kafu.ac.ke</td><td>General questions about the university not covered above</td></tr>
+    <tr><td>Main Switchboard</td><td>+254 777 373 633</td><td>Phone enquiries, Mon–Fri 8 AM–5 PM EAT</td></tr>
+  </table>
+
+  <!-- CHANGELOG -->
+  <h2 class="st" id="changelog">C. Document Change Log</h2>
+  <table>
+    <tr><th>Version</th><th>Date</th><th>Author</th><th>Changes</th></tr>
+    <tr><td>1.0</td><td>June 2026</td><td>ICT Directorate</td><td>Initial release — System Administration Manual + Website User Manual</td></tr>
+  </table>
+
+  <div style="margin-top: 64px; padding-top: 28px; border-top: 2px solid var(--border); text-align: center; color: #94a3b8; font-size: 12px; line-height: 2;">
+    <p><strong style="color: var(--green); font-size: 14px;">KAIMOSI FRIENDS UNIVERSITY</strong></p>
+    <p style="font-style: italic; color: var(--gold);">Spring of Knowledge</p>
+    <p>KAFU Digital Platform — Comprehensive Administration &amp; User Manual</p>
+    <p>Version 1.0 &nbsp;|&nbsp; Prepared by the ICT Directorate &nbsp;|&nbsp; June 2026</p>
+    <p>P.O. Box 385 – 50309, Kaimosi, Kenya &nbsp;|&nbsp; ict@kafu.ac.ke &nbsp;|&nbsp; +254 777 373 633</p>
+    <p style="margin-top: 12px; font-size: 11px; font-style: italic;">
+      CONFIDENTIAL — For internal use by KAFU staff only.<br>
+      This document contains system configuration details. Do not distribute externally.
+    </p>
+  </div>
+</div>
+
+</body>
+</html>
