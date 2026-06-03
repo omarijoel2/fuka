@@ -156,7 +156,7 @@ const navItems: NavItem[] = [
   {
     name: "Admissions",
     path: "/admissions",
-    megaWidth: 620, megaCols: 3,
+    megaWidth: 700, megaCols: 4,
     megaGroups: [
       {
         heading: "Apply",
@@ -164,19 +164,25 @@ const navItems: NavItem[] = [
           { name: "Admissions Overview",    path: "/admissions" },
           { name: "Apply Online",           path: "/admissions/apply" },
           { name: "Track Application",      path: "/admissions/track" },
-          { name: "Intake Calendar",        path: "/admissions/calendar" },
           { name: "Joining Instructions",   path: "/admissions/joining-instructions" },
+        ],
+      },
+      {
+        heading: "Pathways",
+        links: [
+          { name: "Undergraduate (KUCCPS)", path: "/admissions#undergraduate" },
+          { name: "Postgraduate",           path: "/admissions#postgraduate" },
+          { name: "Self-Sponsored",         path: "/admissions#self-sponsored" },
+          { name: "Eligibility",            path: "/admissions/eligibility" },
         ],
       },
       {
         heading: "Fees & Funding",
         links: [
-          { name: "Undergraduate (KUCCPS)", path: "/admissions#undergraduate" },
-          { name: "Postgraduate",           path: "/admissions#postgraduate" },
-          { name: "Self-Sponsored",         path: "/admissions#self-sponsored" },
           { name: "Fees & Financing",       path: "/admissions/fees" },
           { name: "Access to Funding",      path: "/admissions/funding" },
-          { name: "Eligibility",            path: "/admissions/eligibility" },
+          { name: "Scholarships",           path: "/opportunities?category=scholarship" },
+          { name: "Intake Calendar",        path: "/admissions/calendar" },
           { name: "Timetables",             path: "/admissions/timetables" },
         ],
       },
@@ -204,7 +210,6 @@ const navItems: NavItem[] = [
           { name: "Student Services",   path: "/student-services" },
           { name: "Dean of Students",   path: "/students/affairs" },
           { name: "Student Council",    path: "/students/council" },
-          { name: "Timetables",         path: "/admissions/timetables" },
         ],
       },
       {

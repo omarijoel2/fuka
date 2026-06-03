@@ -1,8 +1,6 @@
-import { useState } from "react";
-import { Link } from "wouter";
 import { useParams } from "wouter";
+import { Link } from "wouter";
 import { useOpportunityDetail } from "@/lib/api-hooks";
-import { DocumentPreviewModal } from "@/components/document-preview-modal";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
@@ -26,7 +24,7 @@ import {
   Bell,
   Info,
   Send,
-  Eye,
+  ExternalLink,
 } from "lucide-react";
 
 function categoryIcon(category: string) {
@@ -75,7 +73,6 @@ function formatDate(date: string) {
 export default function OpportunityDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { data: opp, isLoading, isError } = useOpportunityDetail(slug ?? "");
-  const [previewDoc, setPreviewDoc] = useState<{ url: string; title: string; type: string; size: string } | null>(null);
 
   if (isLoading) {
     return (
@@ -254,9 +251,11 @@ export default function OpportunityDetail() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 shrink-0">
-                        <Button variant="ghost" size="sm" className="gap-1.5" onClick={() => setPreviewDoc({ url: doc.url, title: doc.title, type: doc.type, size: doc.size })} data-testid={`btn-preview-${i}`}>
-                          <Eye className="w-3.5 h-3.5" />
-                          Preview
+                        <Button variant="ghost" size="sm" className="gap-1.5" asChild data-testid={`btn-open-${i}`}>
+                          <a href={doc.url} target="_blank" rel="noreferrer">
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            Open
+                          </a>
                         </Button>
                         <Button variant="outline" size="sm" className="gap-1.5" asChild data-testid={`btn-download-${i}`}>
                           <a href={doc.url} download target="_blank" rel="noreferrer">
@@ -347,15 +346,6 @@ export default function OpportunityDetail() {
       </div>
     </div>
 
-    {previewDoc && (
-      <DocumentPreviewModal
-        url={previewDoc.url}
-        title={previewDoc.title}
-        type={previewDoc.type}
-        size={previewDoc.size}
-        onClose={() => setPreviewDoc(null)}
-      />
-    )}
     </>
   );
 }
