@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Layout } from "@/components/layout";
+import { CmsLayout as Layout } from "@/components/layout";
 import { useAuth } from "@/lib/auth";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
