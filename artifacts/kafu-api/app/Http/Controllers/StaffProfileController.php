@@ -146,7 +146,7 @@ class StaffProfileController extends Controller
     {
         $request->validate(['photo' => 'required|image|max:3072']);
         $path = $request->file('photo')->store('staff-photos', 'public');
-        $url = '/storage/' . $path;
+        $url = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
 
         $user = $request->user();
         $user->update(['avatar_url' => $url]);
@@ -163,7 +163,7 @@ class StaffProfileController extends Controller
     {
         $request->validate(['cv' => 'required|file|mimes:pdf|max:10240']);
         $path = $request->file('cv')->store('staff-cvs', 'public');
-        $url = '/storage/' . $path;
+        $url = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
 
         $user = $request->user();
         $submission = $this->getOrCreateDraft($user);

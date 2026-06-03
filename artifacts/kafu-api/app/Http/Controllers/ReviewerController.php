@@ -349,7 +349,7 @@ class ReviewerController extends Controller
         $user = User::findOrFail($id);
 
         $path = $request->file('cv')->store('staff-cvs', 'public');
-        $url  = '/storage/' . $path;
+        $url  = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
 
         $submission = ProfileSubmission::firstOrCreate(
             ['user_id' => $id],
@@ -379,7 +379,7 @@ class ReviewerController extends Controller
         $user = User::findOrFail($id);
 
         $path = $request->file('photo')->store('staff-photos', 'public');
-        $url  = '/storage/' . $path;
+        $url  = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
 
         $user->update(['avatar_url' => $url]);
 

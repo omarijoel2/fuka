@@ -46,11 +46,14 @@ function mapCmsNews(CmsContent $item): array {
 
 if (!function_exists('normalizeAttachmentUrl')) {
 function normalizeAttachmentUrl(string $url): string {
-    // If the URL contains /storage/content-attachments/, extract just that path segment.
-    // This handles localhost dev URLs (http://localhost:8000/storage/...) and any host
-    // that was baked in when APP_URL was set to a domain (e.g. https://kafu.ac.ke/storage/...).
-    if (preg_match('#(/storage/content-attachments/.+)$#i', $url, $m)) {
-        return $m[1];
+    // In production the URL is an absolute path like https://kafu.ac.ke/api/storage/...
+    // We must keep it intact so the /api/ prefix is preserved.
+    // In dev the URL contains localhost — strip to a relative /storage/... path so the
+    // Vite dev-server proxy can forward it to the PHP server on its local port.
+    if (str_contains($url, 'localhost') || str_contains($url, '127.0.0.1')) {
+        if (preg_match('#(/storage/.+)$#i', $url, $m)) {
+            return $m[1];
+        }
     }
     return $url;
 }
@@ -5370,7 +5373,7 @@ Route::middleware(['auth:sanctum'])->post('/admin/content/upload-attachment', fu
         $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
         $safeName = Str::slug($originalName) . '-' . substr((string) Str::uuid(), 0, 8) . '.' . $ext;
         $path = $file->storeAs('content-attachments', $safeName, 'public');
-        $url = '/storage/' . $path;
+        $url = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
         return response()->json([
             'url'     => $url,
             'title'   => $file->getClientOriginalName(),

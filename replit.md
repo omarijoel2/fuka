@@ -76,7 +76,7 @@ The frontend, API, and storage all live on the **same domain** (`kafu.ac.ke`). T
 **Backend (Laravel API) — deploy under `kafu.ac.ke`:**
 1. Upload `artifacts/kafu-api/` to the hosting server (exclude `.git`, `node_modules`, `storage/logs`)
 2. Run `composer install --no-dev --optimize-autoloader` on the server
-3. Copy `.env.example` to `.env` and fill in all values — set `APP_URL=https://kafu.ac.ke`
+3. Copy `.env.example` to `.env` and fill in all values — set `APP_URL=https://kafu.ac.ke/api` (critical: storage URLs are built from this, so it must include the `/api` subdirectory path)
 4. Run `php artisan key:generate`
 5. Create MySQL database + user in cPanel → MySQL Databases
 6. Run `php artisan migrate --seed`
