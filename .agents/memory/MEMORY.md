@@ -1,2 +1,3 @@
 - [CMS content migration pattern](cms-content-migration.md) — FALLBACK_ rename + useQuery inside component + icon-merge IIFE for pages with JSX/Lucide icons in data arrays.
 - [PHP artisan serve upload limits](php-artisan-serve-upload.md) — php artisan serve spawns a child php -S process without -d flags; must cd into public/ and call php -S directly.
+- [Dynamic navigation architecture](dynamic-nav.md) — CMS-managed nav via site_config navigation group; public GET /api/navigation; mergeWithCms() in navbar; departments mega-menu is always hardcoded.

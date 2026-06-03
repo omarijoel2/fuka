@@ -297,6 +297,11 @@ function mapCmsOpportunityDetail(CmsContent $item): array {
 }
 }
 
+Route::get('/navigation', function () {
+    $config = \App\Models\SiteConfig::getGroup('navigation');
+    return response()->json($config ?: ['primary_nav' => [], 'utility_nav' => [], 'footer_nav' => []]);
+});
+
 Route::get('/healthz', function () {
     return response()->json(['status' => 'ok', 'service' => 'KAFU API']);
 });

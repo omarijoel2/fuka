@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { useAuth } from "@/lib/auth";
 import {
   LayoutDashboard, User, ClipboardList, LogOut, Menu, X,
-  FileText, Clock, ChevronRight, Settings, Users
+  FileText, Clock, ChevronRight, Settings, Users, BookOpen
 } from "lucide-react";
 
 interface NavItem { label: string; href: string; icon: React.ReactNode; roles?: string[]; }
@@ -14,6 +14,7 @@ const NAV: NavItem[] = [
   { label: "Submission History", href: "/history", icon: <ClipboardList className="w-4 h-4" /> },
   { label: "Review Queue", href: "/review", icon: <FileText className="w-4 h-4" />, roles: ["reviewer", "super_admin", "ict_admin", "communications_admin"] },
   { label: "Staff Profiles", href: "/staff-profiles", icon: <Users className="w-4 h-4" />, roles: ["reviewer", "super_admin", "ict_admin"] },
+  { label: "Policy Documents", href: "/documents", icon: <BookOpen className="w-4 h-4" /> },
   { label: "Account Management", href: "/accounts", icon: <Settings className="w-4 h-4" />, roles: ["super_admin", "ict_admin"] },
 ];
 

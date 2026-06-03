@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { Menu, X, ChevronDown, ChevronRight, MapPin, Phone, ExternalLink, Search } from "lucide-react";
 import { Button } from "./ui/button";
 import { SearchModal } from "./search-bar";
-import { useBranding, BRANDING_DEFAULTS } from "@/lib/api-hooks";
+import { useBranding, BRANDING_DEFAULTS, useNavConfig } from "@/lib/api-hooks";
 
 // ─── Departments mega-menu data (grouped by school) ──────────────────────────
 // Slugs MUST match the `slug` column in the `departments` table (DepartmentSeeder)
@@ -340,10 +340,40 @@ const navItems: NavItem[] = [
   { name: "Contact", path: "/contact" },
 ];
 
+// ─── CMS merge helper ─────────────────────────────────────────────────────────
+// If the CMS config provides children for a nav item (matched by label), override
+// the hardcoded mega-menu with a CMS-managed dropdown. Items with megaType
+// "departments" are always kept as-is.
+function mergeWithCms(
+  defaults: NavItem[],
+  cmsItems: Array<{ label: string; url: string; children?: Array<{ label: string; url: string; external?: boolean }> }> | undefined
+): NavItem[] {
+  if (!cmsItems?.length) return defaults;
+  return defaults.map((def) => {
+    if (def.megaType === "departments") return def;
+    const cms = cmsItems.find((c) => c.label.toLowerCase() === def.name.toLowerCase());
+    if (!cms?.children?.length) return def;
+    return {
+      name: def.name,
+      path: def.path,
+      children: cms.children.map((c) => ({
+        name: c.label,
+        path: c.url,
+        external: c.external ?? c.url.startsWith("http"),
+      })),
+    };
+  });
+}
+
 // ─── Desktop Dropdown ────────────────────────────────────────────────────────
 function DropdownPanel({ item, onClose }: { item: NavItem; onClose: () => void }) {
+  const count = item.children!.length;
+  const multiCol = count > 6;
   return (
-    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 w-56 bg-white rounded-b-xl shadow-2xl border-t-2 border-accent py-2 z-50">
+    <div
+      className={`absolute top-full left-1/2 -translate-x-1/2 mt-0 bg-white rounded-b-xl shadow-2xl border-t-2 border-accent z-50 ${multiCol ? "w-96" : "w-56"}`}
+    >
+      <div className={multiCol ? "grid grid-cols-2 py-2" : "py-2"}>
       {item.children!.map((child) =>
         child.external ? (
           <a
@@ -369,6 +399,7 @@ function DropdownPanel({ item, onClose }: { item: NavItem; onClose: () => void }
           </Link>
         )
       )}
+      </div>
     </div>
   );
 }
@@ -657,9 +688,14 @@ export function Navbar() {
   const [mobileOpen,   setMobileOpen]   = React.useState(false);
   const [openDropdown, setOpenDropdown] = React.useState<string | null>(null);
   const [searchOpen,   setSearchOpen]   = useState(false);
-  const { data: branding } = useBranding();
+  const { data: branding }   = useBranding();
+  const { data: navConfig }  = useNavConfig();
   const logoUrl = branding?.logo_primary_url ?? BRANDING_DEFAULTS.logo_primary_url;
   const logoAlt = branding?.logo_alt         ?? BRANDING_DEFAULTS.logo_alt;
+  const resolvedNavItems = React.useMemo(
+    () => mergeWithCms(navItems, navConfig?.primary_nav),
+    [navConfig]
+  );
   const [location]                      = useLocation();
   const navRowRef                       = React.useRef<HTMLDivElement>(null);
 
@@ -762,7 +798,7 @@ export function Navbar() {
       {/* ── Row 3: Full-width nav — desktop xl+ only ── */}
       <div className="hidden xl:block border-t border-gray-100" ref={navRowRef}>
         <nav className="container mx-auto px-4 flex items-center justify-center gap-0">
-          {navItems.map((item) => (
+          {resolvedNavItems.map((item) => (
             <div key={item.name} className="relative">
               {(item.megaGroups || item.megaType === "departments") ? (
                 <div
@@ -840,7 +876,7 @@ export function Navbar() {
               </div>
             </div>
             <div className="flex-1">
-              {navItems.map((item) => (
+              {resolvedNavItems.map((item) => (
                 <MobileNavItem key={item.name} item={item} onClose={closeMobile} />
               ))}
             </div>

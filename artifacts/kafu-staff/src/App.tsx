@@ -9,6 +9,7 @@ import HistoryPage from "@/pages/history";
 import ReviewQueuePage from "@/pages/review-queue";
 import ReviewerStaffProfilesPage from "@/pages/reviewer-staff-profiles";
 import AccountsPage from "@/pages/accounts";
+import PolicyDocumentsPage from "@/pages/policy-documents";
 import { StaffLayout } from "@/components/layout";
 
 const queryClient = new QueryClient();
@@ -65,6 +66,7 @@ function AppRoutes() {
             : <div className="text-center py-20 text-gray-400">Access denied.</div>
           }
         </Route>
+        <Route path="/documents" component={PolicyDocumentsPage} />
         <Route>
           <div className="text-center py-20 text-gray-400">Page not found.</div>
         </Route>

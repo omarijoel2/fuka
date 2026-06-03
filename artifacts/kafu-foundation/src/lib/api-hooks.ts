@@ -556,3 +556,29 @@ export function useServicePointDetail(slug: string) {
     enabled: !!slug,
   });
 }
+
+// ─── Navigation Config (public) ──────────────────────────────────────────────
+export interface CmsNavChild {
+  label: string;
+  url: string;
+  external?: boolean;
+}
+export interface CmsPrimaryNavItem {
+  label: string;
+  url: string;
+  children?: CmsNavChild[];
+}
+export interface CmsNavConfig {
+  primary_nav?: CmsPrimaryNavItem[];
+  utility_nav?: Array<{ label: string; url: string }>;
+  footer_nav?: Array<{ group: string; items: Array<{ label: string; url: string }> }>;
+}
+
+export function useNavConfig() {
+  return useQuery<CmsNavConfig>({
+    queryKey: ["nav-config"],
+    queryFn: () => fetch("/api/navigation").then((r) => r.json()),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+  });
+}

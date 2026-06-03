@@ -41,6 +41,12 @@ Route::prefix('staff')
 
         // Consent
         Route::post('/consent/accept', [StaffProfileController::class, 'acceptConsent']);
+
+        // Policy & institutional documents
+        Route::get('/policy-documents', function () {
+            $docs = \App\Models\SiteConfig::getGroup('staff_documents');
+            return response()->json($docs ?: ['intro' => '', 'documents' => []]);
+        });
     });
 
 // Reviewer routes
