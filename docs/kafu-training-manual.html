@@ -1,0 +1,1211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KAFU Digital Systems — Training Manual</title>
+<style>
+  :root {
+    --green: #1A5C38;
+    --green-light: #2d7a52;
+    --gold: #C9A227;
+    --gray: #4b5563;
+    --light: #f8fafc;
+    --border: #e2e8f0;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #1e293b;
+    background: #fff;
+  }
+  /* ── Cover page ── */
+  .cover {
+    min-height: 100vh;
+    background: var(--green);
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 40px;
+    page-break-after: always;
+  }
+  .cover-logo {
+    font-size: 48px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+  .cover-tagline { color: var(--gold); font-style: italic; font-size: 18px; margin-bottom: 48px; }
+  .cover h1 { font-size: 36px; font-weight: 700; margin-bottom: 12px; }
+  .cover .subtitle { font-size: 18px; color: rgba(255,255,255,0.8); margin-bottom: 48px; }
+  .cover-meta { border-top: 1px solid rgba(255,255,255,0.2); padding-top: 24px; font-size: 13px; color: rgba(255,255,255,0.65); }
+  .cover-meta span { display: inline-block; margin: 0 16px; }
+  .cover-badge {
+    display: inline-block;
+    background: var(--gold);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    padding: 6px 18px;
+    border-radius: 20px;
+    margin-bottom: 32px;
+  }
+
+  /* ── Layout ── */
+  .page { max-width: 900px; margin: 0 auto; padding: 40px 48px; }
+
+  /* ── TOC ── */
+  .toc { page-break-after: always; }
+  .toc h2 { font-size: 22px; color: var(--green); border-bottom: 3px solid var(--gold); padding-bottom: 8px; margin-bottom: 24px; }
+  .toc-part { margin-bottom: 20px; }
+  .toc-part-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--green); margin-bottom: 8px; }
+  .toc a { display: block; color: #334155; text-decoration: none; padding: 4px 0; font-size: 14px; border-bottom: 1px dotted #cbd5e1; }
+  .toc a:hover { color: var(--green); }
+  .toc .toc-num { display: inline-block; width: 28px; color: var(--gold); font-weight: 600; }
+  .toc .indent { padding-left: 28px; font-size: 13px; color: #64748b; }
+
+  /* ── Section headings ── */
+  .part-banner {
+    background: var(--green);
+    color: #fff;
+    padding: 32px 48px;
+    margin: 0 -48px 32px;
+    page-break-before: always;
+  }
+  .part-banner .part-label { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 6px; }
+  .part-banner h2 { font-size: 28px; font-weight: 700; }
+
+  h2.section-title {
+    font-size: 22px;
+    color: var(--green);
+    border-bottom: 2px solid var(--border);
+    padding-bottom: 8px;
+    margin: 40px 0 16px;
+  }
+  h3.sub-title {
+    font-size: 16px;
+    color: var(--green-light);
+    margin: 28px 0 10px;
+    padding-left: 12px;
+    border-left: 3px solid var(--gold);
+  }
+  h4 { font-size: 14px; font-weight: 700; color: #334155; margin: 18px 0 6px; }
+
+  p { margin-bottom: 12px; }
+  ul, ol { margin: 0 0 14px 20px; }
+  li { margin-bottom: 5px; }
+
+  /* ── Screenshot ── */
+  .screenshot-wrap {
+    margin: 20px 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  }
+  .screenshot-wrap img { display: block; width: 100%; }
+  .screenshot-caption {
+    background: var(--light);
+    border-top: 1px solid var(--border);
+    padding: 8px 14px;
+    font-size: 12px;
+    color: #64748b;
+    font-style: italic;
+  }
+
+  /* ── Callout boxes ── */
+  .callout {
+    border-left: 4px solid;
+    padding: 12px 16px;
+    border-radius: 0 6px 6px 0;
+    margin: 16px 0;
+    font-size: 13.5px;
+  }
+  .callout.tip   { border-color: #10b981; background: #f0fdf4; }
+  .callout.warn  { border-color: #f59e0b; background: #fffbeb; }
+  .callout.info  { border-color: #3b82f6; background: #eff6ff; }
+  .callout.note  { border-color: var(--green); background: #f0fdf4; }
+  .callout strong { display: block; margin-bottom: 4px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .callout.tip strong   { color: #059669; }
+  .callout.warn strong  { color: #d97706; }
+  .callout.info strong  { color: #2563eb; }
+  .callout.note strong  { color: var(--green); }
+
+  /* ── Role badge ── */
+  .role-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin: 0 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .role-super   { background: #fef3c7; color: #92400e; }
+  .role-ict     { background: #dbeafe; color: #1e40af; }
+  .role-comms   { background: #ede9fe; color: #5b21b6; }
+  .role-reviewer { background: #d1fae5; color: #065f46; }
+  .role-staff   { background: #f1f5f9; color: #475569; }
+
+  /* ── Status badge ── */
+  .status {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 20px;
+    margin: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .s-draft      { background: #f1f5f9; color: #475569; }
+  .s-submitted  { background: #ccfbf1; color: #0f766e; }
+  .s-under      { background: #fef9c3; color: #a16207; }
+  .s-approved   { background: #dcfce7; color: #15803d; }
+  .s-scheduled  { background: #f3e8ff; color: #7c3aed; }
+  .s-published  { background: #d1fae5; color: #065f46; }
+  .s-unpublished { background: #ffedd5; color: #c2410c; }
+  .s-archived   { background: #f8fafc; color: #64748b; }
+
+  /* ── Table ── */
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+  th { background: var(--green); color: #fff; padding: 10px 14px; text-align: left; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 9px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:nth-child(even) td { background: var(--light); }
+  tr:hover td { background: #f0fdf4; }
+
+  /* ── Step list ── */
+  .steps { counter-reset: step; list-style: none; margin: 14px 0; padding: 0; }
+  .steps li {
+    counter-increment: step;
+    display: flex;
+    gap: 14px;
+    margin-bottom: 14px;
+    align-items: flex-start;
+  }
+  .steps li::before {
+    content: counter(step);
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--green);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+  }
+  .steps li .step-body { flex: 1; }
+  .steps li strong { display: block; font-size: 14px; color: #1e293b; margin-bottom: 3px; }
+  .steps li p { margin: 0; font-size: 13.5px; color: #475569; }
+
+  /* ── Workflow diagram ── */
+  .flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    margin: 16px 0;
+    padding: 16px;
+    background: var(--light);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+  .flow-arrow { color: #94a3b8; font-size: 18px; }
+
+  /* ── Sidebar nav listing ── */
+  .nav-group { margin-bottom: 14px; }
+  .nav-group-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: var(--gold); margin-bottom: 6px; }
+  .nav-item { font-size: 13px; color: #334155; padding: 2px 0 2px 12px; border-left: 2px solid var(--border); }
+
+  /* ── Print ── */
+  @media print {
+    .cover { page-break-after: always; }
+    .toc   { page-break-after: always; }
+    .part-banner { page-break-before: always; }
+    h2.section-title { page-break-after: avoid; }
+    .screenshot-wrap { page-break-inside: avoid; }
+    .callout { page-break-inside: avoid; }
+    table { page-break-inside: avoid; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     COVER PAGE
+═══════════════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-logo">KAFU</div>
+  <div class="cover-tagline">Spring of Knowledge</div>
+  <div class="cover-badge">Preliminary Training Manual</div>
+  <h1>Digital Systems User Guide</h1>
+  <div class="subtitle">CMS Administration &amp; Staff Account Updater Portal</div>
+  <div class="cover-meta">
+    <span>Kaimosi Friends University</span>
+    <span>|</span>
+    <span>ICT Directorate</span>
+    <span>|</span>
+    <span>Version 1.0 — June 2026</span>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     TABLE OF CONTENTS
+═══════════════════════════════════════════════════════════════ -->
+<div class="page toc">
+  <h2>Table of Contents</h2>
+
+  <div class="toc-part">
+    <div class="toc-part-title">Introduction</div>
+    <a href="#intro"><span class="toc-num">1.</span> System Overview &amp; Who Uses What</a>
+    <a href="#access"><span class="toc-num">2.</span> System URLs &amp; Access Requirements</a>
+    <a href="#roles"><span class="toc-num">3.</span> User Roles &amp; Permissions</a>
+  </div>
+
+  <div class="toc-part">
+    <div class="toc-part-title">Part A — CMS Administration</div>
+    <a href="#cms-login"><span class="toc-num">4.</span> Logging In to the CMS</a>
+    <a href="#cms-dashboard"><span class="toc-num">5.</span> Dashboard Overview</a>
+    <a href="#content-library"><span class="toc-num">6.</span> Content Library</a>
+    <a href="#workflow"><span class="toc-num">7.</span> Content Workflow &amp; Statuses</a>
+    <a href="#content-editor"><span class="toc-num">8.</span> Content Editor</a>
+    <a href="#review-queue"><span class="toc-num">9.</span> Review Queue</a>
+    <a href="#media"><span class="toc-num">10.</span> Media Library</a>
+    <a href="#research"><span class="toc-num">11.</span> Research Office Module</a>
+    <a href="#international"><span class="toc-num">12.</span> International Office Module</a>
+    <a href="#repository"><span class="toc-num">13.</span> Institutional Repository</a>
+    <a href="#staff-profiles"><span class="toc-num">14.</span> Academic Profiles &amp; Staff Management</a>
+    <a href="#governance"><span class="toc-num">15.</span> Governance Module</a>
+    <a href="#academic-structure"><span class="toc-num">16.</span> Academic Structure</a>
+    <a href="#admissions"><span class="toc-num">17.</span> Admissions Management</a>
+    <a href="#site-controls"><span class="toc-num">18.</span> Site Controls</a>
+    <a href="#navigation"><span class="toc-num">19.</span> Navigation Manager</a>
+    <a href="#redirects"><span class="toc-num">20.</span> Redirects</a>
+    <a href="#content-health"><span class="toc-num">21.</span> Content Health</a>
+    <a href="#workflow-console"><span class="toc-num">22.</span> Workflow Console</a>
+    <a href="#users"><span class="toc-num">23.</span> User Management</a>
+    <a href="#taxonomy"><span class="toc-num">24.</span> Taxonomy Manager</a>
+    <a href="#audit"><span class="toc-num">25.</span> Audit Log</a>
+    <a href="#settings"><span class="toc-num">26.</span> Settings &amp; Branding</a>
+  </div>
+
+  <div class="toc-part">
+    <div class="toc-part-title">Part B — Staff Account Updater Portal</div>
+    <a href="#staff-access"><span class="toc-num">27.</span> Getting Access &amp; First Login</a>
+    <a href="#onboarding"><span class="toc-num">28.</span> Onboarding Steps</a>
+    <a href="#profile-editor"><span class="toc-num">29.</span> Profile Editor Sections</a>
+    <a href="#submitting"><span class="toc-num">30.</span> Submitting Your Profile for Review</a>
+    <a href="#review-status"><span class="toc-num">31.</span> Understanding Review Status</a>
+    <a href="#reviewer-guide"><span class="toc-num">32.</span> Reviewer: Approving &amp; Returning Submissions</a>
+  </div>
+
+  <div class="toc-part">
+    <div class="toc-part-title">Appendix</div>
+    <a href="#tips"><span class="toc-num">A.</span> Quick-Reference Tips &amp; Best Practices</a>
+    <a href="#contacts"><span class="toc-num">B.</span> Support Contacts</a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     INTRODUCTION
+═══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-banner">
+    <div class="part-label">Introduction</div>
+    <h2>Overview &amp; Getting Started</h2>
+  </div>
+
+  <h2 class="section-title" id="intro">1. System Overview</h2>
+  <p>Kaimosi Friends University operates three integrated digital systems that together power the official university website at <strong>www.kafu.ac.ke</strong>.</p>
+
+  <div class="screenshot-wrap">
+    <img src="../screenshots/site-homepage.jpg" alt="KAFU Website Homepage">
+    <div class="screenshot-caption">Figure 1.1 — The KAFU public website. All content displayed here is managed through the CMS Administration system.</div>
+  </div>
+
+  <table>
+    <tr><th>System</th><th>Who Uses It</th><th>Purpose</th></tr>
+    <tr>
+      <td><strong>CMS Administration</strong></td>
+      <td>Communications team, ICT, Reviewers, Administrators</td>
+      <td>Create, edit, approve and publish all website content — news, events, programmes, research, staff profiles, governance information, and site configuration.</td>
+    </tr>
+    <tr>
+      <td><strong>Staff Account Updater Portal</strong></td>
+      <td>All academic and administrative staff</td>
+      <td>Update personal academic profile information (biography, qualifications, publications, research interests) for display on the university website.</td>
+    </tr>
+    <tr>
+      <td><strong>KAFU Website (Public)</strong></td>
+      <td>General public, students, staff</td>
+      <td>The live website. Displays all approved and published content from the CMS. No editing happens here.</td>
+    </tr>
+  </table>
+
+  <h2 class="section-title" id="access">2. System URLs &amp; Access Requirements</h2>
+
+  <table>
+    <tr><th>System</th><th>URL</th><th>Who Can Request Access</th></tr>
+    <tr>
+      <td>KAFU Website</td>
+      <td>www.kafu.ac.ke</td>
+      <td>Public — no login required</td>
+    </tr>
+    <tr>
+      <td>CMS Administration</td>
+      <td>cms.kafu.ac.ke</td>
+      <td>Authorised staff only — contact ICT (<a href="mailto:ict@kafu.ac.ke">ict@kafu.ac.ke</a>)</td>
+    </tr>
+    <tr>
+      <td>Staff Portal</td>
+      <td>portal-update.kafu.ac.ke</td>
+      <td>All permanent &amp; contract staff — contact ICT</td>
+    </tr>
+  </table>
+
+  <div class="callout info">
+    <strong>Note</strong>
+    During development/testing these systems run on internal preview URLs. Your ICT department will provide the correct production URLs when the system goes live.
+  </div>
+
+  <h2 class="section-title" id="roles">3. User Roles &amp; Permissions</h2>
+  <p>The CMS uses four roles. Each role has carefully scoped access to prevent accidental changes to sensitive content.</p>
+
+  <table>
+    <tr><th>Role</th><th>Label</th><th>What They Can Do</th></tr>
+    <tr>
+      <td><span class="role-badge role-super">Super Admin</span></td>
+      <td>Super Admin</td>
+      <td>Full access to everything — all content, all settings, user management, site configuration, redirects, branding, and governance data. Typically 1–2 people in ICT.</td>
+    </tr>
+    <tr>
+      <td><span class="role-badge role-ict">ICT Admin</span></td>
+      <td>ICT Admin</td>
+      <td>Same as Super Admin except cannot manage other Super Admins. Handles technical configuration, site controls, user accounts, and all content modules.</td>
+    </tr>
+    <tr>
+      <td><span class="role-badge role-comms">Comms Admin</span></td>
+      <td>Communications Admin</td>
+      <td>Creates and edits all content types, manages media, news, events, research, and governance data. Cannot access system settings or user management.</td>
+    </tr>
+    <tr>
+      <td><span class="role-badge role-reviewer">Reviewer</span></td>
+      <td>Reviewer</td>
+      <td>Reviews submitted content in the Review Queue. Can approve or request revisions. Cannot create new content or change settings.</td>
+    </tr>
+  </table>
+
+  <div class="callout warn">
+    <strong>Important</strong>
+    Only users with a <span class="role-badge role-super">Super Admin</span> or <span class="role-badge role-ict">ICT Admin</span> role can create new user accounts or change another user's role. If you need access, contact the ICT Directorate.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PART A — CMS ADMINISTRATION
+═══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-banner">
+    <div class="part-label">Part A</div>
+    <h2>CMS Administration Manual</h2>
+  </div>
+
+  <!-- 4. CMS LOGIN -->
+  <h2 class="section-title" id="cms-login">4. Logging In to the CMS</h2>
+
+  <div class="screenshot-wrap">
+    <img src="../screenshots/cms-login.jpg" alt="CMS Login Page">
+    <div class="screenshot-caption">Figure 4.1 — CMS Administration login screen at cms.kafu.ac.ke</div>
+  </div>
+
+  <ol class="steps">
+    <li>
+      <div class="step-body">
+        <strong>Navigate to the CMS URL</strong>
+        <p>Open your browser and go to <strong>cms.kafu.ac.ke</strong>. You will see the CMS Administration sign-in page with the KAFU logo.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-body">
+        <strong>Enter your institutional email</strong>
+        <p>Type your KAFU email address in the format <code>you@kafu.ac.ke</code>. This is the same email registered with ICT when your account was created.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-body">
+        <strong>Enter your password</strong>
+        <p>Type your password. If you have forgotten it, click <strong>Forgot password?</strong> to receive a reset link by email.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-body">
+        <strong>Click Sign In</strong>
+        <p>You will be taken to the Dashboard. The sidebar on the left shows your available modules based on your role.</p>
+      </div>
+    </li>
+  </ol>
+
+  <div class="callout tip">
+    <strong>Tip</strong>
+    If you see "Invalid credentials", double-check that Caps Lock is not on. If the problem persists, ask an Admin to reset your password via User Management.
+  </div>
+
+  <!-- 5. DASHBOARD -->
+  <h2 class="section-title" id="cms-dashboard">5. Dashboard Overview</h2>
+  <p>After logging in, the Dashboard provides an at-a-glance view of the CMS health and pending work. It contains four key widgets:</p>
+
+  <table>
+    <tr><th>Widget</th><th>What It Shows</th></tr>
+    <tr>
+      <td><strong>Content Health</strong></td>
+      <td>A ring-gauge score (0–100) indicating overall website content quality. Below it are alerts for stale, expired, or overdue content items. Click any alert to jump directly to the affected content.</td>
+    </tr>
+    <tr>
+      <td><strong>Workflow Pipeline</strong></td>
+      <td>A count of content items at each workflow stage: Draft, Submitted, Under Review, Approved, Scheduled, Published. Helps you identify bottlenecks at a glance.</td>
+    </tr>
+    <tr>
+      <td><strong>Site Operations</strong></td>
+      <td>Quick-action buttons for the most common tasks: New Content, View Published, Manage Media, Review Queue, Navigation Manager, and Redirects.</td>
+    </tr>
+    <tr>
+      <td><strong>Recent Activity</strong></td>
+      <td>A log of the latest content changes across the system — who edited what and when.</td>
+    </tr>
+  </table>
+
+  <!-- 6. CONTENT LIBRARY -->
+  <h2 class="section-title" id="content-library">6. Content Library</h2>
+  <p>The Content Library is the central list of all website content items. Access it from the sidebar under <strong>Content</strong>.</p>
+
+  <h3 class="sub-title">Filtering Content</h3>
+  <p>Use the filter bar at the top of the library to narrow down what you see:</p>
+  <ul>
+    <li><strong>Type filter</strong> — Choose from News, Event, Announcement, Opportunity, Programme, Staff Profile, Page, Document.</li>
+    <li><strong>Status filter</strong> — Filter by any workflow status (see Section 7).</li>
+    <li><strong>Search box</strong> — Full-text search across titles and content.</li>
+  </ul>
+
+  <h3 class="sub-title">Content Table Columns</h3>
+  <table>
+    <tr><th>Column</th><th>Meaning</th></tr>
+    <tr><td>Title</td><td>The name of the content item. Click to open the editor.</td></tr>
+    <tr><td>Type</td><td>The content category (News, Event, etc.)</td></tr>
+    <tr><td>Status</td><td>Current workflow stage (see Section 7)</td></tr>
+    <tr><td>Author</td><td>Who created the item</td></tr>
+    <tr><td>Modified</td><td>When it was last edited</td></tr>
+    <tr><td>Published</td><td>When it went live (if applicable)</td></tr>
+    <tr><td>Actions</td><td>Edit, Preview, Publish, Archive buttons</td></tr>
+  </table>
+
+  <div class="callout info">
+    <strong>Note for Admins</strong>
+    A yellow notice bar appears at the top of the library if there are items that are not yet published. Use the <strong>Publish</strong> button on any approved item to make it live immediately.
+  </div>
+
+  <!-- 7. WORKFLOW -->
+  <h2 class="section-title" id="workflow">7. Content Workflow &amp; Statuses</h2>
+  <p>Every piece of content in the CMS goes through a defined lifecycle before it appears on the public website. Understanding these stages is essential for all CMS users.</p>
+
+  <div class="flow">
+    <span class="status s-draft">Draft</span>
+    <span class="flow-arrow">→</span>
+    <span class="status s-submitted">Submitted</span>
+    <span class="flow-arrow">→</span>
+    <span class="status s-under">Under Review</span>
+    <span class="flow-arrow">→</span>
+    <span class="status s-approved">Approved</span>
+    <span class="flow-arrow">→</span>
+    <span class="status s-scheduled">Scheduled</span>
+    <span class="flow-arrow">→</span>
+    <span class="status s-published">Published</span>
+    <span class="flow-arrow">→</span>
+    <span class="status s-unpublished">Unpublished</span>
+    <span class="flow-arrow">→</span>
+    <span class="status s-archived">Archived</span>
+  </div>
+
+  <table>
+    <tr><th>Status</th><th>What It Means</th><th>Who Acts Next</th></tr>
+    <tr>
+      <td><span class="status s-draft">Draft</span></td>
+      <td>Content is being written. Not visible to public. Only the author and admins can see it.</td>
+      <td>Author — continues editing, then submits</td>
+    </tr>
+    <tr>
+      <td><span class="status s-submitted">Submitted</span></td>
+      <td>Author has marked it ready for review. Waiting for a Reviewer to pick it up.</td>
+      <td>Reviewer — moves to Under Review</td>
+    </tr>
+    <tr>
+      <td><span class="status s-under">Under Review</span></td>
+      <td>A Reviewer is actively checking the content for accuracy, formatting and policy compliance.</td>
+      <td>Reviewer — either Approves or Requests Revision</td>
+    </tr>
+    <tr>
+      <td><span class="status s-approved">Approved</span></td>
+      <td>Content is approved and ready to go live. Admin can publish immediately or schedule for a future date.</td>
+      <td>Admin — publishes or schedules</td>
+    </tr>
+    <tr>
+      <td><span class="status s-scheduled">Scheduled</span></td>
+      <td>Set to publish automatically on a future date and time.</td>
+      <td>System — auto-publishes at set time</td>
+    </tr>
+    <tr>
+      <td><span class="status s-published">Published</span></td>
+      <td>Visible to the public on www.kafu.ac.ke.</td>
+      <td>Admin — can unpublish or archive</td>
+    </tr>
+    <tr>
+      <td><span class="status s-unpublished">Unpublished</span></td>
+      <td>Was published but has been temporarily removed from public view. Content is preserved.</td>
+      <td>Admin — can re-publish or archive</td>
+    </tr>
+    <tr>
+      <td><span class="status s-archived">Archived</span></td>
+      <td>Permanently removed from the website. Still stored in the CMS for records. Cannot be un-archived automatically.</td>
+      <td>Admin only</td>
+    </tr>
+  </table>
+
+  <!-- 8. CONTENT EDITOR -->
+  <h2 class="section-title" id="content-editor">8. Content Editor</h2>
+  <p>The Content Editor opens whenever you click an item in the Content Library or click <strong>New Content</strong>. It is divided into several panels:</p>
+
+  <h3 class="sub-title">Main Content Fields</h3>
+  <ul>
+    <li><strong>Title</strong> — The heading displayed on the website.</li>
+    <li><strong>Slug</strong> — Auto-generated URL-friendly identifier (e.g. <code>graduation-ceremony-2026</code>). Edit only if needed.</li>
+    <li><strong>Type</strong> — Content category. Set this correctly as it determines where the content appears on the website.</li>
+    <li><strong>Body</strong> — The main text. Supports rich-text formatting (headings, bold, lists, links).</li>
+    <li><strong>Featured Image</strong> — The thumbnail image displayed in listings and at the top of the detail page. Select from the Media Library.</li>
+    <li><strong>Summary / Excerpt</strong> — A short description shown in listing pages and search results (max ~200 characters).</li>
+    <li><strong>Tags</strong> — Keywords for categorisation and search. Select from the Taxonomy Manager.</li>
+  </ul>
+
+  <h3 class="sub-title">Publishing &amp; Scheduling Panel</h3>
+  <ul>
+    <li><strong>Published At</strong> — Set a specific date and time for automatic publishing. Leave blank to publish immediately.</li>
+    <li><strong>Expiry Date</strong> — Optional. After this date the content is automatically marked as expired on the Content Health dashboard.</li>
+    <li><strong>Status</strong> — The current workflow stage. Use the action buttons at the bottom to transition status.</li>
+  </ul>
+
+  <h3 class="sub-title">SEO Panel</h3>
+  <ul>
+    <li><strong>SEO Title</strong> — Title shown in browser tabs and search engine results. If blank, the main Title is used.</li>
+    <li><strong>Meta Description</strong> — Short summary shown below the title in search results. Aim for 120–160 characters.</li>
+    <li><strong>Focus Keyword</strong> — The primary search term this content should rank for.</li>
+  </ul>
+
+  <h3 class="sub-title">Revision History</h3>
+  <p>Every time you save, the CMS creates a revision. You can view and restore any previous version from the <strong>Revisions</strong> panel on the right side of the editor. This makes it safe to make changes — nothing is permanently lost.</p>
+
+  <div class="callout tip">
+    <strong>Best Practice</strong>
+    Always click <strong>Save Draft</strong> frequently while writing. Only click <strong>Submit for Review</strong> when the content is complete and ready. Once submitted, the author cannot edit it until a Reviewer returns it for revision.
+  </div>
+
+  <!-- 9. REVIEW QUEUE -->
+  <h2 class="section-title" id="review-queue">9. Review Queue</h2>
+  <p>The Review Queue collects all content items with status <span class="status s-submitted">Submitted</span> or <span class="status s-under">Under Review</span>. It is the primary workspace for Reviewers.</p>
+
+  <p>Available to: <span class="role-badge role-super">Super Admin</span> <span class="role-badge role-ict">ICT Admin</span> <span class="role-badge role-comms">Comms Admin</span> <span class="role-badge role-reviewer">Reviewer</span></p>
+
+  <ol class="steps">
+    <li>
+      <div class="step-body">
+        <strong>Open the Review Queue</strong>
+        <p>Click <strong>Review Queue</strong> in the left sidebar. Items are listed by age — oldest first so nothing is forgotten.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-body">
+        <strong>Claim an item for review</strong>
+        <p>Click <strong>Start Review</strong> on any <span class="status s-submitted">Submitted</span> item. Its status changes to <span class="status s-under">Under Review</span> and it is now assigned to you.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-body">
+        <strong>Read the content carefully</strong>
+        <p>Check for accuracy, grammar, policy compliance, appropriate imagery, and SEO quality. Use the <strong>Preview</strong> button to see how it will look on the live website.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-body">
+        <strong>Approve or Request Revision</strong>
+        <p>If the content meets standards, click <strong>Approve</strong>. The item moves to <span class="status s-approved">Approved</span> and can be published. If changes are needed, click <strong>Request Revision</strong>, enter your feedback, and the author is notified.</p>
+      </div>
+    </li>
+  </ol>
+
+  <!-- 10. MEDIA LIBRARY -->
+  <h2 class="section-title" id="media">10. Media Library</h2>
+  <p>The Media Library stores all images, PDFs, and documents used across the website. Access via <strong>Media Library</strong> in the sidebar under the Media section.</p>
+
+  <h3 class="sub-title">Uploading Files</h3>
+  <ol class="steps">
+    <li><div class="step-body"><strong>Click "Upload"</strong><p>Drag and drop files into the upload zone, or click to browse. Supported: JPG, PNG, WebP, PDF, DOCX, XLSX.</p></div></li>
+    <li><div class="step-body"><strong>Add metadata</strong><p>For images, add an Alt Text (required for accessibility). For documents, add a title and description.</p></div></li>
+    <li><div class="step-body"><strong>Save</strong><p>The file is stored and immediately available to use in any content item.</p></div></li>
+  </ol>
+
+  <h3 class="sub-title">Image Guidelines</h3>
+  <table>
+    <tr><th>Type</th><th>Recommended Size</th><th>Max File Size</th></tr>
+    <tr><td>Hero / Banner images</td><td>1920 × 800 px</td><td>2 MB</td></tr>
+    <tr><td>News / Event thumbnails</td><td>1200 × 630 px</td><td>1 MB</td></tr>
+    <tr><td>Staff profile photos</td><td>400 × 400 px (square)</td><td>500 KB</td></tr>
+    <tr><td>Gallery photos</td><td>1600 × 1200 px</td><td>3 MB</td></tr>
+    <tr><td>Documents (PDF)</td><td>—</td><td>20 MB</td></tr>
+  </table>
+
+  <!-- 11. RESEARCH OFFICE -->
+  <h2 class="section-title" id="research">11. Research Office Module</h2>
+  <p>Manages the university's research information displayed at <strong>/research</strong> on the public website. Access via <strong>Research Office</strong> in the sidebar.</p>
+
+  <table>
+    <tr><th>Sub-section</th><th>What You Manage</th></tr>
+    <tr><td>Themes</td><td>Broad research areas and priority themes of the university</td></tr>
+    <tr><td>Projects</td><td>Active and completed research projects with investigators, timelines, and funding</td></tr>
+    <tr><td>Publications</td><td>Journal articles, books, conference papers published by KAFU researchers</td></tr>
+    <tr><td>Grants</td><td>Research grants — funding body, amount, period, and status</td></tr>
+    <tr><td>Partners</td><td>Research partner institutions and collaborative networks</td></tr>
+  </table>
+
+  <!-- 12. INTERNATIONAL -->
+  <h2 class="section-title" id="international">12. International Office Module</h2>
+  <p>Manages the international section of the website at <strong>/international</strong>. Access via <strong>International Office</strong> in the sidebar.</p>
+  <table>
+    <tr><th>Sub-section</th><th>What You Manage</th></tr>
+    <tr><td>Partnerships</td><td>Partner universities and international organisations</td></tr>
+    <tr><td>Exchange Programmes</td><td>Student and staff exchange opportunities</td></tr>
+  </table>
+
+  <!-- 13. REPOSITORY -->
+  <h2 class="section-title" id="repository">13. Institutional Repository</h2>
+  <p>The repository stores academic work — theses, dissertations, reports, and papers. Access via <strong>Institutional Repository</strong> in the sidebar.</p>
+  <ul>
+    <li><strong>All Records</strong> — Browse and search the full repository.</li>
+    <li><strong>Pending Review</strong> — Items submitted by staff/students awaiting approval before they appear publicly.</li>
+  </ul>
+
+  <!-- 14. STAFF PROFILES -->
+  <h2 class="section-title" id="staff-profiles">14. Academic Profiles &amp; Staff Management</h2>
+  <p>This section manages staff academic profiles that appear in the Staff Directory at <strong>/staff</strong> on the public website. Access via <strong>Academic Profiles</strong> in the sidebar.</p>
+
+  <table>
+    <tr><th>Sub-section</th><th>Purpose</th></tr>
+    <tr><td>Staff Profiles</td><td>View and edit individual staff academic profiles. Each profile includes bio, qualifications, research, teaching, and contact details.</td></tr>
+    <tr><td>Staff Content</td><td>Shortcut to the Content Library filtered for Staff Profile content type.</td></tr>
+    <tr><td>Submission Review</td><td>Queue of staff profile updates submitted through the Staff Account Updater Portal (awaiting admin approval before publishing).</td></tr>
+    <tr><td>Staff Accounts</td><td>Manage staff portal user accounts — create accounts, reset passwords, deactivate users.</td></tr>
+  </table>
+
+  <!-- 15. GOVERNANCE -->
+  <h2 class="section-title" id="governance">15. Governance Module</h2>
+  <p>Manages leadership and governance information displayed across the website. Access via <strong>Governance</strong> in the sidebar. Only Admins can edit governance data.</p>
+
+  <table>
+    <tr><th>Sub-section</th><th>What It Controls on the Website</th></tr>
+    <tr><td>University Council</td><td>Council member profiles at /about/council</td></tr>
+    <tr><td>VC Office</td><td>Vice-Chancellor and Deputy VC profiles at /about/vice-chancellor</td></tr>
+    <tr><td>Management Board</td><td>University Management committee members at /about/management</td></tr>
+    <tr><td>Directorates</td><td>Directorate listings and contacts at /directorates</td></tr>
+    <tr><td>Departments</td><td>Academic department details linked from Schools pages</td></tr>
+    <tr><td>Strategic Plan</td><td>Strategic plan document and summary at /about/strategic-plan</td></tr>
+    <tr><td>Policies &amp; Regulations</td><td>Policy documents at /about/policies</td></tr>
+    <tr><td>Service Charter</td><td>Service delivery standards at /about/service-charter</td></tr>
+  </table>
+
+  <!-- 16. ACADEMIC STRUCTURE -->
+  <h2 class="section-title" id="academic-structure">16. Academic Structure</h2>
+  <p>Manages the Schools, Faculties, and Programmes listed on the website. Access via <strong>Academic Structure</strong> in the sidebar.</p>
+  <ul>
+    <li><strong>Schools &amp; Faculties</strong> — Add or edit the five schools (SESS, SBE, SCIT, SOS, SHS) with their descriptions, images, and dean information.</li>
+    <li><strong>Programmes</strong> — The full catalogue of degree programmes. Each programme has title, school, level (certificate/diploma/degree/postgraduate), duration, and description.</li>
+  </ul>
+
+  <!-- 17. ADMISSIONS -->
+  <h2 class="section-title" id="admissions">17. Admissions Management</h2>
+  <p>Manages content displayed in the Admissions section of the website. Access via <strong>Admissions</strong> in the sidebar.</p>
+
+  <table>
+    <tr><th>Sub-section</th><th>Purpose</th></tr>
+    <tr><td>Document Uploads</td><td>Upload forms, application documents, and requirement checklists visible to applicants</td></tr>
+    <tr><td>Fees &amp; Payments</td><td>Manage the fee structure tables displayed on /admissions/fees</td></tr>
+    <tr><td>Postgraduate Programmes</td><td>Postgraduate-specific admission information</td></tr>
+    <tr><td>Eligibility Settings</td><td>Configure minimum requirements and cutoff points for each programme category</td></tr>
+  </table>
+
+  <!-- 18. SITE CONTROLS -->
+  <h2 class="section-title" id="site-controls">18. Site Controls</h2>
+  <p>Site Controls allow admins to configure global website settings without touching code. Access via <strong>Site Controls</strong> in the sidebar under <em>Site Controls</em> group.</p>
+
+  <h3 class="sub-title">Homepage Manager</h3>
+  <p>Edit the hero section text, admissions banner message, university statistics (student count, staff count, programmes), and the quick-links grid on the homepage.</p>
+
+  <h3 class="sub-title">Emergency Banner</h3>
+  <p>Switch on a site-wide coloured banner at the top of every page for urgent announcements (e.g., exam postponements, campus closures). Set the message and expiry time, then toggle it on or off without any code change.</p>
+
+  <h3 class="sub-title">Announcement Bar</h3>
+  <p>A scrolling ticker below the navbar showing rotating short announcements. Can be toggled independently of the Emergency Banner.</p>
+
+  <h3 class="sub-title">Maintenance Mode</h3>
+  <p>Temporarily replace the entire public website with a maintenance page. Only logged-in CMS users see the live site while maintenance mode is active.</p>
+
+  <h3 class="sub-title">Social Media Links</h3>
+  <p>Update the university's Facebook, Twitter/X, YouTube, LinkedIn, and Instagram URLs. These appear in the website footer and share buttons.</p>
+
+  <h3 class="sub-title">Footer Text</h3>
+  <p>Edit the copyright notice, address block, and disclaimer text shown in the website footer.</p>
+
+  <div class="callout warn">
+    <strong>Warning</strong>
+    Enabling Maintenance Mode will immediately hide the website from all visitors. Always set an estimated restoration time and disable it as soon as work is complete. Only use this for scheduled maintenance windows.
+  </div>
+
+  <!-- 19. NAVIGATION MANAGER -->
+  <h2 class="section-title" id="navigation">19. Navigation Manager</h2>
+  <p>The Navigation Manager controls the menus displayed on the public website. Changes take effect immediately when saved. Access via <strong>Site Controls → Navigation Manager</strong>.</p>
+
+  <p>It has three tabs:</p>
+
+  <h3 class="sub-title">Primary Navigation Tab</h3>
+  <p>Manages the main navigation bar (Home, About, Academics, Departments, Admissions, Students, News, Media, Research, Directorates, Contact). Each item has a <strong>type</strong>:</p>
+
+  <table>
+    <tr><th>Type</th><th>Description</th></tr>
+    <tr><td><strong>Plain Link</strong></td><td>A simple top-level link with no dropdown (e.g. Home, Contact).</td></tr>
+    <tr><td><strong>Mega Menu</strong></td><td>A wide dropdown with grouped columns. You can add multiple groups, each with a heading and a list of links. Set the panel width and number of columns (2, 3, or 4). Add optional footer quick-links at the bottom of the panel.</td></tr>
+    <tr><td><strong>Departments (auto)</strong></td><td>Automatically generates a mega-menu from the Schools and Departments database. No manual editing needed.</td></tr>
+  </table>
+
+  <h4>How to edit a Mega Menu submenu:</h4>
+  <ol class="steps">
+    <li><div class="step-body"><strong>Find the item</strong><p>Locate the top-level nav item (e.g. "Admissions") in the Primary Navigation list.</p></div></li>
+    <li><div class="step-body"><strong>Change the type</strong><p>Ensure the type selector shows "Mega Menu".</p></div></li>
+    <li><div class="step-body"><strong>Click the groups count button</strong><p>Click the green "X groups" button to expand the group editor.</p></div></li>
+    <li><div class="step-body"><strong>Edit groups and links</strong><p>Add, rename, or remove groups. Within each group, add or remove individual links (label + URL). Tick "External" for links that open outside the KAFU website.</p></div></li>
+    <li><div class="step-body"><strong>Save Changes</strong><p>Click <strong>Save Changes</strong> at the top or bottom of the page. The live website reflects changes immediately.</p></div></li>
+  </ol>
+
+  <h3 class="sub-title">Utility Navigation Tab</h3>
+  <p>Manages the top utility bar links — currently Student Portal, E-Learning, and Staff Login. Edit labels and URLs here.</p>
+
+  <h3 class="sub-title">Footer Navigation Tab</h3>
+  <p>Manages the link columns in the website footer. Add or remove groups (columns) and their individual links.</p>
+
+  <!-- 20. REDIRECTS -->
+  <h2 class="section-title" id="redirects">20. Redirects</h2>
+  <p>Create URL redirect rules to forward old or shortened URLs to their correct destinations. Access via <strong>Site Controls → Redirects</strong>.</p>
+
+  <p>Example use cases: <code>/apply</code> → <code>/admissions/apply</code>, or an old news URL pointing to a new one after a page rename.</p>
+
+  <table>
+    <tr><th>Field</th><th>Description</th></tr>
+    <tr><td>From (Source)</td><td>The old URL path (e.g. <code>/courses</code>). Must start with <code>/</code>.</td></tr>
+    <tr><td>To (Destination)</td><td>The new URL or external link (e.g. <code>/programmes</code> or <code>https://...</code>)</td></tr>
+    <tr><td>Type</td><td><strong>301</strong> = Permanent (tells search engines to update their index). <strong>302</strong> = Temporary.</td></tr>
+    <tr><td>Active</td><td>Toggle to enable or disable the redirect without deleting it.</td></tr>
+  </table>
+
+  <div class="callout tip">
+    <strong>Best Practice</strong>
+    Always use <strong>301 (Permanent)</strong> redirects when you have renamed or restructured pages. This preserves any search engine rankings from the old URL. Only use 302 for truly temporary redirects.
+  </div>
+
+  <!-- 21. CONTENT HEALTH -->
+  <h2 class="section-title" id="content-health">21. Content Health</h2>
+  <p>The Content Health page provides a full audit of your website content quality. Access via <strong>Site Controls → Content Health</strong>.</p>
+
+  <ul>
+    <li><strong>Health Score</strong> — A 0–100 score calculated from a combination of freshness, completeness, SEO, and media quality across all published content.</li>
+    <li><strong>Issue Cards</strong> — Categorised lists of problems: Missing SEO descriptions, missing featured images, stale content (not updated in 6+ months), and expired content.</li>
+    <li><strong>Content Breakdown</strong> — A bar chart showing counts by content type and status.</li>
+    <li><strong>Stale / Expired / Overdue Lists</strong> — Clickable lists of specific items that need attention.</li>
+  </ul>
+
+  <div class="callout tip">
+    <strong>Tip</strong>
+    Review the Content Health page at least monthly. Aim to keep the score above 75. A low score can indicate outdated information that may confuse prospective students.
+  </div>
+
+  <!-- 22. WORKFLOW CONSOLE -->
+  <h2 class="section-title" id="workflow-console">22. Workflow Console</h2>
+  <p>The Workflow Console gives a unified view of all content items by workflow stage. Access via <strong>Site Controls → Workflow</strong>.</p>
+  <p>Unlike the Review Queue (which shows only items awaiting review), the Workflow Console shows <em>every</em> item at <em>every</em> stage. It is useful for administrators who want to see what is in progress across the whole CMS at any given time, identify items that have been sitting in a stage for too long, and take bulk actions.</p>
+
+  <!-- 23. USER MANAGEMENT -->
+  <h2 class="section-title" id="users">23. User Management</h2>
+  <p>Manage CMS user accounts. Access via <strong>Users</strong> in the sidebar. Available to: <span class="role-badge role-super">Super Admin</span> <span class="role-badge role-ict">ICT Admin</span> only.</p>
+
+  <h3 class="sub-title">Creating a New User</h3>
+  <ol class="steps">
+    <li><div class="step-body"><strong>Click "New User"</strong><p>Opens a form for the new account.</p></div></li>
+    <li><div class="step-body"><strong>Enter name and email</strong><p>Use the staff member's institutional KAFU email address.</p></div></li>
+    <li><div class="step-body"><strong>Select a role</strong><p>Choose the appropriate role (see Section 3). When in doubt, assign <span class="role-badge role-reviewer">Reviewer</span> — it is the most restricted role and additional access can be granted later.</p></div></li>
+    <li><div class="step-body"><strong>Set a temporary password</strong><p>The user will be prompted to change this on first login.</p></div></li>
+    <li><div class="step-body"><strong>Save</strong><p>The account is created. Inform the user of their email and temporary password.</p></div></li>
+  </ol>
+
+  <h3 class="sub-title">Editing or Deactivating a User</h3>
+  <p>Click the <strong>Edit</strong> button next to any user to change their name, role, or department. To remove access, deactivate the account — this prevents login without deleting the user's content history.</p>
+
+  <!-- 24. TAXONOMY -->
+  <h2 class="section-title" id="taxonomy">24. Taxonomy Manager</h2>
+  <p>The Taxonomy Manager controls the tags and categories that classify content. Access via <strong>Taxonomy Manager</strong> in the sidebar.</p>
+  <p>Tags help users find related content through filters and search. Common taxonomies include: <em>School</em>, <em>Programme Level</em>, <em>Research Theme</em>, <em>News Category</em>, <em>Event Type</em>.</p>
+  <ul>
+    <li>Add new terms by typing in the input and clicking <strong>Add</strong>.</li>
+    <li>Edit a term's label by clicking the pencil icon.</li>
+    <li>Delete unused terms (note: this removes the tag from all content that uses it).</li>
+  </ul>
+
+  <!-- 25. AUDIT LOG -->
+  <h2 class="section-title" id="audit">25. Audit Log</h2>
+  <p>The Audit Log records every action taken in the CMS — who did what, and when. Access via <strong>Audit Log</strong> in the sidebar. Available to Admins only.</p>
+  <p>Use the Audit Log to:</p>
+  <ul>
+    <li>Track who published or unpublished a specific item</li>
+    <li>Investigate accidental deletions</li>
+    <li>Monitor user activity for governance and accountability</li>
+  </ul>
+
+  <!-- 26. SETTINGS -->
+  <h2 class="section-title" id="settings">26. Settings &amp; Branding</h2>
+  <p>The Settings section allows configuration of global site identity and branding. Access via <strong>Settings</strong> in the sidebar. Admins only.</p>
+
+  <table>
+    <tr><th>Setting</th><th>What It Controls</th></tr>
+    <tr><td>Site Name</td><td>The name used in browser tabs and email notifications</td></tr>
+    <tr><td>Site Logo</td><td>The primary logo displayed in the navbar and emails</td></tr>
+    <tr><td>Favicon</td><td>The small icon in browser tabs</td></tr>
+    <tr><td>Brand Colours</td><td>Primary (Forest Green) and Accent (Gold) colour codes — change only with approval from Communications</td></tr>
+    <tr><td>Contact Email</td><td>The default contact email displayed site-wide</td></tr>
+    <tr><td>Permissions Matrix</td><td>Fine-grained control over which roles can perform specific actions on specific content types</td></tr>
+  </table>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PART B — STAFF PORTAL
+═══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-banner">
+    <div class="part-label">Part B</div>
+    <h2>Staff Account Updater Portal Manual</h2>
+  </div>
+
+  <!-- 27. GETTING ACCESS -->
+  <h2 class="section-title" id="staff-access">27. Getting Access &amp; First Login</h2>
+  <p>The Staff Account Updater Portal is the system through which all KAFU academic and administrative staff maintain their profiles on the university website. Your profile appears in the Staff Directory at <strong>www.kafu.ac.ke/staff</strong> and on your individual profile page.</p>
+
+  <div class="screenshot-wrap">
+    <img src="../screenshots/staff-login.jpg" alt="Staff Portal Login Page">
+    <div class="screenshot-caption">Figure 27.1 — Staff Account Updater Portal login screen</div>
+  </div>
+
+  <h3 class="sub-title">How to Get an Account</h3>
+  <ol class="steps">
+    <li><div class="step-body"><strong>Contact ICT</strong><p>Send an email to <strong>ict@kafu.ac.ke</strong> with your full name, staff ID number, department, and institutional email address.</p></div></li>
+    <li><div class="step-body"><strong>Receive your credentials</strong><p>ICT will create your account and send you a temporary password by email.</p></div></li>
+    <li><div class="step-body"><strong>Log in</strong><p>Go to the Staff Portal URL, enter your institutional email and the temporary password, then follow the onboarding steps.</p></div></li>
+  </ol>
+
+  <!-- 28. ONBOARDING -->
+  <h2 class="section-title" id="onboarding">28. Onboarding Steps (First-Time Login)</h2>
+  <p>The first time you log in, the portal will walk you through two mandatory setup steps before you can access your profile:</p>
+
+  <div class="flow" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">1</div>
+      <div><strong>Change Password</strong> — Replace your temporary password with a secure personal password (minimum 8 characters).</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">2</div>
+      <div><strong>Accept Data Policy</strong> — Read and accept the University's data processing policy (version 1.0). This is required by Kenya's Data Protection Act 2019.</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <div style="width:32px;height:32px;border-radius:50%;background:var(--gold);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex-shrink:0;">3</div>
+      <div><strong>Start Editing</strong> — You are taken to your Profile Editor dashboard.</div>
+    </div>
+  </div>
+
+  <div class="callout note">
+    <strong>Important</strong>
+    You cannot skip the onboarding steps. Both the password change and policy acceptance are mandatory before you can access your profile. If you have already completed onboarding in a previous session, you will not be asked again.
+  </div>
+
+  <!-- 29. PROFILE EDITOR -->
+  <h2 class="section-title" id="profile-editor">29. Profile Editor Sections</h2>
+  <p>The Profile Editor is organised into <strong>seven tabs</strong>. Work through each tab, fill in the relevant information, and click <strong>Save Section</strong> before moving to the next tab. You do not need to complete all sections in one session — your progress is saved automatically.</p>
+
+  <p>A <strong>completeness percentage</strong> is shown for each section at the top of the editor. The system requires a minimum overall completeness before you can submit your profile for review.</p>
+
+  <h3 class="sub-title">Tab 1 — Personal</h3>
+  <p>Your basic identity information displayed on your staff profile page.</p>
+  <table>
+    <tr><th>Field</th><th>Notes</th></tr>
+    <tr><td>Full Name</td><td>Enter as it should appear on the website (e.g. Dr. Jane A. Wanjiku)</td></tr>
+    <tr><td>Title</td><td>Prof., Dr., Mr., Mrs., Ms., etc.</td></tr>
+    <tr><td>Designation</td><td>Official job title (e.g. Lecturer, Senior Lecturer, Associate Professor)</td></tr>
+    <tr><td>Department</td><td>Select your home department from the dropdown</td></tr>
+    <tr><td>School</td><td>Auto-populated from your department selection</td></tr>
+    <tr><td>Profile Photo</td><td>Upload a clear professional headshot (square, minimum 400×400px). No backgrounds with busy patterns.</td></tr>
+    <tr><td>Academic Identifiers</td><td>Optional but recommended: ORCID iD, Google Scholar URL, Scopus Author ID</td></tr>
+  </table>
+
+  <h3 class="sub-title">Tab 2 — Biography</h3>
+  <p>A narrative description of your academic background and expertise. This is the first text visitors read on your profile page.</p>
+  <table>
+    <tr><th>Field</th><th>Notes</th></tr>
+    <tr><td>Short Biography</td><td>2–3 sentences suitable for introduction at events and events programmes (max 300 characters)</td></tr>
+    <tr><td>Full Biography</td><td>Detailed academic biography covering career history, areas of expertise, and notable achievements (300–600 words recommended)</td></tr>
+    <tr><td>Research Interests</td><td>Comma-separated list of your main research areas (e.g. <em>Machine Learning, Precision Agriculture, Data Analytics</em>)</td></tr>
+  </table>
+
+  <h3 class="sub-title">Tab 3 — Qualifications</h3>
+  <p>Your academic degrees and professional certifications.</p>
+  <table>
+    <tr><th>Field</th><th>Notes</th></tr>
+    <tr><td>Degree</td><td>e.g. PhD in Computer Science, MSc in Education, Bachelor of Commerce</td></tr>
+    <tr><td>Institution</td><td>Name of the awarding university or institution</td></tr>
+    <tr><td>Year Awarded</td><td>Year of graduation or certification</td></tr>
+  </table>
+  <p>Add as many qualifications as you have. Click <strong>+ Add Qualification</strong> for each additional degree.</p>
+
+  <h3 class="sub-title">Tab 4 — Teaching</h3>
+  <p>Courses and units you currently teach or have recently taught.</p>
+  <table>
+    <tr><th>Field</th><th>Notes</th></tr>
+    <tr><td>Course Name</td><td>Full course title as it appears in the prospectus</td></tr>
+    <tr><td>Course Code</td><td>e.g. BSCCS301</td></tr>
+    <tr><td>Programme / Level</td><td>Which programme and study level this course belongs to</td></tr>
+    <tr><td>Semester</td><td>When you teach it (e.g. Semester 1, Year-round)</td></tr>
+  </table>
+
+  <h3 class="sub-title">Tab 5 — Research</h3>
+  <p>Your active research work and academic outputs.</p>
+  <table>
+    <tr><th>Sub-section</th><th>What to Enter</th></tr>
+    <tr><td>Publications</td><td>Journal articles, book chapters, conference papers. Include title, journal/venue, year, co-authors, and DOI/URL if available.</td></tr>
+    <tr><td>Ongoing Projects</td><td>Active research projects. Include title, funding body, start date, and brief description.</td></tr>
+    <tr><td>Grants</td><td>Research grants awarded. Include funding body, amount (optional), period.</td></tr>
+    <tr><td>Supervision</td><td>Current PhD/MSc students you are supervising. Include student name and thesis title.</td></tr>
+  </table>
+
+  <h3 class="sub-title">Tab 6 — Contact</h3>
+  <p>Contact details displayed on your public profile.</p>
+  <table>
+    <tr><th>Field</th><th>Notes</th></tr>
+    <tr><td>Office Location</td><td>Building name and room number (e.g. SCIT Block, Room 202)</td></tr>
+    <tr><td>Office Phone</td><td>Extension or direct line (e.g. +254 777 373 633 Ext. 204)</td></tr>
+    <tr><td>Institutional Email</td><td>Pre-filled from your account. Cannot be changed here — contact ICT.</td></tr>
+    <tr><td>Personal/Alternate Email</td><td>Optional secondary email for students to reach you</td></tr>
+    <tr><td>Office Hours</td><td>When you are available for student consultations (e.g. Mon &amp; Wed 2:00–4:00 PM)</td></tr>
+  </table>
+
+  <h3 class="sub-title">Tab 7 — Uploads</h3>
+  <p>Upload supporting documents for your profile.</p>
+  <table>
+    <tr><th>Document</th><th>Purpose</th></tr>
+    <tr><td>Curriculum Vitae (CV)</td><td>Your most recent academic CV in PDF format. The portal can also extract information from your CV to pre-fill other sections — click <strong>"Pre-fill from CV"</strong> after uploading.</td></tr>
+    <tr><td>Certificate Copies</td><td>Scanned copies of degree certificates (for internal verification — not displayed publicly)</td></tr>
+    <tr><td>Other Documents</td><td>Any other supporting documents requested by your department or HR</td></tr>
+  </table>
+
+  <div class="callout tip">
+    <strong>Tip — CV Pre-fill</strong>
+    After uploading your CV (PDF), click the <strong>"Pre-fill from CV"</strong> button. The system will attempt to automatically extract your qualifications, publications, and bio from the document and suggest them as field values. Review each suggestion carefully before accepting — the system is helpful but not perfect.
+  </div>
+
+  <!-- 30. SUBMITTING -->
+  <h2 class="section-title" id="submitting">30. Submitting Your Profile for Review</h2>
+  <p>Once you have filled in all sections to the minimum required completeness level, the <strong>Submit for Review</strong> button becomes active.</p>
+
+  <ol class="steps">
+    <li><div class="step-body"><strong>Check completeness</strong><p>Review the completeness indicators at the top of the editor. All sections should be at least partially complete. Sections with red indicators need attention.</p></div></li>
+    <li><div class="step-body"><strong>Save all sections</strong><p>Make sure you have clicked <strong>Save Section</strong> in every tab. Unsaved changes are not included in the submission.</p></div></li>
+    <li><div class="step-body"><strong>Click "Submit for Review"</strong><p>A confirmation dialogue appears. Read the consent statement — by submitting you confirm the information is accurate and you consent to it being displayed on the public university website.</p></div></li>
+    <li><div class="step-body"><strong>Confirm submission</strong><p>Click <strong>Confirm &amp; Submit</strong>. Your profile status changes to <span class="status s-submitted">Submitted</span> and the CMS Review Team is notified.</p></div></li>
+  </ol>
+
+  <div class="callout note">
+    <strong>After Submitting</strong>
+    You cannot edit your profile while it is under review. If the reviewer requests changes, the submission is returned to you with feedback notes and you can make edits and resubmit.
+  </div>
+
+  <!-- 31. REVIEW STATUS -->
+  <h2 class="section-title" id="review-status">31. Understanding Your Review Status</h2>
+  <p>You can track the status of your profile submission on the <strong>Submission History</strong> page in the portal (accessible from the sidebar or top navigation).</p>
+
+  <table>
+    <tr><th>Status</th><th>What It Means</th><th>What You Should Do</th></tr>
+    <tr>
+      <td><span class="status s-draft">Draft</span></td>
+      <td>You are still editing. Profile has not been submitted.</td>
+      <td>Continue filling in your profile sections, then submit when ready.</td>
+    </tr>
+    <tr>
+      <td><span class="status s-submitted">Submitted</span></td>
+      <td>Your profile has been sent to the review team. Awaiting assignment.</td>
+      <td>Wait. The review team will process submissions within 3–5 working days.</td>
+    </tr>
+    <tr>
+      <td><span class="status s-under">Under Review</span></td>
+      <td>A reviewer is actively checking your submission.</td>
+      <td>Wait. You may be contacted by email if the reviewer has quick questions.</td>
+    </tr>
+    <tr>
+      <td style="color:#c2410c"><strong>Revision Requested</strong></td>
+      <td>The reviewer has identified issues and returned the submission to you with feedback.</td>
+      <td>Read the reviewer's notes carefully. Make the requested changes in the relevant sections, then resubmit.</td>
+    </tr>
+    <tr>
+      <td><span class="status s-approved">Approved</span></td>
+      <td>Your profile has been approved. It will be published to the website shortly.</td>
+      <td>No action needed. Your profile will appear live within 24 hours.</td>
+    </tr>
+  </table>
+
+  <!-- 32. REVIEWER GUIDE -->
+  <h2 class="section-title" id="reviewer-guide">32. Reviewer: Approving &amp; Returning Submissions (CMS)</h2>
+  <p>Staff profile submissions come into the CMS via <strong>Academic Profiles → Submission Review</strong>. This queue lists all pending staff portal submissions.</p>
+
+  <ol class="steps">
+    <li>
+      <div class="step-body">
+        <strong>Open the Submission Review queue</strong>
+        <p>Navigate to <strong>Academic Profiles → Submission Review</strong> in the CMS sidebar. You will see a list of staff members who have submitted profile updates, with the submission date and their department.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-body">
+        <strong>Open a submission</strong>
+        <p>Click the staff member's name to open a side-by-side comparison: the <em>current live profile</em> on the left and the <em>proposed changes</em> on the right. Changes are highlighted.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-body">
+        <strong>Review each section</strong>
+        <p>Check: factual accuracy (verify qualifications where possible), professional tone of the biography, appropriate profile photo, valid URLs for publications and identifiers, no personal contact details outside the Contact section.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-body">
+        <strong>Approve or Request Revision</strong>
+        <p>If all information is correct and appropriate, click <strong>Approve</strong>. The updated profile will be published to the website. If changes are needed, click <strong>Request Revision</strong>, type your feedback in the notes field (be specific — tell the staff member exactly what to fix), and click <strong>Send Back</strong>. The staff member receives a notification.</p>
+      </div>
+    </li>
+  </ol>
+
+  <div class="callout warn">
+    <strong>Privacy Reminder</strong>
+    Do not approve profiles that contain personal information that staff have not explicitly consented to display publicly — for example, a personal home address or personal mobile number. Staff should only use institutional contact details in the Contact section.
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     APPENDIX
+═══════════════════════════════════════════════════════════════ -->
+<div class="page">
+  <div class="part-banner">
+    <div class="part-label">Appendix</div>
+    <h2>Quick Reference &amp; Support</h2>
+  </div>
+
+  <h2 class="section-title" id="tips">A. Quick-Reference Tips &amp; Best Practices</h2>
+
+  <h3 class="sub-title">CMS — Writing Good Content</h3>
+  <ul>
+    <li>News titles should be specific and informative: <em>"KAFU Launches New MSc Data Science Programme"</em> not <em>"New Programme"</em>.</li>
+    <li>Always add a featured image to news and event items. Articles with images get significantly more clicks.</li>
+    <li>Write meta descriptions for every published page. Aim for 140–160 characters that summarise the page's purpose and include the key search term.</li>
+    <li>Set expiry dates on time-sensitive content (application deadlines, event registrations) so the Content Health dashboard flags them when they are past due.</li>
+    <li>After publishing a significant announcement, also post it as a Notice/Memo to ensure it appears in the on-site ticker.</li>
+  </ul>
+
+  <h3 class="sub-title">CMS — Workflow Discipline</h3>
+  <ul>
+    <li>The Review Queue should never have items sitting for more than <strong>5 working days</strong>. If your team is busy, assign a backup reviewer.</li>
+    <li>Authors: save your draft frequently. The Content Editor auto-saves, but clicking <strong>Save Draft</strong> creates a named revision you can restore.</li>
+    <li>Admins: use the Workflow Console weekly to identify items stuck at any stage.</li>
+    <li>Do not publish directly from Draft — always go through the review workflow. This applies even for urgent news.</li>
+  </ul>
+
+  <h3 class="sub-title">Staff Portal — Profile Quality Tips</h3>
+  <ul>
+    <li>Your profile photo should be a clear, professional headshot taken against a plain background. Avoid group photos, informal selfies, or low-resolution images.</li>
+    <li>In your Full Biography, write in third person: <em>"Dr. Wanjiku is a specialist in..."</em> rather than <em>"I am a specialist in..."</em></li>
+    <li>Add your ORCID iD if you have one — it links your KAFU profile directly to your full publication record automatically.</li>
+    <li>Keep your Research Interests brief and accurate — they are used by the website search to match researchers with collaboration enquiries.</li>
+    <li>Update your profile at least once a year, or whenever you gain a new qualification, publish a paper, or change your role.</li>
+  </ul>
+
+  <h3 class="sub-title">General Security</h3>
+  <ul>
+    <li>Never share your CMS or Staff Portal password with colleagues. Each user must have their own account.</li>
+    <li>Always log out when you finish a session, especially on shared computers.</li>
+    <li>If you suspect your account has been accessed without your permission, contact ICT immediately.</li>
+    <li>Do not bookmark the login page with your password auto-filled on a shared computer.</li>
+  </ul>
+
+  <h2 class="section-title" id="contacts">B. Support Contacts</h2>
+
+  <table>
+    <tr><th>Issue</th><th>Contact</th><th>How</th></tr>
+    <tr>
+      <td>Cannot log in / forgotten password</td>
+      <td>ICT Directorate</td>
+      <td>Email ict@kafu.ac.ke or visit ICT offices at SCIT Block</td>
+    </tr>
+    <tr>
+      <td>New user account request (CMS or Staff Portal)</td>
+      <td>ICT Directorate</td>
+      <td>Email ict@kafu.ac.ke with staff details and required role</td>
+    </tr>
+    <tr>
+      <td>Content corrections on the live website</td>
+      <td>Communications Office</td>
+      <td>Email communications@kafu.ac.ke</td>
+    </tr>
+    <tr>
+      <td>Reporting incorrect information on a staff profile</td>
+      <td>Human Resources</td>
+      <td>Email hr@kafu.ac.ke with the staff member's name and the specific error</td>
+    </tr>
+    <tr>
+      <td>Technical errors or system crashes</td>
+      <td>ICT Directorate</td>
+      <td>Email ict@kafu.ac.ke with a screenshot of the error message</td>
+    </tr>
+    <tr>
+      <td>Training and system guidance</td>
+      <td>ICT Directorate</td>
+      <td>Request a training session via ict@kafu.ac.ke</td>
+    </tr>
+  </table>
+
+  <div style="margin-top: 60px; padding-top: 24px; border-top: 2px solid var(--border); text-align: center; color: #94a3b8; font-size: 12px;">
+    <p><strong style="color: var(--green);">KAIMOSI FRIENDS UNIVERSITY</strong> — Spring of Knowledge</p>
+    <p>KAFU Digital Systems Training Manual v1.0 | Prepared by ICT Directorate | June 2026</p>
+    <p>P.O Box 385–50309, Kaimosi, Kenya &nbsp;|&nbsp; ict@kafu.ac.ke &nbsp;|&nbsp; +254 777 373 633</p>
+    <p style="margin-top: 12px; font-style: italic;">This document is for internal training purposes. For the latest version, contact the ICT Directorate.</p>
+  </div>
+</div>
+
+</body>
+</html>

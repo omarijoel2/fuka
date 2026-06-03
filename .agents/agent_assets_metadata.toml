@@ -101,3 +101,9 @@ id = "mH8WjxaND3wPxm-0yHErY"
 uri = "file://kafu-foundation-hero-v2.zip"
 type = "unspecified"
 title = "Hero redesign — index.html + src/pages/home.tsx"
+
+[[outputs]]
+id = "4knbfAKX6RteyX36ioELF"
+uri = "file://docs/kafu-training-manual.zip"
+type = "unspecified"
+title = "KAFU Digital Systems Training Manual v1.0 (with Screenshots)"
