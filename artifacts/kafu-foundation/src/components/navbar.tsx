@@ -473,15 +473,15 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full bg-white shadow-md">
 
-      {/* ── Row 1: Utility bar — desktop only ── */}
-      <div className="hidden sm:block bg-primary text-primary-foreground py-1.5 text-xs">
+      {/* ── Row 1: Utility bar ── */}
+      <div className="bg-primary text-primary-foreground py-1.5 text-xs">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <div className="flex items-center gap-4 opacity-90">
             <span className="flex items-center gap-1.5">
               <MapPin className="w-3 h-3 shrink-0" />
-              <span className="hidden md:inline">P.O BOX 385 – 50309, </span>Kaimosi, Kenya
+              <span className="hidden sm:inline">P.O BOX 385 – 50309, </span>Kaimosi, Kenya
             </span>
-            <span className="hidden md:flex items-center gap-1.5">
+            <span className="hidden sm:flex items-center gap-1.5">
               <Phone className="w-3 h-3 shrink-0" />
               +254 777 373 633
             </span>
@@ -494,7 +494,7 @@ export function Navbar() {
                   href={item.url}
                   target={item.url.startsWith("http") ? "_blank" : undefined}
                   rel={item.url.startsWith("http") ? "noreferrer" : undefined}
-                  className="hover:text-accent transition-colors"
+                  className="hover:text-accent transition-colors hidden sm:inline"
                   data-testid={`link-utility-${i}`}
                 >
                   {item.label}
@@ -510,13 +510,13 @@ export function Navbar() {
         </div>
       </div>
 
-      {/* ── Row 2: Logo + Apply Now / Hamburger ── */}
-      <div className="container mx-auto px-4 h-[68px] flex items-center justify-between">
+      {/* ── Row 2: Logo + Search + Apply Now + Hamburger ── */}
+      <div className="container mx-auto px-4 h-[72px] flex items-center justify-between border-b border-gray-100">
         <Link href="/" className="flex items-center shrink-0" data-testid="link-home-logo">
           <img
             src={logoUrl}
             alt={logoAlt}
-            className="h-11 object-contain"
+            className="h-12 object-contain"
             onError={(e) => {
               const img = e.target as HTMLImageElement;
               img.style.display = "none";
@@ -557,7 +557,7 @@ export function Navbar() {
       </div>
 
       {/* ── Row 3: Full-width nav — desktop xl+ only ── */}
-      <div className="hidden xl:block border-t border-gray-100" ref={navRowRef}>
+      <div className="hidden xl:block bg-primary" ref={navRowRef}>
         <nav className="container mx-auto px-4 flex items-center justify-center gap-0">
           {resolvedNavItems.map((item) => (
             <div key={item.name} className="relative">
@@ -571,7 +571,7 @@ export function Navbar() {
                     className={`flex items-center gap-0.5 px-3 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
                       isActive(item.path)
                         ? "border-accent text-accent"
-                        : "border-transparent text-foreground hover:text-primary hover:border-primary/30"
+                        : "border-transparent text-white/90 hover:text-white hover:border-accent/60"
                     }`}
                     data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
                   >
@@ -594,7 +594,7 @@ export function Navbar() {
                     className={`flex items-center gap-0.5 px-3 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
                       isActive(item.path)
                         ? "border-accent text-accent"
-                        : "border-transparent text-foreground hover:text-primary hover:border-primary/30"
+                        : "border-transparent text-white/90 hover:text-white hover:border-accent/60"
                     }`}
                     data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
                   >
@@ -611,7 +611,7 @@ export function Navbar() {
                   className={`block px-3 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
                     isActive(item.path)
                       ? "border-accent text-accent"
-                      : "border-transparent text-foreground hover:text-primary hover:border-primary/30"
+                      : "border-transparent text-white/90 hover:text-white hover:border-accent/60"
                   }`}
                   data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
                 >
@@ -625,7 +625,7 @@ export function Navbar() {
 
       {/* ── Mobile Drawer ── */}
       {mobileOpen && (
-        <div className="xl:hidden fixed inset-0 top-[68px] z-40 flex">
+        <div className="xl:hidden fixed inset-0 top-[calc(28px+72px)] z-40 flex">
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={closeMobile} />
           <div className="relative w-full max-w-sm bg-white shadow-2xl flex flex-col overflow-y-auto">
             <div className="bg-primary px-5 py-3 flex items-center justify-between">
