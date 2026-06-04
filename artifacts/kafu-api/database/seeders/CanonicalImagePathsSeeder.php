@@ -24,7 +24,7 @@ class CanonicalImagePathsSeeder extends Seeder
             'Dr. Felix Saouma' => '/images/uploads/saouma.jpg',
             'Dr. Aggrey A. Amugune' => '/images/uploads/Dr.-Amugune.jpg',
             "Ms. Margaret Thang'wa" => '/images/uploads/Thangwa.jpg',
-            'Mr. Ahmed K. Wangara' => '/images/uploads/wangara.jpg',
+            'Mr. Ahmed K. Wangara' => '/images/uploads/Wangara.jpg',
             'Mr. Obed Tanda Monayo' => '/images/uploads/Obed-Tanda.jpg',
             'Dr. Lilian Ronoh' => '/images/uploads/Dr.-Ronoh.jpg',
             'Dr. Ayub H. Shirandula' => '/images/uploads/Mr.-Shirandula.jpg',
@@ -122,58 +122,6 @@ class CanonicalImagePathsSeeder extends Seeder
                     DB::table('cms_content')->where('id', $row->id)->update($updates);
                 }
             }
-        }
-
-
-        // Department alias fixes
-        DB::table('departments')
-            ->where('slug', 'information-technology')
-            ->update([
-                'hod_name' => 'Dr. Ayub H. Shirandula',
-                'hod_title' => 'Chair, Department of Information Technology',
-                'hod_email' => 'dept.it@kafu.ac.ke',
-                'hod_phone' => '+254 700 100 415',
-                'hod_photo_url' => '/images/uploads/Mr.-Shirandula.jpg',
-                'updated_at' => now(),
-            ]);
-
-
-        // Directorate photo fixes
-        DB::table('directorates')
-            ->where('director_name', 'like', '%Hillan%')
-            ->update([
-                'director_photo_url' => '/images/uploads/Dr.-Ronoh.jpg',
-                'updated_at' => now(),
-            ]);
-
-
-        DB::table('directorates')
-            ->where('director_name', 'like', '%Obiye%')
-            ->update([
-                'director_photo_url' => '/images/uploads/yohana-obiye.jpg',
-                'updated_at' => now(),
-            ]);
-
-
-        // Directorate photo fixes
-        $directoratePhotos = [
-            'Silas' => '/images/directors/silas-rugut.jpg',
-            'Nicholas' => '/images/directors/nicholas-khasoha.jpg',
-            'Victor' => '/images/directors/victor-shikuku.jpg',
-            'Otsyulah' => '/images/directors/joseph-otsyulah.png',
-            'Damianus' => '/images/directors/damianus-okaka.jpg',
-            'Caroline' => '/images/uploads/Dr.-Mulinya-Caroline-300x300.jpeg',
-            'Hillan' => '/images/uploads/Dr.-Ronoh.jpg',
-            'Obiye' => '/images/uploads/yohana-obiye.jpg',
-        ];
-
-        foreach ($directoratePhotos as $name => $photo) {
-            DB::table('directorates')
-                ->where('director_name', 'like', '%' . $name . '%')
-                ->update([
-                    'director_photo_url' => $photo,
-                    'updated_at' => now(),
-                ]);
         }
 
         $this->command?->info('Canonical image paths applied.');
