@@ -253,9 +253,9 @@ function SlideEditorModal({ slide, defaultSortOrder, onClose, onSaved }: {
     setSaving(true); setError("");
     try {
       if (slide) {
-        await apiPut(`/admin/hero-slides/${slide.id}`, form as unknown as Record<string, unknown>);
+        await apiPut(`/hero-slides/${slide.id}`, form as unknown as Record<string, unknown>);
       } else {
-        await apiPost("/admin/hero-slides", form as unknown as Record<string, unknown>);
+        await apiPost("/hero-slides", form as unknown as Record<string, unknown>);
       }
       onSaved();
     } catch (e: unknown) {
@@ -652,7 +652,7 @@ export default function HeroSlidesCmsPage() {
   const load = useCallback(async () => {
     setLoading(true);
     try {
-      const d = await apiGet("/admin/hero-slides");
+      const d = await apiGet("/hero-slides");
       setSlides((d.data ?? []).sort((a: HeroSlide, b: HeroSlide) => a.sortOrder - b.sortOrder));
     } catch { /* silent */ }
     finally { setLoading(false); }
@@ -661,13 +661,13 @@ export default function HeroSlidesCmsPage() {
   useEffect(() => { load(); }, [load]);
 
   async function handleDelete(slide: HeroSlide) {
-    await apiDelete(`/admin/hero-slides/${slide.id}`);
+    await apiDelete(`/hero-slides/${slide.id}`);
     setDeleteSlide(null);
     load();
   }
 
   async function handleDuplicate(slide: HeroSlide) {
-    await apiPost("/admin/hero-slides", {
+    await apiPost("/hero-slides", {
       headline: `${slide.headline} (Copy)`,
       accent: slide.accent,
       badge: slide.badge,
@@ -688,7 +688,7 @@ export default function HeroSlidesCmsPage() {
   }
 
   async function toggleStatus(slide: HeroSlide) {
-    await apiPut(`/admin/hero-slides/${slide.id}`, {
+    await apiPut(`/hero-slides/${slide.id}`, {
       status: slide.status === "published" ? "draft" : "published",
     } as Record<string, unknown>);
     load();
@@ -703,7 +703,7 @@ export default function HeroSlidesCmsPage() {
     setSlides(optimistic);
     setReordering(true);
     try {
-      await apiPost("/admin/hero-slides/reorder", { order: optimistic.map(s => s.id) });
+      await apiPost("/hero-slides/reorder", { order: optimistic.map(s => s.id) });
     } catch { await load(); }
     finally { setReordering(false); }
   }
