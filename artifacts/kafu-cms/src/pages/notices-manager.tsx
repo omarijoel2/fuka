@@ -7,8 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Plus, Pencil, Trash2, Download, Upload, X, AlertCircle, Image, FileText } from "lucide-react";
 
-const API = import.meta.env.BASE_URL.replace(/\/$/, "");
-
+const API = window.location.origin;
 type Category = "memo" | "circular" | "notice" | "policy" | "announcement";
 
 interface Notice {
