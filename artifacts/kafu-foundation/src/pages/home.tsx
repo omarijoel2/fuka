@@ -118,7 +118,7 @@ interface HeroCarouselProps {
 }
 
 function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
-  const { data: apiSlides } = useHeroSlides();
+  const { data: apiSlides, isLoading: heroLoading } = useHeroSlides();
   // Map API shape → carousel shape, fall back to static SLIDES if API empty
   const slides: typeof SLIDES = React.useMemo(() => {
     if (apiSlides && apiSlides.length > 0) {
@@ -134,8 +134,11 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
         testid: `hero-slide-${i}`,
       }));
     }
+
+    if (heroLoading) return [];
+
     return STATIC_SLIDES;
-  }, [apiSlides]);
+  }, [apiSlides, heroLoading]);
 
   const [current, setCurrent] = React.useState(0);
   const [paused, setPaused] = React.useState(false);
@@ -159,6 +162,10 @@ function HeroCarousel({ stats, statsLoading }: HeroCarouselProps) {
   }, [current, paused, goTo]);
 
   const slide = slides[current];
+
+  if (heroLoading || !slide) {
+    return <section className="relative overflow-hidden bg-gray-50 min-h-[520px]" />;
+  }
 
   return (
     <section
