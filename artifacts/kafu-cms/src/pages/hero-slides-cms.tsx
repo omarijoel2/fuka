@@ -3,7 +3,7 @@ import { apiGet, apiPost, apiPut, apiDelete } from "../lib/api";
 import {
   Plus, Pencil, Trash2, X, ChevronUp, ChevronDown, Image as ImageIcon,
   Eye, EyeOff, Star, Copy, Loader2, Search, CheckCircle2, ArrowRight,
-  ExternalLink, Monitor, SlidersHorizontal, AlignLeft,
+  ExternalLink, Monitor, SlidersHorizontal, AlignLeft, Upload,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -244,8 +244,42 @@ function SlideEditorModal({ slide, defaultSortOrder, onClose, onSaved }: {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [showPicker, setShowPicker] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const uploadRef = useRef<HTMLInputElement>(null);
 
   const set = <K extends keyof SlideForm>(k: K, v: SlideForm[K]) => setForm(f => ({ ...f, [k]: v }));
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadError("");
+    setUploading(true);
+    try {
+      const token = localStorage.getItem(TOKEN_KEY);
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("folder", "hero-slides");
+      const res = await fetch("/api/admin/media", {
+        method: "POST",
+        headers: { Accept: "application/json", ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: fd,
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({})) as Record<string, unknown>;
+        throw new Error((err?.message as string) || `Upload failed (${res.status})`);
+      }
+      const data = await res.json();
+      const url = data?.url ?? data?.data?.url ?? "";
+      if (url) set("image", url);
+      else throw new Error("No URL returned from upload.");
+    } catch (err: unknown) {
+      setUploadError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setUploading(false);
+      if (uploadRef.current) uploadRef.current.value = "";
+    }
+  }
 
   async function save() {
     if (!form.headline.trim()) { setError("Headline is required."); return; }
@@ -345,14 +379,23 @@ function SlideEditorModal({ slide, defaultSortOrder, onClose, onSaved }: {
                     <label className="block text-sm font-medium text-gray-700 mb-1">Background Image <span className="text-red-500">*</span></label>
                     <div className="flex gap-2">
                       <input type="text" value={form.image} onChange={e => set("image", e.target.value)}
-                        placeholder="Paste image URL or pick from Media Library…"
+                        placeholder="Paste image URL or pick/upload…"
                         className={`flex-1 ${inputCls}`} data-testid="input-slide-image" />
+                      <button type="button" onClick={() => uploadRef.current?.click()} disabled={uploading}
+                        data-testid="btn-upload-image"
+                        className="shrink-0 flex items-center gap-1.5 px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed">
+                        {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                        {uploading ? "Uploading…" : "Upload"}
+                      </button>
                       <button type="button" onClick={() => setShowPicker(true)} data-testid="btn-pick-image"
                         className="shrink-0 flex items-center gap-1.5 px-3 py-2 border border-gray-200 rounded-lg text-sm hover:bg-gray-50 text-gray-600">
                         <ImageIcon className="w-4 h-4" /> Pick
                       </button>
                     </div>
-                    <p className="text-[10px] text-gray-400 mt-1">Recommended: 1920×1080 or wider. The preview above updates as you type.</p>
+                    <input ref={uploadRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif"
+                      onChange={handleImageUpload} className="hidden" data-testid="input-slide-file-upload" />
+                    {uploadError && <p className="text-xs text-red-600 mt-1">{uploadError}</p>}
+                    <p className="text-[10px] text-gray-400 mt-1">Recommended: 1920×1080 or wider. Upload a new file or paste a URL.</p>
                   </div>
                 </>
               )}
