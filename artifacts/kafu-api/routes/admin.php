@@ -2317,6 +2317,7 @@ Route::prefix('admin')->group(function () {
         Route::put('/{id}', [\App\Http\Controllers\NoticesController::class, 'update']);
         Route::delete('/{id}', [\App\Http\Controllers\NoticesController::class, 'destroy']);
         Route::post('/upload', [\App\Http\Controllers\NoticesController::class, 'upload']);
+        Route::post('/upload-image', [\App\Http\Controllers\NoticesController::class, 'uploadImage']);
     });
 
 });

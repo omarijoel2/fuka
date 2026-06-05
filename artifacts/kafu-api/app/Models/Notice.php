@@ -13,6 +13,7 @@ class Notice extends Model
         'file_url',
         'file_name',
         'file_size',
+        'cover_image_url',
         'issued_date',
         'is_active',
     ];

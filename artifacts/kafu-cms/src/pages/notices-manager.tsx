@@ -5,7 +5,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, Pencil, Trash2, Download, Upload, X, AlertCircle } from "lucide-react";
+import { Plus, Pencil, Trash2, Download, Upload, X, AlertCircle, Image, FileText } from "lucide-react";
 
 const API = import.meta.env.BASE_URL.replace(/\/$/, "");
 
@@ -19,6 +19,7 @@ interface Notice {
   file_url: string | null;
   file_name: string | null;
   file_size: string | null;
+  cover_image_url: string | null;
   issued_date: string;
   is_active: boolean;
 }
@@ -30,6 +31,7 @@ const BLANK: Omit<Notice, "id"> = {
   file_url: null,
   file_name: null,
   file_size: null,
+  cover_image_url: null,
   issued_date: new Date().toISOString().slice(0, 10),
   is_active: true,
 };
@@ -67,7 +69,9 @@ export default function NoticesManagerPage() {
   const [form, setForm] = useState<Omit<Notice, "id">>(BLANK);
   const [deleteId, setDeleteId] = useState<number | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState("");
+  const [imageUploadError, setImageUploadError] = useState("");
   const [saveError, setSaveError] = useState("");
 
   const { data: notices = [], isLoading } = useQuery<Notice[]>({
@@ -119,13 +123,27 @@ export default function NoticesManagerPage() {
   function openAdd() {
     setForm(BLANK);
     setSaveError("");
+    setUploadError("");
+    setImageUploadError("");
     setModal("add");
   }
 
   function openEdit(n: Notice) {
     setEditing(n);
-    setForm({ title: n.title, description: n.description ?? "", category: n.category, file_url: n.file_url, file_name: n.file_name, file_size: n.file_size, issued_date: n.issued_date, is_active: n.is_active });
+    setForm({
+      title: n.title,
+      description: n.description ?? "",
+      category: n.category,
+      file_url: n.file_url,
+      file_name: n.file_name,
+      file_size: n.file_size,
+      cover_image_url: n.cover_image_url,
+      issued_date: n.issued_date,
+      is_active: n.is_active,
+    });
     setSaveError("");
+    setUploadError("");
+    setImageUploadError("");
     setModal("edit");
   }
 
@@ -133,6 +151,7 @@ export default function NoticesManagerPage() {
     setModal(null);
     setEditing(null);
     setUploadError("");
+    setImageUploadError("");
     setSaveError("");
   }
 
@@ -164,6 +183,30 @@ export default function NoticesManagerPage() {
       setUploadError("Upload failed. Ensure file is PDF/DOC/XLS under 20 MB.");
     } finally {
       setUploading(false);
+      e.target.value = "";
+    }
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageUploadError("");
+    setUploadingImage(true);
+    try {
+      const fd = new FormData();
+      fd.append("image", file);
+      const res = await fetch(`${API}/api/admin/notices/upload-image`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      });
+      if (!res.ok) throw new Error("Upload failed");
+      const { url } = await res.json();
+      setForm((f) => ({ ...f, cover_image_url: url }));
+    } catch {
+      setImageUploadError("Upload failed. Ensure image is JPG/PNG/WebP under 5 MB.");
+    } finally {
+      setUploadingImage(false);
       e.target.value = "";
     }
   }
@@ -200,7 +243,7 @@ export default function NoticesManagerPage() {
                   <th className="text-left px-4 py-3 font-semibold text-muted-foreground">Title</th>
                   <th className="text-left px-4 py-3 font-semibold text-muted-foreground w-28">Category</th>
                   <th className="text-left px-4 py-3 font-semibold text-muted-foreground w-32">Date Issued</th>
-                  <th className="text-left px-4 py-3 font-semibold text-muted-foreground w-20">File</th>
+                  <th className="text-left px-4 py-3 font-semibold text-muted-foreground w-24">Attachments</th>
                   <th className="text-left px-4 py-3 font-semibold text-muted-foreground w-20">Status</th>
                   <th className="w-20 px-4 py-3" />
                 </tr>
@@ -209,8 +252,19 @@ export default function NoticesManagerPage() {
                 {notices.map((n) => (
                   <tr key={n.id} className="hover:bg-muted/30 transition-colors">
                     <td className="px-4 py-3">
-                      <p className="font-medium line-clamp-1">{n.title}</p>
-                      {n.description && <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{n.description}</p>}
+                      <div className="flex items-center gap-3">
+                        {n.cover_image_url && (
+                          <img
+                            src={n.cover_image_url}
+                            alt=""
+                            className="w-10 h-10 rounded object-cover shrink-0 border"
+                          />
+                        )}
+                        <div className="min-w-0">
+                          <p className="font-medium line-clamp-1">{n.title}</p>
+                          {n.description && <p className="text-xs text-muted-foreground line-clamp-1 mt-0.5">{n.description}</p>}
+                        </div>
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold capitalize ${CATEGORY_COLORS[n.category]}`}>
@@ -221,13 +275,21 @@ export default function NoticesManagerPage() {
                       {new Date(n.issued_date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                     </td>
                     <td className="px-4 py-3">
-                      {n.file_url ? (
-                        <a href={n.file_url} target="_blank" rel="noopener noreferrer" className="text-[#1A5C38] hover:underline flex items-center gap-1 text-xs" data-testid={`notice-file-${n.id}`}>
-                          <Download className="w-3.5 h-3.5" /> {n.file_size ?? "View"}
-                        </a>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {n.file_url && (
+                          <a href={n.file_url} target="_blank" rel="noopener noreferrer" className="text-[#1A5C38] hover:underline flex items-center gap-1 text-xs" data-testid={`notice-file-${n.id}`}>
+                            <FileText className="w-3.5 h-3.5" /> {n.file_size ?? "Doc"}
+                          </a>
+                        )}
+                        {n.cover_image_url && (
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Image className="w-3.5 h-3.5" /> Img
+                          </span>
+                        )}
+                        {!n.file_url && !n.cover_image_url && (
+                          <span className="text-xs text-muted-foreground">—</span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
                       <span className={`inline-block px-2 py-0.5 rounded text-xs font-semibold ${n.is_active ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
@@ -255,7 +317,7 @@ export default function NoticesManagerPage() {
       {/* ─── Add / Edit Modal ─── */}
       {modal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-lg font-bold font-serif">{modal === "add" ? "Add Notice" : "Edit Notice"}</h2>
               <button onClick={closeModal} className="text-muted-foreground hover:text-foreground" data-testid="btn-modal-close"><X className="w-5 h-5" /></button>
@@ -290,6 +352,44 @@ export default function NoticesManagerPage() {
                 <Textarea value={form.description ?? ""} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={2} placeholder="Brief summary (optional)" data-testid="input-notice-description" />
               </div>
 
+              {/* Cover Image */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Cover Image</label>
+                {form.cover_image_url ? (
+                  <div className="relative rounded-lg overflow-hidden border aspect-video bg-muted/30">
+                    <img src={form.cover_image_url} alt="Cover" className="w-full h-full object-cover" />
+                    <button
+                      onClick={() => setForm({ ...form, cover_image_url: null })}
+                      className="absolute top-2 right-2 w-7 h-7 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-colors"
+                      data-testid="btn-remove-cover-image"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ) : (
+                  <label
+                    className="flex flex-col items-center justify-center gap-2 px-4 py-6 border-2 border-dashed rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/40 transition-colors"
+                    data-testid="label-upload-image"
+                  >
+                    <Image className="w-6 h-6 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground text-center">
+                      {uploadingImage ? "Uploading..." : "Click to upload cover image"}
+                    </span>
+                    <span className="text-xs text-muted-foreground">JPG, PNG, WebP — max 5 MB</span>
+                    <input
+                      type="file"
+                      accept=".jpg,.jpeg,.png,.webp,.gif"
+                      onChange={handleImageUpload}
+                      className="hidden"
+                      disabled={uploadingImage}
+                      data-testid="input-image-upload"
+                    />
+                  </label>
+                )}
+                {imageUploadError && <p className="text-xs text-destructive mt-1">{imageUploadError}</p>}
+              </div>
+
+              {/* Document Attachment */}
               <div>
                 <label className="block text-sm font-medium mb-1">Attachment (PDF / DOC / XLS)</label>
                 {form.file_url ? (
@@ -310,7 +410,7 @@ export default function NoticesManagerPage() {
                 ) : (
                   <label className="flex items-center gap-2 px-4 py-2.5 border-2 border-dashed rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/40 transition-colors" data-testid="label-upload-file">
                     <Upload className="w-4 h-4 text-muted-foreground shrink-0" />
-                    <span className="text-sm text-muted-foreground">{uploading ? "Uploading..." : "Click to upload file"}</span>
+                    <span className="text-sm text-muted-foreground">{uploading ? "Uploading..." : "Click to upload document"}</span>
                     <input type="file" accept=".pdf,.doc,.docx,.xls,.xlsx" onChange={handleFileUpload} className="hidden" disabled={uploading} data-testid="input-file-upload" />
                   </label>
                 )}
@@ -327,7 +427,7 @@ export default function NoticesManagerPage() {
 
             <div className="flex justify-end gap-3 mt-6">
               <Button variant="outline" onClick={closeModal} data-testid="btn-modal-cancel">Cancel</Button>
-              <Button onClick={handleSave} disabled={isBusy || uploading} className="bg-[#1A5C38] hover:bg-[#154a2d] text-white" data-testid="btn-modal-save">
+              <Button onClick={handleSave} disabled={isBusy || uploading || uploadingImage} className="bg-[#1A5C38] hover:bg-[#154a2d] text-white" data-testid="btn-modal-save">
                 {isBusy ? "Saving..." : modal === "add" ? "Add Notice" : "Save Changes"}
               </Button>
             </div>
