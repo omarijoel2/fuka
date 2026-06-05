@@ -8,7 +8,8 @@ use App\Models\CmsContent;
 
 if (!function_exists('mapHeroSlide')) {
 function mapHeroSlide(CmsContent $item): array {
-    $sd = is_string($item->structured_data) ? json_decode($item->structured_data, true) : ($item->structured_data ?? []);
+    $sd = $item->structured_data ?? [];
+    if (is_string($sd)) $sd = json_decode($sd, true) ?? [];
     return [
         'id'              => $item->id,
         'headline'        => $item->title,
@@ -5240,7 +5241,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin/hero-slides')->group(function
     // Create new slide
     Route::post('/', function (Request $request) {
         try {
-            $sd = json_encode([
+            $sd = [
                 'accent'          => $request->input('accent', ''),
                 'badge'           => $request->input('badge', ''),
                 'cta1_label'      => $request->input('cta1_label', 'Learn More'),
@@ -5251,7 +5252,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin/hero-slides')->group(function
                 'cta2_external'   => (bool)$request->input('cta2_external', false),
                 'object_position' => $request->input('object_position', 'center center'),
                 'sort_order'      => (int)$request->input('sort_order', 99),
-            ]);
+            ];
             $item = CmsContent::create([
                 'type'            => 'hero_slide',
                 'title'           => $request->input('headline', 'New Slide'),
@@ -5278,8 +5279,9 @@ Route::middleware(['auth:sanctum'])->prefix('admin/hero-slides')->group(function
     Route::put('/{id}', function (Request $request, int $id) {
         try {
             $item = CmsContent::where('type', 'hero_slide')->where('is_deleted', false)->findOrFail($id);
-            $sdOld = is_string($item->structured_data) ? json_decode($item->structured_data, true) : ($item->structured_data ?? []);
-            $sd = json_encode([
+            $sdOld = $item->structured_data ?? [];
+            if (is_string($sdOld)) $sdOld = json_decode($sdOld, true) ?? [];
+            $sd = [
                 'accent'          => $request->input('accent', $sdOld['accent'] ?? ''),
                 'badge'           => $request->input('badge', $sdOld['badge'] ?? ''),
                 'cta1_label'      => $request->input('cta1_label', $sdOld['cta1_label'] ?? 'Learn More'),
@@ -5290,7 +5292,7 @@ Route::middleware(['auth:sanctum'])->prefix('admin/hero-slides')->group(function
                 'cta2_external'   => (bool)$request->input('cta2_external', $sdOld['cta2_external'] ?? false),
                 'object_position' => $request->input('object_position', $sdOld['object_position'] ?? 'center center'),
                 'sort_order'      => (int)$request->input('sort_order', $sdOld['sort_order'] ?? 0),
-            ]);
+            ];
             $item->update([
                 'title'           => $request->input('headline', $item->title),
                 'summary'         => $request->input('body', $item->summary),
@@ -5322,9 +5324,10 @@ Route::middleware(['auth:sanctum'])->prefix('admin/hero-slides')->group(function
             foreach ($request->input('order', []) as $position => $id) {
                 $item = CmsContent::where('type', 'hero_slide')->find($id);
                 if (!$item) continue;
-                $sd = is_string($item->structured_data) ? json_decode($item->structured_data, true) : ($item->structured_data ?? []);
+                $sd = $item->structured_data ?? [];
+                if (is_string($sd)) $sd = json_decode($sd, true) ?? [];
                 $sd['sort_order'] = $position;
-                $item->update(['structured_data' => json_encode($sd)]);
+                $item->update(['structured_data' => $sd]);
             }
             return response()->json(['message' => 'Reordered']);
         } catch (\Throwable $e) {
