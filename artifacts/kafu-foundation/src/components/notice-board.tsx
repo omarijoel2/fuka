@@ -12,6 +12,7 @@ interface Notice {
   file_url: string | null;
   file_name: string | null;
   file_size: string | null;
+  cover_image_url: string | null;
   issued_date: string;
   is_active: boolean;
 }
@@ -100,39 +101,58 @@ export function NoticeBoardSection() {
               return (
                 <div
                   key={notice.id}
-                  className="group flex items-start gap-4 p-4 rounded-lg border bg-card hover:border-primary/30 hover:shadow-sm transition-all"
+                  className="group flex items-start gap-0 rounded-lg border bg-card hover:border-primary/30 hover:shadow-sm transition-all overflow-hidden"
                   data-testid={`notice-item-${notice.id}`}
                 >
-                  <div className="shrink-0 mt-0.5">
-                    <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded border text-xs font-semibold ${meta.color} ${meta.bg}`}>
-                      {meta.icon}
-                      {meta.label}
+                  {/* Cover image strip */}
+                  {notice.cover_image_url && (
+                    <div className="w-20 shrink-0 self-stretch overflow-hidden">
+                      <img
+                        src={notice.cover_image_url}
+                        alt=""
+                        aria-hidden="true"
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
-                      {notice.title}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {new Date(notice.issued_date).toLocaleDateString("en-GB", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </p>
-                  </div>
-                  {notice.file_url && (
-                    <a
-                      href={notice.file_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="shrink-0 flex items-center gap-1 text-xs text-primary font-medium hover:underline mt-0.5"
-                      data-testid={`notice-download-${notice.id}`}
-                    >
-                      <Download className="w-3.5 h-3.5" />
-                      {notice.file_size ?? "Download"}
-                    </a>
                   )}
+
+                  <div className="flex items-start gap-3 p-4 flex-1 min-w-0">
+                    {/* Category badge */}
+                    <div className="shrink-0 mt-0.5">
+                      <div className={`inline-flex items-center gap-1.5 px-2 py-1 rounded border text-xs font-semibold ${meta.color} ${meta.bg}`}>
+                        {meta.icon}
+                        {meta.label}
+                      </div>
+                    </div>
+
+                    {/* Title + date */}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug">
+                        {notice.title}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {new Date(notice.issued_date).toLocaleDateString("en-GB", {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </p>
+                    </div>
+
+                    {/* Download link */}
+                    {notice.file_url && (
+                      <a
+                        href={notice.file_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="shrink-0 flex items-center gap-1 text-xs text-primary font-medium hover:underline mt-0.5"
+                        data-testid={`notice-download-${notice.id}`}
+                      >
+                        <Download className="w-3.5 h-3.5" />
+                        {notice.file_size ?? "Download"}
+                      </a>
+                    )}
+                  </div>
                 </div>
               );
             })}

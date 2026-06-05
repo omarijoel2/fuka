@@ -119,6 +119,7 @@ function mapCmsAnnouncement(CmsContent $item): array {
         'summary'      => $item->summary ?? '',
         'tags'         => $item->tags ?? [],
         'status'       => 'active',
+        'imageUrl'     => $item->featured_image ?: null,
     ];
 }
 }

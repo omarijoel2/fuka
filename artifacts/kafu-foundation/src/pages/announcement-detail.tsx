@@ -96,6 +96,17 @@ export default function AnnouncementDetail() {
               </div>
             </div>
 
+            {/* Featured image */}
+            {announcement.imageUrl && (
+              <div className="relative h-56 md:h-72 rounded-2xl overflow-hidden mb-8 bg-muted">
+                <img
+                  src={announcement.imageUrl}
+                  alt={announcement.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+
             {/* Summary callout */}
             <div className={`p-4 rounded-xl border-l-4 mb-8 ${isUrgent ? "bg-red-50 border-red-500 text-red-800" : "bg-primary/5 border-primary text-foreground"}`}>
               <p className="text-sm leading-relaxed font-medium">{announcement.summary}</p>

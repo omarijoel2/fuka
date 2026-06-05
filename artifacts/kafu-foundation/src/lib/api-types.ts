@@ -82,6 +82,7 @@ export interface Announcement {
   summary: string;
   tags: string[];
   status: "active" | "archived";
+  imageUrl?: string | null;
 }
 
 export interface AnnouncementDetail extends Announcement {

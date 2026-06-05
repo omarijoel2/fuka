@@ -116,8 +116,13 @@ export default function Announcements() {
                 <div className="space-y-3">
                   {urgent.map((ann) => (
                     <Link key={ann.id} href={`/announcements/${ann.slug}`} data-testid={`announcement-card-${ann.id}`}>
-                      <div className="group bg-red-50 border border-red-200 rounded-xl p-5 hover:border-red-400 hover:shadow-md transition-all">
-                        <div className="flex items-start justify-between gap-4">
+                      <div className="group bg-red-50 border border-red-200 rounded-xl overflow-hidden hover:border-red-400 hover:shadow-md transition-all">
+                        {ann.imageUrl && (
+                          <div className="h-40 overflow-hidden">
+                            <img src={ann.imageUrl} alt={ann.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          </div>
+                        )}
+                        <div className="flex items-start justify-between gap-4 p-5">
                           <div className="flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2 mb-2">
                               <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider flex items-center gap-1">
@@ -156,8 +161,13 @@ export default function Announcements() {
                 <div className="space-y-3">
                   {normal.map((ann) => (
                     <Link key={ann.id} href={`/announcements/${ann.slug}`} data-testid={`announcement-card-${ann.id}`}>
-                      <div className="group bg-card border rounded-xl p-5 hover:border-primary hover:shadow-md transition-all">
-                        <div className="flex items-start justify-between gap-4">
+                      <div className="group bg-card border rounded-xl overflow-hidden hover:border-primary hover:shadow-md transition-all">
+                        {ann.imageUrl && (
+                          <div className="h-40 overflow-hidden">
+                            <img src={ann.imageUrl} alt={ann.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          </div>
+                        )}
+                        <div className="flex items-start justify-between gap-4 p-5">
                           <div className="flex-1 min-w-0">
                             <div className="flex flex-wrap items-center gap-2 mb-2">
                               <span className="text-xs text-muted-foreground font-semibold bg-secondary px-2 py-0.5 rounded">
