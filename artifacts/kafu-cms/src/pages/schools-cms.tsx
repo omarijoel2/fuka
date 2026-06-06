@@ -4,6 +4,8 @@ import {
   Plus, Pencil, Trash2, X, GraduationCap, Loader2,
   BookOpen, Users, FlaskConical,
 } from "lucide-react";
+import PhotoUploadField from "@/components/photo-upload-field";
+import { PhotoBrowserModal } from "@/components/photo-browser-modal";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface School {
@@ -60,6 +62,7 @@ function SchoolModal({ school, onClose, onSaved }: {
   const [tab, setTab] = useState<Tab>("basic");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [showBrowser, setShowBrowser] = useState(false);
 
   function set(k: string, v: string | number | object) {
     setForm(f => ({ ...f, [k]: v }));
@@ -93,6 +96,7 @@ function SchoolModal({ school, onClose, onSaved }: {
   ];
 
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 overflow-y-auto py-8 px-4">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl">
         <div className="flex items-center justify-between px-6 py-4 border-b">
@@ -113,7 +117,7 @@ function SchoolModal({ school, onClose, onSaved }: {
           ))}
         </div>
 
-        <form onSubmit={save} className="p-6 space-y-4">
+        <form onSubmit={save} className="p-6 space-y-4" data-testid="school-form">
           {error && <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">{error}</p>}
 
           {tab === "basic" && (
@@ -178,10 +182,19 @@ function SchoolModal({ school, onClose, onSaved }: {
                     placeholder="Dean, School of Computing & IT" className={inputCls} data-testid="school-dean-title" />
                 </FormField>
               </div>
-              <FormField label="Dean's Photo URL" hint="Direct image URL — ideally 300×300">
-                <input value={form.dean_photo ?? ""} onChange={e => set("dean_photo", e.target.value)}
-                  placeholder="https://kafu.ac.ke/wp-content/uploads/…" className={inputCls} data-testid="school-dean-photo" />
-              </FormField>
+              <div className="space-y-2">
+                <PhotoUploadField
+                  value={form.dean_photo ?? ""}
+                  onChange={url => set("dean_photo", url)}
+                  personName={form.dean ?? ""}
+                  endpoint="/governance-photo"
+                />
+                <button type="button" onClick={() => setShowBrowser(true)}
+                  data-testid="school-dean-browse-library"
+                  className="text-xs text-[#1A5C38] underline hover:no-underline">
+                  Browse media library
+                </button>
+              </div>
               {form.dean_photo && (
                 <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
                   <img src={form.dean_photo} alt="Dean preview"
@@ -241,6 +254,14 @@ function SchoolModal({ school, onClose, onSaved }: {
         </form>
       </div>
     </div>
+    {showBrowser && (
+      <PhotoBrowserModal
+        onSelect={url => { set("dean_photo", url); setShowBrowser(false); }}
+        onClose={() => setShowBrowser(false)}
+        title="Select Dean's Photo"
+      />
+    )}
+    </>
   );
 }
 
@@ -407,6 +428,7 @@ export default function SchoolsCmsPage() {
         <SchoolModal school={modal} onClose={() => setModal(undefined)}
           onSaved={() => { setModal(undefined); load(); }} />
       )}
+      {/* PhotoBrowserModal is rendered inside SchoolModal via showBrowser state */}
     </div>
   );
 }

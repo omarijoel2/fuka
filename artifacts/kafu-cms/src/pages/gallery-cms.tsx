@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { apiFetch, apiGet } from "@/lib/api";
+import { PhotoBrowserModal } from "@/components/photo-browser-modal";
 import {
   Plus, Pencil, Trash2, X, Camera, Play, ArrowLeft, Search,
   Loader2, Image as ImageIcon, CheckCircle2, Grid, List,
@@ -273,7 +274,7 @@ function AlbumModal({ album, onClose, onSaved }: {
         </div>
       </div>
       {showPicker && (
-        <MediaPickerModal onClose={() => setShowPicker(false)} onPick={url => { set("cover_image_url", url); setShowPicker(false); }} />
+        <PhotoBrowserModal onClose={() => setShowPicker(false)} onSelect={url => { set("cover_image_url", url); setShowPicker(false); }} title="Select Cover Image" />
       )}
     </>
   );
@@ -401,7 +402,7 @@ function ItemModal({ item, albumId, onClose, onSaved }: {
         </div>
       </div>
       {showPicker && (
-        <MediaPickerModal onClose={() => setShowPicker(false)} onPick={url => { set("media_url", url); setShowPicker(false); }} />
+        <PhotoBrowserModal onClose={() => setShowPicker(false)} onSelect={url => { set("media_url", url); setShowPicker(false); }} title="Select Image" />
       )}
     </>
   );

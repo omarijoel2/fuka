@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
 import { Plus, Pencil, Trash2, X, Building2, ChevronRight } from "lucide-react";
+import PhotoUploadField from "@/components/photo-upload-field";
+import { PhotoBrowserModal } from "@/components/photo-browser-modal";
 
 interface Department {
   id: number;
@@ -62,6 +64,7 @@ function DeptModal({ dept, onClose, onSaved }: { dept: Partial<Department> | nul
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [tab, setTab] = useState<"basic" | "hod" | "contact">("basic");
+  const [showBrowser, setShowBrowser] = useState(false);
 
   function set(k: string, v: string | boolean | number) { setForm(f => ({ ...f, [k]: v })); }
 
@@ -85,6 +88,7 @@ function DeptModal({ dept, onClose, onSaved }: { dept: Partial<Department> | nul
   ] as const;
 
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 overflow-y-auto py-8">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl mx-4">
         <div className="flex items-center justify-between px-6 py-4 border-b">
@@ -106,7 +110,7 @@ function DeptModal({ dept, onClose, onSaved }: { dept: Partial<Department> | nul
           ))}
         </div>
 
-        <form onSubmit={save} className="p-6 space-y-4">
+        <form onSubmit={save} className="p-6 space-y-4" data-testid="dept-form">
           {error && <p className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">{error}</p>}
 
           {tab === "basic" && (
@@ -170,10 +174,19 @@ function DeptModal({ dept, onClose, onSaved }: { dept: Partial<Department> | nul
                     placeholder="+254 700 000 000" className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="hod-phone" />
                 </FormField>
               </div>
-              <FormField label="HOD Photo URL">
-                <input value={form.hod_photo_url ?? ""} onChange={e => set("hod_photo_url", e.target.value)}
-                  placeholder="https://..." className="w-full border rounded-lg px-3 py-2 text-sm" data-testid="hod-photo" />
-              </FormField>
+              <div className="space-y-2">
+                <PhotoUploadField
+                  value={form.hod_photo_url ?? ""}
+                  onChange={url => set("hod_photo_url", url)}
+                  personName={form.hod_name ?? ""}
+                  endpoint="/governance-photo"
+                />
+                <button type="button" onClick={() => setShowBrowser(true)}
+                  data-testid="hod-browse-library"
+                  className="text-xs text-[#1A5C38] underline hover:no-underline">
+                  Browse media library
+                </button>
+              </div>
               {form.hod_photo_url && (
                 <img src={form.hod_photo_url} alt="HOD Preview" className="w-20 h-20 rounded-xl object-cover" />
               )}
@@ -231,6 +244,14 @@ function DeptModal({ dept, onClose, onSaved }: { dept: Partial<Department> | nul
         </form>
       </div>
     </div>
+    {showBrowser && (
+      <PhotoBrowserModal
+        onSelect={url => { set("hod_photo_url", url); setShowBrowser(false); }}
+        onClose={() => setShowBrowser(false)}
+        title="Select HOD Photo"
+      />
+    )}
+    </>
   );
 }
 
