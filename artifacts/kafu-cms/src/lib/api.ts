@@ -136,6 +136,7 @@ export const STATUS_COLORS: Record<WorkflowStatus, string> = {
 export const CONTENT_TYPE_LABELS: Record<string, string> = {
   page: "Page",
   news: "News",
+  article: "Article",
   event: "Event",
   announcement: "Announcement",
   opportunity: "Opportunity",

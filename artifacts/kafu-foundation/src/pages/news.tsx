@@ -113,7 +113,7 @@ export default function News() {
           <>
             {/* Featured Article */}
             {featured && category === "All" && !debouncedSearch && (
-              <Link href={`/news/${featured.slug}`} data-testid={`news-featured-${featured.id}`}>
+              <Link href={featured.content_type === "article" ? `/articles/${featured.slug}` : `/news/${featured.slug}`} data-testid={`news-featured-${featured.id}`}>
                 <div className="mb-10 group rounded-2xl overflow-hidden border bg-card shadow-sm hover:shadow-lg hover:border-primary/30 transition-all flex flex-col md:flex-row">
                   <div className="md:w-5/12 h-56 md:h-auto overflow-hidden bg-primary/5">
                     {featured.imageUrl ? (
@@ -160,7 +160,7 @@ export default function News() {
               {(category !== "All" || debouncedSearch ? articles : rest)?.map((article) => (
                 <Link
                   key={article.id}
-                  href={`/news/${article.slug}`}
+                  href={article.content_type === "article" ? `/articles/${article.slug}` : `/news/${article.slug}`}
                   data-testid={`news-card-${article.id}`}
                 >
                   <div className="group h-full flex flex-col rounded-xl border bg-card overflow-hidden hover:shadow-md hover:border-primary/30 transition-all">

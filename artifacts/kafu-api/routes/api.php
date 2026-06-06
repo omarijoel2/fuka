@@ -38,9 +38,10 @@ function mapCmsNews(CmsContent $item): array {
         'category' => $item->category ?? 'General',
         'author'   => $item->author?->name ?? 'KAFU Communications Office',
         'date'     => $item->published_at?->format('Y-m-d') ?? $item->created_at->format('Y-m-d'),
-        'imageUrl' => $item->featured_image ?: null,
-        'tags'     => $item->tags ?? [],
-        'featured' => (bool)$item->featured,
+        'imageUrl'     => $item->featured_image ?: null,
+        'tags'         => $item->tags ?? [],
+        'featured'     => (bool)$item->featured,
+        'content_type' => 'news',
     ];
 }
 }
@@ -70,6 +71,37 @@ function mapCmsNewsDetail(CmsContent $item): array {
         $a['url'] = normalizeAttachmentUrl($a['url'] ?? '');
         return $a;
     }, $sd['attachments'] ?? []);
+    return $base;
+}
+}
+
+if (!function_exists('mapCmsArticle')) {
+function mapCmsArticle(CmsContent $item): array {
+    $sd = $item->structured_data ?? [];
+    return [
+        'id'                 => $item->id,
+        'slug'               => $item->slug,
+        'title'              => $item->title,
+        'excerpt'            => $item->summary,
+        'summary'            => $item->summary,
+        'category'           => $item->category ?? 'General',
+        'author'             => $item->author?->name ?? 'KAFU Communications Office',
+        'date'               => $item->published_at?->format('Y-m-d') ?? $item->created_at->format('Y-m-d'),
+        'imageUrl'           => $item->featured_image ?: null,
+        'tags'               => $item->tags ?? [],
+        'featured'           => (bool)$item->featured,
+        'content_type'       => 'article',
+        'gallery_album_slug' => $sd['gallery_album_slug'] ?? null,
+    ];
+}
+}
+
+if (!function_exists('mapCmsArticleDetail')) {
+function mapCmsArticleDetail(CmsContent $item): array {
+    $base            = mapCmsArticle($item);
+    $sd              = $item->structured_data ?? [];
+    $base['blocks']  = $sd['blocks'] ?? [];
+    $base['content'] = $item->body ?? '';
     return $base;
 }
 }
@@ -632,7 +664,7 @@ Route::get('/gallery/albums/{slug}', function (string $slug) {
 
 Route::get('/news', function (Request $request) {
     try {
-        $query = CmsContent::where('type', 'news')
+        $query = CmsContent::whereIn('type', ['news', 'article'])
             ->where('status', 'published')
             ->where('is_deleted', false)
             ->orderByDesc('published_at');
@@ -648,7 +680,7 @@ Route::get('/news', function (Request $request) {
             $query->where('featured', true);
         }
 
-        $items = $query->get()->map(fn($item) => mapCmsNews($item))->toArray();
+        $items = $query->get()->map(fn($item) => $item->type === 'article' ? mapCmsArticle($item) : mapCmsNews($item))->toArray();
         return response()->json(['data' => $items]);
     } catch (\Throwable $e) {
         return response()->json(['data' => []]);
@@ -657,7 +689,7 @@ Route::get('/news', function (Request $request) {
 
 Route::get('/news/{slug}', function (string $slug) {
     try {
-        $item = CmsContent::where('type', 'news')
+        $item = CmsContent::whereIn('type', ['news', 'article'])
             ->where('slug', $slug)
             ->where('status', 'published')
             ->where('is_deleted', false)
@@ -665,7 +697,23 @@ Route::get('/news/{slug}', function (string $slug) {
         if (!$item) {
             return response()->json(['error' => 'Article not found'], 404);
         }
-        return response()->json(['data' => mapCmsNewsDetail($item)]);
+        return response()->json(['data' => $item->type === 'article' ? mapCmsArticleDetail($item) : mapCmsNewsDetail($item)]);
+    } catch (\Throwable $e) {
+        return response()->json(['error' => 'Article not found'], 404);
+    }
+});
+
+Route::get('/articles/{slug}', function (string $slug) {
+    try {
+        $item = CmsContent::where('type', 'article')
+            ->where('slug', $slug)
+            ->where('status', 'published')
+            ->where('is_deleted', false)
+            ->first();
+        if (!$item) {
+            return response()->json(['error' => 'Article not found'], 404);
+        }
+        return response()->json(['data' => mapCmsArticleDetail($item)]);
     } catch (\Throwable $e) {
         return response()->json(['error' => 'Article not found'], 404);
     }
@@ -5418,3 +5466,229 @@ Route::get('/branding', function () {
 // ─── Notices (public) ────────────────────────────────────────────────────────
 Route::get('/notices', [\App\Http\Controllers\NoticesController::class, 'index']);
 Route::get('/notices/{id}', [\App\Http\Controllers\NoticesController::class, 'show']);
+
+// ─── Articles admin CRUD ──────────────────────────────────────────────────────
+Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
+
+    Route::get('/articles', function (Request $request) {
+        $q = CmsContent::where('type', 'article')
+            ->where('is_deleted', false)
+            ->with('author')
+            ->orderByDesc('created_at');
+        if ($request->query('status')) {
+            $q->where('status', $request->query('status'));
+        }
+        return response()->json(['data' => $q->get()->map(function ($item) {
+            $sd = $item->structured_data ?? [];
+            return [
+                'id'              => $item->id,
+                'title'           => $item->title,
+                'slug'            => $item->slug,
+                'summary'         => $item->summary,
+                'category'        => $item->category,
+                'featured_image'  => $item->featured_image,
+                'tags'            => $item->tags ?? [],
+                'featured'        => (bool)$item->featured,
+                'status'          => $item->status,
+                'structured_data' => $sd,
+                'blocks'          => $sd['blocks'] ?? [],
+                'published_at'    => $item->published_at,
+                'created_at'      => $item->created_at,
+                'updated_at'      => $item->updated_at,
+            ];
+        })]);
+    });
+
+    Route::post('/articles', function (Request $request) {
+        $data = $request->validate([
+            'title'           => 'required|string|max:255',
+            'slug'            => 'required|string|unique:cms_content,slug',
+            'summary'         => 'nullable|string',
+            'body'            => 'nullable|string',
+            'category'        => 'nullable|string|max:100',
+            'featured_image'  => 'nullable|string',
+            'tags'            => 'nullable|array',
+            'featured'        => 'nullable|boolean',
+            'structured_data' => 'nullable|array',
+            'status'          => 'nullable|string',
+        ]);
+        $data['type']      = 'article';
+        $data['status']    = $data['status'] ?? 'draft';
+        $data['author_id'] = auth()->id();
+        if (!isset($data['structured_data'])) {
+            $data['structured_data'] = ['blocks' => []];
+        }
+        $item = CmsContent::create($data);
+        $sd   = $item->structured_data ?? [];
+        return response()->json(['data' => [
+            'id'              => $item->id,
+            'title'           => $item->title,
+            'slug'            => $item->slug,
+            'summary'         => $item->summary,
+            'category'        => $item->category,
+            'featured_image'  => $item->featured_image,
+            'tags'            => $item->tags ?? [],
+            'featured'        => (bool)$item->featured,
+            'status'          => $item->status,
+            'structured_data' => $sd,
+            'blocks'          => $sd['blocks'] ?? [],
+            'published_at'    => $item->published_at,
+            'created_at'      => $item->created_at,
+            'updated_at'      => $item->updated_at,
+        ]], 201);
+    });
+
+    Route::get('/articles/{id}', function (int $id) {
+        $item = CmsContent::where('type', 'article')->where('is_deleted', false)->findOrFail($id);
+        $sd   = $item->structured_data ?? [];
+        return response()->json(['data' => [
+            'id'              => $item->id,
+            'title'           => $item->title,
+            'slug'            => $item->slug,
+            'summary'         => $item->summary,
+            'body'            => $item->body,
+            'category'        => $item->category,
+            'featured_image'  => $item->featured_image,
+            'tags'            => $item->tags ?? [],
+            'featured'        => (bool)$item->featured,
+            'status'          => $item->status,
+            'structured_data' => $sd,
+            'blocks'          => $sd['blocks'] ?? [],
+            'published_at'    => $item->published_at,
+            'created_at'      => $item->created_at,
+            'updated_at'      => $item->updated_at,
+        ]]);
+    });
+
+    Route::put('/articles/{id}', function (Request $request, int $id) {
+        $item = CmsContent::where('type', 'article')->where('is_deleted', false)->findOrFail($id);
+        $data = $request->validate([
+            'title'           => 'sometimes|string|max:255',
+            'slug'            => 'sometimes|string|unique:cms_content,slug,' . $item->id,
+            'summary'         => 'nullable|string',
+            'body'            => 'nullable|string',
+            'category'        => 'nullable|string|max:100',
+            'featured_image'  => 'nullable|string',
+            'tags'            => 'nullable|array',
+            'featured'        => 'nullable|boolean',
+            'structured_data' => 'nullable|array',
+        ]);
+        $item->update($data);
+        $sd = $item->fresh()->structured_data ?? [];
+        return response()->json(['data' => [
+            'id'              => $item->id,
+            'title'           => $item->title,
+            'slug'            => $item->slug,
+            'summary'         => $item->summary,
+            'category'        => $item->category,
+            'featured_image'  => $item->featured_image,
+            'tags'            => $item->tags ?? [],
+            'featured'        => (bool)$item->featured,
+            'status'          => $item->status,
+            'structured_data' => $sd,
+            'blocks'          => $sd['blocks'] ?? [],
+            'published_at'    => $item->published_at,
+            'created_at'      => $item->created_at,
+            'updated_at'      => $item->updated_at,
+        ]]);
+    });
+
+    Route::delete('/articles/{id}', function (int $id) {
+        $item = CmsContent::where('type', 'article')->where('is_deleted', false)->findOrFail($id);
+        $item->update(['is_deleted' => true]);
+        return response()->json(['success' => true]);
+    });
+
+    Route::post('/articles/{id}/publish', function (Request $request, int $id) {
+        $item = CmsContent::where('type', 'article')->where('is_deleted', false)->findOrFail($id);
+        $sd     = $item->structured_data ?? [];
+        $blocks = $sd['blocks'] ?? [];
+
+        // Extract image blocks for auto-gallery creation
+        $imageBlocks = array_values(array_filter($blocks, fn($b) => ($b['type'] ?? '') === 'image' && !empty($b['url'])));
+
+        $galleryAlbumId   = $sd['gallery_album_id'] ?? null;
+        $galleryAlbumSlug = $sd['gallery_album_slug'] ?? null;
+
+        if (!empty($imageBlocks)) {
+            $albumSlug = $item->slug;
+            $album     = \App\Models\GalleryAlbum::firstOrNew(['slug' => $albumSlug]);
+            $album->title        = $item->title;
+            $album->slug         = $albumSlug;
+            $album->description  = $item->summary ?? '';
+            $album->category     = 'events';
+            $album->album_date   = $item->published_at ?? now();
+            $album->is_published = true;
+            if (empty($album->cover_image_url) && !empty($imageBlocks[0]['url'])) {
+                $album->cover_image_url = $imageBlocks[0]['url'];
+            }
+            $album->save();
+
+            // Remove items previously synced from this article
+            $album->items()->where('title', 'LIKE', '[article]%')->delete();
+
+            // Add fresh items
+            foreach ($imageBlocks as $i => $block) {
+                \App\Models\GalleryItem::create([
+                    'album_id'      => $album->id,
+                    'title'         => '[article] ' . ($block['caption'] ?? ($item->title . ' — Photo ' . ($i + 1))),
+                    'caption'       => $block['caption'] ?? '',
+                    'type'          => 'image',
+                    'media_url'     => $block['url'],
+                    'thumbnail_url' => $block['url'],
+                    'sort_order'    => $i,
+                    'is_published'  => true,
+                ]);
+            }
+
+            $galleryAlbumId   = $album->id;
+            $galleryAlbumSlug = $album->slug;
+        }
+
+        // Generate plain HTML body from blocks (for backward compat and RSS/SEO)
+        $html = '';
+        foreach ($blocks as $block) {
+            switch ($block['type'] ?? '') {
+                case 'paragraph':
+                    $html .= ($block['content'] ?? '') . "\n";
+                    break;
+                case 'heading':
+                    $lvl   = (int)($block['level'] ?? 2);
+                    $lvl   = max(2, min(6, $lvl));
+                    $html .= "<h{$lvl}>" . e($block['content'] ?? '') . "</h{$lvl}>\n";
+                    break;
+                case 'image':
+                    $url  = htmlspecialchars($block['url'] ?? '', ENT_QUOTES);
+                    $cap  = e($block['caption'] ?? '');
+                    $html .= "<figure><img src=\"{$url}\" alt=\"{$cap}\" />";
+                    if ($cap) $html .= "<figcaption>{$cap}</figcaption>";
+                    $html .= "</figure>\n";
+                    break;
+                case 'quote':
+                    $html .= '<blockquote><p>' . e($block['content'] ?? '') . '</p>';
+                    if (!empty($block['attribution'])) {
+                        $html .= '<cite>' . e($block['attribution']) . '</cite>';
+                    }
+                    $html .= "</blockquote>\n";
+                    break;
+            }
+        }
+
+        // Persist gallery info back to structured_data
+        $sd['gallery_album_id']   = $galleryAlbumId;
+        $sd['gallery_album_slug'] = $galleryAlbumSlug;
+
+        $item->update([
+            'status'          => 'published',
+            'body'            => $html,
+            'structured_data' => $sd,
+            'published_at'    => $item->published_at ?? now(),
+        ]);
+
+        return response()->json([
+            'success'            => true,
+            'gallery_album_slug' => $galleryAlbumSlug,
+            'message'            => 'Article published' . ($galleryAlbumSlug ? " and gallery album '{$galleryAlbumSlug}' synced." : '.'),
+        ]);
+    });
+});

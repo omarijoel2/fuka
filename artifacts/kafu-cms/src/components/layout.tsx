@@ -29,6 +29,7 @@ const navItems: NavItem[] = [
     children: [
       { label: "All Content", href: "/content" },
       { label: "News", href: "/content?type=news" },
+      { label: "Articles", href: "/articles" },
       { label: "Events", href: "/content?type=event" },
       { label: "Announcements", href: "/content?type=announcement" },
       { label: "Opportunities", href: "/content?type=opportunity" },

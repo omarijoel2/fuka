@@ -1,42 +1,12 @@
 import React, { useState } from "react";
 import { Link, useParams } from "wouter";
-import { useQuery } from "@tanstack/react-query";
-import { fetchApi } from "@/lib/api-types";
 import { Button } from "@/components/ui/button";
 import {
   Calendar, User, Tag, ChevronRight, ArrowLeft, Share2, Images, ChevronDown, ChevronUp,
 } from "lucide-react";
 import { SeoHead, SITE_URL, ORG_JSONLD } from "@/components/seo-head";
-import { resolveStorageUrl, useNews } from "@/lib/api-hooks";
-
-/* ── Types ─────────────────────────────────────────────────────────────────── */
-export interface ArticleBlock {
-  id: string;
-  type: "paragraph" | "heading" | "image" | "quote";
-  content?: string;
-  url?: string;
-  caption?: string;
-  level?: 2 | 3;
-  attribution?: string;
-}
-
-interface ArticleDetail {
-  id: number;
-  slug: string;
-  title: string;
-  excerpt: string;
-  summary: string;
-  category: string;
-  author: string;
-  date: string;
-  imageUrl?: string | null;
-  tags: string[];
-  featured: boolean;
-  blocks: ArticleBlock[];
-  content: string;
-  gallery_album_slug?: string | null;
-  content_type: string;
-}
+import { resolveStorageUrl, useNews, useArticle } from "@/lib/api-hooks";
+import type { ArticleBlock } from "@/lib/api-types";
 
 /* ── Helpers ────────────────────────────────────────────────────────────────── */
 function formatDate(d: string) {
@@ -155,11 +125,7 @@ export default function ArticleDetail() {
   const slug = params.slug ?? "";
   const [expanded, setExpanded] = useState(false);
 
-  const { data: article, isLoading, isError } = useQuery({
-    queryKey: ["article", slug],
-    queryFn: () => fetchApi<ArticleDetail>(`/articles/${slug}`),
-    enabled: !!slug,
-  });
+  const { data: article, isLoading, isError } = useArticle(slug);
 
   const { data: allNews } = useNews();
 

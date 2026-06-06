@@ -7,6 +7,16 @@ export interface Stat {
   value: number;
 }
 
+export interface ArticleBlock {
+  id: string;
+  type: "paragraph" | "heading" | "image" | "quote";
+  content?: string;
+  url?: string;
+  caption?: string;
+  level?: 2 | 3;
+  attribution?: string;
+}
+
 export interface NewsArticle {
   id: number;
   slug: string;
@@ -19,11 +29,32 @@ export interface NewsArticle {
   imageUrl?: string | null;
   tags: string[];
   featured: boolean;
+  content_type?: string;
+  gallery_album_slug?: string | null;
 }
 
 export interface NewsArticleDetail extends NewsArticle {
   content: string;
   related: number[];
+  blocks?: ArticleBlock[];
+}
+
+export interface ArticleDetail {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt: string;
+  summary: string;
+  category: string;
+  author: string;
+  date: string;
+  imageUrl?: string | null;
+  tags: string[];
+  featured: boolean;
+  blocks: ArticleBlock[];
+  content: string;
+  gallery_album_slug?: string | null;
+  content_type: string;
 }
 
 export interface ProgrammeCount {

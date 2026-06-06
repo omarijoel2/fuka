@@ -54,6 +54,7 @@ import BrandingSettingsPage from "@/pages/branding-settings";
 import GovernanceStrategicPlanPage from "@/pages/governance-strategic-plan";
 import GovernancePoliciesPage from "@/pages/governance-policies";
 import GovernanceServiceCharterPage from "@/pages/governance-service-charter";
+import ArticlesCmsPage from "@/pages/articles-cms";
 const NoticesManagerPage = lazy(() => import("./pages/notices-manager"));
 
 // ─── Role constants ───────────────────────────────────────────────────────────
@@ -101,6 +102,7 @@ function AppRoutes() {
         <Route path="/content" component={ContentLibraryPage} />
         <Route path="/content/new">{() => <ContentEditorPage />}</Route>
         <Route path="/content/:id">{(params: { id: string }) => <ContentEditorPage id={params.id} />}</Route>
+        <Route path="/articles" component={ArticlesCmsPage} />
         <Route path="/media" component={MediaLibraryPage} />
 
         {/* ── Reviewer + Admin ── */}

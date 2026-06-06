@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchApi } from "./api-types";
+import { fetchApi, type ArticleDetail } from "./api-types";
 
 /**
  * Resolves a storage URL so it works in both dev (Vite proxy) and production.
@@ -167,6 +167,14 @@ export function useNewsDetail(slug: string) {
   return useQuery({
     queryKey: ["news-detail", slug],
     queryFn: () => fetchApi<NewsArticleDetail>(`/news/${slug}`),
+    enabled: !!slug,
+  });
+}
+
+export function useArticle(slug: string) {
+  return useQuery({
+    queryKey: ["article", slug],
+    queryFn: () => fetchApi<ArticleDetail>(`/articles/${slug}`),
     enabled: !!slug,
   });
 }
