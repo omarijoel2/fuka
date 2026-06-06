@@ -1,2 +1,10 @@
 User-agent: *
-Disallow:
+Allow: /
+Disallow: /api/admin/
+Disallow: /api/healthz
+
+Sitemap: https://kafu.ac.ke/sitemap.xml
+Sitemap: https://kafu.ac.ke/sitemap-news.xml
+Sitemap: https://kafu.ac.ke/sitemap-staff.xml
+Sitemap: https://kafu.ac.ke/sitemap-research.xml
+Sitemap: https://kafu.ac.ke/sitemap-repository.xml

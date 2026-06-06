@@ -15,6 +15,18 @@
     RewriteCond %{REQUEST_URI} ^/storage(/|$)
     RewriteRule ^ - [L]
 
+    # Sitemap index + sub-sitemaps — proxy to Laravel (requires mod_proxy).
+    # In Virtualmin/cPanel add these ProxyPass directives to the VirtualHost instead:
+    #   ProxyPass /sitemap.xml            http://127.0.0.1:<laravel-port>/sitemap.xml
+    #   ProxyPass /sitemap-pages.xml      http://127.0.0.1:<laravel-port>/sitemap-pages.xml
+    #   ProxyPass /sitemap-news.xml       http://127.0.0.1:<laravel-port>/sitemap-news.xml
+    #   ProxyPass /sitemap-staff.xml      http://127.0.0.1:<laravel-port>/sitemap-staff.xml
+    #   ProxyPass /sitemap-research.xml   http://127.0.0.1:<laravel-port>/sitemap-research.xml
+    #   ProxyPass /sitemap-repository.xml http://127.0.0.1:<laravel-port>/sitemap-repository.xml
+    #   ProxyPass /robots.txt             http://127.0.0.1:<laravel-port>/robots.txt
+    RewriteCond %{REQUEST_URI} ^/(sitemap[^/]*\.xml|robots\.txt)$
+    RewriteRule ^ - [L]
+
     # SPA fallback: route all other requests to index.html
     RewriteRule ^ index.html [L]
 </IfModule>

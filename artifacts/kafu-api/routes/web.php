@@ -160,8 +160,8 @@ Route::get('/sitemap-pages.xml', function () {
 Route::get('/sitemap-news.xml', function () {
     $host = "https://kafu.ac.ke";
 
-    $news = CmsContent::where('type', 'news')->where('status', 'published')
-        ->orderByDesc('published_at')->limit(500)->get(['slug', 'updated_at', 'published_at']);
+    $news = CmsContent::whereIn('type', ['news', 'article'])->where('status', 'published')
+        ->orderByDesc('published_at')->limit(500)->get(['slug', 'type', 'updated_at', 'published_at']);
 
     $events = CmsContent::where('type', 'event')->where('status', 'published')
         ->orderByDesc('published_at')->limit(200)->get(['slug', 'updated_at', 'published_at']);
@@ -176,8 +176,9 @@ Route::get('/sitemap-news.xml', function () {
     $xml .= '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
 
     foreach ($news as $item) {
+        $urlPath = $item->type === 'article' ? '/articles/' : '/news/';
         $xml .= "  <url>\n";
-        $xml .= "    <loc>" . htmlspecialchars($host . '/news/' . $item->slug) . "</loc>\n";
+        $xml .= "    <loc>" . htmlspecialchars($host . $urlPath . $item->slug) . "</loc>\n";
         $xml .= "    <lastmod>" . ($item->published_at ?? $item->updated_at)->toAtomString() . "</lastmod>\n";
         $xml .= "    <changefreq>weekly</changefreq>\n";
         $xml .= "    <priority>0.7</priority>\n";

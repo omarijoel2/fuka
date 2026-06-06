@@ -60,6 +60,36 @@ export default defineConfig({
         target: `http://localhost:${process.env.API_PORT ?? "8080"}`,
         changeOrigin: true,
       },
+      // Sitemap index + sub-sitemaps + robots.txt — served by Laravel web routes.
+      // In production these are handled via Apache ProxyPass (see .htaccess).
+      "/sitemap.xml": {
+        target: `http://localhost:${process.env.API_PORT ?? "8080"}`,
+        changeOrigin: true,
+      },
+      "/sitemap-pages.xml": {
+        target: `http://localhost:${process.env.API_PORT ?? "8080"}`,
+        changeOrigin: true,
+      },
+      "/sitemap-news.xml": {
+        target: `http://localhost:${process.env.API_PORT ?? "8080"}`,
+        changeOrigin: true,
+      },
+      "/sitemap-staff.xml": {
+        target: `http://localhost:${process.env.API_PORT ?? "8080"}`,
+        changeOrigin: true,
+      },
+      "/sitemap-research.xml": {
+        target: `http://localhost:${process.env.API_PORT ?? "8080"}`,
+        changeOrigin: true,
+      },
+      "/sitemap-repository.xml": {
+        target: `http://localhost:${process.env.API_PORT ?? "8080"}`,
+        changeOrigin: true,
+      },
+      "/robots.txt": {
+        target: `http://localhost:${process.env.API_PORT ?? "8080"}`,
+        changeOrigin: true,
+      },
     },
     fs: {
       strict: true,
