@@ -7,7 +7,6 @@ import { useBranding, BRANDING_DEFAULTS, useNavConfig } from "@/lib/api-hooks";
 import type { CmsPrimaryNavItem } from "@/lib/api-hooks";
 
 // ─── Departments mega-menu data (grouped by school) ──────────────────────────
-// Slugs MUST match the `slug` column in the `departments` table (DepartmentSeeder)
 const DEPARTMENTS_BY_SCHOOL = [
   {
     school: "Education & Social Sciences",
@@ -76,7 +75,6 @@ type NavItem = {
 };
 
 // ─── CMS → NavItem mapper ─────────────────────────────────────────────────────
-
 function cmsToNavItems(items: CmsPrimaryNavItem[]): NavItem[] {
   if (!items?.length) return [];
   return items.map((item) => {
@@ -126,35 +124,33 @@ function DropdownPanel({ item, onClose }: { item: NavItem; onClose: () => void }
   const count = item.children!.length;
   const multiCol = count > 6;
   return (
-    <div
-      className={`absolute top-full left-1/2 -translate-x-1/2 mt-0 bg-white rounded-b-xl shadow-2xl border-t-2 border-accent z-50 ${multiCol ? "w-96" : "w-56"}`}
-    >
+    <div className={`absolute top-full left-1/2 -translate-x-1/2 mt-0 bg-white rounded-b-xl shadow-2xl border-t-2 border-primary z-50 ${multiCol ? "w-96" : "w-56"}`}>
       <div className={multiCol ? "grid grid-cols-2 py-2" : "py-2"}>
-      {item.children!.map((child) =>
-        child.external ? (
-          <a
-            key={child.path}
-            href={child.path}
-            target="_blank"
-            rel="noreferrer"
-            className="flex items-center justify-between px-4 py-2.5 text-sm text-foreground/80 hover:bg-primary hover:text-white transition-colors group"
-            data-testid={`nav-dropdown-${child.name.toLowerCase().replace(/\s+/g, "-")}`}
-          >
-            {child.name}
-            <ExternalLink className="w-3 h-3 opacity-40 group-hover:opacity-100" />
-          </a>
-        ) : (
-          <Link
-            key={child.path}
-            href={child.path}
-            className="block px-4 py-2.5 text-sm text-foreground/80 hover:bg-primary hover:text-white transition-colors"
-            onClick={onClose}
-            data-testid={`nav-dropdown-${child.name.toLowerCase().replace(/\s+/g, "-")}`}
-          >
-            {child.name}
-          </Link>
-        )
-      )}
+        {item.children!.map((child) =>
+          child.external ? (
+            <a
+              key={child.path}
+              href={child.path}
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center justify-between px-4 py-2.5 text-sm text-gray-600 hover:bg-primary hover:text-white transition-colors group"
+              data-testid={`nav-dropdown-${child.name.toLowerCase().replace(/\s+/g, "-")}`}
+            >
+              {child.name}
+              <ExternalLink className="w-3 h-3 opacity-40 group-hover:opacity-100" />
+            </a>
+          ) : (
+            <Link
+              key={child.path}
+              href={child.path}
+              className="block px-4 py-2.5 text-sm text-gray-600 hover:bg-primary hover:text-white transition-colors"
+              onClick={onClose}
+              data-testid={`nav-dropdown-${child.name.toLowerCase().replace(/\s+/g, "-")}`}
+            >
+              {child.name}
+            </Link>
+          )
+        )}
       </div>
     </div>
   );
@@ -163,7 +159,7 @@ function DropdownPanel({ item, onClose }: { item: NavItem; onClose: () => void }
 // ─── Departments Mega Panel ───────────────────────────────────────────────────
 function DepartmentsMegaPanel({ onClose }: { onClose: () => void }) {
   return (
-    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 z-50 bg-white shadow-2xl border-t-2 border-accent rounded-b-xl"
+    <div className="absolute top-full left-1/2 -translate-x-1/2 mt-0 z-50 bg-white shadow-2xl border-t-2 border-primary rounded-b-xl"
       style={{ width: "780px" }}>
       <div className="grid grid-cols-3 gap-0 divide-x divide-gray-100 p-4">
         {DEPARTMENTS_BY_SCHOOL.map((group) => (
@@ -181,7 +177,7 @@ function DepartmentsMegaPanel({ onClose }: { onClose: () => void }) {
                 key={dept.slug}
                 href={`/departments/${dept.slug}`}
                 onClick={onClose}
-                className="block py-1.5 text-xs text-foreground/75 hover:text-primary hover:bg-primary/5 rounded px-1 -ml-1 transition-colors leading-snug"
+                className="block py-1.5 text-xs text-gray-500 hover:text-primary hover:bg-primary/5 rounded px-1 -ml-1 transition-colors leading-snug"
                 data-testid={`nav-dept-${dept.slug}`}
               >
                 {dept.name}
@@ -215,7 +211,7 @@ function GenericMegaPanel({ item, onClose }: { item: NavItem; onClose: () => voi
 
   return (
     <div
-      className="absolute top-full left-1/2 -translate-x-1/2 mt-0 z-50 bg-white shadow-2xl border-t-2 border-accent rounded-b-xl"
+      className="absolute top-full left-1/2 -translate-x-1/2 mt-0 z-50 bg-white shadow-2xl border-t-2 border-primary rounded-b-xl"
       style={{ width: `${width}px` }}
     >
       <div
@@ -235,7 +231,7 @@ function GenericMegaPanel({ item, onClose }: { item: NavItem; onClose: () => voi
                   href={link.path}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-1 py-1.5 text-xs text-foreground/75 hover:text-primary hover:bg-primary/5 rounded px-1 -ml-1 transition-colors leading-snug"
+                  className="flex items-center gap-1 py-1.5 text-xs text-gray-500 hover:text-primary hover:bg-primary/5 rounded px-1 -ml-1 transition-colors leading-snug"
                   data-testid={`nav-${slug}-${link.name.toLowerCase().replace(/[\s&()—]+/g, "-")}`}
                 >
                   {link.name}
@@ -246,7 +242,7 @@ function GenericMegaPanel({ item, onClose }: { item: NavItem; onClose: () => voi
                   key={link.path + link.name}
                   href={link.path}
                   onClick={onClose}
-                  className="block py-1.5 text-xs text-foreground/75 hover:text-primary hover:bg-primary/5 rounded px-1 -ml-1 transition-colors leading-snug"
+                  className="block py-1.5 text-xs text-gray-500 hover:text-primary hover:bg-primary/5 rounded px-1 -ml-1 transition-colors leading-snug"
                   data-testid={`nav-${slug}-${link.name.toLowerCase().replace(/[\s&()—]+/g, "-")}`}
                 >
                   {link.name}
@@ -281,7 +277,6 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
   const [location]      = useLocation();
   const isActive        = item.path === "/" ? location === "/" : location.startsWith(item.path);
 
-  // Generic grouped mega items (megaGroups)
   if (item.megaGroups) {
     const slug = item.name.toLowerCase().replace(/\s+/g, "-");
     return (
@@ -289,7 +284,7 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
         <button
           onClick={() => setOpen((o) => !o)}
           className={`w-full flex items-center justify-between px-5 py-4 text-sm font-semibold transition-colors ${
-            isActive ? "text-accent" : "text-foreground hover:bg-gray-50"
+            isActive ? "text-primary" : "text-gray-700 hover:bg-gray-50"
           }`}
           data-testid={`mobile-nav-${slug}`}
         >
@@ -310,7 +305,7 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
                       href={link.path}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex items-center gap-1 pl-8 pr-5 py-2 text-sm text-muted-foreground hover:text-primary"
+                      className="flex items-center gap-1 pl-8 pr-5 py-2 text-sm text-gray-500 hover:text-primary"
                       data-testid={`mobile-${slug}-${link.name.toLowerCase().replace(/[\s&()—]+/g, "-")}`}
                     >
                       {link.name}
@@ -321,7 +316,7 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
                       key={link.path + link.name}
                       href={link.path}
                       onClick={onClose}
-                      className="block pl-8 pr-5 py-2 text-sm text-muted-foreground hover:text-primary"
+                      className="block pl-8 pr-5 py-2 text-sm text-gray-500 hover:text-primary"
                       data-testid={`mobile-${slug}-${link.name.toLowerCase().replace(/[\s&()—]+/g, "-")}`}
                     >
                       {link.name}
@@ -336,14 +331,13 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
     );
   }
 
-  // Departments mega item — accordion grouped by school
   if (item.megaType === "departments") {
     return (
       <div className="border-b border-gray-100">
         <button
           onClick={() => setOpen((o) => !o)}
           className={`w-full flex items-center justify-between px-5 py-4 text-sm font-semibold transition-colors ${
-            isActive ? "text-accent" : "text-foreground hover:bg-gray-50"
+            isActive ? "text-primary" : "text-gray-700 hover:bg-gray-50"
           }`}
           data-testid="mobile-nav-departments"
         >
@@ -367,7 +361,7 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
                     key={dept.slug}
                     href={`/departments/${dept.slug}`}
                     onClick={onClose}
-                    className="block pl-8 pr-5 py-2 text-sm text-muted-foreground hover:text-primary"
+                    className="block pl-8 pr-5 py-2 text-sm text-gray-500 hover:text-primary"
                     data-testid={`mobile-dept-${dept.slug}`}
                   >
                     {dept.name}
@@ -387,7 +381,7 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
         href={item.path}
         onClick={onClose}
         className={`flex items-center px-5 py-4 text-sm font-semibold border-b border-gray-100 transition-colors ${
-          isActive ? "text-accent bg-accent/5" : "text-foreground hover:bg-gray-50"
+          isActive ? "text-primary bg-primary/5" : "text-gray-700 hover:bg-gray-50"
         }`}
         data-testid={`mobile-nav-${item.name.toLowerCase()}`}
       >
@@ -401,7 +395,7 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
       <button
         onClick={() => setOpen((o) => !o)}
         className={`w-full flex items-center justify-between px-5 py-4 text-sm font-semibold transition-colors ${
-          isActive ? "text-accent" : "text-foreground hover:bg-gray-50"
+          isActive ? "text-primary" : "text-gray-700 hover:bg-gray-50"
         }`}
         data-testid={`mobile-nav-${item.name.toLowerCase()}`}
       >
@@ -417,7 +411,7 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
                 href={child.path}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-2 pl-8 pr-5 py-3 text-sm text-muted-foreground hover:text-primary"
+                className="flex items-center gap-2 pl-8 pr-5 py-3 text-sm text-gray-500 hover:text-primary"
               >
                 {child.name}
                 <ExternalLink className="w-3 h-3 opacity-50" />
@@ -427,7 +421,7 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
                 key={child.path}
                 href={child.path}
                 onClick={onClose}
-                className="block pl-8 pr-5 py-3 text-sm text-muted-foreground hover:text-primary"
+                className="block pl-8 pr-5 py-3 text-sm text-gray-500 hover:text-primary"
               >
                 {child.name}
               </Link>
@@ -436,6 +430,41 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
         </div>
       )}
     </div>
+  );
+}
+
+// ─── Desktop Nav Button ───────────────────────────────────────────────────────
+function NavBtn({
+  item,
+  isActive,
+  isOpen,
+  onClick,
+}: {
+  item: NavItem;
+  isActive: boolean;
+  isOpen: boolean;
+  onClick?: () => void;
+}) {
+  const hasDropdown = !!(item.children || item.megaGroups || item.megaType === "departments");
+  const base = `flex items-center gap-0.5 px-3 h-full text-sm font-semibold whitespace-nowrap border-b-[3px] transition-colors`;
+  const active = "border-primary text-primary";
+  const inactive = "border-transparent text-gray-700 hover:text-primary hover:border-primary/40";
+
+  if (hasDropdown) {
+    return (
+      <button onClick={onClick} className={`${base} ${isActive ? active : inactive}`}
+        data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}>
+        {item.name}
+        <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+    );
+  }
+
+  return (
+    <Link href={item.path} className={`${base} ${isActive ? active : inactive}`}
+      data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}>
+      {item.name}
+    </Link>
   );
 }
 
@@ -452,8 +481,8 @@ export function Navbar() {
     () => cmsToNavItems(navConfig?.primary_nav ?? []),
     [navConfig]
   );
-  const [location]                      = useLocation();
-  const navRowRef                       = React.useRef<HTMLDivElement>(null);
+  const [location]   = useLocation();
+  const navRowRef    = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -471,161 +500,147 @@ export function Navbar() {
   const closeMobile = () => setMobileOpen(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white shadow-md">
+    <header className="sticky top-0 z-50 w-full">
 
-      {/* ── Row 1: Utility bar ── */}
-      <div className="bg-primary text-primary-foreground py-1.5 text-xs">
+      {/* ── Row 1: Utility bar — white, thin ── */}
+      <div className="bg-white border-b border-gray-200 py-1.5 text-xs text-gray-500">
         <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex items-center gap-4 opacity-90">
+          <div className="flex items-center gap-4">
             <span className="flex items-center gap-1.5">
-              <MapPin className="w-3 h-3 shrink-0" />
+              <MapPin className="w-3 h-3 shrink-0 text-primary/60" />
               <span className="hidden sm:inline">P.O BOX 385 – 50309, </span>Kaimosi, Kenya
             </span>
             <span className="hidden sm:flex items-center gap-1.5">
-              <Phone className="w-3 h-3 shrink-0" />
+              <Phone className="w-3 h-3 shrink-0 text-primary/60" />
               +254 777 373 633
             </span>
           </div>
           <div className="flex items-center gap-3 font-medium">
             {(navConfig?.utility_nav ?? []).map((item, i) => (
               <React.Fragment key={i}>
-                {i > 0 && <span className="opacity-40">|</span>}
+                {i > 0 && <span className="opacity-30">|</span>}
                 <a
                   href={item.url}
                   target={item.url.startsWith("http") ? "_blank" : undefined}
                   rel={item.url.startsWith("http") ? "noreferrer" : undefined}
-                  className="hover:text-accent transition-colors hidden sm:inline"
+                  className="hover:text-primary transition-colors hidden sm:inline"
                   data-testid={`link-utility-${i}`}
                 >
                   {item.label}
                 </a>
               </React.Fragment>
             ))}
-            <span className="opacity-40 hidden md:inline">|</span>
+            <span className="opacity-30 hidden md:inline">|</span>
             <a href="mailto:info@kafu.ac.ke"
-               className="hover:text-accent transition-colors hidden md:inline" data-testid="link-email">
+               className="hover:text-primary transition-colors hidden md:inline" data-testid="link-email">
               info@kafu.ac.ke
             </a>
           </div>
         </div>
       </div>
 
-      {/* ── Row 2: Logo + Search + Apply Now + Hamburger ── */}
-      <div className="container mx-auto px-4 h-[72px] flex items-center justify-between border-b border-gray-100">
-        <Link href="/" className="flex items-center shrink-0" data-testid="link-home-logo">
-          <img
-            src={logoUrl}
-            alt={logoAlt}
-            className="h-12 object-contain"
-            onError={(e) => {
-              const img = e.target as HTMLImageElement;
-              img.style.display = "none";
-              const p = img.parentElement;
-              if (p) p.innerHTML = `<div class="flex flex-col leading-tight"><span class="font-serif font-bold text-xl text-primary">KAFU</span><span class="text-xs text-accent italic">Spring of Knowledge</span></div>`;
-            }}
-          />
-        </Link>
+      {/* ── Row 2: Logo + Nav items + Actions ── */}
+      <div className="bg-white shadow-sm" ref={navRowRef}>
+        <div className="container mx-auto px-4 h-[70px] flex items-stretch gap-2">
 
-        <div className="flex items-center gap-2">
-          <button
-            className="flex items-center justify-center w-9 h-9 rounded-md text-foreground hover:bg-muted transition-colors"
-            onClick={() => setSearchOpen(true)}
-            aria-label="Open search"
-            data-testid="button-open-search"
-          >
-            <Search className="w-4 h-4" />
-          </button>
-          <Button
-            asChild
-            size="sm"
-            className="hidden xl:flex bg-accent text-accent-foreground hover:bg-accent/90 font-semibold px-5"
-            data-testid="button-apply-now"
-          >
-            <a href="/admissions">Apply Now</a>
-          </Button>
+          {/* Logo */}
+          <Link href="/" className="flex items-center shrink-0 mr-4" data-testid="link-home-logo">
+            <img
+              src={logoUrl}
+              alt={logoAlt}
+              className="h-11 object-contain"
+              onError={(e) => {
+                const img = e.target as HTMLImageElement;
+                img.style.display = "none";
+                const p = img.parentElement;
+                if (p) p.innerHTML = `<div class="flex flex-col leading-tight"><span class="font-bold text-xl text-primary" style="font-family:'Roboto Condensed',sans-serif">KAFU</span><span class="text-xs text-amber-600 italic">Spring of Knowledge</span></div>`;
+              }}
+            />
+          </Link>
 
-          <button
-            className="xl:hidden flex items-center justify-center w-10 h-10 rounded-md text-foreground hover:bg-muted transition-colors"
-            onClick={() => setMobileOpen((o) => !o)}
-            aria-label={mobileOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileOpen}
-            data-testid="button-mobile-menu"
-          >
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+          {/* Desktop nav items — xl+ only */}
+          <nav className="hidden xl:flex items-stretch flex-1 gap-0">
+            {resolvedNavItems.map((item) => (
+              <div key={item.name} className="relative flex items-stretch">
+                {(item.megaGroups || item.megaType === "departments") ? (
+                  <div
+                    className="flex items-stretch"
+                    onMouseEnter={() => setOpenDropdown(item.name)}
+                    onMouseLeave={() => setOpenDropdown(null)}
+                  >
+                    <NavBtn
+                      item={item}
+                      isActive={isActive(item.path)}
+                      isOpen={openDropdown === item.name}
+                      onClick={() => setOpenDropdown(openDropdown === item.name ? null : item.name)}
+                    />
+                    {openDropdown === item.name && (
+                      item.megaType === "departments"
+                        ? <DepartmentsMegaPanel onClose={() => setOpenDropdown(null)} />
+                        : <GenericMegaPanel item={item} onClose={() => setOpenDropdown(null)} />
+                    )}
+                  </div>
+                ) : item.children ? (
+                  <div
+                    className="flex items-stretch"
+                    onMouseEnter={() => setOpenDropdown(item.name)}
+                    onMouseLeave={() => setOpenDropdown(null)}
+                  >
+                    <NavBtn
+                      item={item}
+                      isActive={isActive(item.path)}
+                      isOpen={openDropdown === item.name}
+                      onClick={() => setOpenDropdown(openDropdown === item.name ? null : item.name)}
+                    />
+                    {openDropdown === item.name && (
+                      <DropdownPanel item={item} onClose={() => setOpenDropdown(null)} />
+                    )}
+                  </div>
+                ) : (
+                  <NavBtn
+                    item={item}
+                    isActive={isActive(item.path)}
+                    isOpen={false}
+                  />
+                )}
+              </div>
+            ))}
+          </nav>
+
+          {/* Actions */}
+          <div className="flex items-center gap-1.5 ml-auto">
+            <button
+              className="flex items-center justify-center w-9 h-9 rounded-md text-gray-500 hover:text-primary hover:bg-gray-100 transition-colors"
+              onClick={() => setSearchOpen(true)}
+              aria-label="Open search"
+              data-testid="button-open-search"
+            >
+              <Search className="w-4 h-4" />
+            </button>
+            <Button
+              asChild
+              size="sm"
+              className="hidden xl:flex bg-primary text-white hover:bg-primary/90 font-semibold px-5 rounded-md"
+              data-testid="button-apply-now"
+            >
+              <a href="/admissions">Apply Now</a>
+            </Button>
+            <button
+              className="xl:hidden flex items-center justify-center w-10 h-10 rounded-md text-gray-600 hover:bg-gray-100 transition-colors"
+              onClick={() => setMobileOpen((o) => !o)}
+              aria-label={mobileOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileOpen}
+              data-testid="button-mobile-menu"
+            >
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
-      </div>
-
-      {/* ── Row 3: Full-width nav — desktop xl+ only ── */}
-      <div className="hidden xl:block bg-primary" ref={navRowRef}>
-        <nav className="container mx-auto px-4 flex items-center justify-center gap-0">
-          {resolvedNavItems.map((item) => (
-            <div key={item.name} className="relative">
-              {(item.megaGroups || item.megaType === "departments") ? (
-                <div
-                  onMouseEnter={() => setOpenDropdown(item.name)}
-                  onMouseLeave={() => setOpenDropdown(null)}
-                >
-                  <button
-                    onClick={() => setOpenDropdown(openDropdown === item.name ? null : item.name)}
-                    className={`flex items-center gap-0.5 px-3 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
-                      isActive(item.path)
-                        ? "border-accent text-accent"
-                        : "border-transparent text-white/90 hover:text-white hover:border-accent/60"
-                    }`}
-                    data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
-                  >
-                    {item.name}
-                    <ChevronDown className={`w-3 h-3 transition-transform ${openDropdown === item.name ? "rotate-180" : ""}`} />
-                  </button>
-                  {openDropdown === item.name && (
-                    item.megaType === "departments"
-                      ? <DepartmentsMegaPanel onClose={() => setOpenDropdown(null)} />
-                      : <GenericMegaPanel item={item} onClose={() => setOpenDropdown(null)} />
-                  )}
-                </div>
-              ) : item.children ? (
-                <div
-                  onMouseEnter={() => setOpenDropdown(item.name)}
-                  onMouseLeave={() => setOpenDropdown(null)}
-                >
-                  <button
-                    onClick={() => setOpenDropdown(openDropdown === item.name ? null : item.name)}
-                    className={`flex items-center gap-0.5 px-3 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
-                      isActive(item.path)
-                        ? "border-accent text-accent"
-                        : "border-transparent text-white/90 hover:text-white hover:border-accent/60"
-                    }`}
-                    data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
-                  >
-                    {item.name}
-                    <ChevronDown className={`w-3 h-3 transition-transform ${openDropdown === item.name ? "rotate-180" : ""}`} />
-                  </button>
-                  {openDropdown === item.name && (
-                    <DropdownPanel item={item} onClose={() => setOpenDropdown(null)} />
-                  )}
-                </div>
-              ) : (
-                <Link
-                  href={item.path}
-                  className={`block px-3 py-3 text-sm font-semibold transition-colors whitespace-nowrap border-b-2 ${
-                    isActive(item.path)
-                      ? "border-accent text-accent"
-                      : "border-transparent text-white/90 hover:text-white hover:border-accent/60"
-                  }`}
-                  data-testid={`nav-${item.name.toLowerCase().replace(/\s+/g, "-")}`}
-                >
-                  {item.name}
-                </Link>
-              )}
-            </div>
-          ))}
-        </nav>
       </div>
 
       {/* ── Mobile Drawer ── */}
       {mobileOpen && (
-        <div className="xl:hidden fixed inset-0 top-[calc(28px+72px)] z-40 flex">
+        <div className="xl:hidden fixed inset-0 top-[98px] z-40 flex">
           <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={closeMobile} />
           <div className="relative w-full max-w-sm bg-white shadow-2xl flex flex-col overflow-y-auto">
             <div className="bg-primary px-5 py-3 flex items-center justify-between">
@@ -655,8 +670,8 @@ export function Navbar() {
               <a
                 href="/admissions"
                 onClick={closeMobile}
-                className="block w-full text-center py-3.5 bg-accent text-accent-foreground rounded-xl font-semibold text-sm hover:bg-accent/90 transition-colors"
-                data-testid="mobile-button-apply-now"
+                className="block w-full text-center py-3.5 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary/90 transition-colors"
+                data-testid="mobile-apply-now"
               >
                 Apply Now
               </a>
@@ -664,7 +679,8 @@ export function Navbar() {
           </div>
         </div>
       )}
-      <SearchModal open={searchOpen} onClose={() => setSearchOpen(false)} />
+
+      {searchOpen && <SearchModal onClose={() => setSearchOpen(false)} />}
     </header>
   );
 }
