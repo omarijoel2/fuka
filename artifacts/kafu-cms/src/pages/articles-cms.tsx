@@ -333,14 +333,15 @@ function FeaturedImageField({ value, onChange }: { value: string; onChange: (url
       const fd = new FormData();
       fd.append("file", file);
       fd.append("folder", "articles");
-      const res = await fetch(`${API_BASE}/content/upload-attachment`, {
+      const res = await fetch(`${API_BASE}/media`, {
         method: "POST",
         headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: fd,
       });
       if (!res.ok) throw new Error("Upload failed");
-      const data = await res.json() as { url?: string };
-      if (data.url) { onChange(data.url); setShowUrl(false); }
+      const data = await res.json() as { data?: { url?: string } };
+      const url = data.data?.url;
+      if (url) { onChange(url); setShowUrl(false); }
     } catch (err) {
       setUploadError(err instanceof Error ? err.message : "Upload failed");
     } finally {
@@ -630,14 +631,15 @@ export default function ArticlesCmsPage() {
     const fd = new FormData();
     fd.append("file", file);
     fd.append("folder", "articles");
-    const res = await fetch(`${API_BASE}/content/upload-attachment`, {
+    const res = await fetch(`${API_BASE}/media`, {
       method: "POST",
       headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       body: fd,
     });
     if (!res.ok) throw new Error("Upload failed");
-    const data = await res.json() as { url?: string };
-    if (data.url) updateBlock(blockId, { url: data.url });
+    const data = await res.json() as { data?: { url?: string } };
+    const url = data.data?.url;
+    if (url) updateBlock(blockId, { url });
   }
 
   /* ── Build payload ─────────────────────────────────────────────────────── */
