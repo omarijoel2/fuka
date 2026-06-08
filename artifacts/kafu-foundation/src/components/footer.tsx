@@ -123,8 +123,7 @@ export function Footer() {
               {[
                 { label: "Student Portal",    href: "https://portal.kafu.ac.ke",    testid: "footer-portal-student",   external: true },
                 { label: "E-Learning",        href: "https://elearning.kafu.ac.ke", testid: "footer-portal-elearning", external: true },
-                { label: "Staff Portal",      href: "https://staff.kafu.ac.ke",     testid: "footer-portal-staff",     external: true },
-                { label: "CMS Admin",         href: "/kafu-cms/",                   testid: "footer-portal-cms",       external: false },
+                { label: "Staff Portal",      href: "/staff",                       testid: "footer-portal-staff",     external: false },
                 { label: "Library Portal",    href: "https://library.kafu.ac.ke",   testid: "footer-portal-library",   external: true },
               ].map(({ label, href, testid, external }) => (
                 <li key={href}>
