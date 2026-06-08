@@ -5,6 +5,7 @@ import {
   Plus, Trash2, Save, ArrowLeft, ChevronUp, ChevronDown, Upload,
   Eye, Globe, FileText, Image as ImageIcon, Quote, Heading, AlignLeft,
   Loader2, CheckCircle, AlertCircle, X, ExternalLink, Images,
+  Library, Search,
 } from "lucide-react";
 
 /* ── Types ─────────────────────────────────────────────────────────────────── */
@@ -299,6 +300,241 @@ function AddBlockBar({ onAdd }: { onAdd: (type: BlockType) => void }) {
 }
 
 /* ── Main page ──────────────────────────────────────────────────────────────── */
+/* ── FeaturedImageField ─────────────────────────────────────────────────────── */
+interface LibraryItem {
+  id: number;
+  url: string;
+  original_name: string;
+  alt_text: string | null;
+  mime_type: string;
+}
+
+function FeaturedImageField({ value, onChange }: { value: string; onChange: (url: string) => void }) {
+  const [uploading, setUploading]           = useState(false);
+  const [uploadError, setUploadError]       = useState<string | null>(null);
+  const [showUrl, setShowUrl]               = useState(false);
+  const [imgBroken, setImgBroken]           = useState(false);
+  const [showLibrary, setShowLibrary]       = useState(false);
+  const [libraryItems, setLibraryItems]     = useState<LibraryItem[]>([]);
+  const [libraryLoading, setLibraryLoading] = useState(false);
+  const [librarySearch, setLibrarySearch]   = useState("");
+  const fileRef = useRef<HTMLInputElement>(null);
+
+  const hasImage = Boolean(value) && !imgBroken;
+
+  async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadError(null);
+    setUploading(true);
+    setImgBroken(false);
+    try {
+      const token = localStorage.getItem("kafu_cms_token");
+      const fd = new FormData();
+      fd.append("file", file);
+      fd.append("folder", "articles");
+      const res = await fetch(`${API_BASE}/content/upload-attachment`, {
+        method: "POST",
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+        body: fd,
+      });
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json() as { url?: string };
+      if (data.url) { onChange(data.url); setShowUrl(false); }
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  }
+
+  async function openLibrary() {
+    setShowLibrary(true);
+    setLibraryLoading(true);
+    try {
+      const token = localStorage.getItem("kafu_cms_token");
+      const res = await fetch(`${API_BASE}/media?type=image&per_page=48`, {
+        headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      });
+      const json = await res.json();
+      setLibraryItems(json.data ?? []);
+    } catch {
+      setLibraryItems([]);
+    } finally {
+      setLibraryLoading(false);
+    }
+  }
+
+  const filtered = librarySearch
+    ? libraryItems.filter(i => i.original_name.toLowerCase().includes(librarySearch.toLowerCase()))
+    : libraryItems;
+
+  return (
+    <div className="space-y-3">
+      <label className="block text-xs font-medium text-muted-foreground uppercase tracking-wide">
+        Featured Image
+      </label>
+
+      {/* Landscape preview */}
+      <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-primary/5 border border-border flex items-center justify-center">
+        {hasImage ? (
+          <img src={value} alt="Featured" className="w-full h-full object-cover" onError={() => setImgBroken(true)} />
+        ) : (
+          <div className="flex flex-col items-center gap-2 text-primary/20">
+            <ImageIcon className="w-10 h-10" />
+            <span className="text-xs">No image selected</span>
+          </div>
+        )}
+        {uploading && (
+          <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
+            <Loader2 className="w-6 h-6 animate-spin text-primary" />
+          </div>
+        )}
+      </div>
+
+      {/* Action buttons */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          type="button"
+          data-testid="art-fi-upload"
+          disabled={uploading}
+          onClick={() => fileRef.current?.click()}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-colors"
+        >
+          <Upload className="w-3.5 h-3.5" />
+          {uploading ? "Uploading..." : "Upload Image"}
+        </button>
+        <button
+          type="button"
+          data-testid="art-fi-library"
+          onClick={openLibrary}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-lg hover:bg-muted transition-colors text-muted-foreground"
+        >
+          <Library className="w-3.5 h-3.5" />
+          Select from Library
+        </button>
+        <button
+          type="button"
+          data-testid="art-fi-url"
+          onClick={() => setShowUrl(v => !v)}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-lg hover:bg-muted transition-colors text-muted-foreground"
+        >
+          {showUrl ? "Hide URL" : "Paste URL"}
+        </button>
+        {value && (
+          <button
+            type="button"
+            data-testid="art-fi-clear"
+            onClick={() => { onChange(""); setImgBroken(false); }}
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium border border-destructive/30 text-destructive rounded-lg hover:bg-destructive/5 transition-colors"
+          >
+            <X className="w-3.5 h-3.5" />
+            Remove
+          </button>
+        )}
+      </div>
+
+      {uploadError && <p className="text-xs text-destructive" data-testid="art-fi-error">{uploadError}</p>}
+
+      {showUrl && (
+        <input
+          type="url"
+          data-testid="art-featured-image"
+          value={value}
+          onChange={e => { onChange(e.target.value); setImgBroken(false); }}
+          placeholder="https://... or /storage/..."
+          className="w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background"
+        />
+      )}
+
+      <input
+        ref={fileRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp,image/gif"
+        className="hidden"
+        data-testid="art-fi-file"
+        onChange={handleFile}
+      />
+
+      {/* Library picker modal */}
+      {showLibrary && (
+        <div
+          className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4"
+          onClick={() => setShowLibrary(false)}
+        >
+          <div
+            className="bg-background rounded-2xl shadow-xl w-full max-w-3xl max-h-[80vh] flex flex-col"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b">
+              <h2 className="text-base font-semibold">Media Library</h2>
+              <button
+                type="button"
+                data-testid="art-lib-close"
+                onClick={() => setShowLibrary(false)}
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="px-6 py-3 border-b">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Search images..."
+                  value={librarySearch}
+                  onChange={e => setLibrarySearch(e.target.value)}
+                  data-testid="art-lib-search"
+                  className="w-full pl-9 pr-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background"
+                />
+              </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6">
+              {libraryLoading ? (
+                <div className="flex items-center justify-center py-16">
+                  <Loader2 className="w-7 h-7 animate-spin text-primary" />
+                </div>
+              ) : filtered.length === 0 ? (
+                <p className="text-sm text-muted-foreground text-center py-16">
+                  No images found in the media library.
+                </p>
+              ) : (
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+                  {filtered.map(item => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      data-testid={`art-lib-item-${item.id}`}
+                      title={item.alt_text ?? item.original_name}
+                      onClick={() => {
+                        onChange(item.url);
+                        setImgBroken(false);
+                        setShowLibrary(false);
+                        setShowUrl(false);
+                      }}
+                      className="group relative aspect-square rounded-lg overflow-hidden border-2 border-transparent hover:border-primary transition-all bg-muted focus:outline-none focus:border-primary"
+                    >
+                      <img
+                        src={item.url}
+                        alt={item.alt_text ?? item.original_name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ArticlesCmsPage() {
   const { user } = useAuth();
 
@@ -733,20 +969,10 @@ export default function ArticlesCmsPage() {
           </div>
         </div>
 
-        <div>
-          <label className="block text-xs font-medium text-muted-foreground mb-1" htmlFor="art-featured-image">
-            Featured Image URL
-          </label>
-          <input
-            id="art-featured-image"
-            type="url"
-            className="w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background"
-            value={meta.featured_image}
-            onChange={(e) => setMeta((prev) => ({ ...prev, featured_image: e.target.value }))}
-            placeholder="https://... or /storage/..."
-            data-testid="art-featured-image"
-          />
-        </div>
+        <FeaturedImageField
+          value={meta.featured_image}
+          onChange={(url) => setMeta(prev => ({ ...prev, featured_image: url }))}
+        />
 
         <div>
           <label className="block text-xs font-medium text-muted-foreground mb-1" htmlFor="art-tags">
