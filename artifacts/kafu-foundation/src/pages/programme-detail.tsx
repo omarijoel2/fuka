@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRoute, Link } from "wouter";
-import { useSchool, useProgrammeDetail, useStaff, useGraduateOutcomes, useAlumni } from "@/lib/api-hooks";
+import { useSchool, useProgrammeDetail, useStaff, useGraduateOutcomes, useAlumni, useAlumniStories } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
 import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import {
@@ -115,6 +115,25 @@ export default function ProgrammeDetailPage() {
   const outcome = outcomes?.find((o) => o.programme_slug === slugify(programmeName));
   const { data: alumniRes } = useAlumni({ programme: programmeName, per_page: 4 });
   const programmeAlumni = programmeName ? (alumniRes?.data ?? []) : [];
+  const { data: alumniStories } = useAlumniStories();
+  const normalizeProgramme = (s: string) =>
+    s
+      .toLowerCase()
+      .replace(/\b(bachelor|master|doctor)\s+of\s+(science|arts|commerce|education|philosophy|laws?)\s+in\b/g, "")
+      .replace(/\b(bachelor|master|doctor)\s+of\b/g, "")
+      .replace(/\b(b\.?sc|m\.?sc|b\.?a|m\.?a|b\.?com|m\.?com|ph\.?d|b\.?ed|m\.?ed|llb|llm)\b/g, "")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+  const programmeStories = (() => {
+    if (!programmeName) return [];
+    const target = normalizeProgramme(programmeName);
+    if (!target) return [];
+    return (alumniStories ?? []).filter((s) => {
+      if (!s.programme) return false;
+      const sp = normalizeProgramme(s.programme);
+      return sp.length > 0 && (sp === target || sp.includes(target) || target.includes(sp));
+    });
+  })();
 
   return (
     <div className="flex flex-col min-h-screen pb-20 md:pb-0">
@@ -543,6 +562,46 @@ export default function ProgrammeDetailPage() {
                   <Button variant="ghost" className="text-primary" asChild>
                     <Link href={`/schools/${school}`}>View all {school} programmes <ChevronRight className="ml-1 w-4 h-4" /></Link>
                   </Button>
+                </div>
+              </section>
+            )}
+
+            {/* Alumni Success Stories (very end of programme content) */}
+            {!isLoading && programmeName && programmeStories.length > 0 && (
+              <section data-testid="section-programme-success-stories" className="border-t pt-10">
+                <h2 className="text-2xl font-serif font-bold text-primary mb-1 flex items-center gap-2">
+                  <BookOpen className="w-6 h-6" /> Alumni Success Stories
+                </h2>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Real journeys from graduates of this programme
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {programmeStories.map((story, i) => (
+                    <Link
+                      key={story.id}
+                      href={`/alumni-stories/${story.slug}`}
+                      className="group flex flex-col bg-card border rounded-xl overflow-hidden hover:border-primary hover:shadow-sm transition-all"
+                      data-testid={`programme-story-${i}`}
+                    >
+                      {story.photo_url && (
+                        <div className="h-40 w-full overflow-hidden">
+                          <img src={story.photo_url} alt={story.alumni_name ?? story.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                        </div>
+                      )}
+                      <div className="p-4">
+                        <div className="font-serif font-bold text-base text-foreground group-hover:text-primary transition-colors line-clamp-2">{story.title}</div>
+                        {(story.alumni_name || story.graduation_year) && (
+                          <div className="text-xs text-muted-foreground mt-1">
+                            {[story.alumni_name, story.graduation_year ? `Class of ${story.graduation_year}` : null].filter(Boolean).join(" · ")}
+                          </div>
+                        )}
+                        {story.summary && <p className="text-sm text-muted-foreground mt-2 line-clamp-3">{story.summary}</p>}
+                        <span className="inline-flex items-center text-primary text-sm font-medium mt-3">
+                          Read story <ChevronRight className="ml-1 w-4 h-4" />
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               </section>
             )}

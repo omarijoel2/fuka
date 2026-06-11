@@ -213,10 +213,11 @@ export default function Opportunities() {
       );
     }
     return list.sort((a, b) => {
+      const da = new Date(a.publish_date).getTime();
+      const db = new Date(b.publish_date).getTime();
+      if (db !== da) return db - da;
       if (a.featured && !b.featured) return -1;
       if (!a.featured && b.featured) return 1;
-      if (a.status === "closing-soon" && b.status !== "closing-soon") return -1;
-      if (a.status !== "closing-soon" && b.status === "closing-soon") return 1;
       return 0;
     });
   }, [active, activeCategory, search]);

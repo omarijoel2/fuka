@@ -173,6 +173,20 @@ function mapCmsAnnouncementDetail(CmsContent $item): array {
 if (!function_exists('mapCmsOpportunity')) {
 function mapCmsOpportunity(CmsContent $item): array {
     $sd = $item->structured_data ?? [];
+
+    $status   = $sd['opportunity_status'] ?? 'open';
+    $deadline = $sd['deadline'] ?? null;
+    // Auto-archive: any opportunity whose deadline has passed is treated as closed.
+    if ($deadline && $status !== 'closed') {
+        try {
+            if (\Carbon\Carbon::parse($deadline)->endOfDay()->isPast()) {
+                $status = 'closed';
+            }
+        } catch (\Throwable $e) {
+            // leave stored status untouched if the deadline can't be parsed
+        }
+    }
+
     return [
         'id'             => $item->id,
         'slug'           => $item->slug,
@@ -183,9 +197,9 @@ function mapCmsOpportunity(CmsContent $item): array {
         'department'     => $item->department ?? '',
         'summary'        => $item->summary ?? '',
         'publish_date'   => $item->published_at?->format('Y-m-d') ?? $item->created_at->format('Y-m-d'),
-        'deadline'       => $sd['deadline'] ?? null,
+        'deadline'       => $deadline,
         'deadline_time'  => $sd['deadline_time'] ?? null,
-        'status'         => $sd['opportunity_status'] ?? 'open',
+        'status'         => $status,
         'featured'       => (bool)$item->featured,
         'documents_count'=> count($sd['documents'] ?? []),
     ];
