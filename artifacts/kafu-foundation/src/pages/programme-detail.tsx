@@ -110,7 +110,7 @@ export default function ProgrammeDetailPage() {
   const courseStructure = detail?.course_structure ?? [];
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen pb-20 md:pb-0">
       <SeoHead
         title={`${baseProgramme?.name ?? code} — ${SCHOOL_NAMES[school] ?? school} | KAFU`}
         description={detail?.overview ?? baseProgramme?.description ?? `Study ${baseProgramme?.name ?? code} at Kaimosi Friends University.`}
@@ -582,6 +582,16 @@ export default function ProgrammeDetailPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Mobile sticky Apply bar */}
+      <div className="md:hidden fixed bottom-0 inset-x-0 z-30 border-t bg-white/95 backdrop-blur px-4 py-3 flex gap-2" data-testid="mobile-apply-bar">
+        <Button variant="outline" className="flex-1 border-primary text-primary" asChild data-testid="mobile-btn-eligibility">
+          <Link href="/admissions/eligibility">Check Eligibility</Link>
+        </Button>
+        <Button className="flex-1 bg-accent text-accent-foreground hover:bg-accent/90 font-semibold" asChild data-testid="mobile-btn-apply">
+          <a href="https://portal.kafu.ac.ke" target="_blank" rel="noreferrer">Apply Now</a>
+        </Button>
       </div>
     </div>
   );

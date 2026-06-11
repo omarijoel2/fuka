@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { SeoHead } from "@/components/seo-head";
+import { FeeCalculator } from "@/components/fee-calculator";
 import { useAdmissionsFees } from "@/lib/api-hooks";
 import {
   ChevronRight,
@@ -164,6 +165,9 @@ export default function AdmissionsFeesPage() {
                 </table>
               </div>
             </div>
+
+            {/* Affordability Calculator */}
+            <FeeCalculator pathway={currentPathway} />
 
             {/* Scholarships & Funding */}
             {currentPathway.scholarships?.length > 0 && (
