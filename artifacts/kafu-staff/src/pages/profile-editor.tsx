@@ -226,6 +226,9 @@ export default function ProfileEditorPage() {
   const [extracted, setExtracted] = useState<ExtractedData | null>(null);
   const [cvMismatches, setCvMismatches] = useState<CvMismatch[]>([]);
 
+  const [cmsSource, setCmsSource] = useState<{ id: number; name: string; slug: string } | null>(null);
+  const [cmsNoticeDismissed, setCmsNoticeDismissed] = useState(false);
+
   const [newCourse, setNewCourse] = useState({ code: "", title: "", level: "UG", semester: "" });
   const [newGrant, setNewGrant] = useState({ title: "", funder: "", amount: "", year: new Date().getFullYear().toString(), status: "Active" });
 
@@ -239,6 +242,7 @@ export default function ProfileEditorPage() {
     try {
       const res = await staffGet("/profile");
       const sub: Submission = res.submission;
+      setCmsSource(res.cms_source ?? null);
       setSubmission(sub);
       const pd = sub.profile_data ?? {};
       const initialForm: Record<string, Record<string, string>> = {};
@@ -450,6 +454,30 @@ export default function ProfileEditorPage() {
             <p className="text-sm font-semibold text-orange-800">Revision Requested</p>
             <p className="text-sm text-orange-700 mt-1">{submission.reviewer_summary}</p>
           </div>
+        </div>
+      )}
+
+      {/* CMS pre-population notice */}
+      {cmsSource && !cmsNoticeDismissed && (
+        <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 flex items-start justify-between gap-3" data-testid="cms-prepopulate-notice">
+          <div className="flex items-start gap-3">
+            <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+            <div>
+              <p className="text-sm font-semibold text-emerald-900">Profile pre-populated from the staff directory</p>
+              <p className="text-sm text-emerald-700 mt-0.5">
+                We found your public profile (<span className="font-medium">{cmsSource.name}</span>) and have filled in the fields below.
+                Please review every section, update any outdated information, and save each section before submitting.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            data-testid="cms-notice-dismiss"
+            onClick={() => setCmsNoticeDismissed(true)}
+            className="text-emerald-400 hover:text-emerald-600 transition-colors shrink-0"
+          >
+            <X className="w-4 h-4" />
+          </button>
         </div>
       )}
 

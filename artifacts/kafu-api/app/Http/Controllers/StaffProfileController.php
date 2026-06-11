@@ -25,11 +25,18 @@ class StaffProfileController extends Controller
 
     public function getProfile(Request $request)
     {
-        $user = $request->user();
-        $submission = $this->getOrCreateDraft($user);
+        $user       = $request->user();
+        $cmsProfile = $this->findCmsProfile($user);
+        $submission = $this->getOrCreateDraft($user, $cmsProfile);
+
         return response()->json([
-            'submission' => $submission->load('comments.author'),
+            'submission'  => $submission->load('comments.author'),
             'has_consent' => $user->hasAcceptedConsent('profile_publication'),
+            'cms_source'  => $cmsProfile ? [
+                'id'   => $cmsProfile->id,
+                'name' => $cmsProfile->title,
+                'slug' => $cmsProfile->slug,
+            ] : null,
         ]);
     }
 
@@ -58,7 +65,7 @@ class StaffProfileController extends Controller
             : 0;
 
         $submission->update([
-            'profile_data' => $profileData,
+            'profile_data'       => $profileData,
             'section_completion' => $sectionCompletion,
             'completeness_score' => $overallScore,
         ]);
@@ -76,13 +83,13 @@ class StaffProfileController extends Controller
             ->update(['is_current' => false]);
 
         StaffConsentRecord::create([
-            'user_id'            => $user->id,
-            'policy_version'     => $data['policy_version'] ?? 'v1.0',
-            'consent_type'       => 'profile_publication',
-            'accepted_at'        => now(),
-            'accepted_ip'        => $request->ip(),
-            'accepted_user_agent'=> $request->userAgent(),
-            'is_current'         => true,
+            'user_id'             => $user->id,
+            'policy_version'      => $data['policy_version'] ?? 'v1.0',
+            'consent_type'        => 'profile_publication',
+            'accepted_at'         => now(),
+            'accepted_ip'         => $request->ip(),
+            'accepted_user_agent' => $request->userAgent(),
+            'is_current'          => true,
         ]);
 
         StaffSecurityEvent::log('consent_accepted', $user->id, $user->email, ['type' => 'profile_publication'], $request->ip(), $request->userAgent());
@@ -146,12 +153,12 @@ class StaffProfileController extends Controller
     {
         $request->validate(['photo' => 'required|image|max:3072']);
         $path = $request->file('photo')->store('staff-photos', 'public');
-        $url = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
+        $url  = Storage::disk('public')->url($path);
 
         $user = $request->user();
         $user->update(['avatar_url' => $url]);
 
-        $submission = $this->getOrCreateDraft($user);
+        $submission  = $this->getOrCreateDraft($user);
         $profileData = $submission->profile_data ?? [];
         $profileData['uploads'] = array_merge($profileData['uploads'] ?? [], ['photo_url' => $url]);
         $submission->update(['profile_data' => $profileData]);
@@ -163,10 +170,10 @@ class StaffProfileController extends Controller
     {
         $request->validate(['cv' => 'required|file|mimes:pdf|max:10240']);
         $path = $request->file('cv')->store('staff-cvs', 'public');
-        $url = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
+        $url  = Storage::disk('public')->url($path);
 
-        $user = $request->user();
-        $submission = $this->getOrCreateDraft($user);
+        $user        = $request->user();
+        $submission  = $this->getOrCreateDraft($user);
         $profileData = $submission->profile_data ?? [];
         $profileData['uploads'] = array_merge($profileData['uploads'] ?? [], ['cv_url' => $url]);
         $submission->update(['profile_data' => $profileData]);
@@ -195,7 +202,182 @@ class StaffProfileController extends Controller
         return response()->json(['extracted' => $extracted]);
     }
 
-    // ─── Rule-based CV parser ───────────────────────────────────────────────
+    // ─── CMS profile lookup ──────────────────────────────────────────────────
+
+    private function findCmsProfile(\App\Models\User $user): ?CmsContent
+    {
+        return CmsContent::where('type', 'staff')
+            ->where('is_deleted', 0)
+            ->whereRaw("json_extract(structured_data, '$.email') = ?", [$user->email])
+            ->first();
+    }
+
+    private function buildProfileDataFromCms(CmsContent $cms, \App\Models\User $user): array
+    {
+        $sd = $cms->structured_data ?? [];
+
+        // Convert arrays/objects to readable text
+        $toText = function ($val): string {
+            if (is_null($val) || $val === '' || $val === []) return '';
+            if (is_string($val)) return trim($val);
+            if (is_array($val)) {
+                $lines = [];
+                foreach ($val as $item) {
+                    if (is_string($item)) {
+                        $lines[] = trim($item);
+                    } elseif (is_array($item)) {
+                        // Qualification-style object: degree, field, institution, year
+                        $parts = array_filter([
+                            $item['degree']      ?? ($item['award'] ?? ''),
+                            $item['field']       ?? ($item['specialization'] ?? ''),
+                            $item['institution'] ?? ($item['university'] ?? ''),
+                            $item['year']        ?? ($item['completion_year'] ?? ''),
+                        ], fn($v) => $v !== '' && $v !== null);
+                        if ($parts) $lines[] = implode(', ', $parts);
+                    }
+                }
+                return implode("\n", array_filter($lines));
+            }
+            return '';
+        };
+
+        // Supervision: may be {masters_count, phd_count, current_students[]}
+        $supervisionRaw = $sd['supervision'] ?? [];
+        if (is_array($supervisionRaw) && array_key_exists('masters_count', $supervisionRaw)) {
+            $supParts = [];
+            if (($supervisionRaw['masters_count'] ?? 0) > 0) {
+                $supParts[] = "Masters students: {$supervisionRaw['masters_count']}";
+            }
+            if (($supervisionRaw['phd_count'] ?? 0) > 0) {
+                $supParts[] = "PhD students: {$supervisionRaw['phd_count']}";
+            }
+            if (!empty($supervisionRaw['current_students'])) {
+                $supParts[] = implode("\n", (array) $supervisionRaw['current_students']);
+            }
+            $supervisionText = implode("\n", $supParts);
+        } else {
+            $supervisionText = $toText($supervisionRaw);
+        }
+
+        // Publications: may be structured objects
+        $pubsRaw = $sd['publications'] ?? [];
+        if (is_array($pubsRaw) && !empty($pubsRaw) && is_array($pubsRaw[0] ?? null)) {
+            $pubLines = [];
+            foreach ($pubsRaw as $pub) {
+                $parts = array_filter([
+                    $pub['authors']      ?? '',
+                    $pub['year']         ?? '',
+                    $pub['title']        ?? '',
+                    $pub['journal']      ?? ($pub['journal_name'] ?? ''),
+                ], fn($v) => $v !== '' && $v !== null);
+                if ($parts) $pubLines[] = implode('. ', $parts);
+            }
+            $pubsText = implode("\n", $pubLines);
+        } else {
+            $pubsText = $toText($pubsRaw);
+        }
+
+        $profile = [
+            'personal' => [
+                'title'        => $sd['title_prefix'] ?? ($user->title ?? ''),
+                'name'         => $cms->title ?? ($user->name ?? ''),
+                'job_title'    => $sd['designation'] ?? ($sd['rank'] ?? ($user->job_title ?? '')),
+                'department'   => $cms->department ?? ($user->department ?? ''),
+                'staff_number' => $user->staff_number ?? '',
+            ],
+            'bio' => [
+                'biography' => $cms->body ?: ($cms->summary ?? ''),
+                'tagline'   => $sd['tagline'] ?? '',
+            ],
+            'qualifications' => [
+                'qualifications' => $toText($sd['qualifications'] ?? []),
+                'certifications' => $toText($sd['certifications'] ?? []),
+                'memberships'    => $toText($sd['memberships'] ?? []),
+            ],
+            'teaching' => [
+                'teaching_areas' => $toText($sd['teaching_areas'] ?? []),
+                'supervision'    => $supervisionText,
+                'awards'         => $toText($sd['awards'] ?? []),
+            ],
+            'research' => [
+                'research_interests' => $toText($sd['research_interests'] ?? ($sd['specializations'] ?? [])),
+                'publications'       => $pubsText,
+                'orcid'              => $sd['orcid_id'] ?? ($sd['personal']['orcid'] ?? ''),
+                'scopus_id'          => $sd['scopus_id'] ?? ($sd['research']['scopus_id'] ?? ''),
+                'scholar_url'        => $sd['google_scholar_url'] ?? ($sd['research']['scholar_url'] ?? ''),
+                'researchgate_url'   => $sd['researchgate_url'] ?? ($sd['research']['researchgate_url'] ?? ''),
+            ],
+            'contact' => [
+                'contact_email'   => $sd['email'] ?? $user->email,
+                'office_phone'    => $sd['phone'] ?? ($sd['office_phone'] ?? ''),
+                'office_location' => $sd['office'] ?? ($sd['office_location'] ?? ''),
+                'website'         => $sd['linkedin_url'] ?? ($sd['website'] ?? ''),
+            ],
+            'uploads' => [
+                'photo_url' => $cms->featured_image ?: ($sd['photo'] ?? ''),
+                'cv_url'    => $sd['cv_url'] ?? '',
+            ],
+        ];
+
+        // Strip blank strings from each section
+        foreach ($profile as $sec => &$fields) {
+            $fields = array_filter($fields, fn($v) => $v !== '' && $v !== null);
+        }
+        unset($fields);
+
+        return array_filter($profile, fn($v) => !empty($v));
+    }
+
+    // ─── Internal helpers ────────────────────────────────────────────────────
+
+    private function getOrCreateDraft(\App\Models\User $user, ?CmsContent $cmsProfile = null): ProfileSubmission
+    {
+        $existing = ProfileSubmission::where('user_id', $user->id)
+            ->whereNotIn('workflow_status', ['published'])
+            ->orderByDesc('version_number')
+            ->first();
+
+        if ($existing) return $existing;
+
+        // Pre-populate from CMS if a linked profile was found
+        $profileData       = $cmsProfile ? $this->buildProfileDataFromCms($cmsProfile, $user) : [];
+        $sectionCompletion = [];
+
+        if (!empty($profileData)) {
+            foreach (array_keys(self::SECTIONS) as $sec) {
+                if (!empty($profileData[$sec])) {
+                    $sectionCompletion[$sec] = $this->calculateSectionScore($sec, $profileData[$sec]);
+                }
+            }
+        }
+
+        $overallScore = count($sectionCompletion) > 0
+            ? (int) round(array_sum($sectionCompletion) / count(self::SECTIONS))
+            : 0;
+
+        return ProfileSubmission::create([
+            'user_id'            => $user->id,
+            'workflow_status'    => 'draft',
+            'version_number'     => 1,
+            'profile_data'       => $profileData,
+            'section_completion' => $sectionCompletion,
+            'completeness_score' => $overallScore,
+        ]);
+    }
+
+    private function calculateSectionScore(string $section, array $data): int
+    {
+        $required = self::SECTIONS[$section] ?? [];
+        if (empty($required)) return 100;
+        $filled = 0;
+        foreach ($required as $field) {
+            $val = $data[$field] ?? null;
+            if (!empty($val)) $filled++;
+        }
+        return (int) round(($filled / count($required)) * 100);
+    }
+
+    // ─── Rule-based CV parser ────────────────────────────────────────────────
 
     private function parseTextCv(string $rawText): array
     {
@@ -203,7 +385,7 @@ class StaffProfileController extends Controller
         $lines = explode("\n", $text);
         $lines = array_map('trim', $lines);
 
-        $full  = implode(' ', $lines);
+        $full     = implode(' ', $lines);
         $nonEmpty = array_values(array_filter($lines, fn($l) => strlen($l) > 1));
 
         $result = [
@@ -217,51 +399,43 @@ class StaffProfileController extends Controller
 
         // ── Regex extractions (whole-document) ────────────────────────────
 
-        // Email
         if (preg_match('/[\w.+\-]+@[\w\-]+(?:\.[\w\-]+)+/i', $full, $m)) {
             $result['contact']['contact_email'] = $m[0];
         }
 
-        // Kenyan phone
         if (preg_match('/(?:\+?254|0)[17]\d{8}/', $full, $m)) {
             $result['contact']['office_phone'] = $m[0];
         }
 
-        // ORCID iD
         if (preg_match('/\b(\d{4}-\d{4}-\d{4}-\d{3}[\dX])\b/', $full, $m)) {
             $result['research']['orcid'] = $m[1];
         }
 
-        // Scopus Author ID
         if (preg_match('/[Ss]copus\s+(?:[Aa]uthor\s+)?ID[:\s#]*(\d{8,})/i', $full, $m)) {
             $result['research']['scopus_id'] = $m[1];
         }
 
-        // Google Scholar URL
         if (preg_match('|https?://scholar\.google\.com/citations\?[^\s,"\'<>]+|i', $full, $m)) {
             $result['research']['scholar_url'] = rtrim($m[0], '.,;)');
         }
 
-        // ResearchGate URL
         if (preg_match('|https?://(?:www\.)?researchgate\.net/profile/[^\s,"\'<>]+|i', $full, $m)) {
             $result['research']['researchgate_url'] = rtrim($m[0], '.,;)');
         }
 
-        // LinkedIn URL
         if (preg_match('|https?://(?:www\.)?linkedin\.com/in/[^\s,"\'<>]+|i', $full, $m)) {
             $result['contact']['website'] = rtrim($m[0], '.,;)');
         }
 
-        // ── Name & title (first 20 non-empty lines) ───────────────────────
+        // ── Name & title ──────────────────────────────────────────────────
         $headLines = array_slice($nonEmpty, 0, 20);
         $titleRx   = '(Prof\.?|Professor|Assoc\.\s*Prof\.?|Dr\.?|Mr\.?|Mrs\.?|Ms\.?|Rev\.?)';
         $nameRx    = '([A-Z][a-zA-Z\'\-]+(?:\s+[A-Z][a-zA-Z\'\-]+){1,4})';
 
         foreach ($headLines as $line) {
             if (preg_match("/^{$titleRx}\s+{$nameRx}/", $line, $m)) {
-                $title = rtrim($m[1], '.');
-                $result['personal']['title']     = $title . '.';
-                $result['personal']['name']       = trim($m[1] . ' ' . $m[2]);
+                $result['personal']['title'] = rtrim($m[1], '.') . '.';
+                $result['personal']['name']  = trim($m[1] . ' ' . $m[2]);
                 break;
             }
         }
@@ -283,7 +457,7 @@ class StaffProfileController extends Controller
             }
         }
 
-        // ── Job title / designation ───────────────────────────────────────
+        // ── Job title ─────────────────────────────────────────────────────
         $desigRx = '/\b(Vice[\s\-]Chancellor|Deputy\s+Vice[\s\-]Chancellor|Registrar|Dean|Director|Professor|Associate\s+Professor|Senior\s+Lecturer|Lecturer|Tutorial\s+Fellow|Assistant\s+Lecturer)\b/i';
         foreach ($headLines as $line) {
             if (preg_match($desigRx, $line, $m)) {
@@ -299,20 +473,20 @@ class StaffProfileController extends Controller
             $result['personal']['department'] = 'School of ' . trim($m[1]);
         }
 
-        // ── Detect section blocks ─────────────────────────────────────────
+        // ── Section blocks ────────────────────────────────────────────────
         $sectionHeaders = [
-            'education'    => '/^(?:education|qualifications?|academic\s+(?:background|qualifications?)|degrees?\s+(?:held|obtained))/i',
-            'research'     => '/^(?:research\s+interests?|areas?\s+of\s+(?:interest|research|specialization)|research\s+focus|research\s+areas?)/i',
-            'publications' => '/^(?:publications?|selected\s+publications?|journal\s+articles?|books?\s+(?:&\s+)?chapters?|scholarly\s+works?|refereed\s+publications?)/i',
-            'teaching'     => '/^(?:teaching|courses?\s+taught|teaching\s+(?:areas?|experience|responsibilities)|subjects?\s+taught|units?\s+taught)/i',
-            'experience'   => '/^(?:(?:work\s+)?experience|employment(?:\s+history)?|professional\s+background|career\s+(?:history|summary))/i',
-            'awards'       => '/^(?:awards?|honors?|honours?|recognition|achievements?|scholarships?\s+(?:and\s+)?awards?)/i',
-            'memberships'  => '/^(?:memberships?|professional\s+(?:bodies|memberships?|affiliations?)|associations?|affiliations?)/i',
-            'summary'      => '/^(?:profile\s+summary|professional\s+summary|executive\s+summary|about\s+me|biography|professional\s+profile|career\s+objective)/i',
+            'education'      => '/^(?:education|qualifications?|academic\s+(?:background|qualifications?)|degrees?\s+(?:held|obtained))/i',
+            'research'       => '/^(?:research\s+interests?|areas?\s+of\s+(?:interest|research|specialization)|research\s+focus|research\s+areas?)/i',
+            'publications'   => '/^(?:publications?|selected\s+publications?|journal\s+articles?|books?\s+(?:&\s+)?chapters?|scholarly\s+works?|refereed\s+publications?)/i',
+            'teaching'       => '/^(?:teaching|courses?\s+taught|teaching\s+(?:areas?|experience|responsibilities)|subjects?\s+taught|units?\s+taught)/i',
+            'experience'     => '/^(?:(?:work\s+)?experience|employment(?:\s+history)?|professional\s+background|career\s+(?:history|summary))/i',
+            'awards'         => '/^(?:awards?|honors?|honours?|recognition|achievements?|scholarships?\s+(?:and\s+)?awards?)/i',
+            'memberships'    => '/^(?:memberships?|professional\s+(?:bodies|memberships?|affiliations?)|associations?|affiliations?)/i',
+            'summary'        => '/^(?:profile\s+summary|professional\s+summary|executive\s+summary|about\s+me|biography|professional\s+profile|career\s+objective)/i',
             'certifications' => '/^(?:certifications?|professional\s+certifications?|short\s+courses?|training)/i',
         ];
 
-        $sectionMap   = [];  // lineIndex => sectionKey
+        $sectionMap = [];
         foreach ($lines as $i => $line) {
             if (strlen($line) > 1 && strlen($line) < 80) {
                 foreach ($sectionHeaders as $key => $rx) {
@@ -390,7 +564,6 @@ class StaffProfileController extends Controller
                     break;
 
                 case 'experience':
-                    // Try to pull the first/current position as job title if not already found
                     if (empty($result['personal']['job_title']) && !empty($block[0])) {
                         if (preg_match($desigRx, $block[0], $m)) {
                             $result['personal']['job_title'] = $m[0];
@@ -400,43 +573,9 @@ class StaffProfileController extends Controller
             }
         }
 
-        // ── Strip empty sub-arrays ────────────────────────────────────────
         foreach ($result as $section => $fields) {
             $result[$section] = array_filter((array) $fields, fn($v) => !empty(trim((string) $v)));
         }
         return array_filter($result, fn($v) => !empty($v));
-    }
-
-    // --- Internal helpers ---
-
-    private function getOrCreateDraft(\App\Models\User $user): ProfileSubmission
-    {
-        $existing = ProfileSubmission::where('user_id', $user->id)
-            ->whereNotIn('workflow_status', ['published'])
-            ->orderByDesc('version_number')
-            ->first();
-
-        if ($existing) return $existing;
-
-        return ProfileSubmission::create([
-            'user_id'          => $user->id,
-            'workflow_status'  => 'draft',
-            'version_number'   => 1,
-            'profile_data'     => [],
-            'section_completion' => [],
-            'completeness_score' => 0,
-        ]);
-    }
-
-    private function calculateSectionScore(string $section, array $data): int
-    {
-        $required = self::SECTIONS[$section] ?? [];
-        if (empty($required)) return 100;
-        $filled = 0;
-        foreach ($required as $field) {
-            $val = $data[$field] ?? null;
-            if (!empty($val)) $filled++;
-        }
-        return (int) round(($filled / count($required)) * 100);
     }
 }
