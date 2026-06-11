@@ -202,7 +202,7 @@ export default function AdmissionsJoiningInstructions() {
               <p className="text-sm text-gray-600 mt-1">{current.subtitle}</p>
             </div>
             <div className="divide-y divide-gray-100">
-              {current.steps.map((step) => (
+              {current.steps.map((step: any) => (
                 <div key={step.number} className="flex gap-5 px-6 py-5">
                   <div
                     className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center text-white"

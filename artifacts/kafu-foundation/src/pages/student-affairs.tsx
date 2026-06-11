@@ -92,7 +92,7 @@ export default function StudentAffairs() {
       <PageHero
         title="Dean of Students Office"
         subtitle="Championing student welfare, holistic development, and a supportive campus environment from admission through graduation"
-        breadcrumbs={[
+        breadcrumb={[
           { label: "Home", href: "/" },
           { label: "Students", href: "/student-services" },
           { label: "Student Affairs" },

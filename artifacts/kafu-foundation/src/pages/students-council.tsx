@@ -87,7 +87,7 @@ export default function StudentsCouncil() {
       <PageHero
         title="KAFU Student Council"
         subtitle="The Kaimosi Friends University Students' Association — the voice and advocate of the KAFU student community"
-        breadcrumbs={[
+        breadcrumb={[
           { label: "Home", href: "/" },
           { label: "Students", href: "/student-services" },
           { label: "Student Council" },
