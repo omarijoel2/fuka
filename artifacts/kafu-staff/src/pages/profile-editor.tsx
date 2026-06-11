@@ -202,7 +202,7 @@ function ExtractionPreview({ extracted, mismatches, onApply, onDismiss }: Extrac
 }
 
 export default function ProfileEditorPage() {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const [activeTab, setActiveTab] = useState<Section>("personal");
   const [submission, setSubmission] = useState<Submission | null>(null);
   const [form, setForm] = useState<Record<string, Record<string, string>>>({});
@@ -228,6 +228,12 @@ export default function ProfileEditorPage() {
 
   const [cmsSource, setCmsSource] = useState<{ id: number; name: string; slug: string } | null>(null);
   const [cmsNoticeDismissed, setCmsNoticeDismissed] = useState(false);
+
+  // Account settings — email change
+  const [newEmail, setNewEmail]         = useState("");
+  const [emailPassword, setEmailPassword] = useState("");
+  const [emailSaving, setEmailSaving]   = useState(false);
+  const [emailFeedback, setEmailFeedback] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const [newCourse, setNewCourse] = useState({ code: "", title: "", level: "UG", semester: "" });
   const [newGrant, setNewGrant] = useState({ title: "", funder: "", amount: "", year: new Date().getFullYear().toString(), status: "Active" });
@@ -416,6 +422,24 @@ export default function ProfileEditorPage() {
     setExtracted(null);
     setActiveTab("personal");
     showToast("success", "Profile pre-filled from CV. Review each section and save.");
+  }
+
+  async function handleEmailChange(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newEmail.trim() || !emailPassword.trim()) return;
+    setEmailSaving(true);
+    setEmailFeedback(null);
+    try {
+      const res = await staffPut("/account/email", { email: newEmail.trim(), current_password: emailPassword });
+      setEmailFeedback({ type: "success", text: "Email updated successfully." });
+      setNewEmail("");
+      setEmailPassword("");
+      if (res.user) setUser(res.user);
+    } catch (err: unknown) {
+      setEmailFeedback({ type: "error", text: err instanceof Error ? err.message : "Update failed." });
+    } finally {
+      setEmailSaving(false);
+    }
   }
 
   const canEdit = !submission || ["draft", "revision_requested"].includes(submission.workflow_status);
@@ -1035,6 +1059,80 @@ export default function ProfileEditorPage() {
             {submitting ? "Submitting…" : "Submit Profile for Review"}
           </button>
         )}
+      </div>
+
+      {/* Account Settings */}
+      <div className="bg-white rounded-2xl border border-gray-200 p-6" data-testid="account-settings">
+        <h3 className="text-sm font-bold text-gray-900 mb-1">Account Settings</h3>
+        <p className="text-xs text-gray-500 mb-5">Update your login email address. Your current password is required to confirm the change.</p>
+
+        <form onSubmit={handleEmailChange} className="space-y-4 max-w-md">
+          {/* Current email (read-only) */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5">Current Email</label>
+            <div className="w-full border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-gray-50 text-gray-500 select-all" data-testid="current-email-display">
+              {user?.email ?? "—"}
+            </div>
+          </div>
+
+          {/* New email */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5" htmlFor="new-email">
+              New Email Address
+            </label>
+            <input
+              id="new-email"
+              type="email"
+              value={newEmail}
+              onChange={e => { setNewEmail(e.target.value); setEmailFeedback(null); }}
+              placeholder="new.address@kafu.ac.ke"
+              required
+              data-testid="input-new-email"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
+            />
+          </div>
+
+          {/* Current password confirmation */}
+          <div>
+            <label className="block text-xs font-semibold text-gray-600 mb-1.5" htmlFor="email-password">
+              Current Password <span className="text-red-500">*</span>
+            </label>
+            <input
+              id="email-password"
+              type="password"
+              value={emailPassword}
+              onChange={e => { setEmailPassword(e.target.value); setEmailFeedback(null); }}
+              placeholder="Enter your current password"
+              required
+              data-testid="input-email-password"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-colors"
+            />
+          </div>
+
+          {/* Feedback */}
+          {emailFeedback && (
+            <div className={`flex items-center gap-2 text-sm rounded-lg px-3 py-2.5 ${
+              emailFeedback.type === "success"
+                ? "bg-green-50 text-green-700 border border-green-200"
+                : "bg-red-50 text-red-700 border border-red-200"
+            }`} data-testid="email-change-feedback">
+              {emailFeedback.type === "success"
+                ? <CheckCircle className="w-4 h-4 shrink-0" />
+                : <AlertCircle className="w-4 h-4 shrink-0" />}
+              {emailFeedback.text}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={emailSaving || !newEmail.trim() || !emailPassword.trim()}
+            data-testid="btn-update-email"
+            className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-sm font-semibold hover:bg-primary/90 disabled:opacity-50 transition-colors"
+          >
+            <Save className="w-4 h-4" />
+            {emailSaving ? "Updating…" : "Update Email"}
+          </button>
+        </form>
       </div>
     </div>
   );

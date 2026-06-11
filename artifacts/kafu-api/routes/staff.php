@@ -42,6 +42,36 @@ Route::prefix('staff')
         // Consent
         Route::post('/consent/accept', [StaffProfileController::class, 'acceptConsent']);
 
+        // Account settings
+        Route::put('/account/email', function (\Illuminate\Http\Request $request) {
+            $user = $request->user();
+            $data = $request->validate([
+                'email'            => 'required|email|max:255|unique:users,email,' . $user->id,
+                'current_password' => 'required|string',
+            ]);
+
+            if (!\Illuminate\Support\Facades\Hash::check($data['current_password'], $user->password)) {
+                return response()->json(['message' => 'Current password is incorrect.'], 422);
+            }
+
+            $old = $user->email;
+            $user->update(['email' => $data['email']]);
+
+            \App\Models\StaffSecurityEvent::log(
+                'email_change',
+                $user->id,
+                $data['email'],
+                ['old_email' => $old],
+                $request->ip(),
+                $request->userAgent()
+            );
+
+            return response()->json([
+                'message' => 'Email address updated successfully.',
+                'user'    => array_merge($user->fresh()->toArray(), ['has_consent' => $user->hasAcceptedConsent('profile_publication')]),
+            ]);
+        });
+
         // Policy & institutional documents
         Route::get('/policy-documents', function () {
             $docs = \App\Models\SiteConfig::getGroup('staff_documents');
