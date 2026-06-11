@@ -5692,3 +5692,528 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
         ]);
     });
 });
+
+/*
+|--------------------------------------------------------------------------
+| MP18 — Alumni & Graduate Outcomes Intelligence
+|--------------------------------------------------------------------------
+*/
+
+// ─── Public: Alumni Directory ────────────────────────────────────────────────
+Route::get('/alumni/featured', function () {
+    $items = \App\Models\AlumniProfile::where('is_published', true)
+        ->where('visibility', 'public')
+        ->where('is_featured', true)
+        ->orderBy('name')
+        ->get()
+        ->map(fn($a) => kafu_map_alumni($a));
+    return response()->json(['data' => $items]);
+});
+
+Route::get('/alumni', function (\Illuminate\Http\Request $request) {
+    $q = \App\Models\AlumniProfile::where('is_published', true)->where('visibility', 'public');
+
+    if ($request->school_code) $q->where('school_code', $request->school_code);
+    if ($request->sector)      $q->where('sector', $request->sector);
+    if ($request->industry)    $q->where('industry', 'like', '%' . $request->industry . '%');
+    if ($request->programme)   $q->where('programme', 'like', '%' . $request->programme . '%');
+    if ($request->graduation_year) $q->where('graduation_year', (int) $request->graduation_year);
+    if ($request->boolean('featured')) $q->where('is_featured', true);
+    if ($request->search) {
+        $q->where(function ($sq) use ($request) {
+            $sq->where('name', 'like', '%' . $request->search . '%')
+               ->orWhere('current_organization', 'like', '%' . $request->search . '%')
+               ->orWhere('current_role', 'like', '%' . $request->search . '%')
+               ->orWhere('programme', 'like', '%' . $request->search . '%');
+        });
+    }
+
+    $perPage = min((int) ($request->per_page ?? 12), 50);
+    $paginator = $q->orderByDesc('is_featured')->orderBy('name')->paginate($perPage);
+
+    return response()->json([
+        'data' => collect($paginator->items())->map(fn($a) => kafu_map_alumni($a)),
+        'total' => $paginator->total(),
+        'last_page' => $paginator->lastPage(),
+        'current_page' => $paginator->currentPage(),
+        'per_page' => $paginator->perPage(),
+    ]);
+});
+
+Route::get('/alumni/{slug}', function (string $slug) {
+    $a = \App\Models\AlumniProfile::where('slug', $slug)->where('is_published', true)->firstOrFail();
+    $data = kafu_map_alumni($a);
+    $data['bio'] = $a->bio;
+    $data['linkedin_url'] = $a->linkedin_url;
+    $data['seo_meta'] = $a->seo_meta;
+    $data['stories'] = $a->stories()->where('is_published', true)->get()->map(fn($s) => [
+        'id' => $s->id, 'slug' => $s->slug, 'title' => $s->title, 'summary' => $s->summary,
+    ])->values();
+    return response()->json($data);
+});
+
+// ─── Public: Alumni Stories ──────────────────────────────────────────────────
+Route::get('/alumni-stories', function (\Illuminate\Http\Request $request) {
+    $q = \App\Models\AlumniStory::where('is_published', true);
+    if ($request->boolean('featured')) $q->where('is_featured', true);
+    $items = $q->orderByDesc('is_featured')->orderByDesc('graduation_year')->get()->map(fn($s) => [
+        'id' => $s->id, 'slug' => $s->slug, 'title' => $s->title, 'summary' => $s->summary,
+        'alumni_name' => $s->alumni_name, 'programme' => $s->programme,
+        'graduation_year' => $s->graduation_year, 'photo_url' => $s->photo_url,
+        'video_url' => $s->video_url, 'is_featured' => $s->is_featured,
+    ]);
+    return response()->json(['data' => $items]);
+});
+
+Route::get('/alumni-stories/{slug}', function (string $slug) {
+    $s = \App\Models\AlumniStory::where('slug', $slug)->where('is_published', true)->firstOrFail();
+    return response()->json([
+        'id' => $s->id, 'slug' => $s->slug, 'title' => $s->title, 'summary' => $s->summary,
+        'body' => $s->body, 'alumni_name' => $s->alumni_name, 'alumni_id' => $s->alumni_id,
+        'programme' => $s->programme, 'graduation_year' => $s->graduation_year,
+        'photo_url' => $s->photo_url, 'video_url' => $s->video_url, 'seo_meta' => $s->seo_meta,
+    ]);
+});
+
+// ─── Public: Employer Partners ───────────────────────────────────────────────
+Route::get('/employer-partners', function (\Illuminate\Http\Request $request) {
+    $q = \App\Models\EmployerPartner::where('is_published', true);
+    if ($request->industry) $q->where('industry', 'like', '%' . $request->industry . '%');
+    if ($request->status)   $q->where('partnership_status', $request->status);
+    if ($request->boolean('featured')) $q->where('is_featured', true);
+    $items = $q->orderByDesc('is_featured')->orderByDesc('graduate_hires')->orderBy('name')->get()->map(fn($e) => [
+        'id' => $e->id, 'slug' => $e->slug, 'name' => $e->name, 'industry' => $e->industry,
+        'partnership_status' => $e->partnership_status, 'internship_opportunities' => $e->internship_opportunities,
+        'graduate_hires' => $e->graduate_hires, 'logo_url' => $e->logo_url, 'website_url' => $e->website_url,
+        'description' => $e->description, 'is_featured' => $e->is_featured,
+    ]);
+    return response()->json(['data' => $items]);
+});
+
+// ─── Public: Graduate Outcomes ───────────────────────────────────────────────
+Route::get('/graduate-outcomes', function (\Illuminate\Http\Request $request) {
+    $q = \App\Models\GraduateOutcome::where('is_published', true);
+    if ($request->programme_slug) $q->where('programme_slug', $request->programme_slug);
+    if ($request->school_code)    $q->where('school_code', $request->school_code);
+    $items = $q->orderByDesc('cohort_year')->orderBy('programme')->get()->map(fn($o) => kafu_map_outcome($o));
+    return response()->json(['data' => $items]);
+});
+
+/*
+| MP18 Admin (AdminAuth) — Alumni, Stories, Employers, Outcomes
+*/
+
+// Alumni profiles
+Route::get('/admin/alumni', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    return response()->json(['data' => \App\Models\AlumniProfile::orderByDesc('id')->get()]);
+});
+Route::post('/admin/alumni', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $data = $request->validate([
+        'name' => 'required|string|max:200', 'programme' => 'nullable|string|max:200',
+        'school_code' => 'nullable|string|max:50', 'graduation_year' => 'nullable|integer|min:1970|max:2035',
+        'current_role' => 'nullable|string|max:200', 'current_organization' => 'nullable|string|max:200',
+        'country' => 'nullable|string|max:100', 'industry' => 'nullable|string|max:150',
+        'sector' => 'nullable|in:employed,self_employed,entrepreneur,public_sector,ngo_sector,academic_sector,further_study,leadership',
+        'achievements' => 'nullable|string', 'bio' => 'nullable|string',
+        'photo_url' => 'nullable|string|max:500', 'linkedin_url' => 'nullable|string|max:500',
+        'featured_category' => 'nullable|string|max:50', 'visibility' => 'nullable|in:public,private',
+        'is_featured' => 'nullable|boolean', 'is_published' => 'nullable|boolean',
+    ]);
+    $data['slug'] = kafu_unique_slug(\App\Models\AlumniProfile::class, $data['name']);
+    $a = \App\Models\AlumniProfile::create($data);
+    return response()->json($a, 201);
+});
+Route::put('/admin/alumni/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $a = \App\Models\AlumniProfile::findOrFail($id);
+    $data = $request->validate([
+        'name' => 'sometimes|string|max:200', 'programme' => 'nullable|string|max:200',
+        'school_code' => 'nullable|string|max:50', 'graduation_year' => 'nullable|integer|min:1970|max:2035',
+        'current_role' => 'nullable|string|max:200', 'current_organization' => 'nullable|string|max:200',
+        'country' => 'nullable|string|max:100', 'industry' => 'nullable|string|max:150',
+        'sector' => 'nullable|in:employed,self_employed,entrepreneur,public_sector,ngo_sector,academic_sector,further_study,leadership',
+        'achievements' => 'nullable|string', 'bio' => 'nullable|string',
+        'photo_url' => 'nullable|string|max:500', 'linkedin_url' => 'nullable|string|max:500',
+        'featured_category' => 'nullable|string|max:50', 'visibility' => 'nullable|in:public,private',
+        'is_featured' => 'nullable|boolean', 'is_published' => 'nullable|boolean',
+    ]);
+    $a->update($data);
+    return response()->json($a);
+});
+Route::delete('/admin/alumni/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    \App\Models\AlumniProfile::findOrFail($id)->delete();
+    return response()->json(['success' => true]);
+});
+
+// Alumni stories
+Route::get('/admin/alumni-stories', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    return response()->json(['data' => \App\Models\AlumniStory::orderByDesc('id')->get()]);
+});
+Route::post('/admin/alumni-stories', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $data = $request->validate([
+        'title' => 'required|string|max:300', 'alumni_id' => 'nullable|integer|exists:alumni_profiles,id',
+        'alumni_name' => 'nullable|string|max:200', 'programme' => 'nullable|string|max:200',
+        'graduation_year' => 'nullable|integer|min:1970|max:2035', 'summary' => 'required|string',
+        'body' => 'nullable|string', 'video_url' => 'nullable|string|max:500',
+        'photo_url' => 'nullable|string|max:500', 'is_featured' => 'nullable|boolean', 'is_published' => 'nullable|boolean',
+    ]);
+    $data['slug'] = kafu_unique_slug(\App\Models\AlumniStory::class, $data['title']);
+    $s = \App\Models\AlumniStory::create($data);
+    return response()->json($s, 201);
+});
+Route::put('/admin/alumni-stories/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $s = \App\Models\AlumniStory::findOrFail($id);
+    $data = $request->validate([
+        'title' => 'sometimes|string|max:300', 'alumni_id' => 'nullable|integer|exists:alumni_profiles,id',
+        'alumni_name' => 'nullable|string|max:200', 'programme' => 'nullable|string|max:200',
+        'graduation_year' => 'nullable|integer|min:1970|max:2035', 'summary' => 'sometimes|string',
+        'body' => 'nullable|string', 'video_url' => 'nullable|string|max:500',
+        'photo_url' => 'nullable|string|max:500', 'is_featured' => 'nullable|boolean', 'is_published' => 'nullable|boolean',
+    ]);
+    $s->update($data);
+    return response()->json($s);
+});
+Route::delete('/admin/alumni-stories/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    \App\Models\AlumniStory::findOrFail($id)->delete();
+    return response()->json(['success' => true]);
+});
+
+// Employer partners
+Route::get('/admin/employer-partners', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    return response()->json(['data' => \App\Models\EmployerPartner::orderByDesc('id')->get()]);
+});
+Route::post('/admin/employer-partners', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $data = $request->validate([
+        'name' => 'required|string|max:200', 'industry' => 'nullable|string|max:150',
+        'partnership_status' => 'required|in:active,prospective,mou_signed,inactive',
+        'internship_opportunities' => 'nullable|boolean', 'graduate_hires' => 'nullable|integer|min:0',
+        'logo_url' => 'nullable|string|max:500', 'website_url' => 'nullable|string|max:500',
+        'description' => 'nullable|string', 'is_featured' => 'nullable|boolean', 'is_published' => 'nullable|boolean',
+    ]);
+    $data['slug'] = kafu_unique_slug(\App\Models\EmployerPartner::class, $data['name']);
+    $e = \App\Models\EmployerPartner::create($data);
+    return response()->json($e, 201);
+});
+Route::put('/admin/employer-partners/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $e = \App\Models\EmployerPartner::findOrFail($id);
+    $data = $request->validate([
+        'name' => 'sometimes|string|max:200', 'industry' => 'nullable|string|max:150',
+        'partnership_status' => 'sometimes|in:active,prospective,mou_signed,inactive',
+        'internship_opportunities' => 'nullable|boolean', 'graduate_hires' => 'nullable|integer|min:0',
+        'logo_url' => 'nullable|string|max:500', 'website_url' => 'nullable|string|max:500',
+        'description' => 'nullable|string', 'is_featured' => 'nullable|boolean', 'is_published' => 'nullable|boolean',
+    ]);
+    $e->update($data);
+    return response()->json($e);
+});
+Route::delete('/admin/employer-partners/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    \App\Models\EmployerPartner::findOrFail($id)->delete();
+    return response()->json(['success' => true]);
+});
+
+// Graduate outcomes
+Route::get('/admin/graduate-outcomes', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    return response()->json(['data' => \App\Models\GraduateOutcome::orderByDesc('cohort_year')->orderBy('programme')->get()]);
+});
+Route::post('/admin/graduate-outcomes', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $data = $request->validate([
+        'programme' => 'required|string|max:200', 'programme_slug' => 'nullable|string|max:200',
+        'school_code' => 'nullable|string|max:50', 'cohort_year' => 'nullable|integer|min:1970|max:2035',
+        'employment_rate' => 'nullable|numeric|min:0|max:100', 'further_study_rate' => 'nullable|numeric|min:0|max:100',
+        'entrepreneurship_rate' => 'nullable|numeric|min:0|max:100', 'avg_time_to_employment_months' => 'nullable|integer|min:0|max:120',
+        'sample_size' => 'nullable|integer|min:0', 'top_employers' => 'nullable|array', 'top_sectors' => 'nullable|array',
+        'notes' => 'nullable|string', 'is_published' => 'nullable|boolean',
+    ]);
+    $o = \App\Models\GraduateOutcome::create($data);
+    return response()->json($o, 201);
+});
+Route::put('/admin/graduate-outcomes/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $o = \App\Models\GraduateOutcome::findOrFail($id);
+    $data = $request->validate([
+        'programme' => 'sometimes|string|max:200', 'programme_slug' => 'nullable|string|max:200',
+        'school_code' => 'nullable|string|max:50', 'cohort_year' => 'nullable|integer|min:1970|max:2035',
+        'employment_rate' => 'nullable|numeric|min:0|max:100', 'further_study_rate' => 'nullable|numeric|min:0|max:100',
+        'entrepreneurship_rate' => 'nullable|numeric|min:0|max:100', 'avg_time_to_employment_months' => 'nullable|integer|min:0|max:120',
+        'sample_size' => 'nullable|integer|min:0', 'top_employers' => 'nullable|array', 'top_sectors' => 'nullable|array',
+        'notes' => 'nullable|string', 'is_published' => 'nullable|boolean',
+    ]);
+    $o->update($data);
+    return response()->json($o);
+});
+Route::delete('/admin/graduate-outcomes/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    \App\Models\GraduateOutcome::findOrFail($id)->delete();
+    return response()->json(['success' => true]);
+});
+
+if (! function_exists('kafu_map_alumni')) {
+    function kafu_map_alumni($a): array {
+        return [
+            'id' => $a->id, 'slug' => $a->slug, 'name' => $a->name, 'programme' => $a->programme,
+            'school_code' => $a->school_code, 'graduation_year' => $a->graduation_year,
+            'current_role' => $a->current_role, 'current_organization' => $a->current_organization,
+            'country' => $a->country, 'industry' => $a->industry, 'sector' => $a->sector,
+            'achievements' => $a->achievements, 'photo_url' => $a->photo_url,
+            'featured_category' => $a->featured_category, 'is_featured' => $a->is_featured,
+        ];
+    }
+}
+if (! function_exists('kafu_map_outcome')) {
+    function kafu_map_outcome($o): array {
+        return [
+            'id' => $o->id, 'programme' => $o->programme, 'programme_slug' => $o->programme_slug,
+            'school_code' => $o->school_code, 'cohort_year' => $o->cohort_year,
+            'employment_rate' => $o->employment_rate, 'further_study_rate' => $o->further_study_rate,
+            'entrepreneurship_rate' => $o->entrepreneurship_rate,
+            'avg_time_to_employment_months' => $o->avg_time_to_employment_months,
+            'sample_size' => $o->sample_size, 'top_employers' => $o->top_employers ?? [],
+            'top_sectors' => $o->top_sectors ?? [],
+        ];
+    }
+}
+if (! function_exists('kafu_unique_slug')) {
+    function kafu_unique_slug(string $modelClass, string $title): string {
+        $base = \Illuminate\Support\Str::slug($title);
+        $slug = $base ?: 'item';
+        $i = 2;
+        while ($modelClass::where('slug', $slug)->exists()) {
+            $slug = $base . '-' . $i++;
+        }
+        return $slug;
+    }
+}
+
+/*
+|--------------------------------------------------------------------------
+| MP19 — Institutional Data, Rankings & Transparency
+|--------------------------------------------------------------------------
+*/
+
+// ─── Public: Institutional KPIs ──────────────────────────────────────────────
+Route::get('/institutional-kpis', function (\Illuminate\Http\Request $request) {
+    $q = \App\Models\InstitutionalKpi::where('is_published', true);
+    if ($request->category) $q->where('category', $request->category);
+    if ($request->boolean('featured')) $q->where('is_featured', true);
+    $items = $q->orderBy('sort_order')->orderBy('label')->get()->map(fn($k) => kafu_map_kpi($k));
+    return response()->json(['data' => $items]);
+});
+
+// ─── Public: Rankings ────────────────────────────────────────────────────────
+Route::get('/rankings', function (\Illuminate\Http\Request $request) {
+    $q = \App\Models\Ranking::where('is_published', true);
+    if ($request->category) $q->where('category', $request->category);
+    if ($request->boolean('featured')) $q->where('is_featured', true);
+    $items = $q->orderBy('sort_order')->orderByDesc('year')->get()->map(fn($r) => [
+        'id' => $r->id, 'slug' => $r->slug, 'organization' => $r->organization, 'title' => $r->title,
+        'rank_value' => $r->rank_value, 'rank_numeric' => $r->rank_numeric, 'category' => $r->category,
+        'year' => $r->year, 'scope' => $r->scope, 'logo_url' => $r->logo_url, 'source_url' => $r->source_url,
+        'description' => $r->description, 'is_featured' => $r->is_featured,
+    ]);
+    return response()->json(['data' => $items]);
+});
+
+// ─── Public: Institutional Reports ───────────────────────────────────────────
+Route::get('/institutional-reports', function (\Illuminate\Http\Request $request) {
+    $q = \App\Models\InstitutionalReport::where('is_published', true);
+    if ($request->report_type) $q->where('report_type', $request->report_type);
+    if ($request->year)        $q->where('year', (int) $request->year);
+    $items = $q->orderBy('sort_order')->orderByDesc('year')->get()->map(fn($r) => [
+        'id' => $r->id, 'slug' => $r->slug, 'title' => $r->title, 'report_type' => $r->report_type,
+        'year' => $r->year, 'description' => $r->description, 'file_url' => $r->file_url,
+        'file_size' => $r->file_size, 'published_date' => $r->published_date?->toDateString(),
+        'is_featured' => $r->is_featured,
+    ]);
+    return response()->json(['data' => $items]);
+});
+
+// ─── Public: Accreditations ──────────────────────────────────────────────────
+Route::get('/accreditations', function (\Illuminate\Http\Request $request) {
+    $q = \App\Models\Accreditation::where('is_published', true);
+    if ($request->accreditation_type) $q->where('accreditation_type', $request->accreditation_type);
+    $items = $q->orderBy('sort_order')->orderBy('body_name')->get()->map(fn($a) => [
+        'id' => $a->id, 'slug' => $a->slug, 'body_name' => $a->body_name,
+        'accreditation_type' => $a->accreditation_type, 'programme' => $a->programme,
+        'school_code' => $a->school_code, 'status' => $a->status,
+        'award_date' => $a->award_date?->toDateString(), 'expiry_date' => $a->expiry_date?->toDateString(),
+        'certificate_url' => $a->certificate_url, 'logo_url' => $a->logo_url, 'description' => $a->description,
+    ]);
+    return response()->json(['data' => $items]);
+});
+
+/*
+| MP19 Admin (AdminAuth) — KPIs, Rankings, Reports, Accreditations
+*/
+
+// Institutional KPIs
+Route::get('/admin/institutional-kpis', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    return response()->json(['data' => \App\Models\InstitutionalKpi::orderBy('sort_order')->orderBy('label')->get()]);
+});
+Route::post('/admin/institutional-kpis', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $data = $request->validate([
+        'label' => 'required|string|max:200', 'category' => 'required|string|max:50',
+        'value' => 'nullable|numeric', 'display_value' => 'nullable|string|max:100', 'unit' => 'nullable|string|max:50',
+        'period_year' => 'nullable|integer|min:1970|max:2035', 'trend' => 'nullable|in:up,down,flat',
+        'trend_value' => 'nullable|numeric', 'icon' => 'nullable|string|max:50', 'description' => 'nullable|string',
+        'series' => 'nullable|array', 'sort_order' => 'nullable|integer', 'is_featured' => 'nullable|boolean', 'is_published' => 'nullable|boolean',
+    ]);
+    $data['slug'] = kafu_unique_slug(\App\Models\InstitutionalKpi::class, $data['label']);
+    $k = \App\Models\InstitutionalKpi::create($data);
+    return response()->json($k, 201);
+});
+Route::put('/admin/institutional-kpis/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $k = \App\Models\InstitutionalKpi::findOrFail($id);
+    $data = $request->validate([
+        'label' => 'sometimes|string|max:200', 'category' => 'sometimes|string|max:50',
+        'value' => 'nullable|numeric', 'display_value' => 'nullable|string|max:100', 'unit' => 'nullable|string|max:50',
+        'period_year' => 'nullable|integer|min:1970|max:2035', 'trend' => 'nullable|in:up,down,flat',
+        'trend_value' => 'nullable|numeric', 'icon' => 'nullable|string|max:50', 'description' => 'nullable|string',
+        'series' => 'nullable|array', 'sort_order' => 'nullable|integer', 'is_featured' => 'nullable|boolean', 'is_published' => 'nullable|boolean',
+    ]);
+    $k->update($data);
+    return response()->json($k);
+});
+Route::delete('/admin/institutional-kpis/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    \App\Models\InstitutionalKpi::findOrFail($id)->delete();
+    return response()->json(['success' => true]);
+});
+
+// Rankings
+Route::get('/admin/rankings', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    return response()->json(['data' => \App\Models\Ranking::orderBy('sort_order')->orderByDesc('year')->get()]);
+});
+Route::post('/admin/rankings', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $data = $request->validate([
+        'organization' => 'required|string|max:200', 'title' => 'required|string|max:300',
+        'rank_value' => 'nullable|string|max:100', 'rank_numeric' => 'nullable|integer|min:0',
+        'category' => 'required|in:national,regional,global,subject', 'year' => 'nullable|integer|min:1970|max:2035',
+        'scope' => 'nullable|string|max:100', 'logo_url' => 'nullable|string|max:500', 'source_url' => 'nullable|string|max:500',
+        'description' => 'nullable|string', 'sort_order' => 'nullable|integer', 'is_featured' => 'nullable|boolean', 'is_published' => 'nullable|boolean',
+    ]);
+    $data['slug'] = kafu_unique_slug(\App\Models\Ranking::class, $data['organization'] . '-' . ($data['year'] ?? ''));
+    $r = \App\Models\Ranking::create($data);
+    return response()->json($r, 201);
+});
+Route::put('/admin/rankings/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $r = \App\Models\Ranking::findOrFail($id);
+    $data = $request->validate([
+        'organization' => 'sometimes|string|max:200', 'title' => 'sometimes|string|max:300',
+        'rank_value' => 'nullable|string|max:100', 'rank_numeric' => 'nullable|integer|min:0',
+        'category' => 'sometimes|in:national,regional,global,subject', 'year' => 'nullable|integer|min:1970|max:2035',
+        'scope' => 'nullable|string|max:100', 'logo_url' => 'nullable|string|max:500', 'source_url' => 'nullable|string|max:500',
+        'description' => 'nullable|string', 'sort_order' => 'nullable|integer', 'is_featured' => 'nullable|boolean', 'is_published' => 'nullable|boolean',
+    ]);
+    $r->update($data);
+    return response()->json($r);
+});
+Route::delete('/admin/rankings/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    \App\Models\Ranking::findOrFail($id)->delete();
+    return response()->json(['success' => true]);
+});
+
+// Institutional Reports
+Route::get('/admin/institutional-reports', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    return response()->json(['data' => \App\Models\InstitutionalReport::orderBy('sort_order')->orderByDesc('year')->get()]);
+});
+Route::post('/admin/institutional-reports', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $data = $request->validate([
+        'title' => 'required|string|max:300', 'report_type' => 'required|string|max:50',
+        'year' => 'nullable|integer|min:1970|max:2035', 'description' => 'nullable|string',
+        'file_url' => 'nullable|string|max:500', 'file_size' => 'nullable|string|max:50',
+        'published_date' => 'nullable|date', 'sort_order' => 'nullable|integer', 'is_featured' => 'nullable|boolean', 'is_published' => 'nullable|boolean',
+    ]);
+    $data['slug'] = kafu_unique_slug(\App\Models\InstitutionalReport::class, $data['title']);
+    $r = \App\Models\InstitutionalReport::create($data);
+    return response()->json($r, 201);
+});
+Route::put('/admin/institutional-reports/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $r = \App\Models\InstitutionalReport::findOrFail($id);
+    $data = $request->validate([
+        'title' => 'sometimes|string|max:300', 'report_type' => 'sometimes|string|max:50',
+        'year' => 'nullable|integer|min:1970|max:2035', 'description' => 'nullable|string',
+        'file_url' => 'nullable|string|max:500', 'file_size' => 'nullable|string|max:50',
+        'published_date' => 'nullable|date', 'sort_order' => 'nullable|integer', 'is_featured' => 'nullable|boolean', 'is_published' => 'nullable|boolean',
+    ]);
+    $r->update($data);
+    return response()->json($r);
+});
+Route::delete('/admin/institutional-reports/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    \App\Models\InstitutionalReport::findOrFail($id)->delete();
+    return response()->json(['success' => true]);
+});
+
+// Accreditations
+Route::get('/admin/accreditations', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    return response()->json(['data' => \App\Models\Accreditation::orderBy('sort_order')->orderBy('body_name')->get()]);
+});
+Route::post('/admin/accreditations', function (\Illuminate\Http\Request $request) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $data = $request->validate([
+        'body_name' => 'required|string|max:200', 'accreditation_type' => 'required|in:institutional,programme',
+        'programme' => 'nullable|string|max:200', 'school_code' => 'nullable|string|max:50',
+        'status' => 'required|in:accredited,provisional,candidate,expired',
+        'award_date' => 'nullable|date', 'expiry_date' => 'nullable|date',
+        'certificate_url' => 'nullable|string|max:500', 'logo_url' => 'nullable|string|max:500',
+        'description' => 'nullable|string', 'sort_order' => 'nullable|integer', 'is_published' => 'nullable|boolean',
+    ]);
+    $data['slug'] = kafu_unique_slug(\App\Models\Accreditation::class, $data['body_name'] . '-' . ($data['programme'] ?? ''));
+    $a = \App\Models\Accreditation::create($data);
+    return response()->json($a, 201);
+});
+Route::put('/admin/accreditations/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    $a = \App\Models\Accreditation::findOrFail($id);
+    $data = $request->validate([
+        'body_name' => 'sometimes|string|max:200', 'accreditation_type' => 'sometimes|in:institutional,programme',
+        'programme' => 'nullable|string|max:200', 'school_code' => 'nullable|string|max:50',
+        'status' => 'sometimes|in:accredited,provisional,candidate,expired',
+        'award_date' => 'nullable|date', 'expiry_date' => 'nullable|date',
+        'certificate_url' => 'nullable|string|max:500', 'logo_url' => 'nullable|string|max:500',
+        'description' => 'nullable|string', 'sort_order' => 'nullable|integer', 'is_published' => 'nullable|boolean',
+    ]);
+    $a->update($data);
+    return response()->json($a);
+});
+Route::delete('/admin/accreditations/{id}', function (\Illuminate\Http\Request $request, int $id) {
+    \App\Http\Middleware\AdminAuth::check($request);
+    \App\Models\Accreditation::findOrFail($id)->delete();
+    return response()->json(['success' => true]);
+});
+
+if (! function_exists('kafu_map_kpi')) {
+    function kafu_map_kpi($k): array {
+        return [
+            'id' => $k->id, 'slug' => $k->slug, 'label' => $k->label, 'category' => $k->category,
+            'value' => $k->value, 'display_value' => $k->display_value, 'unit' => $k->unit,
+            'period_year' => $k->period_year, 'trend' => $k->trend, 'trend_value' => $k->trend_value,
+            'icon' => $k->icon, 'description' => $k->description, 'series' => $k->series ?? [],
+            'is_featured' => $k->is_featured,
+        ];
+    }
+}

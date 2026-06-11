@@ -118,6 +118,10 @@ import type {
   ExchangeProgramme,
   Campus,
   ServicePoint,
+  AlumniProfile,
+  AlumniStory,
+  EmployerPartner,
+  GraduateOutcome,
 } from "./api-types";
 
 export interface HeroSlide {
@@ -801,5 +805,139 @@ export function useNavConfig() {
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     placeholderData: FALLBACK_NAV_CONFIG,
+  });
+}
+
+// MP18 — Alumni & Graduate Outcomes Hooks
+
+export function useAlumniFeatured() {
+  return useQuery<AlumniProfile[]>({
+    queryKey: ["alumni-featured"],
+    queryFn: () => fetchApi<AlumniProfile[]>("/alumni/featured"),
+  });
+}
+
+export function useAlumni(params?: { school_code?: string; sector?: string; programme?: string; graduation_year?: number; search?: string; page?: number; per_page?: number }) {
+  const p = params ?? {};
+  return useQuery<PaginatedResearch<AlumniProfile>>({
+    queryKey: ["alumni", p],
+    queryFn: async () => {
+      const q = new URLSearchParams();
+      if (p.school_code) q.set("school_code", p.school_code);
+      if (p.sector) q.set("sector", p.sector);
+      if (p.programme) q.set("programme", p.programme);
+      if (p.graduation_year) q.set("graduation_year", String(p.graduation_year));
+      if (p.search) q.set("search", p.search);
+      if (p.page) q.set("page", String(p.page));
+      if (p.per_page) q.set("per_page", String(p.per_page));
+      const qs = q.toString();
+      const res = await fetch(`/api/alumni${qs ? "?" + qs : ""}`);
+      return res.json();
+    },
+  });
+}
+
+export function useAlumniProfile(slug: string) {
+  return useQuery<AlumniProfile>({
+    queryKey: ["alumni-profile", slug],
+    queryFn: () => fetchApi<AlumniProfile>(`/alumni/${slug}`),
+    enabled: !!slug,
+  });
+}
+
+export function useAlumniStories(featured?: boolean) {
+  return useQuery<AlumniStory[]>({
+    queryKey: ["alumni-stories", featured ?? false],
+    queryFn: () => fetchApi<AlumniStory[]>(`/alumni-stories${featured ? "?featured=1" : ""}`),
+  });
+}
+
+export function useAlumniStory(slug: string) {
+  return useQuery<AlumniStory>({
+    queryKey: ["alumni-story", slug],
+    queryFn: () => fetchApi<AlumniStory>(`/alumni-stories/${slug}`),
+    enabled: !!slug,
+  });
+}
+
+export function useEmployerPartners(params?: { industry?: string; status?: string; featured?: boolean }) {
+  const p = params ?? {};
+  return useQuery<EmployerPartner[]>({
+    queryKey: ["employer-partners", p],
+    queryFn: () => {
+      const q = new URLSearchParams();
+      if (p.industry) q.set("industry", p.industry);
+      if (p.status) q.set("status", p.status);
+      if (p.featured) q.set("featured", "1");
+      const qs = q.toString();
+      return fetchApi<EmployerPartner[]>(`/employer-partners${qs ? "?" + qs : ""}`);
+    },
+  });
+}
+
+export function useGraduateOutcomes(params?: { programme_slug?: string; school_code?: string }) {
+  const p = params ?? {};
+  return useQuery<GraduateOutcome[]>({
+    queryKey: ["graduate-outcomes", p],
+    queryFn: () => {
+      const q = new URLSearchParams();
+      if (p.programme_slug) q.set("programme_slug", p.programme_slug);
+      if (p.school_code) q.set("school_code", p.school_code);
+      const qs = q.toString();
+      return fetchApi<GraduateOutcome[]>(`/graduate-outcomes${qs ? "?" + qs : ""}`);
+    },
+  });
+}
+
+// ============================================================
+// MP19 — Institutional Data, Rankings & Transparency
+// ============================================================
+import type {
+  InstitutionalKpi as Mp19Kpi,
+  Ranking as Mp19Ranking,
+  InstitutionalReport as Mp19Report,
+  Accreditation as Mp19Accreditation,
+} from "./api-types";
+
+export function useInstitutionalKpis(params?: { category?: string; featured?: boolean }) {
+  const qs = new URLSearchParams();
+  if (params?.category) qs.set("category", params.category);
+  if (params?.featured) qs.set("featured", "1");
+  const q = qs.toString();
+  return useQuery<Mp19Kpi[]>({
+    queryKey: ["institutional-kpis", params],
+    queryFn: () => fetchApi<Mp19Kpi[]>(`/institutional-kpis${q ? "?" + q : ""}`),
+  });
+}
+
+export function useRankings(params?: { category?: string; featured?: boolean }) {
+  const qs = new URLSearchParams();
+  if (params?.category) qs.set("category", params.category);
+  if (params?.featured) qs.set("featured", "1");
+  const q = qs.toString();
+  return useQuery<Mp19Ranking[]>({
+    queryKey: ["rankings", params],
+    queryFn: () => fetchApi<Mp19Ranking[]>(`/rankings${q ? "?" + q : ""}`),
+  });
+}
+
+export function useInstitutionalReports(params?: { report_type?: string; year?: number }) {
+  const qs = new URLSearchParams();
+  if (params?.report_type) qs.set("report_type", params.report_type);
+  if (params?.year) qs.set("year", String(params.year));
+  const q = qs.toString();
+  return useQuery<Mp19Report[]>({
+    queryKey: ["institutional-reports", params],
+    queryFn: () => fetchApi<Mp19Report[]>(`/institutional-reports${q ? "?" + q : ""}`),
+  });
+}
+
+export function useAccreditations(params?: { accreditation_type?: string }) {
+  const qs = new URLSearchParams();
+  if (params?.accreditation_type) qs.set("accreditation_type", params.accreditation_type);
+  const q = qs.toString();
+  return useQuery<Mp19Accreditation[]>({
+    queryKey: ["accreditations", params],
+    queryFn: () => fetchApi<Mp19Accreditation[]>(`/accreditations${q ? "?" + q : ""}`),
   });
 }

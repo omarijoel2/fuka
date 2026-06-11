@@ -78,6 +78,10 @@ import DirectorateDetail from "@/pages/directorate-detail";
 import GalleryPage from "@/pages/gallery";
 import GalleryAlbumPage from "@/pages/gallery-album";
 import DepartmentDetail from "@/pages/department-detail";
+import Alumni from "@/pages/alumni";
+import AlumniDetail from "@/pages/alumni-detail";
+import AlumniStoryPage from "@/pages/alumni-story";
+import InstitutionalData from "@/pages/institutional-data";
 import MediaPage from "@/pages/media";
 import MediaVideosPage from "@/pages/media-videos";
 import MediaPressReleasesPage from "@/pages/media-press-releases";
@@ -194,6 +198,14 @@ function Router() {
           <Route path="/media/downloads" component={MediaDownloadsPage} />
           <Route path="/media/branding" component={MediaBrandingPage} />
           <Route path="/departments/:slug" component={DepartmentDetail} />
+          <Route path="/alumni" component={Alumni} />
+          <Route path="/alumni-stories/:slug">
+            {(params) => <AlumniStoryPage slug={params.slug ?? ""} />}
+          </Route>
+          <Route path="/alumni/:slug">
+            {(params) => <AlumniDetail slug={params.slug ?? ""} />}
+          </Route>
+          <Route path="/institutional-data" component={InstitutionalData} />
           <Route component={NotFound} />
         </Switch>
       </main>

@@ -7,7 +7,7 @@ import {
   ChevronDown, ChevronRight, BookOpen, UserCog, AlertTriangle, Newspaper, SlidersHorizontal,
   FlaskConical, Globe, Banknote, HeartHandshake, MapPin, Building2,
   Home, Navigation, ToggleRight, ArrowRightLeft, Activity, GitBranch, Search, GraduationCap,
-  Landmark, Camera, ShieldCheck, Gauge
+  Landmark, Camera, ShieldCheck, Gauge, BarChart3
 } from "lucide-react";
 
 interface NavItem {
@@ -61,6 +61,28 @@ const navItems: NavItem[] = [
     children: [
       { label: "Partnerships", href: "/international/partnerships" },
       { label: "Exchange Programmes", href: "/international/exchange" },
+    ],
+  },
+  {
+    label: "Alumni & Outcomes",
+    icon: <GraduationCap className="w-4 h-4" />,
+    roles: ADMIN_ROLES,
+    children: [
+      { label: "Alumni Profiles", href: "/alumni/profiles" },
+      { label: "Success Stories", href: "/alumni/stories" },
+      { label: "Employer Partners", href: "/alumni/employers" },
+      { label: "Graduate Outcomes", href: "/alumni/outcomes" },
+    ],
+  },
+  {
+    label: "Institutional Data",
+    icon: <BarChart3 className="w-4 h-4" />,
+    roles: ADMIN_ROLES,
+    children: [
+      { label: "KPIs & Figures", href: "/institutional/kpis" },
+      { label: "Rankings", href: "/institutional/rankings" },
+      { label: "Public Reports", href: "/institutional/reports" },
+      { label: "Accreditations", href: "/institutional/accreditations" },
     ],
   },
   {

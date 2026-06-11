@@ -773,3 +773,146 @@ export interface ServicePoint {
   status: 'active' | 'inactive';
   seo_meta?: { title?: string; description?: string } | null;
 }
+
+// ============================================================
+// MP18 — Alumni & Graduate Outcomes Types
+// ============================================================
+export type AlumniSector =
+  | "employed" | "self_employed" | "entrepreneur" | "public_sector"
+  | "ngo_sector" | "academic_sector" | "further_study" | "leadership";
+
+export interface AlumniProfile {
+  id: number;
+  slug: string;
+  name: string;
+  programme?: string;
+  school_code?: string;
+  graduation_year?: number;
+  current_role?: string;
+  current_organization?: string;
+  country?: string;
+  industry?: string;
+  sector?: AlumniSector;
+  achievements?: string;
+  photo_url?: string;
+  featured_category?: string;
+  is_featured: boolean;
+  bio?: string;
+  linkedin_url?: string;
+  seo_meta?: { title?: string; description?: string } | null;
+  stories?: { id: number; slug: string; title: string; summary: string }[];
+}
+
+export interface AlumniStory {
+  id: number;
+  slug: string;
+  title: string;
+  summary: string;
+  body?: string;
+  alumni_name?: string;
+  alumni_id?: number;
+  programme?: string;
+  graduation_year?: number;
+  photo_url?: string;
+  video_url?: string;
+  is_featured?: boolean;
+  seo_meta?: { title?: string; description?: string } | null;
+}
+
+export interface EmployerPartner {
+  id: number;
+  slug: string;
+  name: string;
+  industry?: string;
+  partnership_status: string;
+  internship_opportunities?: boolean;
+  graduate_hires?: number;
+  logo_url?: string;
+  website_url?: string;
+  description?: string;
+  is_featured?: boolean;
+}
+
+export interface GraduateOutcome {
+  id: number;
+  programme: string;
+  programme_slug?: string;
+  school_code?: string;
+  cohort_year?: number;
+  employment_rate?: number;
+  further_study_rate?: number;
+  entrepreneurship_rate?: number;
+  avg_time_to_employment_months?: number;
+  sample_size?: number;
+  top_employers: string[];
+  top_sectors: string[];
+}
+
+// ============================================================
+// MP19 — Institutional Data, Rankings & Transparency
+// ============================================================
+export interface KpiSeriesPoint {
+  year: number;
+  value: number;
+}
+
+export interface InstitutionalKpi {
+  id: number;
+  slug: string;
+  label: string;
+  category: string;
+  value: number | string | null;
+  display_value: string | null;
+  unit: string | null;
+  period_year: number | null;
+  trend: "up" | "down" | "flat" | null;
+  trend_value: number | string | null;
+  icon: string | null;
+  description: string | null;
+  series: KpiSeriesPoint[];
+  is_featured: boolean;
+}
+
+export interface Ranking {
+  id: number;
+  slug: string;
+  organization: string;
+  title: string;
+  rank_value: string | null;
+  rank_numeric: number | null;
+  category: string;
+  year: number | null;
+  scope: string | null;
+  logo_url: string | null;
+  source_url: string | null;
+  description: string | null;
+  is_featured: boolean;
+}
+
+export interface InstitutionalReport {
+  id: number;
+  slug: string;
+  title: string;
+  report_type: string;
+  year: number | null;
+  description: string | null;
+  file_url: string | null;
+  file_size: string | null;
+  published_date: string | null;
+  is_featured: boolean;
+}
+
+export interface Accreditation {
+  id: number;
+  slug: string;
+  body_name: string;
+  accreditation_type: string;
+  programme: string | null;
+  school_code: string | null;
+  status: string;
+  award_date: string | null;
+  expiry_date: string | null;
+  certificate_url: string | null;
+  logo_url: string | null;
+  description: string | null;
+}

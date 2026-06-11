@@ -50,6 +50,13 @@ class DatabaseSeeder extends Seeder
         $this->call(CampusSeeder::class);
         $this->call(SchoolStaffSeeder::class);    // Assign staff departments + add school-level staff
 
+        // ── Account provisioning (school editors + staff portal logins) ───────
+        $this->call(AccountProvisioningSeeder::class);
+
+        // ── Alumni & Institutional Data (MP18 / MP19) ─────────────────────────
+        $this->call(AlumniSeeder::class);
+        $this->call(InstitutionalDataSeeder::class);
+
         // ── Site-wide configuration (CMS back-office settings) ────────────────
         $this->call(SiteConfigSeeder::class);
         $this->call(CanonicalImagePathsSeeder::class);

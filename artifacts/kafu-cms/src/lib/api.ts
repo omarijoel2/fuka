@@ -235,3 +235,49 @@ export function apiGetResearchPartners(params?: Record<string, string | number |
 export function apiPostResearchPartner(body: unknown) { return apiPost("/research/partners", body); }
 export function apiPutResearchPartner(id: number, body: unknown) { return apiPut(`/research/partners/${id}`, body); }
 export function apiDeleteResearchPartner(id: number) { return apiDelete(`/research/partners/${id}`); }
+
+// ============================================================
+// MP18 — Alumni & Graduate Outcomes API helpers
+// ============================================================
+export function apiGetAlumni() { return apiGet("/alumni"); }
+export function apiPostAlumni(body: unknown) { return apiPost("/alumni", body); }
+export function apiPutAlumni(id: number, body: unknown) { return apiPut(`/alumni/${id}`, body); }
+export function apiDeleteAlumni(id: number) { return apiDelete(`/alumni/${id}`); }
+
+export function apiGetAlumniStories() { return apiGet("/alumni-stories"); }
+export function apiPostAlumniStory(body: unknown) { return apiPost("/alumni-stories", body); }
+export function apiPutAlumniStory(id: number, body: unknown) { return apiPut(`/alumni-stories/${id}`, body); }
+export function apiDeleteAlumniStory(id: number) { return apiDelete(`/alumni-stories/${id}`); }
+
+export function apiGetEmployerPartners() { return apiGet("/employer-partners"); }
+export function apiPostEmployerPartner(body: unknown) { return apiPost("/employer-partners", body); }
+export function apiPutEmployerPartner(id: number, body: unknown) { return apiPut(`/employer-partners/${id}`, body); }
+export function apiDeleteEmployerPartner(id: number) { return apiDelete(`/employer-partners/${id}`); }
+
+export function apiGetGraduateOutcomes() { return apiGet("/graduate-outcomes"); }
+export function apiPostGraduateOutcome(body: unknown) { return apiPost("/graduate-outcomes", body); }
+export function apiPutGraduateOutcome(id: number, body: unknown) { return apiPut(`/graduate-outcomes/${id}`, body); }
+export function apiDeleteGraduateOutcome(id: number) { return apiDelete(`/graduate-outcomes/${id}`); }
+
+// ============================================================
+// MP19 — Institutional Data, Rankings & Transparency
+// ============================================================
+export function apiGetInstitutionalKpis() { return apiGet("/institutional-kpis"); }
+export function apiPostInstitutionalKpi(body: unknown) { return apiPost("/institutional-kpis", body); }
+export function apiPutInstitutionalKpi(id: number, body: unknown) { return apiPut(`/institutional-kpis/${id}`, body); }
+export function apiDeleteInstitutionalKpi(id: number) { return apiDelete(`/institutional-kpis/${id}`); }
+
+export function apiGetRankings() { return apiGet("/rankings"); }
+export function apiPostRanking(body: unknown) { return apiPost("/rankings", body); }
+export function apiPutRanking(id: number, body: unknown) { return apiPut(`/rankings/${id}`, body); }
+export function apiDeleteRanking(id: number) { return apiDelete(`/rankings/${id}`); }
+
+export function apiGetInstitutionalReports() { return apiGet("/institutional-reports"); }
+export function apiPostInstitutionalReport(body: unknown) { return apiPost("/institutional-reports", body); }
+export function apiPutInstitutionalReport(id: number, body: unknown) { return apiPut(`/institutional-reports/${id}`, body); }
+export function apiDeleteInstitutionalReport(id: number) { return apiDelete(`/institutional-reports/${id}`); }
+
+export function apiGetAccreditations() { return apiGet("/accreditations"); }
+export function apiPostAccreditation(body: unknown) { return apiPost("/accreditations", body); }
+export function apiPutAccreditation(id: number, body: unknown) { return apiPut(`/accreditations/${id}`, body); }
+export function apiDeleteAccreditation(id: number) { return apiDelete(`/accreditations/${id}`); }

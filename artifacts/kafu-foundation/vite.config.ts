@@ -54,6 +54,12 @@ export default defineConfig({
     host: "0.0.0.0",
     allowedHosts: true,
     proxy: {
+      // Forward /api/... to the PHP dev server (dev only).
+      // In production, Apache ProxyPass maps /api/ to the Laravel app.
+      "/api": {
+        target: `http://localhost:${process.env.API_PORT ?? "8080"}`,
+        changeOrigin: true,
+      },
       // Forward /storage/... to the PHP dev server (dev only).
       // In production, an Apache Alias maps /storage/ to kafu-api/storage/app/public.
       "/storage": {

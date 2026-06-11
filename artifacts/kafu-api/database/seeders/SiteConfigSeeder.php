@@ -53,6 +53,7 @@ class SiteConfigSeeder extends Seeder
                     ['label' => 'Complaints & Resolution',         'url' => '/about/complaints'],
                     ['label' => 'Legal Office',                    'url' => '/about/legal'],
                     ['label' => 'Corporate Social Responsibility', 'url' => '/about/csr'],
+                    ['label' => 'Facts, Figures & Transparency',   'url' => '/institutional-data'],
                 ]],
                 ['label' => 'Academics', 'url' => '/schools', 'children' => [
                     ['label' => 'All Schools',                          'url' => '/schools'],
@@ -87,6 +88,7 @@ class SiteConfigSeeder extends Seeder
                     ['label' => 'Student Services',  'url' => '/student-services'],
                     ['label' => 'Dean of Students',  'url' => '/students/affairs'],
                     ['label' => 'Student Council',   'url' => '/students/council'],
+                    ['label' => 'Alumni & Outcomes', 'url' => '/alumni'],
                     ['label' => 'Timetables',        'url' => '/admissions/timetables'],
                     ['label' => 'Student Portal',    'url' => 'https://portal.kafu.ac.ke',    'external' => true],
                     ['label' => 'E-Learning',        'url' => 'https://elearning.kafu.ac.ke', 'external' => true],

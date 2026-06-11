@@ -18,6 +18,14 @@ import SettingsPage from "@/pages/settings";
 import SiteSettingsPage from "@/pages/site-settings";
 import ResearchThemesPage from "@/pages/research-themes";
 import ResearchProjectsCmsPage from "@/pages/research-projects-cms";
+import AlumniCmsPage from "@/pages/alumni-cms";
+import AlumniStoriesCmsPage from "@/pages/alumni-stories-cms";
+import EmployerPartnersCmsPage from "@/pages/employer-partners-cms";
+import GraduateOutcomesCmsPage from "@/pages/graduate-outcomes-cms";
+import InstitutionalKpisCmsPage from "@/pages/institutional-kpis-cms";
+import RankingsCmsPage from "@/pages/rankings-cms";
+import InstitutionalReportsCmsPage from "@/pages/institutional-reports-cms";
+import AccreditationsCmsPage from "@/pages/accreditations-cms";
 import ResearchPublicationsCmsPage from "@/pages/research-publications-cms";
 import ResearchGrantsCmsPage from "@/pages/research-grants-cms";
 import ResearchPartnersCmsPage from "@/pages/research-partners-cms";
@@ -270,6 +278,66 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <ExchangeProgrammesCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* Alumni & Graduate Outcomes */}
+        <Route path="/alumni/profiles">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <AlumniCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/alumni/stories">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <AlumniStoriesCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/alumni/employers">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <EmployerPartnersCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/alumni/outcomes">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <GraduateOutcomesCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* Institutional Data & Transparency */}
+        <Route path="/institutional/kpis">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <InstitutionalKpisCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/institutional/rankings">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <RankingsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/institutional/reports">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <InstitutionalReportsCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/institutional/accreditations">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <AccreditationsCmsPage />
             </RequireRole>
           )}
         </Route>
