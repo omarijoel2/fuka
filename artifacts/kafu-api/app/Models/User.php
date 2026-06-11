@@ -95,6 +95,20 @@ class User extends Authenticatable
         return $this->hasRole(['super_admin', 'ict_admin', 'communications_admin']);
     }
 
+    public function isWebmaster(): bool
+    {
+        return $this->hasRole('webmaster');
+    }
+
+    /**
+     * Who may access the Webmaster Operations Console.
+     * Central admins plus the dedicated Webmaster role.
+     */
+    public function canAccessWebmasterConsole(): bool
+    {
+        return $this->isCentralAdmin() || $this->isWebmaster();
+    }
+
     public function canPublish(): bool
     {
         return $this->hasRole(['super_admin', 'ict_admin', 'communications_admin']);
@@ -110,7 +124,10 @@ class User extends Authenticatable
         return [
             'super_admin'          => 'Super Admin',
             'ict_admin'            => 'ICT Admin',
+            'webmaster'            => 'Webmaster',
             'communications_admin' => 'Communications Admin',
+            'department_content_owner' => 'Department Content Owner',
+            'viewer'               => 'Viewer (Read-only)',
             'admissions_owner'     => 'Admissions Content Owner',
             'academic_owner'       => 'Academic / Faculty Content Owner',
             'department_editor'    => 'Department Content Editor',

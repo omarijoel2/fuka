@@ -55,11 +55,16 @@ import GovernanceStrategicPlanPage from "@/pages/governance-strategic-plan";
 import GovernancePoliciesPage from "@/pages/governance-policies";
 import GovernanceServiceCharterPage from "@/pages/governance-service-charter";
 import ArticlesCmsPage from "@/pages/articles-cms";
+import WebmasterGovernancePage from "@/pages/webmaster-governance";
+import ContentFreshnessPage from "@/pages/content-freshness";
+import WebmasterTasksPage from "@/pages/webmaster-tasks";
+import GovernanceReportsPage from "@/pages/governance-reports";
 const NoticesManagerPage = lazy(() => import("./pages/notices-manager"));
 
 // ─── Role constants ───────────────────────────────────────────────────────────
 const ADMIN_ROLES    = ["super_admin", "ict_admin", "communications_admin"];
 const REVIEWER_ROLES = [...ADMIN_ROLES, "reviewer"];
+const WEBMASTER_ROLES = [...ADMIN_ROLES, "webmaster"];
 
 // ─── Route-level RBAC guard ───────────────────────────────────────────────────
 function RequireRole({
@@ -182,6 +187,36 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <BrandingSettingsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* Webmaster Operations Console */}
+        <Route path="/webmaster/governance">
+          {() => (
+            <RequireRole roles={WEBMASTER_ROLES}>
+              <WebmasterGovernancePage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/webmaster/freshness">
+          {() => (
+            <RequireRole roles={WEBMASTER_ROLES}>
+              <ContentFreshnessPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/webmaster/tasks">
+          {() => (
+            <RequireRole roles={WEBMASTER_ROLES}>
+              <WebmasterTasksPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/webmaster/reports">
+          {() => (
+            <RequireRole roles={WEBMASTER_ROLES}>
+              <GovernanceReportsPage />
             </RequireRole>
           )}
         </Route>

@@ -2320,6 +2320,37 @@ Route::prefix('admin')->group(function () {
         Route::post('/upload-image', [\App\Http\Controllers\NoticesController::class, 'uploadImage']);
     });
 
+    // -------------------------------------------------------------------------
+    // Webmaster Operations Console
+    // -------------------------------------------------------------------------
+    Route::middleware('auth:sanctum')->prefix('webmaster')->group(function () {
+        // Content Governance
+        Route::get('/governance/overview', [\App\Http\Controllers\Admin\WebmasterGovernanceController::class, 'overview']);
+        Route::get('/governance/content',  [\App\Http\Controllers\Admin\WebmasterGovernanceController::class, 'content']);
+        Route::get('/governance/filters',  [\App\Http\Controllers\Admin\WebmasterGovernanceController::class, 'filters']);
+
+        // Content Freshness
+        Route::get('/freshness',                       [\App\Http\Controllers\Admin\ContentFreshnessController::class, 'index']);
+        Route::put('/freshness/{contentId}/schedule',  [\App\Http\Controllers\Admin\ContentFreshnessController::class, 'setSchedule']);
+        Route::post('/freshness/{contentId}/reviewed', [\App\Http\Controllers\Admin\ContentFreshnessController::class, 'markReviewed']);
+
+        // Tasks
+        Route::get('/tasks',         [\App\Http\Controllers\Admin\WebmasterTaskController::class, 'index']);
+        Route::post('/tasks',        [\App\Http\Controllers\Admin\WebmasterTaskController::class, 'store']);
+        Route::put('/tasks/{id}',    [\App\Http\Controllers\Admin\WebmasterTaskController::class, 'update']);
+        Route::delete('/tasks/{id}', [\App\Http\Controllers\Admin\WebmasterTaskController::class, 'destroy']);
+
+        // Alerts
+        Route::get('/alerts',      [\App\Http\Controllers\Admin\WebmasterAlertController::class, 'index']);
+        Route::put('/alerts/{id}', [\App\Http\Controllers\Admin\WebmasterAlertController::class, 'update']);
+
+        // Governance Reports
+        Route::get('/reports',           [\App\Http\Controllers\Admin\GovernanceReportController::class, 'index']);
+        Route::post('/reports/generate', [\App\Http\Controllers\Admin\GovernanceReportController::class, 'generate']);
+        Route::get('/reports/{id}',      [\App\Http\Controllers\Admin\GovernanceReportController::class, 'show']);
+        Route::delete('/reports/{id}',   [\App\Http\Controllers\Admin\GovernanceReportController::class, 'destroy']);
+    });
+
 });
 
 if (!function_exists('updateApplicationStatus')) {

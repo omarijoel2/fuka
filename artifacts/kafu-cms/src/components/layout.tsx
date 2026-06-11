@@ -7,7 +7,7 @@ import {
   ChevronDown, ChevronRight, BookOpen, UserCog, AlertTriangle, Newspaper, SlidersHorizontal,
   FlaskConical, Globe, Banknote, HeartHandshake, MapPin, Building2,
   Home, Navigation, ToggleRight, ArrowRightLeft, Activity, GitBranch, Search, GraduationCap,
-  Landmark, Camera, ShieldCheck
+  Landmark, Camera, ShieldCheck, Gauge
 } from "lucide-react";
 
 interface NavItem {
@@ -20,6 +20,7 @@ interface NavItem {
 
 const ADMIN_ROLES = ["super_admin", "ict_admin", "communications_admin"];
 const REVIEWER_ROLES = [...ADMIN_ROLES, "reviewer"];
+const WEBMASTER_ROLES = [...ADMIN_ROLES, "webmaster"];
 
 const navItems: NavItem[] = [
   { label: "Dashboard", icon: <LayoutDashboard className="w-4 h-4" />, href: "/" },
@@ -162,6 +163,17 @@ const navItems: NavItem[] = [
     children: [
       { label: "Redirect Rules", href: "/redirects" },
       { label: "Site SEO Settings", href: "/site-settings" },
+    ],
+  },
+  {
+    label: "Webmaster Console",
+    icon: <Gauge className="w-4 h-4" />,
+    roles: WEBMASTER_ROLES,
+    children: [
+      { label: "Content Governance", href: "/webmaster/governance" },
+      { label: "Content Freshness", href: "/webmaster/freshness" },
+      { label: "Tasks", href: "/webmaster/tasks" },
+      { label: "Governance Reports", href: "/webmaster/reports" },
     ],
   },
   {
