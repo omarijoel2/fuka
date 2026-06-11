@@ -2,3 +2,4 @@
 - [PHP artisan serve upload limits](php-artisan-serve-upload.md) — php artisan serve spawns a child php -S process without -d flags; must cd into public/ and call php -S directly.
 - [Dynamic navigation architecture](dynamic-nav.md) — CMS-managed nav via site_config navigation group; public GET /api/navigation; mergeWithCms() in navbar; departments mega-menu is always hardcoded.
 - [Webmaster scan alert dedupe](webmaster-scan-alerts.md) — scan dedupe must escalate severity on the existing unresolved alert, not skip; one alert type spans multiple severity tiers.
+- [Staff profile routing](staff-profile-routing.md) — public profile URL is /images/uploads/:slug but API detail is /staff/{slug}; hook must fetch /staff/${slug}; department must be in cms_content column.

@@ -305,7 +305,7 @@ export function useStaff(params?: { school?: string; search?: string; designatio
 export function useStaffProfile(slug: string) {
   return useQuery({
     queryKey: ["staff", slug],
-    queryFn: () => fetchApi<StaffProfile>(`/images/uploads/${slug}`),
+    queryFn: () => fetchApi<StaffProfile>(`/staff/${slug}`),
     enabled: !!slug,
   });
 }
