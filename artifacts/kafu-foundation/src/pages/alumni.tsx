@@ -81,7 +81,7 @@ export default function Alumni() {
             <ChevronRight className="w-4 h-4 opacity-50" />
             <span>Alumni</span>
           </div>
-          <h1 className="text-4xl md:text-5xl font-serif font-bold mb-3">Alumni &amp; Graduate Outcomes</h1>
+          <h1 className="text-4xl md:text-5xl font-serif font-bold mb-3 text-primary-foreground">Alumni &amp; Graduate Outcomes</h1>
           <p className="text-primary-foreground/80 text-lg max-w-2xl">
             From Kaimosi to the world — explore where our graduates are today, the impact they make, and the outcomes that define a KAFU education.
           </p>

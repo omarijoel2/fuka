@@ -65,7 +65,7 @@ timeoutMs = 20000
 [userenv]
 
 [userenv.production]
-VITE_API_URL = "https://kafu.difbac.com"
+VITE_API_URL = "https://kafu.ac.ke"
 
 [[ports]]
 localPort = 5000

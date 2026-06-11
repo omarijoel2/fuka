@@ -1,24 +1,21 @@
 ---
-name: Foundation dev API target (difbac vs local)
-description: Why newly-built foundation pages render empty in the dev preview, and how fetchApi vs raw fetch reach different backends.
+name: Foundation dev API target (local vs remote)
+description: How the kafu-foundation dev preview reaches the backend, and why fetchApi vs raw fetch can hit different backends.
 ---
 
-# Foundation dev preview fetches from a REMOTE API by default
+# `VITE_API_URL` is PRODUCTION-scoped only — dev preview uses the LOCAL API
 
-The kafu-foundation dev server is configured (via `.replit` env `VITE_API_URL`) to point at a **remote** deployed API (e.g. `https://kafu.difbac.com`), NOT the local Laravel API on port 8080.
+In `.replit` the var lives under `[userenv.production]` (managed via the env store, NOT a directly-editable `.replit` line — use the environment-secrets skill's `setEnvVars({environment:"production"})`). There is **no development-scoped** `VITE_API_URL`.
 
-**Consequence:** any module built locally (new tables/routes/seed data) renders EMPTY in the dev preview, because the remote API returns 404 for endpoints that only exist locally. The local backend can be 100% correct and still show nothing in the preview. Verify new backend work with `curl localhost:8080/api/...`, not just by looking at the preview.
+**Consequence:** in the dev preview `import.meta.env.VITE_API_URL` is empty, so `fetchApi` becomes **relative** and is served by the vite dev proxy. A `/api` proxy → `http://localhost:${API_PORT||8080}` exists in `vite.config.ts` server.proxy (mirrors the production Apache ProxyPass). So the dev preview reads the **local Laravel API on 8080** — locally-built modules DO render in the preview. No hacks needed.
 
-## Two fetch paths reach DIFFERENT backends
-- `fetchApi()` (in `src/lib/api-types.ts`) uses `import.meta.env.VITE_API_URL` as an **absolute** origin → goes to the remote difbac when that env is set, **bypassing** the vite dev proxy.
-- Raw `fetch("/api/...")` (used by research/international/repository hooks) is **relative** → same-origin → hits the vite dev proxy.
+The production value is `https://kafu.ac.ke` (same domain the prod frontend is served from; functionally same-origin). Note: `replit.md`'s deployment checklist says prod can also leave it empty (same-domain Apache proxy) — both work; the explicit value is the user's choice.
 
-So with `VITE_API_URL` set, `fetchApi` hooks and raw-`fetch` hooks can silently read from two different databases. Keep a module's hooks on ONE strategy.
+## Two fetch paths — keep them consistent per module
+- `fetchApi()` (`src/lib/api-types.ts`) prefixes `import.meta.env.VITE_API_URL`. Empty in dev → relative → proxy → local. It also **unwraps `.data`**, so it is NOT usable for paginated endpoints.
+- Raw `fetch("/api/...")` (research/international/repository/alumni-directory hooks) is relative and returns the full pagination envelope. This is why paginated lists use raw fetch — intentional, not a bug.
 
-## Making the whole foundation use the local API in dev
-A `/api` proxy → `http://localhost:${API_PORT||8080}` exists in `vite.config.ts` server.proxy (mirrors the production Apache ProxyPass). It only takes effect for RELATIVE fetches. To route everything (including `fetchApi`) at the local API, set `VITE_API_URL=""` so `fetchApi` becomes relative too.
+If a production `VITE_API_URL` is ever set, fetchApi hooks would go remote while raw-fetch hooks stay relative — keep this divergence in mind.
 
-**Why:** difbac is the user's deliberate `.replit` setting (live/staging content). Switching the whole preview to local seed data is a user-visible change — confirm before flipping `VITE_API_URL`.
-
-## Quick local visual verification trick
-To screenshot a locally-built page without touching `.replit`: temporarily hardcode `const API_ORIGIN = ""` in `api-types.ts` (forces relative → proxy → local 8080), restart "Start application", screenshot, then revert.
+## Hero h1 invisibility gotcha
+`index.css` forces all headings to `text-primary` (green). On a `bg-primary` / photo-overlay hero this is green-on-green and invisible. Add explicit `text-primary-foreground` to hero `<h1>` (done for institutional-data.tsx and alumni.tsx).
