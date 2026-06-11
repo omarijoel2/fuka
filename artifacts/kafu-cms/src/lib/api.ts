@@ -107,6 +107,58 @@ export function apiDelete(path: string) {
   return apiFetch(path, { method: "DELETE" });
 }
 
+export interface ContentReferrer {
+  id: number;
+  type: string;
+  title: string;
+  slug: string;
+  status: string;
+}
+
+export type DeleteContentResult =
+  | { deleted: true }
+  | { conflict: true; message: string; referenced_by: ContentReferrer[] };
+
+// Delete content with relationship-integrity awareness. When other content
+// references this item, the API returns 409 with the referrers; pass force=true
+// to delete anyway.
+export async function deleteContent(id: number | string, force = false): Promise<DeleteContentResult> {
+  const token = getToken();
+  const res = await fetch(`${API_BASE}/content/${id}${force ? "?force=1" : ""}`, {
+    method: "DELETE",
+    headers: {
+      "Accept": "application/json",
+      ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (res.status === 401) {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem("kafu_cms_user");
+    window.location.href = `${BASE_URL}/login`;
+    throw new Error("Session expired. Please log in again.");
+  }
+
+  if (res.status === 409) {
+    const body = (await parseJsonSafe(res).catch(() => ({}))) as {
+      message?: string;
+      referenced_by?: ContentReferrer[];
+    };
+    return {
+      conflict: true,
+      message: body?.message ?? "This content is referenced by other items.",
+      referenced_by: body?.referenced_by ?? [],
+    };
+  }
+
+  if (!res.ok) {
+    const err = (await parseJsonSafe(res).catch(() => ({}))) as Record<string, unknown>;
+    throw new Error((err?.message as string) || `API error ${res.status}`);
+  }
+
+  return { deleted: true };
+}
+
 export type WorkflowStatus =
   | "draft" | "submitted" | "under_review" | "approved"
   | "scheduled" | "published" | "unpublished" | "archived";

@@ -314,12 +314,37 @@ Route::prefix('admin')->group(function () {
             }
 
             $content = CmsContent::findOrFail($id);
+
+            // Relationship integrity: block delete if other live content references this item,
+            // unless the caller explicitly confirms with ?force=1.
+            if (!$request->boolean('force')) {
+                $referrers = CmsContent::where('is_deleted', false)
+                    ->where('id', '!=', $content->id)
+                    ->where('related_ids', 'like', '%' . $content->id . '%')
+                    ->get(['id', 'type', 'title', 'slug', 'status', 'related_ids'])
+                    ->filter(function ($c) use ($content) {
+                        $ids = is_array($c->related_ids) ? $c->related_ids : [];
+                        return in_array((int) $content->id, array_map('intval', $ids), true);
+                    })
+                    ->values();
+
+                if ($referrers->isNotEmpty()) {
+                    return response()->json([
+                        'message' => 'This content is referenced by other items. Confirm to delete anyway.',
+                        'referenced_by' => $referrers->map(fn($c) => [
+                            'id' => $c->id, 'type' => $c->type, 'title' => $c->title,
+                            'slug' => $c->slug, 'status' => $c->status,
+                        ])->values(),
+                    ], 409);
+                }
+            }
+
             $before = $content->toArray();
 
             $content->update(['is_deleted' => true, 'status' => 'archived']);
 
             AuditLog::record($user, 'content.delete', $content->type, $content->id, $content->title,
-                $before, null, 'Soft deleted');
+                $before, null, $request->boolean('force') ? 'Soft deleted (forced over references)' : 'Soft deleted');
 
             return response()->json(['message' => 'Content deleted (soft).']);
         });
@@ -528,6 +553,77 @@ Route::prefix('admin')->group(function () {
             AuditLog::record($user, 'media.delete', 'media_file', $media->id, $media->original_name);
             $media->update(['status' => 'deleted']);
             return response()->json(['message' => 'Media file deleted.']);
+        });
+
+        // Media usage tracking — find which content references this asset
+        Route::get('/media/{id}/usage', function (Request $request, $id) {
+            $media = MediaFile::findOrFail($id);
+            $needles = array_values(array_filter([$media->url, $media->path, $media->filename]));
+
+            $items = collect();
+            if (!empty($needles)) {
+                $items = CmsContent::forRole($request->user())
+                    ->where('is_deleted', false)
+                    ->where(function ($sub) use ($needles) {
+                        foreach ($needles as $n) {
+                            $sub->orWhere('featured_image', 'like', '%' . $n . '%')
+                                ->orWhere('body', 'like', '%' . $n . '%')
+                                ->orWhere('structured_data', 'like', '%' . $n . '%');
+                        }
+                    })
+                    ->orderByDesc('updated_at')
+                    ->get(['id', 'type', 'title', 'slug', 'status', 'updated_at'])
+                    ->map(fn($c) => [
+                        'id' => $c->id, 'type' => $c->type, 'title' => $c->title,
+                        'slug' => $c->slug, 'status' => $c->status, 'updated_at' => $c->updated_at,
+                    ])
+                    ->values();
+            }
+
+            return response()->json([
+                'media' => ['id' => $media->id, 'original_name' => $media->original_name, 'url' => $media->url],
+                'usage_count' => $items->count(),
+                'used_by' => $items,
+            ]);
+        });
+
+        // Content ownership report — content distribution by author and department
+        Route::get('/content-ownership', function (Request $request) {
+            $user = $request->user();
+            if (!$user->isCentralAdmin()) {
+                return response()->json(['message' => 'Unauthorized'], 403);
+            }
+
+            $rows = CmsContent::where('is_deleted', false)
+                ->with('author:id,name,role,department')
+                ->get(['id', 'author_id', 'department', 'status', 'type', 'updated_at']);
+
+            $byAuthor = $rows->groupBy('author_id')->map(function ($items, $authorId) {
+                $author = $items->first()->author;
+                $statusCounts = $items->groupBy('status')->map->count();
+                return [
+                    'author_id'    => $authorId ? (int) $authorId : null,
+                    'author_name'  => $author->name ?? 'Unassigned',
+                    'role'         => $author->role ?? null,
+                    'department'   => $author->department ?? null,
+                    'total'        => $items->count(),
+                    'published'    => $statusCounts['published'] ?? 0,
+                    'draft'        => $statusCounts['draft'] ?? 0,
+                    'in_review'    => ($statusCounts['submitted'] ?? 0) + ($statusCounts['under_review'] ?? 0),
+                    'last_updated' => $items->max('updated_at'),
+                ];
+            })->values()->sortByDesc('total')->values();
+
+            $byDept = $rows->groupBy(fn($c) => $c->department ?: 'Unassigned')
+                ->map(fn($items, $dept) => ['department' => $dept, 'total' => $items->count()])
+                ->values()->sortByDesc('total')->values();
+
+            return response()->json([
+                'total_content' => $rows->count(),
+                'unassigned'    => $rows->whereNull('author_id')->count(),
+                'by_author'     => $byAuthor,
+                'by_department' => $byDept,
+            ]);
         });
 
         // -------------------------------------------------------------------------

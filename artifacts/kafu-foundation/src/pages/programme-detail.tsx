@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useRoute, Link } from "wouter";
-import { useSchool, useProgrammeDetail, useStaff } from "@/lib/api-hooks";
+import { useSchool, useProgrammeDetail, useStaff, useGraduateOutcomes, useAlumni } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
 import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 import {
@@ -108,6 +108,13 @@ export default function ProgrammeDetailPage() {
   const employability = detail?.employability_data;
   const learningOutcomes = detail?.learning_outcomes ?? [];
   const courseStructure = detail?.course_structure ?? [];
+
+  const programmeName = baseProgramme?.name ?? "";
+  const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+  const { data: outcomes } = useGraduateOutcomes({ school_code: school });
+  const outcome = outcomes?.find((o) => o.programme_slug === slugify(programmeName));
+  const { data: alumniRes } = useAlumni({ programme: programmeName, per_page: 4 });
+  const programmeAlumni = programmeName ? (alumniRes?.data ?? []) : [];
 
   return (
     <div className="flex flex-col min-h-screen pb-20 md:pb-0">
@@ -371,6 +378,56 @@ export default function ProgrammeDetailPage() {
               </section>
             )}
 
+            {/* Graduate Outcomes (real destination survey) */}
+            {!isLoading && outcome && (
+              <section data-testid="section-graduate-outcomes">
+                <h2 className="text-2xl font-serif font-bold text-primary mb-1 flex items-center gap-2">
+                  <Award className="w-6 h-6" /> Graduate Outcomes
+                </h2>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Destination survey of the Class of {outcome.cohort_year}
+                  {outcome.sample_size ? ` — ${outcome.sample_size} graduates surveyed` : ""}
+                </p>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+                  {[
+                    { label: "In Employment", value: outcome.employment_rate, suffix: "%", testid: "outcome-employment" },
+                    { label: "Further Study", value: outcome.further_study_rate, suffix: "%", testid: "outcome-further-study" },
+                    { label: "Entrepreneurship", value: outcome.entrepreneurship_rate, suffix: "%", testid: "outcome-entrepreneurship" },
+                    { label: "Avg. Months to Job", value: outcome.avg_time_to_employment_months, suffix: "", testid: "outcome-time" },
+                  ]
+                    .filter((s) => s.value !== undefined && s.value !== null)
+                    .map((s, i) => (
+                      <div key={i} className="p-4 bg-card border rounded-xl text-center" data-testid={s.testid}>
+                        <div className="text-2xl font-serif font-bold text-primary">{s.value}{s.suffix}</div>
+                        <div className="text-xs text-muted-foreground mt-1">{s.label}</div>
+                      </div>
+                    ))}
+                </div>
+                {outcome.top_employers.length > 0 && (
+                  <div className="mb-4">
+                    <h3 className="font-semibold text-base text-foreground mb-2 flex items-center gap-2">
+                      <Briefcase className="w-4 h-4 text-primary" /> Top Graduate Employers
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {outcome.top_employers.map((e, i) => (
+                        <span key={i} className="px-3 py-1.5 bg-secondary border rounded-full text-sm text-foreground font-medium" data-testid={`outcome-employer-${i}`}>{e}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {outcome.top_sectors.length > 0 && (
+                  <div>
+                    <h3 className="font-semibold text-base text-foreground mb-2">Leading Sectors</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {outcome.top_sectors.map((s, i) => (
+                        <span key={i} className="px-3 py-1.5 bg-primary/5 border rounded-full text-sm text-muted-foreground font-medium" data-testid={`outcome-sector-${i}`}>{s}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </section>
+            )}
+
             {/* Career Opportunities (legacy fallback) */}
             {!isLoading && !employability && (detail?.career_opportunities ?? []).length > 0 && (
               <section>
@@ -421,6 +478,39 @@ export default function ProgrammeDetailPage() {
                     </Button>
                   </div>
                 )}
+              </section>
+            )}
+
+            {/* Alumni from this programme */}
+            {!isLoading && programmeName && programmeAlumni.length > 0 && (
+              <section data-testid="section-programme-alumni" className="border-t pt-10">
+                <h2 className="text-2xl font-serif font-bold text-primary mb-4 flex items-center gap-2">
+                  <GraduationCap className="w-6 h-6" /> Where Our Graduates Are
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {programmeAlumni.map((a, i) => (
+                    <Link
+                      key={a.id}
+                      href={`/alumni/${a.slug}`}
+                      className="group flex items-center gap-4 p-4 bg-card border rounded-xl hover:border-primary hover:shadow-sm transition-all"
+                      data-testid={`programme-alumni-${i}`}
+                    >
+                      <div className="w-12 h-12 rounded-full bg-primary/10 text-primary flex items-center justify-center shrink-0 font-bold text-lg overflow-hidden">
+                        {a.photo_url ? <img src={a.photo_url} alt={a.name} className="w-full h-full object-cover" /> : (a.name?.charAt(0) ?? "?")}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-1">{a.name}</div>
+                        <div className="text-xs text-muted-foreground line-clamp-1">{[a.current_role, a.current_organization].filter(Boolean).join(" · ")}</div>
+                        {a.graduation_year && <div className="text-xs text-muted-foreground">Class of {a.graduation_year}</div>}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+                <div className="mt-3">
+                  <Button variant="ghost" className="text-primary text-sm" asChild>
+                    <Link href="/alumni">Explore alumni stories <ChevronRight className="ml-1 w-4 h-4" /></Link>
+                  </Button>
+                </div>
               </section>
             )}
 

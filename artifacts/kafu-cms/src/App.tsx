@@ -53,6 +53,7 @@ import DepartmentsCmsPage from "@/pages/departments-cms";
 import SchoolsCmsPage from "@/pages/schools-cms";
 import ProgrammesCmsPage from "@/pages/programmes-cms";
 import ContentHealthPage from "@/pages/content-health";
+import ContentOwnershipPage from "@/pages/content-ownership";
 import WorkflowConsolePage from "@/pages/workflow-console";
 import AdmissionsCmsPage from "@/pages/admissions-cms";
 import KuccpsImportWizard from "@/pages/kuccps-import-wizard";
@@ -144,6 +145,13 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={REVIEWER_ROLES}>
               <ContentHealthPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/content-ownership">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <ContentOwnershipPage />
             </RequireRole>
           )}
         </Route>

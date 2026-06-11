@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useLocation } from "wouter";
-import { apiGet, apiPost, apiPut, apiDelete, CONTENT_TYPE_LABELS, CONTENT_TYPES, WORKFLOW_TRANSITIONS, STATUS_LABELS, formatDateTime, type WorkflowStatus } from "@/lib/api";
+import { apiGet, apiPost, apiPut, apiDelete, deleteContent, CONTENT_TYPE_LABELS, CONTENT_TYPES, WORKFLOW_TRANSITIONS, STATUS_LABELS, formatDateTime, type WorkflowStatus } from "@/lib/api";
 import { StatusBadge } from "@/components/status-badge";
 import { PhotoBrowserModal } from "@/components/photo-browser-modal";
 import { useAuth } from "@/lib/auth";
@@ -282,7 +282,20 @@ export default function ContentEditorPage({ id }: { id?: string }) {
     if (!window.confirm("Delete this content item? This action cannot be undone.")) return;
     setDeleting(true);
     try {
-      await apiDelete(`/content/${id}`);
+      const result = await deleteContent(id!, false);
+      if ("conflict" in result) {
+        const list = result.referenced_by
+          .map((r) => `- ${r.title} (${CONTENT_TYPE_LABELS[r.type] ?? r.type})`)
+          .join("\n");
+        const proceed = window.confirm(
+          `${result.message}\n\nReferenced by:\n${list}\n\nDeleting it may leave broken links in the items above. Delete anyway?`
+        );
+        if (!proceed) {
+          setDeleting(false);
+          return;
+        }
+        await deleteContent(id!, true);
+      }
       navigate("/content");
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Delete failed.");

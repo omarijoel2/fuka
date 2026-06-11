@@ -14,7 +14,7 @@ interface NavItem {
   label: string;
   icon: React.ReactNode;
   href?: string;
-  children?: { label: string; href: string }[];
+  children?: { label: string; href: string; roles?: string[] }[];
   roles?: string[];
 }
 
@@ -205,6 +205,7 @@ const navItems: NavItem[] = [
     children: [
       { label: "Workflow Console", href: "/workflow" },
       { label: "Content Health", href: "/content-health" },
+      { label: "Content Ownership", href: "/content-ownership", roles: ADMIN_ROLES },
       { label: "Audit Log", href: "/audit" },
     ],
   },
@@ -238,6 +239,7 @@ function NavItemRow({ item, currentPath }: { item: NavItem; currentPath: string 
         {open && (
           <div className="ml-7 mt-1 space-y-0.5 border-l border-sidebar-border pl-3">
             {item.children.map((child) => {
+              if (child.roles && user && !child.roles.includes(user.role)) return null;
               const isActive = currentPath === child.href.split("?")[0] ||
                 (currentPath === "/content" && child.href === "/content");
               return (

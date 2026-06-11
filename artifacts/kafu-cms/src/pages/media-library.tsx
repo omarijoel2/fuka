@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef, useCallback } from "react";
+import { Link } from "wouter";
 import { apiGet, apiFetch, formatDateTime } from "@/lib/api";
 import {
   Image as ImageIcon, Upload, Search, Copy, Trash2, RefreshCw, ExternalLink, X,
@@ -23,6 +24,15 @@ interface MediaFile {
   uploaded_by: number | string | null;
   uploader?: { id: number; name: string } | null;
   created_at: string;
+}
+
+interface UsageItem {
+  id: number;
+  type: string;
+  title: string;
+  slug: string;
+  status: string;
+  updated_at: string;
 }
 
 type UploadStatus = "pending" | "uploading" | "done" | "error";
@@ -152,12 +162,31 @@ function DetailPanel({ file, onClose, onDeleted, onUpdated }: {
   const [saveMsg, setSaveMsg] = useState("");
   const [copied, setCopied] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [usage, setUsage] = useState<{ usage_count: number; used_by: UsageItem[] } | null>(null);
+  const [usageLoading, setUsageLoading] = useState(false);
 
   useEffect(() => {
     setAltText(file.alt_text ?? "");
     setCaption(file.caption ?? "");
     setFolder(file.folder ?? "general");
     setSaveMsg("");
+  }, [file.id]);
+
+  useEffect(() => {
+    let cancelled = false;
+    setUsage(null);
+    setUsageLoading(true);
+    apiGet(`/media/${file.id}/usage`)
+      .then((d) => {
+        if (!cancelled) setUsage({ usage_count: d?.usage_count ?? 0, used_by: d?.used_by ?? [] });
+      })
+      .catch(() => {
+        if (!cancelled) setUsage(null);
+      })
+      .finally(() => {
+        if (!cancelled) setUsageLoading(false);
+      });
+    return () => { cancelled = true; };
   }, [file.id]);
 
   async function save() {
@@ -234,6 +263,39 @@ function DetailPanel({ file, onClose, onDeleted, onUpdated }: {
               <p className="text-[10px] text-muted-foreground mt-0.5">
                 Uploaded by {typeof file.uploader === "object" && file.uploader ? file.uploader.name : `User #${file.uploaded_by}`}
               </p>
+            )}
+          </div>
+
+          {/* Where Used */}
+          <div className="pt-1 border-t border-border">
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Where Used</p>
+            {usageLoading ? (
+              <p className="text-[11px] text-muted-foreground flex items-center gap-1" data-testid="media-usage-loading">
+                <Loader2 className="w-3 h-3 animate-spin" /> Checking usage…
+              </p>
+            ) : !usage || usage.usage_count === 0 ? (
+              <p className="text-[11px] text-muted-foreground" data-testid="media-usage-empty">
+                Not referenced by any content. Safe to delete.
+              </p>
+            ) : (
+              <div className="space-y-1.5" data-testid="media-usage-list">
+                <p className="text-[11px] font-medium text-foreground">
+                  Referenced by {usage.usage_count} item{usage.usage_count === 1 ? "" : "s"}
+                </p>
+                <div className="space-y-1">
+                  {usage.used_by.map((u) => (
+                    <Link
+                      key={u.id}
+                      href={`/content/${u.id}`}
+                      data-testid={`media-usage-item-${u.id}`}
+                      className="flex items-center gap-1.5 text-[11px] text-primary hover:underline"
+                    >
+                      <FileText className="w-3 h-3 shrink-0" />
+                      <span className="truncate">{u.title}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             )}
           </div>
 
