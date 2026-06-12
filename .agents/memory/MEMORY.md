@@ -1,6 +1,7 @@
 - [CMS content migration pattern](cms-content-migration.md) — FALLBACK_ rename + useQuery inside component + icon-merge IIFE for pages with JSX/Lucide icons in data arrays.
 - [PHP artisan serve upload limits](php-artisan-serve-upload.md) — php artisan serve spawns a child php -S process without -d flags; must cd into public/ and call php -S directly.
 - [Dynamic navigation architecture](dynamic-nav.md) — CMS-managed nav via site_config navigation group; public GET /api/navigation; mergeWithCms() in navbar; departments mega-menu is always hardcoded.
+- [CMS page structured_data full-replace](cms-page-structured-data.md) — admin PUT /pages/{slug} overwrites structured_data wholesale; retain loaded sd in a ref and spread on every save or sibling keys are wiped.
 - [Programme name matching](programme-name-matching.md) — alumni/stories/programmes use inconsistent programme names ("BSc X" vs "Bachelor of Science in X"); normalize degree prefixes before matching.
 - [CMS admin route role scoping](cms-admin-route-scoping.md) — any /api/admin route reading cms_content must use CmsContent::forRole($user) or it leaks cross-scope content; unauth admin routes 500 "Route [login] not defined" (not a bug).
 - [Foundation dev API target](foundation-api-target.md) — dev preview fetches from remote difbac via VITE_API_URL; locally-built modules render empty; fetchApi(absolute) vs raw fetch(relative→proxy) hit different backends.

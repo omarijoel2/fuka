@@ -1,6 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "@/lib/auth";
-import { Save, RefreshCw, Plus, Trash2, ChevronDown, ChevronUp, Pencil, X, Check } from "lucide-react";
+import { Save, RefreshCw, Plus, Trash2, ChevronDown, ChevronUp, Pencil, X, Check, Film, Headphones, Images, UploadCloud } from "lucide-react";
+import { apiUploadFile } from "@/lib/api";
 
 const API_GET = (slug: string) => `/api/admin/pages/${slug}`;
 const API_PUT = (slug: string) => `/api/admin/pages/${slug}`;
@@ -16,6 +17,103 @@ interface ServiceCategory {
   category: string;
   colour: string;
   services: ServiceStandard[];
+}
+
+interface MediaVideo { url: string; title: string; poster?: string }
+interface MediaAudio { url: string; title: string }
+interface MediaImage { url: string; caption: string }
+interface CharterMedia {
+  video: MediaVideo[];
+  audio: MediaAudio[];
+  images: MediaImage[];
+}
+
+const EMPTY_MEDIA: CharterMedia = { video: [], audio: [], images: [] };
+
+async function uploadMediaFile(file: File): Promise<string> {
+  const result = await apiUploadFile("/media", file, "file") as unknown as { url?: string; data?: { url?: string } };
+  const url = result?.data?.url ?? result?.url;
+  if (!url) throw new Error("Upload succeeded but no URL was returned.");
+  return url;
+}
+
+function MediaUploadRow({
+  kind, url, label, labelPlaceholder, onUrlChange, onLabelChange, onRemove, accept, idx,
+}: {
+  kind: "video" | "audio" | "image";
+  url: string;
+  label: string;
+  labelPlaceholder: string;
+  onUrlChange: (v: string) => void;
+  onLabelChange: (v: string) => void;
+  onRemove: () => void;
+  accept: string;
+  idx: number;
+}) {
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setError(null);
+    setUploading(true);
+    try {
+      const uploadedUrl = await uploadMediaFile(file);
+      onUrlChange(uploadedUrl);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  return (
+    <div className="border border-gray-200 rounded-lg p-3 space-y-2 bg-gray-50">
+      <input
+        data-testid={`media-${kind}-label-${idx}`}
+        value={label}
+        placeholder={labelPlaceholder}
+        onChange={e => onLabelChange(e.target.value)}
+        className="w-full border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"
+      />
+      <div className="flex gap-2">
+        <input
+          data-testid={`media-${kind}-url-${idx}`}
+          value={url}
+          placeholder={kind === "video" ? "Paste a file URL or a YouTube/Vimeo link" : "Paste a file URL or upload below"}
+          onChange={e => onUrlChange(e.target.value)}
+          className="flex-1 border border-gray-300 rounded px-3 py-2 text-xs text-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+        />
+        <button
+          type="button"
+          data-testid={`media-${kind}-upload-${idx}`}
+          disabled={uploading}
+          onClick={() => fileRef.current?.click()}
+          className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium bg-green-700 text-white rounded hover:bg-green-800 disabled:opacity-50 whitespace-nowrap"
+        >
+          <UploadCloud className="w-3.5 h-3.5" />
+          {uploading ? "Uploading..." : "Upload"}
+        </button>
+        <button
+          type="button"
+          data-testid={`media-${kind}-remove-${idx}`}
+          onClick={onRemove}
+          className="p-2 text-gray-400 hover:text-red-600 border border-gray-300 rounded"
+        >
+          <Trash2 className="w-3.5 h-3.5" />
+        </button>
+      </div>
+      {url && kind === "image" && (
+        <img src={url} alt={label || "preview"} className="h-20 rounded border border-gray-200 object-cover" />
+      )}
+      {url && kind === "audio" && <audio controls src={url} className="w-full h-9" />}
+      {error && <p className="text-xs text-red-600" data-testid={`media-${kind}-error-${idx}`}>{error}</p>}
+      <input ref={fileRef} type="file" accept={accept} className="hidden" onChange={handleFile} data-testid={`media-${kind}-file-${idx}`} />
+    </div>
+  );
 }
 
 interface ServiceModal {
@@ -50,6 +148,8 @@ function ServiceRow({ svc, onEdit, onDelete }: { svc: ServiceStandard; onEdit: (
 export default function GovernanceServiceCharterPage() {
   const { token } = useAuth();
   const [categories, setCategories] = useState<ServiceCategory[]>([]);
+  const [media, setMedia] = useState<CharterMedia>(EMPTY_MEDIA);
+  const sdRef = useRef<Record<string, unknown>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [openCats, setOpenCats] = useState<Record<number, boolean>>({});
@@ -68,8 +168,15 @@ export default function GovernanceServiceCharterPage() {
       .then(r => r.json())
       .then(res => {
         const sd = res.data?.structured_data ?? {};
+        sdRef.current = sd && typeof sd === "object" ? sd : {};
         const cats: ServiceCategory[] = Array.isArray(sd.standards) ? sd.standards : [];
         setCategories(cats);
+        const m = sd.media ?? {};
+        setMedia({
+          video: Array.isArray(m.video) ? m.video : [],
+          audio: Array.isArray(m.audio) ? m.audio : [],
+          images: Array.isArray(m.images) ? m.images : [],
+        });
         const openState: Record<number, boolean> = {};
         cats.forEach((_, i) => { openState[i] = i === 0; });
         setOpenCats(openState);
@@ -80,21 +187,26 @@ export default function GovernanceServiceCharterPage() {
 
   useEffect(() => { if (token) load(); }, [token]);
 
-  const save = (cats: ServiceCategory[]) => {
+  // Persists both standards and media together. The API PUT replaces the entire
+  // structured_data, so media must always be sent alongside standards.
+  const persist = (cats: ServiceCategory[], mediaObj: CharterMedia) => {
     setSaving(true);
     fetch(API_PUT(PAGE_SLUG), {
       method: "PUT",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ structured_data: { standards: cats } }),
+      body: JSON.stringify({ structured_data: { ...sdRef.current, standards: cats, media: mediaObj } }),
     })
       .then(r => r.json())
       .then(res => {
         setSaving(false);
         if (res.error) showToast("error", res.error);
-        else { setCategories(cats); showToast("success", "Service charter saved."); }
+        else { setCategories(cats); setMedia(mediaObj); showToast("success", "Service charter saved."); }
       })
       .catch(() => { setSaving(false); showToast("error", "Save failed."); });
   };
+
+  const save = (cats: ServiceCategory[]) => persist(cats, media);
+  const saveMedia = (mediaObj: CharterMedia) => persist(categories, mediaObj);
 
   const toggleCat = (i: number) => setOpenCats(s => ({ ...s, [i]: !s[i] }));
 
@@ -143,6 +255,22 @@ export default function GovernanceServiceCharterPage() {
     cats[catIdx] = { ...cats[catIdx], services: cats[catIdx].services.filter((_, i) => i !== svcIdx) };
     save(cats);
   };
+
+  // ── Media handlers (local edits; persisted on Save Media) ──────────────────
+  const addVideo = () => setMedia(m => ({ ...m, video: [...m.video, { url: "", title: "" }] }));
+  const addAudio = () => setMedia(m => ({ ...m, audio: [...m.audio, { url: "", title: "" }] }));
+  const addImage = () => setMedia(m => ({ ...m, images: [...m.images, { url: "", caption: "" }] }));
+
+  const updateVideo = (i: number, patch: Partial<MediaVideo>) =>
+    setMedia(m => ({ ...m, video: m.video.map((v, idx) => idx === i ? { ...v, ...patch } : v) }));
+  const updateAudio = (i: number, patch: Partial<MediaAudio>) =>
+    setMedia(m => ({ ...m, audio: m.audio.map((a, idx) => idx === i ? { ...a, ...patch } : a) }));
+  const updateImage = (i: number, patch: Partial<MediaImage>) =>
+    setMedia(m => ({ ...m, images: m.images.map((img, idx) => idx === i ? { ...img, ...patch } : img) }));
+
+  const removeVideo = (i: number) => setMedia(m => ({ ...m, video: m.video.filter((_, idx) => idx !== i) }));
+  const removeAudio = (i: number) => setMedia(m => ({ ...m, audio: m.audio.filter((_, idx) => idx !== i) }));
+  const removeImage = (i: number) => setMedia(m => ({ ...m, images: m.images.filter((_, idx) => idx !== i) }));
 
   if (loading) return <div className="p-8 text-gray-500">Loading...</div>;
 
@@ -294,6 +422,70 @@ export default function GovernanceServiceCharterPage() {
             )}
           </div>
         ))}
+      </div>
+
+      {/* ── CSDC Multimedia (video / audio / images) ───────────────────────── */}
+      <div className="border-t border-gray-200 pt-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-gray-900">Citizen Service Delivery Charter — Media</h2>
+            <p className="text-sm text-gray-500 mt-1">Upload or link the video clip, audio, and images shown on the public Service Charter page.</p>
+          </div>
+          <button type="button" onClick={() => saveMedia(media)} disabled={saving} data-testid="save-media-btn"
+            className="flex items-center gap-2 px-4 py-2 bg-green-700 text-white text-sm rounded hover:bg-green-800 disabled:opacity-50">
+            <Save className="w-4 h-4" /> {saving ? "Saving..." : "Save Media"}
+          </button>
+        </div>
+
+        {/* Video */}
+        <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-800"><Film className="w-4 h-4 text-green-700" /> Video</h3>
+            <button type="button" onClick={addVideo} data-testid="add-video-btn" className="text-sm text-green-700 hover:text-green-900 flex items-center gap-1"><Plus className="w-3 h-3" /> Add Video</button>
+          </div>
+          {media.video.length === 0 && <p className="text-xs text-gray-400">No video added yet.</p>}
+          {media.video.map((v, i) => (
+            <MediaUploadRow key={i} kind="video" idx={i} accept="video/*"
+              label={v.title} labelPlaceholder="Title (e.g. CSDC Implementation Briefing)" url={v.url}
+              onLabelChange={val => updateVideo(i, { title: val })}
+              onUrlChange={val => updateVideo(i, { url: val })}
+              onRemove={() => removeVideo(i)} />
+          ))}
+        </div>
+
+        {/* Audio */}
+        <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-800"><Headphones className="w-4 h-4 text-green-700" /> Audio</h3>
+            <button type="button" onClick={addAudio} data-testid="add-audio-btn" className="text-sm text-green-700 hover:text-green-900 flex items-center gap-1"><Plus className="w-3 h-3" /> Add Audio</button>
+          </div>
+          {media.audio.length === 0 && <p className="text-xs text-gray-400">No audio added yet.</p>}
+          {media.audio.map((a, i) => (
+            <MediaUploadRow key={i} kind="audio" idx={i} accept="audio/*"
+              label={a.title} labelPlaceholder="Title (e.g. CSDC Radio Spot)" url={a.url}
+              onLabelChange={val => updateAudio(i, { title: val })}
+              onUrlChange={val => updateAudio(i, { url: val })}
+              onRemove={() => removeAudio(i)} />
+          ))}
+        </div>
+
+        {/* Images */}
+        <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="flex items-center gap-2 text-sm font-semibold text-gray-800"><Images className="w-4 h-4 text-green-700" /> Images</h3>
+            <button type="button" onClick={addImage} data-testid="add-image-btn" className="text-sm text-green-700 hover:text-green-900 flex items-center gap-1"><Plus className="w-3 h-3" /> Add Image</button>
+          </div>
+          {media.images.length === 0 && <p className="text-xs text-gray-400">No images added yet.</p>}
+          {media.images.map((img, i) => (
+            <MediaUploadRow key={i} kind="image" idx={i} accept="image/*"
+              label={img.caption} labelPlaceholder="Caption" url={img.url}
+              onLabelChange={val => updateImage(i, { caption: val })}
+              onUrlChange={val => updateImage(i, { url: val })}
+              onRemove={() => removeImage(i)} />
+          ))}
+        </div>
+
+        <p className="text-xs text-gray-400">Files are limited to 20 MB each. For larger videos, upload to YouTube or Vimeo and paste the link.</p>
       </div>
     </div>
   );

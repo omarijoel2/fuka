@@ -3,8 +3,111 @@ import { useQuery } from "@tanstack/react-query";
 import { Link } from "wouter";
 import { SeoHead } from "@/components/seo-head";
 import { Button } from "@/components/ui/button";
-import { Clock, CheckCircle, AlertCircle, Phone, Mail, ArrowLeft, Download } from "lucide-react";
+import { Clock, CheckCircle, AlertCircle, Phone, Mail, ArrowLeft, Download, Film, Headphones, Images } from "lucide-react";
 import { PageHero } from "@/components/ui/page-hero";
+
+interface MediaImage { url: string; caption?: string }
+interface MediaAudio { url: string; title?: string }
+interface MediaVideo { url: string; title?: string; poster?: string }
+interface CharterMedia { video?: MediaVideo[]; audio?: MediaAudio[]; images?: MediaImage[] }
+
+function toVideoEmbed(url: string): string | null {
+  const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
+  const vimeo = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}`;
+  return null;
+}
+
+function ServiceCharterMedia({ media }: { media: CharterMedia }) {
+  const videos = media.video ?? [];
+  const audios = media.audio ?? [];
+  const images = media.images ?? [];
+  if (videos.length === 0 && audios.length === 0 && images.length === 0) return null;
+
+  return (
+    <section className="py-16 bg-background border-b" data-testid="section-charter-media">
+      <div className="container mx-auto px-4 max-w-5xl">
+        <div className="text-center max-w-3xl mx-auto mb-10">
+          <h2 className="text-3xl font-serif font-bold text-primary mb-4">Citizen Service Delivery Charter (CSDC)</h2>
+          <p className="text-muted-foreground">
+            Watch, listen, and view how Kaimosi Friends University implements its Citizen Service Delivery Charter —
+            our commitment to transparent, timely, and accountable public service.
+          </p>
+        </div>
+
+        {videos.length > 0 && (
+          <div className="mb-12" data-testid="charter-video-group">
+            <h3 className="flex items-center gap-2 text-lg font-serif font-bold text-foreground mb-5">
+              <Film className="w-5 h-5 text-primary" /> Video
+            </h3>
+            <div className={`grid gap-6 ${videos.length > 1 ? "md:grid-cols-2" : "max-w-3xl mx-auto"}`}>
+              {videos.map((v, i) => {
+                const embed = toVideoEmbed(v.url);
+                return (
+                  <figure key={i} className="rounded-2xl border bg-card overflow-hidden" data-testid={`charter-video-${i}`}>
+                    <div className="aspect-video bg-black">
+                      {embed ? (
+                        <iframe
+                          src={embed}
+                          title={v.title || `Service Charter video ${i + 1}`}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <video controls preload="metadata" poster={v.poster || undefined} className="w-full h-full" data-testid={`charter-video-player-${i}`}>
+                          <source src={v.url} />
+                          Your browser does not support the video tag.
+                        </video>
+                      )}
+                    </div>
+                    {v.title && <figcaption className="p-4 text-sm font-medium text-foreground">{v.title}</figcaption>}
+                  </figure>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {audios.length > 0 && (
+          <div className="mb-12" data-testid="charter-audio-group">
+            <h3 className="flex items-center gap-2 text-lg font-serif font-bold text-foreground mb-5">
+              <Headphones className="w-5 h-5 text-primary" /> Audio
+            </h3>
+            <div className="space-y-4 max-w-3xl mx-auto">
+              {audios.map((a, i) => (
+                <div key={i} className="rounded-xl border bg-card p-5" data-testid={`charter-audio-${i}`}>
+                  {a.title && <p className="text-sm font-medium text-foreground mb-3">{a.title}</p>}
+                  <audio controls preload="metadata" className="w-full" data-testid={`charter-audio-player-${i}`}>
+                    <source src={a.url} />
+                    Your browser does not support the audio element.
+                  </audio>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {images.length > 0 && (
+          <div data-testid="charter-image-group">
+            <h3 className="flex items-center gap-2 text-lg font-serif font-bold text-foreground mb-5">
+              <Images className="w-5 h-5 text-primary" /> Images
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              {images.map((img, i) => (
+                <figure key={i} className="rounded-xl border bg-card overflow-hidden" data-testid={`charter-image-${i}`}>
+                  <img src={img.url} alt={img.caption || `Service Charter image ${i + 1}`} className="w-full h-48 object-cover" loading="lazy" />
+                  {img.caption && <figcaption className="p-3 text-xs text-muted-foreground">{img.caption}</figcaption>}
+                </figure>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
 
 const FALLBACK_STANDARDS = [
   {
@@ -78,6 +181,7 @@ export default function ServiceCharter() {
   });
   const sd = pageData?.data?.structured_data ?? {};
   const STANDARDS = (sd.standards as typeof FALLBACK_STANDARDS) ?? FALLBACK_STANDARDS;
+  const media = (sd.media as CharterMedia) ?? {};
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -133,6 +237,9 @@ export default function ServiceCharter() {
           </div>
         </div>
       </section>
+
+      {/* CSDC Multimedia (video / audio / images) */}
+      <ServiceCharterMedia media={media} />
 
       {/* Service Standards Table */}
       <section className="py-16 bg-background">
