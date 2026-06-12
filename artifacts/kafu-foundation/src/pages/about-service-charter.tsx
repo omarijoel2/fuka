@@ -173,6 +173,31 @@ const FALLBACK_STANDARDS = [
   },
 ];
 
+function CharterImageCard({ src, label, alt, testid }: { src: string; label: string; alt: string; testid: string }) {
+  const [errored, setErrored] = React.useState(false);
+  return (
+    <div className="rounded-xl bg-card border overflow-hidden flex flex-col" data-testid={`card-charter-image-${testid}`}>
+      <div className="px-5 py-3 bg-primary/5 border-b">
+        <h4 className="font-semibold text-foreground text-sm">{label}</h4>
+      </div>
+      {errored ? (
+        <div className="flex-1 flex items-center justify-center min-h-[200px] bg-secondary/30 text-center px-4">
+          <p className="text-sm text-muted-foreground">{label} will be added soon.</p>
+        </div>
+      ) : (
+        <a href={src} target="_blank" rel="noopener noreferrer" data-testid={`link-charter-image-${testid}`}>
+          <img
+            src={src}
+            alt={alt}
+            onError={() => setErrored(true)}
+            className="w-full h-auto object-contain"
+          />
+        </a>
+      )}
+    </div>
+  );
+}
+
 export default function ServiceCharter() {
   const { data: pageData } = useQuery({
     queryKey: ["page", "about-service-charter"],
@@ -283,9 +308,19 @@ export default function ServiceCharter() {
         <div className="container mx-auto px-4 max-w-3xl">
           <h2 className="text-2xl font-serif font-bold text-primary text-center mb-8">How to Raise a Concern</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <CharterImageCard
+              testid="en"
+              label="Service Delivery Charter (English)"
+              alt="KAFU Service Delivery Charter - English"
+              src="/images/uploads/service-delivery-charter-en.jpg"
+            />
+            <CharterImageCard
+              testid="sw"
+              label="Service Delivery Charter (Kiswahili)"
+              alt="KAFU Service Delivery Charter - Kiswahili"
+              src="/images/uploads/service-delivery-charter-sw.jpg"
+            />
             {[
-              { step: "1", title: "Contact the Department", desc: "First raise your concern directly with the relevant department or office." },
-              { step: "2", title: "Escalate to Head of Department", desc: "If unresolved within 5 working days, escalate to the Head of Department." },
               { step: "3", title: "Write to the Registrar", desc: "For unresolved matters, write formally to the Academic or Administrative Registrar." },
               { step: "4", title: "Complaints & Ethics Office", desc: "For serious grievances or whistleblowing, contact the Complaints & Ethics Office." },
             ].map(s => (
