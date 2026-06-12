@@ -198,6 +198,66 @@ function CharterImageCard({ src, label, alt, testid }: { src: string; label: str
   );
 }
 
+function CharterVideoCard({ media }: { media: CharterMedia }) {
+  const v = (media.video ?? [])[0];
+  const embed = v ? toVideoEmbed(v.url) : null;
+  return (
+    <div className="rounded-xl bg-card border overflow-hidden flex flex-col" data-testid="card-charter-video">
+      <div className="px-5 py-3 bg-primary/5 border-b flex items-center gap-2">
+        <Film className="w-4 h-4 text-primary" />
+        <h4 className="font-semibold text-foreground text-sm">{v?.title || "Service Charter Video"}</h4>
+      </div>
+      {v ? (
+        <div className="aspect-video bg-black">
+          {embed ? (
+            <iframe
+              src={embed}
+              title={v.title || "Service Charter video"}
+              className="w-full h-full"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              data-testid="charter-concern-video-embed"
+            />
+          ) : (
+            <video controls preload="metadata" poster={v.poster || undefined} className="w-full h-full" data-testid="charter-concern-video-player">
+              <source src={v.url} />
+              Your browser does not support the video tag.
+            </video>
+          )}
+        </div>
+      ) : (
+        <div className="flex-1 flex items-center justify-center min-h-[200px] bg-secondary/30 text-center px-4">
+          <p className="text-sm text-muted-foreground">Service Charter video will be added soon.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CharterAudioCard({ media }: { media: CharterMedia }) {
+  const a = (media.audio ?? [])[0];
+  return (
+    <div className="rounded-xl bg-card border overflow-hidden flex flex-col" data-testid="card-charter-audio">
+      <div className="px-5 py-3 bg-primary/5 border-b flex items-center gap-2">
+        <Headphones className="w-4 h-4 text-primary" />
+        <h4 className="font-semibold text-foreground text-sm">{a?.title || "Service Charter Audio"}</h4>
+      </div>
+      {a ? (
+        <div className="flex-1 flex items-center p-5">
+          <audio controls preload="metadata" className="w-full" data-testid="charter-concern-audio-player">
+            <source src={a.url} />
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      ) : (
+        <div className="flex-1 flex items-center justify-center min-h-[200px] bg-secondary/30 text-center px-4">
+          <p className="text-sm text-muted-foreground">Service Charter audio will be added soon.</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function ServiceCharter() {
   const { data: pageData } = useQuery({
     queryKey: ["page", "about-service-charter"],
@@ -306,7 +366,7 @@ export default function ServiceCharter() {
       {/* How to raise a concern */}
       <section className="py-16 bg-secondary/30 border-t">
         <div className="container mx-auto px-4 max-w-3xl">
-          <h2 className="text-2xl font-serif font-bold text-primary text-center mb-8">How to Raise a Concern</h2>
+          <h2 className="text-2xl font-serif font-bold text-primary text-center mb-8">Service Charter Documents, Video &amp; Audio</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <CharterImageCard
               testid="en"
@@ -320,18 +380,8 @@ export default function ServiceCharter() {
               alt="KAFU Service Delivery Charter - Kiswahili"
               src="/images/uploads/service-delivery-charter-sw.jpg"
             />
-            {[
-              { step: "3", title: "Write to the Registrar", desc: "For unresolved matters, write formally to the Academic or Administrative Registrar." },
-              { step: "4", title: "Complaints & Ethics Office", desc: "For serious grievances or whistleblowing, contact the Complaints & Ethics Office." },
-            ].map(s => (
-              <div key={s.step} className="flex gap-4 p-5 rounded-xl bg-card border">
-                <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm shrink-0">{s.step}</div>
-                <div>
-                  <h4 className="font-semibold text-foreground mb-1">{s.title}</h4>
-                  <p className="text-sm text-muted-foreground">{s.desc}</p>
-                </div>
-              </div>
-            ))}
+            <CharterVideoCard media={media} />
+            <CharterAudioCard media={media} />
           </div>
           <div className="mt-8 p-5 rounded-xl bg-card border flex flex-col sm:flex-row gap-4 justify-between items-center">
             <p className="text-sm text-muted-foreground">For urgent matters or if you are unsatisfied with the process:</p>
