@@ -315,7 +315,11 @@ Route::prefix('admin')->group(function () {
             $user = $request->user();
             $content = CmsContent::forRole($user)->findOrFail($id);
 
-            if (!in_array($content->status, ['draft', 'unpublished'])) {
+            // Builder pages are directly editable by their managers regardless of
+            // publish state (they don't follow the editorial review workflow).
+            // Other content types remain locked once past draft/unpublished
+            // unless the user is a central admin.
+            if ($content->type !== 'page' && !in_array($content->status, ['draft', 'unpublished'])) {
                 if (!$user->isCentralAdmin()) {
                     return response()->json(['message' => 'Cannot edit content in current workflow state.'], 403);
                 }
