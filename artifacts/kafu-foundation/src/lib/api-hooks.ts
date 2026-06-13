@@ -648,7 +648,7 @@ const FALLBACK_NAV_CONFIG: CmsNavConfig = {
   primary_nav: [
     { label: "Home", url: "/" },
     {
-      label: "About",
+      label: "About Us",
       url: "/about",
       type: "mega",
       mega_width: 520,
@@ -659,120 +659,101 @@ const FALLBACK_NAV_CONFIG: CmsNavConfig = {
           links: [
             { label: "About KAFU", url: "/about" },
             { label: "Vice-Chancellor", url: "/about/vice-chancellor" },
-            { label: "Management Board", url: "/about/management" },
+            { label: "University Management", url: "/about/management" },
             { label: "University Council", url: "/about/council" },
             { label: "Strategic Plan", url: "/about/strategic-plan" },
           ],
         },
         {
-          heading: "Governance",
+          heading: "Governance & More",
           links: [
-            { label: "Policies & Regulations", url: "/about/policies" },
             { label: "Service Charter", url: "/about/service-charter" },
+            { label: "Policies & Regulations", url: "/about/policies" },
+            { label: "Our Campuses", url: "/campuses" },
             { label: "Directorates", url: "/directorates" },
-            { label: "Campuses", url: "/campuses" },
-            { label: "Contacts & Offices", url: "/contact" },
+            { label: "Corporate Social Responsibility", url: "/about/csr" },
           ],
         },
       ],
       mega_footer: [
-        { label: "Our History", url: "/about/history" },
+        { label: "Facts & Figures", url: "/institutional-data" },
         { label: "Contact Us", url: "/contact" },
       ],
     },
     {
       label: "Academics",
-      url: "/academics",
+      url: "/schools",
       type: "mega",
-      mega_width: 560,
-      mega_cols: 2,
+      mega_width: 720,
+      mega_cols: 3,
       mega_groups: [
         {
-          heading: "Study",
+          heading: "Schools & Faculties",
           links: [
-            { label: "Schools & Faculties", url: "/schools" },
-            { label: "All Programmes", url: "/programmes" },
+            { label: "All Schools", url: "/schools" },
+            { label: "Education & Social Sciences", url: "/schools/SESS" },
+            { label: "Business & Economics", url: "/schools/SBE" },
+            { label: "Computing & IT", url: "/schools/SCIT" },
+            { label: "Science", url: "/schools/SOS" },
+            { label: "Health Sciences", url: "/schools/SHS" },
+          ],
+        },
+        {
+          heading: "Programmes",
+          links: [
+            { label: "Programme Catalogue", url: "/programmes" },
+            { label: "Compare Programmes", url: "/programmes/compare" },
             { label: "Postgraduate", url: "/programmes?level=postgraduate" },
-            { label: "Diploma & Certificate", url: "/programmes?level=diploma" },
-            { label: "ODeL (Online & Distance)", url: "/odel" },
+            { label: "Open, Distance & e-Learning", url: "/directorates/open-distance-elearning" },
           ],
         },
         {
           heading: "Resources",
           links: [
-            { label: "Academic Calendar", url: "/academic-calendar" },
-            { label: "Examination Timetables", url: "/exams" },
-            { label: "Library", url: "https://library.kafu.ac.ke", },
-            { label: "E-Learning", url: "https://elearning.kafu.ac.ke" },
+            { label: "Academic Calendar", url: "/admissions/calendar" },
+            { label: "Timetables", url: "/admissions/timetables" },
+            { label: "Library & Repository", url: "/repository" },
+            { label: "E-Learning", url: "https://elearning.kafu.ac.ke", external: true },
           ],
         },
       ],
-      mega_footer: [
-        { label: "All Programmes", url: "/programmes" },
-        { label: "Compare Programmes", url: "/programmes/compare" },
-      ],
+      mega_footer: [{ label: "All Programmes", url: "/programmes" }],
     },
-    { label: "Departments", url: "/departments", type: "departments" },
     {
-      label: "Admissions",
+      label: "Admission",
       url: "/admissions",
       type: "mega",
-      mega_width: 480,
+      mega_width: 520,
       mega_cols: 2,
       mega_groups: [
         {
           heading: "Apply",
           links: [
-            { label: "Undergraduate (KUCCPS)", url: "/admissions/undergraduate" },
-            { label: "Self-Sponsored (Mod. II)", url: "/admissions/module-ii" },
-            { label: "Postgraduate", url: "/admissions/postgraduate" },
-            { label: "International Students", url: "/admissions/international" },
-            { label: "KUCCPS Verification", url: "/kuccps-verify" },
+            { label: "Admissions Overview", url: "/admissions" },
+            { label: "Apply Online", url: "/admissions/apply" },
+            { label: "Track Application", url: "/admissions/track" },
+            { label: "International Admissions", url: "/international/study" },
+            { label: "Visa & Immigration", url: "/international/visa" },
           ],
         },
         {
           heading: "Information",
           links: [
-            { label: "Entry Requirements", url: "/admissions/requirements" },
-            { label: "Fees & Funding", url: "/admissions/fees" },
-            { label: "Scholarships", url: "/opportunities?type=scholarship" },
-            { label: "Hostel & Accommodation", url: "/students/accommodation" },
+            { label: "Entry Requirements", url: "/admissions/eligibility" },
+            { label: "Fees & Financing", url: "/admissions/fees" },
+            { label: "Access to Funding", url: "/admissions/funding" },
+            { label: "Intake Calendar", url: "/admissions/calendar" },
+            { label: "Joining Instructions", url: "/admissions/joining-instructions" },
           ],
         },
       ],
       mega_footer: [{ label: "Apply Now", url: "/admissions" }],
     },
     {
-      label: "Students",
-      url: "/student-services",
-      children: [
-        { label: "Student Services", url: "/student-services" },
-        { label: "Student Portal", url: "https://portal.kafu.ac.ke" },
-        { label: "E-Learning Platform", url: "https://elearning.kafu.ac.ke" },
-        { label: "Library", url: "https://library.kafu.ac.ke" },
-        { label: "Accommodation", url: "/students/accommodation" },
-        { label: "Clubs & Societies", url: "/students/clubs" },
-        { label: "Health & Welfare", url: "/students/welfare" },
-        { label: "Graduation", url: "/students/graduation" },
-      ],
-    },
-    {
-      label: "News",
-      url: "/news",
-      children: [
-        { label: "University News", url: "/news" },
-        { label: "Events Calendar", url: "/events" },
-        { label: "Announcements", url: "/announcements" },
-        { label: "Opportunities", url: "/opportunities" },
-        { label: "Media Gallery", url: "/media" },
-        { label: "Press Releases", url: "/news?category=press-release" },
-      ],
-    },
-    {
       label: "Research",
       url: "/research",
       type: "mega",
-      mega_width: 480,
+      mega_width: 520,
       mega_cols: 2,
       mega_groups: [
         {
@@ -781,27 +762,73 @@ const FALLBACK_NAV_CONFIG: CmsNavConfig = {
             { label: "Research Overview", url: "/research" },
             { label: "Research Projects", url: "/research/projects" },
             { label: "Publications", url: "/research/publications" },
-            { label: "Grants & Funding", url: "/research/grants" },
+            { label: "KAFU Journal", url: "/research/journal" },
           ],
         },
         {
-          heading: "Innovation",
+          heading: "Innovation & More",
           links: [
-            { label: "Research Partnerships", url: "/research/partnerships" },
-            { label: "KAFU Journal", url: "/research/journal" },
-            { label: "Innovation Hub", url: "/research/innovation" },
-            { label: "International", url: "/international" },
+            { label: "Partnerships & Grants", url: "/research/partnerships" },
+            { label: "Institutional Repository", url: "/repository" },
+            { label: "Ethics Review Committee", url: "/research/ethics" },
+            { label: "Innovation & Incubation Hub", url: "https://kafu-iihub.com", external: true },
           ],
         },
       ],
-      mega_footer: [{ label: "Research & Innovation Hub", url: "/research" }],
+      mega_footer: [{ label: "Research & Innovation", url: "/research" }],
     },
-    { label: "Contact", url: "/contact" },
+    {
+      label: "Info",
+      url: "/news",
+      type: "mega",
+      mega_width: 720,
+      mega_cols: 3,
+      mega_groups: [
+        {
+          heading: "News & Media",
+          links: [
+            { label: "Latest News", url: "/news" },
+            { label: "Events Calendar", url: "/events" },
+            { label: "Announcements", url: "/announcements" },
+            { label: "Journal", url: "/journal" },
+            { label: "Media Gallery", url: "/media" },
+            { label: "Photo Gallery", url: "/gallery" },
+          ],
+        },
+        {
+          heading: "Student Life",
+          links: [
+            { label: "Student Services", url: "/student-services" },
+            { label: "Dean of Students", url: "/students/affairs" },
+            { label: "Student Council", url: "/students/council" },
+            { label: "Alumni & Outcomes", url: "/alumni" },
+            { label: "Opportunities", url: "/opportunities" },
+          ],
+        },
+        {
+          heading: "Quick Links",
+          links: [
+            { label: "Student Portal", url: "https://portal.kafu.ac.ke", external: true },
+            { label: "E-Learning", url: "https://elearning.kafu.ac.ke", external: true },
+            { label: "Staff Login", url: "https://staff.kafu.ac.ke", external: true },
+            { label: "Downloads", url: "/media/downloads" },
+            { label: "International", url: "/international" },
+            { label: "Contact", url: "/contact" },
+          ],
+        },
+      ],
+      mega_footer: [{ label: "All News", url: "/news" }],
+    },
   ],
   utility_nav: [
     { label: "Student Portal", url: "https://portal.kafu.ac.ke" },
     { label: "E-Learning",     url: "https://elearning.kafu.ac.ke" },
     { label: "Staff Login",    url: "https://staff.kafu.ac.ke" },
+    { label: "Library",        url: "/repository" },
+    { label: "Downloads",      url: "/media/downloads" },
+    { label: "Alumni",         url: "/alumni" },
+    { label: "Tenders",        url: "/opportunities" },
+    { label: "Contacts",       url: "/contact" },
   ],
 };
 
@@ -818,6 +845,35 @@ export function useNavConfig() {
     staleTime: 5 * 60 * 1000,
     gcTime: 10 * 60 * 1000,
     placeholderData: FALLBACK_NAV_CONFIG,
+  });
+}
+
+export interface SiteSettings {
+  site_name?: string;
+  site_tagline?: string;
+  social_facebook?: string;
+  social_twitter?: string;
+  social_linkedin?: string;
+  social_youtube?: string;
+  social_instagram?: string;
+  footer_copyright?: string;
+  footer_tagline?: string;
+  [key: string]: unknown;
+}
+
+export function useSiteSettings() {
+  return useQuery<SiteSettings>({
+    queryKey: ["site-settings"],
+    queryFn: () =>
+      fetch("/api/site-config/site")
+        .then((r) => {
+          if (!r.ok) throw new Error("site-config fetch failed");
+          return r.json();
+        })
+        .then((d) => (d?.data ?? {}) as SiteSettings)
+        .catch(() => ({} as SiteSettings)),
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   });
 }
 

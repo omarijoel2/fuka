@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { Menu, X, ChevronDown, ChevronRight, MapPin, Phone, ExternalLink, Search } from "lucide-react";
+import { Menu, X, ChevronDown, ChevronRight, Phone, Mail, ExternalLink, Search, Facebook, Twitter, Linkedin, Youtube, Instagram } from "lucide-react";
 import { Button } from "./ui/button";
 import { SearchModal } from "./search-bar";
-import { useBranding, BRANDING_DEFAULTS, useNavConfig } from "@/lib/api-hooks";
+import { useBranding, BRANDING_DEFAULTS, useNavConfig, useSiteSettings } from "@/lib/api-hooks";
 import type { CmsPrimaryNavItem } from "@/lib/api-hooks";
 
 // ─── Departments mega-menu data (grouped by school) ──────────────────────────
@@ -412,6 +412,7 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
                 target="_blank"
                 rel="noreferrer"
                 className="flex items-center gap-2 pl-8 pr-5 py-3 text-sm text-gray-500 hover:text-primary"
+                data-testid={`mobile-nav-child-${child.name.toLowerCase().replace(/\s+/g, "-")}`}
               >
                 {child.name}
                 <ExternalLink className="w-3 h-3 opacity-50" />
@@ -422,6 +423,7 @@ function MobileNavItem({ item, onClose }: { item: NavItem; onClose: () => void }
                 href={child.path}
                 onClick={onClose}
                 className="block pl-8 pr-5 py-3 text-sm text-gray-500 hover:text-primary"
+                data-testid={`mobile-nav-child-${child.name.toLowerCase().replace(/\s+/g, "-")}`}
               >
                 {child.name}
               </Link>
@@ -446,9 +448,9 @@ function NavBtn({
   onClick?: () => void;
 }) {
   const hasDropdown = !!(item.children || item.megaGroups || item.megaType === "departments");
-  const base = `flex items-center gap-0.5 px-3 h-full text-sm font-semibold whitespace-nowrap border-b-[3px] transition-colors`;
-  const active = "border-primary text-primary";
-  const inactive = "border-transparent text-gray-700 hover:text-primary hover:border-primary/40";
+  const base = `flex items-center gap-0.5 px-3.5 h-full text-[13px] font-bold uppercase tracking-wide whitespace-nowrap border-b-[3px] transition-colors`;
+  const active = "border-accent text-primary";
+  const inactive = "border-transparent text-gray-700 hover:text-primary hover:border-accent";
 
   if (hasDropdown) {
     return (
@@ -473,16 +475,38 @@ export function Navbar() {
   const [mobileOpen,   setMobileOpen]   = React.useState(false);
   const [openDropdown, setOpenDropdown] = React.useState<string | null>(null);
   const [searchOpen,   setSearchOpen]   = useState(false);
+  const [searchTerm,   setSearchTerm]   = useState("");
   const { data: branding }   = useBranding();
   const { data: navConfig }  = useNavConfig();
+  const { data: site }       = useSiteSettings();
   const logoUrl = branding?.logo_primary_url ?? BRANDING_DEFAULTS.logo_primary_url;
   const logoAlt = branding?.logo_alt         ?? BRANDING_DEFAULTS.logo_alt;
   const resolvedNavItems = React.useMemo(
     () => cmsToNavItems(navConfig?.primary_nav ?? []),
     [navConfig]
   );
-  const [location]   = useLocation();
+  const socialLinks = React.useMemo(
+    () =>
+      [
+        { key: "facebook",  url: site?.social_facebook,  Icon: Facebook },
+        { key: "twitter",   url: site?.social_twitter,   Icon: Twitter },
+        { key: "linkedin",  url: site?.social_linkedin,  Icon: Linkedin },
+        { key: "youtube",   url: site?.social_youtube,   Icon: Youtube },
+        { key: "instagram", url: site?.social_instagram, Icon: Instagram },
+      ].filter((s) => s.url && s.url.trim().length > 0) as Array<{ key: string; url: string; Icon: typeof Facebook }>,
+    [site]
+  );
+  const [location, navigate] = useLocation();
   const navRowRef    = React.useRef<HTMLDivElement>(null);
+
+  const submitSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = searchTerm.trim();
+    if (q.length === 0) return;
+    navigate(`/search?q=${encodeURIComponent(q)}`);
+    setSearchTerm("");
+    setMobileOpen(false);
+  };
 
   React.useEffect(() => {
     function onClickOutside(e: MouseEvent) {
@@ -502,53 +526,82 @@ export function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full">
 
-      {/* ── Row 1: Utility bar — white, thin ── */}
-      <div className="bg-white border-b border-gray-200 py-1.5 text-xs text-gray-500">
-        <div className="container mx-auto px-4 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1.5">
-              <MapPin className="w-3 h-3 shrink-0 text-primary/60" />
-              <span className="hidden sm:inline">P.O BOX 385 – 50309, </span>Kaimosi, Kenya
-            </span>
-            <span className="hidden sm:flex items-center gap-1.5">
-              <Phone className="w-3 h-3 shrink-0 text-primary/60" />
-              +254 777 373 633
-            </span>
-          </div>
-          <div className="flex items-center gap-3 font-medium">
-            {(navConfig?.utility_nav ?? []).map((item, i) => (
-              <React.Fragment key={i}>
-                {i > 0 && <span className="opacity-30">|</span>}
-                <a
-                  href={item.url}
-                  target={item.url.startsWith("http") ? "_blank" : undefined}
-                  rel={item.url.startsWith("http") ? "noreferrer" : undefined}
-                  className="hover:text-primary transition-colors hidden sm:inline"
-                  data-testid={`link-utility-${i}`}
-                >
-                  {item.label}
-                </a>
-              </React.Fragment>
+      {/* ── Row 1: Utility / social bar — forest green ── */}
+      <div className="bg-primary text-white/90 text-xs">
+        <div className="container mx-auto px-4 h-9 flex items-center justify-between gap-3">
+          {/* Social icons */}
+          <div className="flex items-center gap-1">
+            {socialLinks.map(({ key, url, Icon }) => (
+              <a
+                key={key}
+                href={url}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={key}
+                className="flex items-center justify-center w-6 h-6 rounded hover:bg-white/15 hover:text-white transition-colors"
+                data-testid={`link-social-${key}`}
+              >
+                <Icon className="w-3.5 h-3.5" />
+              </a>
             ))}
-            <span className="opacity-30 hidden md:inline">|</span>
-            <a href="mailto:info@kafu.ac.ke"
-               className="hover:text-primary transition-colors hidden md:inline" data-testid="link-email">
-              info@kafu.ac.ke
+            <a
+              href="tel:+254777373633"
+              className="hidden md:flex items-center gap-1.5 ml-2 hover:text-white transition-colors"
+              data-testid="link-utility-phone"
+            >
+              <Phone className="w-3 h-3" /> +254 777 373 633
             </a>
+            <a
+              href="mailto:info@kafu.ac.ke"
+              className="hidden lg:flex items-center gap-1.5 ml-3 hover:text-white transition-colors"
+              data-testid="link-utility-email"
+            >
+              <Mail className="w-3 h-3" /> info@kafu.ac.ke
+            </a>
+          </div>
+          {/* Utility links */}
+          <div className="flex items-center gap-3 overflow-x-auto no-scrollbar">
+            {(navConfig?.utility_nav ?? []).map((item, i) => {
+              const external = item.url.startsWith("http");
+              return (
+                <React.Fragment key={i}>
+                  {i > 0 && <span className="opacity-30 hidden sm:inline">|</span>}
+                  {external ? (
+                    <a
+                      href={item.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="hidden sm:inline whitespace-nowrap uppercase tracking-wide font-medium hover:text-white transition-colors"
+                      data-testid={`link-utility-${i}`}
+                    >
+                      {item.label}
+                    </a>
+                  ) : (
+                    <Link
+                      href={item.url}
+                      className="hidden sm:inline whitespace-nowrap uppercase tracking-wide font-medium hover:text-white transition-colors"
+                      data-testid={`link-utility-${i}`}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
+                </React.Fragment>
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* ── Row 2: Logo + Nav items + Actions ── */}
+      {/* ── Row 2: Logo + Nav items + Search ── */}
       <div className="bg-white shadow-sm" ref={navRowRef}>
-        <div className="container mx-auto px-4 h-[70px] flex items-stretch gap-2">
+        <div className="container mx-auto px-4 h-[72px] flex items-stretch gap-2">
 
           {/* Logo */}
           <Link href="/" className="flex items-center shrink-0 mr-4" data-testid="link-home-logo">
             <img
               src={logoUrl}
               alt={logoAlt}
-              className="h-11 object-contain"
+              className="h-12 object-contain"
               onError={(e) => {
                 const img = e.target as HTMLImageElement;
                 img.style.display = "none";
@@ -559,7 +612,7 @@ export function Navbar() {
           </Link>
 
           {/* Desktop nav items — xl+ only */}
-          <nav className="hidden xl:flex items-stretch flex-1 gap-0">
+          <nav className="hidden xl:flex items-stretch flex-1 justify-center gap-0">
             {resolvedNavItems.map((item) => (
               <div key={item.name} className="relative flex items-stretch">
                 {(item.megaGroups || item.megaType === "departments") ? (
@@ -608,9 +661,34 @@ export function Navbar() {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center gap-1.5 ml-auto">
+          <div className="flex items-center gap-2 ml-auto">
+            {/* Inline search box — xl+ */}
+            <form
+              onSubmit={submitSearch}
+              className="hidden xl:flex items-center h-9 rounded-md border border-gray-200 bg-gray-50 focus-within:border-primary focus-within:ring-1 focus-within:ring-primary overflow-hidden"
+              role="search"
+            >
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search ..."
+                aria-label="Search the site"
+                className="w-36 2xl:w-44 bg-transparent px-3 text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none"
+                data-testid="input-navbar-search"
+              />
+              <button
+                type="submit"
+                aria-label="Search"
+                className="flex items-center justify-center w-9 h-9 text-gray-500 hover:text-primary transition-colors"
+                data-testid="button-navbar-search"
+              >
+                <Search className="w-4 h-4" />
+              </button>
+            </form>
+            {/* Search icon — below xl */}
             <button
-              className="flex items-center justify-center w-9 h-9 rounded-md text-gray-500 hover:text-primary hover:bg-gray-100 transition-colors"
+              className="xl:hidden flex items-center justify-center w-9 h-9 rounded-md text-gray-500 hover:text-primary hover:bg-gray-100 transition-colors"
               onClick={() => setSearchOpen(true)}
               aria-label="Open search"
               data-testid="button-open-search"
@@ -620,7 +698,7 @@ export function Navbar() {
             <Button
               asChild
               size="sm"
-              className="hidden xl:flex bg-primary text-white hover:bg-primary/90 font-semibold px-5 rounded-md"
+              className="hidden xl:flex bg-accent text-primary hover:bg-accent/90 font-semibold px-5 rounded-md"
               data-testid="button-apply-now"
             >
               <a href="/admissions">Apply Now</a>
@@ -654,12 +732,38 @@ export function Navbar() {
                       target={item.url.startsWith("http") ? "_blank" : undefined}
                       rel={item.url.startsWith("http") ? "noreferrer" : undefined}
                       className="hover:text-accent"
+                      data-testid={`mobile-utility-${i}`}
                     >
                       {item.label}
                     </a>
                   </React.Fragment>
                 ))}
               </div>
+            </div>
+            <div className="p-4 border-b border-gray-100">
+              <form
+                onSubmit={submitSearch}
+                className="flex items-center h-10 rounded-md border border-gray-200 bg-gray-50 focus-within:border-primary overflow-hidden"
+                role="search"
+              >
+                <input
+                  type="text"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search ..."
+                  aria-label="Search the site"
+                  className="flex-1 bg-transparent px-3 text-sm text-gray-700 placeholder:text-gray-400 focus:outline-none"
+                  data-testid="input-mobile-search"
+                />
+                <button
+                  type="submit"
+                  aria-label="Search"
+                  className="flex items-center justify-center w-10 h-10 text-gray-500 hover:text-primary transition-colors"
+                  data-testid="button-mobile-search"
+                >
+                  <Search className="w-4 h-4" />
+                </button>
+              </form>
             </div>
             <div className="flex-1">
               {resolvedNavItems.map((item) => (
@@ -670,7 +774,7 @@ export function Navbar() {
               <a
                 href="/admissions"
                 onClick={closeMobile}
-                className="block w-full text-center py-3.5 bg-primary text-white rounded-xl font-semibold text-sm hover:bg-primary/90 transition-colors"
+                className="block w-full text-center py-3.5 bg-accent text-primary rounded-xl font-semibold text-sm hover:bg-accent/90 transition-colors"
                 data-testid="mobile-apply-now"
               >
                 Apply Now
