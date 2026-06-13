@@ -2335,6 +2335,7 @@ Route::prefix('admin')->group(function () {
                         'dean'             => $sd['dean'] ?? '',
                         'dean_title'       => $sd['dean_title'] ?? '',
                         'dean_photo'       => $sd['dean_photo'] ?? '',
+                        'dean_staff_slug'  => $sd['dean_staff_slug'] ?? '',
                         'colour'           => $sd['colour'] ?? '#1B3A6B',
                         'href'             => $sd['href'] ?? '',
                         'programmes_count' => $sd['programmes_count'] ?? ['undergraduate' => 0, 'postgraduate' => 0, 'doctoral' => 0],
@@ -2346,10 +2347,13 @@ Route::prefix('admin')->group(function () {
         });
 
         Route::post('/', function (Request $request) {
+            $deanSlug = $request->input('dean_staff_slug', '');
             $sd = json_encode([
-                'dean'             => $request->input('dean', ''),
-                'dean_title'       => $request->input('dean_title', ''),
-                'dean_photo'       => $request->input('dean_photo', ''),
+                // Legacy dean text is only kept when no staff profile is linked.
+                'dean'             => $deanSlug ? $request->input('dean', '') : '',
+                'dean_title'       => $deanSlug ? $request->input('dean_title', '') : '',
+                'dean_photo'       => $deanSlug ? $request->input('dean_photo', '') : '',
+                'dean_staff_slug'  => $deanSlug,
                 'vision'           => $request->input('vision', ''),
                 'mission'          => $request->input('mission', ''),
                 'colour'           => $request->input('colour', '#1B3A6B'),
@@ -2376,10 +2380,14 @@ Route::prefix('admin')->group(function () {
         Route::put('/{id}', function (Request $request, int $id) {
             $item = CmsContent::where('type', 'school')->where('is_deleted', false)->findOrFail($id);
             $sdOld = is_string($item->structured_data) ? json_decode($item->structured_data, true) : ($item->structured_data ?? []);
+            $deanSlug = $request->input('dean_staff_slug', $sdOld['dean_staff_slug'] ?? '');
             $sd = json_encode([
-                'dean'             => $request->input('dean', $sdOld['dean'] ?? ''),
-                'dean_title'       => $request->input('dean_title', $sdOld['dean_title'] ?? ''),
-                'dean_photo'       => $request->input('dean_photo', $sdOld['dean_photo'] ?? ''),
+                // When a staff profile is linked, dean fields are resolved from it,
+                // so legacy text is cleared to keep "Position Vacant" authoritative.
+                'dean'             => $deanSlug ? $request->input('dean', $sdOld['dean'] ?? '') : '',
+                'dean_title'       => $deanSlug ? $request->input('dean_title', $sdOld['dean_title'] ?? '') : '',
+                'dean_photo'       => $deanSlug ? $request->input('dean_photo', $sdOld['dean_photo'] ?? '') : '',
+                'dean_staff_slug'  => $deanSlug,
                 'vision'           => $request->input('vision', $sdOld['vision'] ?? ''),
                 'mission'          => $request->input('mission', $sdOld['mission'] ?? ''),
                 'colour'           => $request->input('colour', $sdOld['colour'] ?? '#1B3A6B'),
@@ -2400,6 +2408,25 @@ Route::prefix('admin')->group(function () {
         Route::delete('/{id}', function (int $id) {
             CmsContent::where('type', 'school')->findOrFail($id)->update(['is_deleted' => true]);
             return response()->json(['message' => 'School removed.']);
+        });
+
+        // Staff profiles available for the Dean picker (single source of truth).
+        Route::get('/staff-options', function (Request $request) {
+            $q = CmsContent::where('type', 'staff_profile')->where('is_deleted', false);
+            if ($search = $request->query('search')) {
+                $q->where('title', 'like', '%' . $search . '%');
+            }
+            $staff = $q->orderBy('title')->get()->map(function ($item) {
+                $sd = is_string($item->structured_data) ? json_decode($item->structured_data, true) : ($item->structured_data ?? []);
+                return [
+                    'slug'        => $item->slug,
+                    'name'        => $item->title,
+                    'designation' => $sd['designation'] ?? ($item->category ?? ''),
+                    'school'      => $item->school_code ?: null,
+                    'photo'       => $item->featured_image ?: ($sd['photo'] ?? null),
+                ];
+            });
+            return response()->json(['data' => $staff->values()]);
         });
     });
 

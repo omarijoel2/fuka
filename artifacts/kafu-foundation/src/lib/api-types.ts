@@ -87,6 +87,8 @@ export interface School {
   dean: string | null;
   dean_title?: string | null;
   dean_photo?: string | null;
+  dean_slug?: string | null;
+  dean_staff_slug?: string | null;
   description: string;
   programmes_count: ProgrammeCount | number;
   colour?: string;

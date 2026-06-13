@@ -75,13 +75,27 @@ export default function Schools() {
                     </p>
 
                     {school.dean && (
-                      <div className="flex items-center gap-3 mb-6 p-3 bg-secondary rounded-lg w-fit">
-                        <User className="w-4 h-4 text-primary shrink-0" />
-                        <div>
-                          <span className="text-xs text-muted-foreground uppercase font-semibold block">{school.dean_title ?? "Dean of School"}</span>
-                          <span className="text-sm font-medium text-foreground">{school.dean}</span>
+                      school.dean_slug ? (
+                        <Link
+                          href={`/staff/${school.dean_slug}`}
+                          className="flex items-center gap-3 mb-6 p-3 bg-secondary rounded-lg w-fit hover:bg-secondary/70 transition-colors"
+                          data-testid={`dean-link-${school.code}`}
+                        >
+                          <User className="w-4 h-4 text-primary shrink-0" />
+                          <div>
+                            <span className="text-xs text-muted-foreground uppercase font-semibold block">{school.dean_title ?? "Dean of School"}</span>
+                            <span className="text-sm font-medium text-foreground">{school.dean}</span>
+                          </div>
+                        </Link>
+                      ) : (
+                        <div className="flex items-center gap-3 mb-6 p-3 bg-secondary rounded-lg w-fit">
+                          <User className="w-4 h-4 text-primary shrink-0" />
+                          <div>
+                            <span className="text-xs text-muted-foreground uppercase font-semibold block">{school.dean_title ?? "Dean of School"}</span>
+                            <span className="text-sm font-medium text-foreground">{school.dean}</span>
+                          </div>
                         </div>
-                      </div>
+                      )
                     )}
 
                     <div className="flex flex-wrap gap-3 mt-auto">

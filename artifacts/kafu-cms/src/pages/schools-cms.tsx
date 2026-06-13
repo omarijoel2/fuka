@@ -4,9 +4,6 @@ import {
   Plus, Pencil, Trash2, X, GraduationCap, Loader2,
   BookOpen, Users, FlaskConical,
 } from "lucide-react";
-import PhotoUploadField from "@/components/photo-upload-field";
-import { PhotoBrowserModal } from "@/components/photo-browser-modal";
-
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface School {
   id: number;
@@ -19,6 +16,7 @@ interface School {
   dean: string;
   dean_title: string;
   dean_photo: string;
+  dean_staff_slug: string;
   colour: string;
   href: string;
   programmes_count: { undergraduate: number; postgraduate: number; doctoral: number };
@@ -28,10 +26,18 @@ interface School {
 
 const BLANK: Partial<School> = {
   name: "", code: "", slug: "", description: "", vision: "", mission: "",
-  dean: "", dean_title: "Dean", dean_photo: "", colour: "#1A5C38", href: "",
+  dean: "", dean_title: "Dean", dean_photo: "", dean_staff_slug: "", colour: "#1A5C38", href: "",
   programmes_count: { undergraduate: 0, postgraduate: 0, doctoral: 0 },
   status: "published",
 };
+
+interface StaffOption {
+  slug: string;
+  name: string;
+  designation: string;
+  school: string | null;
+  photo: string | null;
+}
 
 type Tab = "basic" | "dean" | "counts";
 
@@ -62,7 +68,22 @@ function SchoolModal({ school, onClose, onSaved }: {
   const [tab, setTab] = useState<Tab>("basic");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [showBrowser, setShowBrowser] = useState(false);
+  const [staffOptions, setStaffOptions] = useState<StaffOption[]>([]);
+  const [staffSearch, setStaffSearch] = useState("");
+
+  useEffect(() => {
+    apiFetch("/schools/staff-options")
+      .then(r => setStaffOptions((r as { data: StaffOption[] }).data ?? []))
+      .catch(() => setStaffOptions([]));
+  }, []);
+
+  const selectedDean = staffOptions.find(s => s.slug === form.dean_staff_slug) ?? null;
+  const deanTerm = staffSearch.trim().toLowerCase();
+  const filteredStaff = deanTerm
+    ? staffOptions.filter(s =>
+        s.name.toLowerCase().includes(deanTerm) ||
+        (s.designation ?? "").toLowerCase().includes(deanTerm))
+    : staffOptions;
 
   function set(k: string, v: string | number | object) {
     setForm(f => ({ ...f, [k]: v }));
@@ -171,42 +192,52 @@ function SchoolModal({ school, onClose, onSaved }: {
           )}
 
           {tab === "dean" && (
-            <>
-              <div className="grid grid-cols-2 gap-4">
-                <FormField label="Dean's Full Name">
-                  <input value={form.dean ?? ""} onChange={e => set("dean", e.target.value)}
-                    placeholder="e.g. Prof. Kelvin K. Omieno" className={inputCls} data-testid="school-dean" />
-                </FormField>
-                <FormField label="Dean's Title">
-                  <input value={form.dean_title ?? ""} onChange={e => set("dean_title", e.target.value)}
-                    placeholder="Dean, School of Computing & IT" className={inputCls} data-testid="school-dean-title" />
-                </FormField>
-              </div>
-              <div className="space-y-2">
-                <PhotoUploadField
-                  value={form.dean_photo ?? ""}
-                  onChange={url => set("dean_photo", url)}
-                  personName={form.dean ?? ""}
-                  endpoint="/governance-photo"
-                />
-                <button type="button" onClick={() => setShowBrowser(true)}
-                  data-testid="school-dean-browse-library"
-                  className="text-xs text-[#1A5C38] underline hover:no-underline">
-                  Browse media library
-                </button>
-              </div>
-              {form.dean_photo && (
-                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
-                  <img src={form.dean_photo} alt="Dean preview"
-                    className="w-20 h-20 rounded-full object-cover border-4 border-white shadow"
-                    onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+            <div className="space-y-4">
+              <p className="text-sm text-gray-500 bg-blue-50 border border-blue-100 rounded-xl p-3">
+                Link the Dean to an existing staff profile. The school page shows the dean's name, title, and photo directly from their profile — keeping everything in sync from a single source.
+              </p>
+              <FormField label="Search staff">
+                <input value={staffSearch} onChange={e => setStaffSearch(e.target.value)}
+                  placeholder="Search by name or title…" className={inputCls} data-testid="school-dean-search" />
+              </FormField>
+              <FormField label="Dean (staff profile)">
+                <select value={form.dean_staff_slug ?? ""} onChange={e => set("dean_staff_slug", e.target.value)}
+                  className={`${inputCls} bg-white`} data-testid="school-dean-select">
+                  <option value="">— Position Vacant —</option>
+                  {filteredStaff.map(s => (
+                    <option key={s.slug} value={s.slug}>
+                      {s.name}{s.designation ? ` — ${s.designation}` : ""}
+                    </option>
+                  ))}
+                </select>
+              </FormField>
+              {selectedDean ? (
+                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100" data-testid="school-dean-preview">
+                  {selectedDean.photo ? (
+                    <img src={selectedDean.photo} alt={selectedDean.name}
+                      className="w-20 h-20 rounded-full object-cover border-4 border-white shadow"
+                      onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                  ) : (
+                    <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-gray-500 font-bold uppercase">
+                      {selectedDean.name.slice(0, 2)}
+                    </div>
+                  )}
                   <div>
-                    <p className="font-semibold text-gray-900">{form.dean || "Dean name"}</p>
-                    <p className="text-sm text-gray-500">{form.dean_title || "Title"}</p>
+                    <p className="font-semibold text-gray-900">{selectedDean.name}</p>
+                    <p className="text-sm text-gray-500">{selectedDean.designation || "Staff member"}</p>
                   </div>
                 </div>
+              ) : (
+                <div className="p-4 bg-gray-50 rounded-xl border border-dashed border-gray-200 text-sm text-gray-400" data-testid="school-dean-vacant">
+                  No dean linked. The school page will show "Position Vacant".
+                </div>
               )}
-            </>
+              {form.dean && !form.dean_staff_slug && (
+                <p className="text-xs text-amber-600 bg-amber-50 border border-amber-100 rounded-lg p-2" data-testid="school-dean-legacy-note">
+                  Legacy dean text on file: <span className="font-medium">{form.dean}</span>. Select a staff profile above to replace it.
+                </p>
+              )}
+            </div>
           )}
 
           {tab === "counts" && (
@@ -254,13 +285,6 @@ function SchoolModal({ school, onClose, onSaved }: {
         </form>
       </div>
     </div>
-    {showBrowser && (
-      <PhotoBrowserModal
-        onSelect={url => { set("dean_photo", url); setShowBrowser(false); }}
-        onClose={() => setShowBrowser(false)}
-        title="Select Dean's Photo"
-      />
-    )}
     </>
   );
 }

@@ -314,15 +314,43 @@ function mapCmsStaffDetail(CmsContent $item): array {
 }
 }
 
+if (!function_exists('resolveDeanFromStaff')) {
+function resolveDeanFromStaff(?string $slug): ?array {
+    if (!$slug) return null;
+    try {
+        $staff = CmsContent::where('type', 'staff_profile')
+            ->where('slug', $slug)
+            ->where('is_deleted', false)
+            ->first();
+        if (!$staff) return null;
+        $m = mapCmsStaff($staff);
+        return [
+            'slug'  => $m['slug'],
+            'name'  => $m['name'],
+            'title' => $m['designation'] ?: ($m['rank'] ?? null),
+            'photo' => $m['photo'],
+        ];
+    } catch (\Throwable $e) {
+        return null;
+    }
+}
+}
+
 if (!function_exists('mapCmsSchool')) {
 function mapCmsSchool(CmsContent $item): array {
     $sd = $item->structured_data ?? [];
+    $deanSlug = $sd['dean_staff_slug'] ?? null;
+    $dean = resolveDeanFromStaff($deanSlug);
     return [
         'code'             => strtoupper($item->slug),
         'name'             => $item->title,
-        'dean'             => $sd['dean'] ?? null,
-        'dean_title'       => $sd['dean_title'] ?? null,
-        'dean_photo'       => $sd['dean_photo'] ?? null,
+        // Dean resolved from the linked staff profile (single source of truth);
+        // falls back to legacy loose-text dean fields when no link is set.
+        'dean'             => $dean['name']  ?? ($sd['dean'] ?? null),
+        'dean_title'       => $dean['title'] ?? ($sd['dean_title'] ?? null),
+        'dean_photo'       => $dean['photo'] ?? ($sd['dean_photo'] ?? null),
+        'dean_slug'        => $dean['slug']  ?? null,
+        'dean_staff_slug'  => $deanSlug,
         'description'      => $item->summary ?? '',
         'vision'           => $sd['vision'] ?? '',
         'mission'          => $sd['mission'] ?? '',

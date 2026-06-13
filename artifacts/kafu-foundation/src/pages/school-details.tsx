@@ -69,10 +69,6 @@ export default function SchoolDetails() {
     staleTime: 1000 * 60 * 10,
     retry: 1,
   });
-  const deanStaff = staffData?.data?.find(s =>
-    s.designation?.toLowerCase().includes("dean") && !s.designation?.toLowerCase().includes("sub")
-  ) ?? null;
-
   const undergrad = programmes?.filter((p) => p.level === "undergraduate") ?? [];
   const postgrad = programmes?.filter((p) => p.level === "postgraduate") ?? [];
   const doctoral = programmes?.filter((p) => p.level === "doctoral") ?? [];
@@ -136,36 +132,52 @@ export default function SchoolDetails() {
                 </div>
               </div>
 
-              {/* Dean card */}
-              <div
-                className="flex items-center gap-4 bg-white/10 backdrop-blur-sm px-5 py-4 rounded-2xl shrink-0 border border-white/15 min-w-[240px]"
-                data-testid="dean-card"
-              >
-                {(deanStaff?.photo || school?.dean_photo) ? (
-                  <img
-                    src={deanStaff?.photo ?? school?.dean_photo ?? ""}
-                    alt={school?.dean ?? "Dean"}
-                    className="w-16 h-16 rounded-full object-cover shrink-0 ring-2 ring-accent/50"
-                  />
+              {/* Dean card — resolved from the linked staff profile */}
+              {(() => {
+                const cardCls =
+                  "flex items-center gap-4 bg-white/10 backdrop-blur-sm px-5 py-4 rounded-2xl shrink-0 border border-white/15 min-w-[240px]";
+                const inner = (
+                  <>
+                    {school?.dean_photo ? (
+                      <img
+                        src={school.dean_photo}
+                        alt={school?.dean ?? "Dean"}
+                        className="w-16 h-16 rounded-full object-cover shrink-0 ring-2 ring-accent/50"
+                      />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-white/15 border border-white/20 flex items-center justify-center shrink-0">
+                        <User className="w-7 h-7 text-primary-foreground/60" />
+                      </div>
+                    )}
+                    <div className="min-w-0">
+                      <span className="block text-[10px] font-bold uppercase tracking-widest text-primary-foreground/55 mb-0.5">
+                        Dean of School
+                      </span>
+                      <span className="block font-semibold text-primary-foreground leading-snug">
+                        {school?.dean ?? "Position Vacant"}
+                      </span>
+                      {school?.dean && school?.dean_title && (
+                        <span className="block text-xs text-primary-foreground/55 mt-0.5">
+                          {school.dean_title}
+                        </span>
+                      )}
+                    </div>
+                  </>
+                );
+                return school?.dean_slug ? (
+                  <Link
+                    href={`/staff/${school.dean_slug}`}
+                    className={`${cardCls} hover:bg-white/15 transition-colors`}
+                    data-testid="dean-card"
+                  >
+                    {inner}
+                  </Link>
                 ) : (
-                  <div className="w-16 h-16 rounded-full bg-white/15 border border-white/20 flex items-center justify-center shrink-0">
-                    <User className="w-7 h-7 text-primary-foreground/60" />
+                  <div className={cardCls} data-testid="dean-card">
+                    {inner}
                   </div>
-                )}
-                <div className="min-w-0">
-                  <span className="block text-[10px] font-bold uppercase tracking-widest text-primary-foreground/55 mb-0.5">
-                    Dean of School
-                  </span>
-                  <span className="block font-semibold text-primary-foreground leading-snug">
-                    {school?.dean ?? "Position Vacant"}
-                  </span>
-                  {school?.dean && (
-                    <span className="block text-xs text-primary-foreground/55 mt-0.5">
-                      {school?.code}
-                    </span>
-                  )}
-                </div>
-              </div>
+                );
+              })()}
             </div>
           </div>
         </div>
