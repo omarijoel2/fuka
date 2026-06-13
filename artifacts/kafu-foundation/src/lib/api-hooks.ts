@@ -319,6 +319,30 @@ export function useStaff(params?: { school?: string; search?: string; designatio
   });
 }
 
+export function useStaffFacets() {
+  return useQuery({
+    queryKey: ["staff-facets"],
+    queryFn: () => fetchApi<import("./api-types").StaffFacets>("/staff/facets"),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useEventFacets() {
+  return useQuery({
+    queryKey: ["event-facets"],
+    queryFn: () => fetchApi<import("./api-types").EventFacets>("/events/facets"),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
+export function useAdmissionsContent() {
+  return useQuery({
+    queryKey: ["admissions-content"],
+    queryFn: () => fetchApi<import("./api-types").AdmissionsContent>("/site-config/admissions_content"),
+    staleTime: 5 * 60 * 1000,
+  });
+}
+
 export function useStaffProfile(slug: string) {
   return useQuery({
     queryKey: ["staff", slug],

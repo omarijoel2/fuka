@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { SeoHead } from "@/components/seo-head";
-import { useAdmissions, useProgrammes } from "@/lib/api-hooks";
+import { useAdmissions, useProgrammes, useAdmissionsContent } from "@/lib/api-hooks";
 import type { AdmissionsPathway } from "@/lib/api-types";
 import ApplicationWizard from "@/components/application-wizard";
 import {
@@ -38,6 +38,27 @@ const PATHWAY_ICONS: Record<string, React.ReactNode> = {
 };
 
 const DOC_CATEGORY_ORDER = ["Application Forms", "Fee Structures", "Joining Instructions", "Brochures"];
+
+const FALLBACK_KCSE_HEADING = "Entry Requirements at a Glance";
+const FALLBACK_KCSE_INTRO = "Minimum KCSE mean grades by programme level. Actual requirements depend on the specific programme and available slots.";
+const FALLBACK_KCSE_GRADES = [
+  { level: "Undergraduate", pathway: "Government-Sponsored (KUCCPS)", grade: "C+ (Plus)", other: "KUCCPS placement + programme cluster subjects" },
+  { level: "Undergraduate", pathway: "Self-Sponsored (Module II)", grade: "C (Plain)", other: "Programme cluster subjects; direct application" },
+  { level: "Undergraduate", pathway: "Diploma Holders", grade: "C (Plain)", other: "Relevant diploma + interview (select programmes)" },
+  { level: "Postgraduate (Masters)", pathway: "All Pathways", grade: "Relevant First Degree", other: "2nd Class Honours (Upper) or equivalent" },
+  { level: "Doctoral (PhD)", pathway: "All Pathways", grade: "Masters Degree", other: "Research proposal + panel interview" },
+];
+
+const FALLBACK_HOW_TO_APPLY_HEADING = "How to Apply — Unified Guide";
+const FALLBACK_HOW_TO_APPLY_INTRO = "Regardless of your pathway, the core application process follows these steps.";
+const FALLBACK_HOW_TO_APPLY = [
+  { n: "01", title: "Identify Your Programme", body: "Browse the KAFU Programme Catalogue and identify the degree, diploma, or certificate that aligns with your career goals and eligibility." },
+  { n: "02", title: "Confirm Entry Requirements", body: "Cross-check the minimum KCSE grades, subject requirements, and any special prerequisites for your chosen programme." },
+  { n: "03", title: "Choose Your Application Route", body: "Government-sponsored students apply via KUCCPS. All others apply directly through the KAFU Student Portal at portal.kafu.ac.ke." },
+  { n: "04", title: "Gather Required Documents", body: "Prepare certified copies of your academic certificates, national ID, passport photos, and any additional documents required for your pathway." },
+  { n: "05", title: "Submit & Pay Application Fee", body: "Complete your application form online or in person and pay the non-refundable application fee via M-Pesa, bank, or at the Finance Office." },
+  { n: "06", title: "Receive & Accept Offer", body: "Successful applicants will receive an admission letter. Accept your offer, pay the required fees, and report on the designated joining date." },
+];
 
 function daysUntil(dateStr: string): number {
   const now = new Date();
@@ -133,6 +154,14 @@ function PathwaySection({ pathway }: { pathway: AdmissionsPathway }) {
 export default function Admissions() {
   const { data, isLoading } = useAdmissions();
   const { data: programmes } = useProgrammes();
+  const { data: admissionsContent } = useAdmissionsContent();
+
+  const kcseHeading = admissionsContent?.kcse_heading || FALLBACK_KCSE_HEADING;
+  const kcseIntro = admissionsContent?.kcse_intro || FALLBACK_KCSE_INTRO;
+  const kcseGrades = admissionsContent?.kcse_grades?.length ? admissionsContent.kcse_grades : FALLBACK_KCSE_GRADES;
+  const howToApplyHeading = admissionsContent?.how_to_apply_heading || FALLBACK_HOW_TO_APPLY_HEADING;
+  const howToApplyIntro = admissionsContent?.how_to_apply_intro || FALLBACK_HOW_TO_APPLY_INTRO;
+  const howToApply = admissionsContent?.how_to_apply?.length ? admissionsContent.how_to_apply : FALLBACK_HOW_TO_APPLY;
   const [activePathway, setActivePathway] = React.useState<string>("undergraduate");
   const [activeDocCategory, setActiveDocCategory] = React.useState<string>("Application Forms");
   const [wizardOpen, setWizardOpen] = useState(false);
@@ -303,8 +332,8 @@ export default function Admissions() {
 
             {/* ── ENTRY REQUIREMENTS AT A GLANCE — KCSE Grade Map ── */}
             <div id="kcse-grades" className="scroll-mt-24">
-              <h2 className="text-2xl md:text-3xl font-serif font-bold text-primary mb-2">Entry Requirements at a Glance</h2>
-              <p className="text-muted-foreground mb-6">Minimum KCSE mean grades by programme level. Actual requirements depend on the specific programme and available slots.</p>
+              <h2 className="text-2xl md:text-3xl font-serif font-bold text-primary mb-2">{kcseHeading}</h2>
+              <p className="text-muted-foreground mb-6">{kcseIntro}</p>
               <div className="overflow-x-auto rounded-xl border">
                 <table className="w-full text-sm">
                   <thead>
@@ -316,13 +345,7 @@ export default function Admissions() {
                     </tr>
                   </thead>
                   <tbody>
-                    {[
-                      { level: "Undergraduate", pathway: "Government-Sponsored (KUCCPS)", grade: "C+ (Plus)", other: "KUCCPS placement + programme cluster subjects" },
-                      { level: "Undergraduate", pathway: "Self-Sponsored (Module II)", grade: "C (Plain)", other: "Programme cluster subjects; direct application" },
-                      { level: "Undergraduate", pathway: "Diploma Holders", grade: "C (Plain)", other: "Relevant diploma + interview (select programmes)" },
-                      { level: "Postgraduate (Masters)", pathway: "All Pathways", grade: "Relevant First Degree", other: "2nd Class Honours (Upper) or equivalent" },
-                      { level: "Doctoral (PhD)", pathway: "All Pathways", grade: "Masters Degree", other: "Research proposal + panel interview" },
-                    ].map((row, i) => (
+                    {kcseGrades.map((row, i) => (
                       <tr key={i} className={`border-b ${i % 2 === 0 ? "bg-secondary/30" : "bg-card"}`} data-testid={`grade-row-${i}`}>
                         <td className="px-5 py-3 font-semibold text-foreground text-xs">{row.level}</td>
                         <td className="px-5 py-3 text-muted-foreground text-xs">{row.pathway}</td>
@@ -400,20 +423,13 @@ export default function Admissions() {
 
             {/* ── HOW TO APPLY — Unified Visual Guide ── */}
             <div id="how-to-apply" className="scroll-mt-24">
-              <h2 className="text-2xl md:text-3xl font-serif font-bold text-primary mb-2">How to Apply — Unified Guide</h2>
-              <p className="text-muted-foreground mb-8">Regardless of your pathway, the core application process follows these steps.</p>
+              <h2 className="text-2xl md:text-3xl font-serif font-bold text-primary mb-2">{howToApplyHeading}</h2>
+              <p className="text-muted-foreground mb-8">{howToApplyIntro}</p>
               <div className="relative">
                 {/* Connecting line */}
                 <div className="hidden md:block absolute left-6 top-8 bottom-8 w-0.5 bg-gradient-to-b from-primary via-primary/40 to-transparent" />
                 <div className="space-y-6">
-                  {[
-                    { n: "01", title: "Identify Your Programme", body: "Browse the KAFU Programme Catalogue and identify the degree, diploma, or certificate that aligns with your career goals and eligibility." },
-                    { n: "02", title: "Confirm Entry Requirements", body: "Cross-check the minimum KCSE grades, subject requirements, and any special prerequisites for your chosen programme." },
-                    { n: "03", title: "Choose Your Application Route", body: "Government-sponsored students apply via KUCCPS. All others apply directly through the KAFU Student Portal at portal.kafu.ac.ke." },
-                    { n: "04", title: "Gather Required Documents", body: "Prepare certified copies of your academic certificates, national ID, passport photos, and any additional documents required for your pathway." },
-                    { n: "05", title: "Submit & Pay Application Fee", body: "Complete your application form online or in person and pay the non-refundable application fee via M-Pesa, bank, or at the Finance Office." },
-                    { n: "06", title: "Receive & Accept Offer", body: "Successful applicants will receive an admission letter. Accept your offer, pay the required fees, and report on the designated joining date." },
-                  ].map((step, i) => (
+                  {howToApply.map((step, i) => (
                     <div key={i} className="relative flex gap-6 items-start" data-testid={`how-step-${i + 1}`}>
                       <div className="w-12 h-12 rounded-xl bg-primary text-white flex items-center justify-center font-bold text-lg shrink-0 z-10">
                         {step.n}

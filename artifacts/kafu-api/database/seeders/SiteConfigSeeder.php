@@ -362,5 +362,28 @@ class SiteConfigSeeder extends Seeder
                 ['title' => 'Anti-Corruption & Ethics Policy', 'type' => 'PDF', 'url' => '',                   'size' => '',  'description' => 'University code of ethics and anti-corruption guidelines.'],
             ],
         ]);
+
+        // Admissions content — Entry Requirements (KCSE grade map) + How-to-Apply guide
+        SiteConfig::setGroup('admissions_content', [
+            'kcse_heading'     => 'Entry Requirements at a Glance',
+            'kcse_intro'       => 'Minimum KCSE mean grades by programme level. Actual requirements depend on the specific programme and available slots.',
+            'kcse_grades' => [
+                ['level' => 'Undergraduate', 'pathway' => 'Government-Sponsored (KUCCPS)', 'grade' => 'C+ (Plus)', 'other' => 'KUCCPS placement + programme cluster subjects'],
+                ['level' => 'Undergraduate', 'pathway' => 'Self-Sponsored (Module II)', 'grade' => 'C (Plain)', 'other' => 'Programme cluster subjects; direct application'],
+                ['level' => 'Undergraduate', 'pathway' => 'Diploma Holders', 'grade' => 'C (Plain)', 'other' => 'Relevant diploma + interview (select programmes)'],
+                ['level' => 'Postgraduate (Masters)', 'pathway' => 'All Pathways', 'grade' => 'Relevant First Degree', 'other' => '2nd Class Honours (Upper) or equivalent'],
+                ['level' => 'Doctoral (PhD)', 'pathway' => 'All Pathways', 'grade' => 'Masters Degree', 'other' => 'Research proposal + panel interview'],
+            ],
+            'how_to_apply_heading' => 'How to Apply — Unified Guide',
+            'how_to_apply_intro'   => 'Regardless of your pathway, the core application process follows these steps.',
+            'how_to_apply' => [
+                ['n' => '01', 'title' => 'Identify Your Programme', 'body' => 'Browse the KAFU Programme Catalogue and identify the degree, diploma, or certificate that aligns with your career goals and eligibility.'],
+                ['n' => '02', 'title' => 'Confirm Entry Requirements', 'body' => 'Cross-check the minimum KCSE grades, subject requirements, and any special prerequisites for your chosen programme.'],
+                ['n' => '03', 'title' => 'Choose Your Application Route', 'body' => 'Government-sponsored students apply via KUCCPS. All others apply directly through the KAFU Student Portal at portal.kafu.ac.ke.'],
+                ['n' => '04', 'title' => 'Gather Required Documents', 'body' => 'Prepare certified copies of your academic certificates, national ID, passport photos, and any additional documents required for your pathway.'],
+                ['n' => '05', 'title' => 'Submit & Pay Application Fee', 'body' => 'Complete your application form online or in person and pay the non-refundable application fee via M-Pesa, bank, or at the Finance Office.'],
+                ['n' => '06', 'title' => 'Receive & Accept Offer', 'body' => 'Successful applicants will receive an admission letter. Accept your offer, pay the required fees, and report on the designated joining date.'],
+            ],
+        ]);
     }
 }

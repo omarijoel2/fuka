@@ -1,6 +1,6 @@
 import React from "react";
 import { Link, useLocation } from "wouter";
-import { useStaff } from "@/lib/api-hooks";
+import { useStaff, useStaffFacets } from "@/lib/api-hooks";
 import type { StaffMember } from "@/lib/api-types";
 import { SeoHead } from "@/components/seo-head";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 
-const SCHOOLS = [
+const FALLBACK_SCHOOLS = [
   { code: "", label: "All Schools" },
   { code: "SESS", label: "SESS — Education & Social Sciences" },
   { code: "SBE", label: "SBE — Business & Economics" },
@@ -26,7 +26,7 @@ const SCHOOLS = [
   { code: "leadership", label: "University Leadership" },
 ];
 
-const RANKS = [
+const FALLBACK_RANKS = [
   { value: "", label: "All Ranks" },
   { value: "Professor", label: "Professor" },
   { value: "Associate Professor", label: "Associate Professor" },
@@ -36,7 +36,7 @@ const RANKS = [
   { value: "Dean", label: "Deans" },
 ];
 
-const RESEARCH_THEMES = [
+const FALLBACK_RESEARCH_THEMES = [
   "Artificial Intelligence",
   "Malaria & Tropical Diseases",
   "Environmental Science",
@@ -249,6 +249,18 @@ export default function StaffDirectoryPage() {
     rank: rank || undefined,
   });
 
+  const { data: facets } = useStaffFacets();
+
+  const schoolOptions = facets?.schools?.length
+    ? [{ code: "", label: "All Schools" }, ...facets.schools]
+    : FALLBACK_SCHOOLS;
+  const rankOptions = facets?.ranks?.length
+    ? [{ value: "", label: "All Ranks" }, ...facets.ranks.map((r) => ({ value: r, label: r }))]
+    : FALLBACK_RANKS;
+  const researchThemes = facets?.research_themes?.length
+    ? facets.research_themes
+    : FALLBACK_RESEARCH_THEMES;
+
   const staff = React.useMemo(() => {
     if (!allStaff) return [];
     let filtered = allStaff;
@@ -265,6 +277,14 @@ export default function StaffDirectoryPage() {
           s.specializations.some((sp) => sp.toLowerCase().includes(q))
       );
     }
+    if (rank) {
+      const r = rank.toLowerCase();
+      filtered = filtered.filter(
+        (s) =>
+          (s.rank ?? "").toLowerCase() === r ||
+          (s.designation ?? "").toLowerCase().includes(r)
+      );
+    }
     if (researchTheme) {
       filtered = filtered.filter((s) =>
         s.specializations.some((sp) =>
@@ -273,7 +293,7 @@ export default function StaffDirectoryPage() {
       );
     }
     return filtered;
-  }, [allStaff, school, search, researchTheme]);
+  }, [allStaff, school, search, rank, researchTheme]);
 
   const suggestions: Suggestion[] = React.useMemo(() => {
     if (!search.trim() || !allStaff) return [];
@@ -391,7 +411,7 @@ export default function StaffDirectoryPage() {
                 onChange={(e) => setSchool(e.target.value)}
                 data-testid="staff-school-filter"
               >
-                {SCHOOLS.map((s) => (
+                {schoolOptions.map((s) => (
                   <option key={s.code} value={s.code}>{s.label}</option>
                 ))}
               </select>
@@ -401,7 +421,7 @@ export default function StaffDirectoryPage() {
                 onChange={(e) => setRank(e.target.value)}
                 data-testid="staff-rank-filter"
               >
-                {RANKS.map((r) => (
+                {rankOptions.map((r) => (
                   <option key={r.value} value={r.value}>{r.label}</option>
                 ))}
               </select>
@@ -423,7 +443,7 @@ export default function StaffDirectoryPage() {
             <span className="text-xs text-muted-foreground shrink-0 flex items-center gap-1">
               <TrendingUp className="w-3.5 h-3.5" /> Research:
             </span>
-            {RESEARCH_THEMES.map((theme) => (
+            {researchThemes.map((theme) => (
               <button
                 key={theme}
                 onClick={() => setResearchTheme(researchTheme === theme ? "" : theme)}
@@ -449,7 +469,7 @@ export default function StaffDirectoryPage() {
             ) : (
               <span>
                 <strong className="text-foreground">{staff.length}</strong> staff member{staff.length !== 1 ? "s" : ""} found
-                {school && ` in ${SCHOOLS.find((s) => s.code === school)?.label}`}
+                {school && ` in ${schoolOptions.find((s) => s.code === school)?.label}`}
                 {rank && ` · ${rank}`}
                 {researchTheme && ` · ${researchTheme}`}
                 {search && ` · matching "${search}"`}
@@ -490,7 +510,7 @@ export default function StaffDirectoryPage() {
           <div className="mt-14 border-t pt-10">
             <h2 className="text-xl font-serif font-bold text-primary mb-5">Browse by School</h2>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-              {SCHOOLS.filter((s) => s.code && s.code !== "leadership").map((s) => (
+              {schoolOptions.filter((s) => s.code && s.code !== "leadership").map((s) => (
                 <button
                   key={s.code}
                   onClick={() => setSchool(s.code)}

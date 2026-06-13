@@ -57,6 +57,7 @@ import ContentHealthPage from "@/pages/content-health";
 import ContentOwnershipPage from "@/pages/content-ownership";
 import WorkflowConsolePage from "@/pages/workflow-console";
 import AdmissionsCmsPage from "@/pages/admissions-cms";
+import AdmissionsContentCmsPage from "@/pages/admissions-content-cms";
 import KuccpsImportWizard from "@/pages/kuccps-import-wizard";
 import MediaHubCmsPage from "@/pages/media-hub-cms";
 import PagesManagerCmsPage from "@/pages/pages-manager-cms";
@@ -176,6 +177,13 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <AdmissionsFeesAdminPage />
+            </RequireRole>
+          )}
+        </Route>
+        <Route path="/admissions/content">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <AdmissionsContentCmsPage />
             </RequireRole>
           )}
         </Route>

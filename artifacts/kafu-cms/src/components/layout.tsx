@@ -117,6 +117,7 @@ const navItems: NavItem[] = [
     roles: ADMIN_ROLES,
     children: [
       { label: "Document Uploads", href: "/admissions" },
+      { label: "Entry & How to Apply", href: "/admissions/content" },
       { label: "Fees & Payments", href: "/admissions/fees" },
       { label: "Postgraduate Programmes", href: "/admissions/programmes" },
       { label: "Eligibility Settings", href: "/admissions/settings" },

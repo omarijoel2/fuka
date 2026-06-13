@@ -489,7 +489,7 @@ Route::get('/hero-slides', function () {
 
 // ── Public site-config (read-only) ────────────────────────────────────────────
 Route::get('/site-config/{group}', function (string $group) {
-    $allowed = ['homepage', 'about', 'contact', 'site', 'seo', 'navigation', 'student-services'];
+    $allowed = ['homepage', 'about', 'contact', 'site', 'seo', 'navigation', 'student-services', 'admissions_content'];
     if (!in_array($group, $allowed)) {
         return response()->json(['error' => 'Config group not found.'], 404);
     }
@@ -919,6 +919,24 @@ Route::get('/events', function (Request $request) {
         return response()->json(['data' => $items]);
     } catch (\Throwable $e) {
         return response()->json(['data' => []]);
+    }
+});
+
+Route::get('/events/facets', function () {
+    try {
+        $cats = CmsContent::where('type', 'event')
+            ->where('status', 'published')
+            ->where('is_deleted', false)
+            ->get()
+            ->map(fn($i) => $i->category ?: 'General')
+            ->filter(fn($c) => trim((string) $c) !== '')
+            ->unique()
+            ->sort()
+            ->values()
+            ->toArray();
+        return response()->json(['data' => ['categories' => $cats]]);
+    } catch (\Throwable $e) {
+        return response()->json(['data' => ['categories' => []]]);
     }
 });
 
@@ -1897,6 +1915,67 @@ Route::prefix('admin/staff-accounts')->middleware(['auth:sanctum'])->group(funct
     Route::post('/{id}/reset-password', [\App\Http\Controllers\AdminStaffController::class, 'resetPassword']);
 });
 // ──────────────────────────────────────────────────────────────────
+
+Route::get('/staff/facets', function () {
+    $fallback = ['schools' => [], 'ranks' => [], 'research_themes' => []];
+    try {
+        $staff = CmsContent::where('type', 'staff_profile')
+            ->where('status', 'published')
+            ->where('is_deleted', false)
+            ->get()
+            ->map(fn($s) => mapCmsStaff($s));
+
+        // School code -> name labels from CMS schools (if available)
+        $schoolNames = [];
+        try {
+            foreach (CmsContent::where('type', 'school')
+                ->where('status', 'published')
+                ->where('is_deleted', false)
+                ->get() as $sc) {
+                $schoolNames[strtoupper($sc->slug)] = $sc->title;
+            }
+        } catch (\Throwable $e) {
+            // labels are best-effort
+        }
+
+        $codes = [];
+        $ranks = [];
+        $themes = [];
+        $hasLeadership = false;
+        foreach ($staff as $s) {
+            if (!empty($s['school'])) $codes[strtoupper($s['school'])] = true;
+            if (!empty($s['rank'])) $ranks[trim($s['rank'])] = true;
+            if (($s['unit'] ?? null) === 'University Leadership') $hasLeadership = true;
+            foreach (($s['specializations'] ?? []) as $sp) {
+                $sp = trim((string) $sp);
+                if ($sp !== '') $themes[$sp] = true;
+            }
+        }
+
+        $schoolsOut = [];
+        foreach (array_keys($codes) as $code) {
+            $name = $schoolNames[$code] ?? null;
+            $schoolsOut[] = ['code' => $code, 'label' => $name ? "$code — $name" : $code];
+        }
+        usort($schoolsOut, fn($a, $b) => strcmp($a['code'], $b['code']));
+        if ($hasLeadership) {
+            $schoolsOut[] = ['code' => 'leadership', 'label' => 'University Leadership'];
+        }
+
+        $ranks = array_keys($ranks);
+        sort($ranks);
+        $themes = array_keys($themes);
+        sort($themes);
+
+        return response()->json(['data' => [
+            'schools' => $schoolsOut,
+            'ranks' => array_values($ranks),
+            'research_themes' => array_values($themes),
+        ]]);
+    } catch (\Throwable $e) {
+        return response()->json(['data' => $fallback]);
+    }
+});
 
 Route::get('/staff/{slug}', function (string $slug) {
     try {

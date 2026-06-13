@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { Link } from "wouter";
-import { useEvents } from "@/lib/api-hooks";
+import { useEvents, useEventFacets } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Clock, Search, ExternalLink, ChevronRight, Tag, ArrowRight } from "lucide-react";
 import { SeoHead } from "@/components/seo-head";
 import type { Event } from "@/lib/api-types";
 
-const CATEGORIES = ["All", "Examinations", "Academic", "Administration", "Graduation", "Special Events", "Community Outreach", "Student Life"];
+const FALLBACK_CATEGORIES = ["All", "Examinations", "Academic", "Administration", "Graduation", "Special Events", "Community Outreach", "Student Life"];
 
 function formatDateRange(start: string, end?: string | null) {
   const s = new Date(start);
@@ -91,6 +91,11 @@ export default function Events() {
     search: debouncedSearch || undefined,
   });
 
+  const { data: eventFacets } = useEventFacets();
+  const categories = eventFacets?.categories?.length
+    ? ["All", ...eventFacets.categories]
+    : FALLBACK_CATEGORIES;
+
   return (
     <div className="flex flex-col min-h-screen">
       <SeoHead
@@ -162,7 +167,7 @@ export default function Events() {
 
           {/* Category chips */}
           <div className="flex flex-wrap gap-2">
-            {CATEGORIES.slice(0, 5).map((cat) => (
+            {categories.slice(0, 5).map((cat) => (
               <button
                 key={cat}
                 onClick={() => setCategory(cat)}

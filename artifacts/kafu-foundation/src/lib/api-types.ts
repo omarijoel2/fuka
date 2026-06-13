@@ -216,6 +216,26 @@ export interface StaffMember {
   specializations: string[];
   photo: string | null;
   bio: string;
+  rank?: string | null;
+}
+
+export interface StaffFacets {
+  schools: { code: string; label: string }[];
+  ranks: string[];
+  research_themes: string[];
+}
+
+export interface EventFacets {
+  categories: string[];
+}
+
+export interface AdmissionsContent {
+  kcse_heading?: string;
+  kcse_intro?: string;
+  kcse_grades?: { level: string; pathway: string; grade: string; other: string }[];
+  how_to_apply_heading?: string;
+  how_to_apply_intro?: string;
+  how_to_apply?: { n: string; title: string; body: string }[];
 }
 
 export interface StaffQualification {
