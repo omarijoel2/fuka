@@ -89,6 +89,7 @@ import MediaPressReleasesPage from "@/pages/media-press-releases";
 import MediaPublicationsPage from "@/pages/media-publications";
 import MediaDownloadsPage from "@/pages/media-downloads";
 import MediaBrandingPage from "@/pages/media-branding";
+import GenericPage from "@/pages/generic-page";
 import NotFound from "@/pages/not-found";
 
 const queryClient = new QueryClient({
@@ -208,6 +209,7 @@ function Router() {
             {(params) => <AlumniDetail slug={params.slug ?? ""} />}
           </Route>
           <Route path="/institutional-data" component={InstitutionalData} />
+          <Route path="/p/:slug" component={GenericPage} />
           <Route component={NotFound} />
         </Switch>
       </main>

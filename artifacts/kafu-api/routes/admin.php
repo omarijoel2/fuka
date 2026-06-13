@@ -19,6 +19,44 @@ use Illuminate\Support\Str;
 |--------------------------------------------------------------------------
 */
 
+if (!function_exists('kafuSanitizeHtml')) {
+    /**
+     * Sanitize editor-authored HTML against an allowlist so that page body
+     * content rendered on the public site cannot inject scripts, event
+     * handlers, or unsafe URI schemes (stored XSS protection).
+     */
+    function kafuSanitizeHtml(?string $html): ?string
+    {
+        if ($html === null || trim($html) === '') {
+            return $html;
+        }
+
+        static $purifier = null;
+        if ($purifier === null) {
+            $config = \HTMLPurifier_Config::createDefault();
+            $config->set('HTML.Allowed',
+                'p,br,hr,h1,h2,h3,h4,h5,h6,strong,b,em,i,u,s,blockquote,pre,code,'
+                . 'ul,ol,li,a[href|title|target|rel],img[src|alt|title|width|height],'
+                . 'table,thead,tbody,tr,th,td,span,div');
+            $config->set('HTML.TargetBlank', true);
+            $config->set('URI.AllowedSchemes', ['http' => true, 'https' => true, 'mailto' => true, 'tel' => true]);
+            $config->set('Attr.AllowedFrameTargets', ['_blank']);
+            $cachePath = storage_path('app/htmlpurifier');
+            if (!is_dir($cachePath)) {
+                @mkdir($cachePath, 0775, true);
+            }
+            if (is_dir($cachePath) && is_writable($cachePath)) {
+                $config->set('Cache.SerializerPath', $cachePath);
+            } else {
+                $config->set('Cache.DefinitionImpl', null);
+            }
+            $purifier = new \HTMLPurifier($config);
+        }
+
+        return $purifier->purify($html);
+    }
+}
+
 Route::prefix('admin')->group(function () {
 
     // -------------------------------------------------------------------------
@@ -231,7 +269,23 @@ Route::prefix('admin')->group(function () {
             ]);
 
             $data['author_id'] = $user->id;
-            $data['status'] = 'draft';
+            // Sanitize editor-authored HTML for pages to prevent stored XSS,
+            // since page bodies are rendered as raw HTML on the public site.
+            if (($data['type'] ?? null) === 'page') {
+                if (array_key_exists('body', $data)) {
+                    $data['body'] = kafuSanitizeHtml($data['body']);
+                }
+                if (array_key_exists('summary', $data)) {
+                    $data['summary'] = kafuSanitizeHtml($data['summary']);
+                }
+            }
+            // Pages built in the CMS page builder may be published directly so
+            // they appear on the site and in the navigation immediately. All
+            // other content types still start as drafts and follow the workflow.
+            $requestedStatus = $request->input('status');
+            $data['status'] = ($data['type'] === 'page' && in_array($requestedStatus, ['draft', 'published', 'unpublished'], true))
+                ? $requestedStatus
+                : 'draft';
             $data['current_version'] = 1;
 
             $content = CmsContent::create($data);
@@ -284,6 +338,23 @@ Route::prefix('admin')->group(function () {
                 'structured_data' => 'nullable|array',
                 'related_ids'     => 'nullable|array',
             ]);
+
+            // Sanitize editor-authored HTML for pages to prevent stored XSS,
+            // since page bodies are rendered as raw HTML on the public site.
+            if ($content->type === 'page') {
+                if (array_key_exists('body', $data)) {
+                    $data['body'] = kafuSanitizeHtml($data['body']);
+                }
+                if (array_key_exists('summary', $data)) {
+                    $data['summary'] = kafuSanitizeHtml($data['summary']);
+                }
+            }
+
+            // Allow page-builder pages to change publish state directly.
+            $requestedStatus = $request->input('status');
+            if ($content->type === 'page' && in_array($requestedStatus, ['draft', 'published', 'unpublished'], true)) {
+                $data['status'] = $requestedStatus;
+            }
 
             $before = $content->toArray();
             $newVersion = $content->current_version + 1;

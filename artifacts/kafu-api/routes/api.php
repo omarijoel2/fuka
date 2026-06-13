@@ -378,7 +378,92 @@ function mapCmsOpportunityDetail(CmsContent $item): array {
 
 Route::get('/navigation', function () {
     $config = \App\Models\SiteConfig::getGroup('navigation');
-    return response()->json($config ?: ['primary_nav' => [], 'utility_nav' => [], 'footer_nav' => []]);
+    $config = $config ?: ['primary_nav' => [], 'utility_nav' => [], 'footer_nav' => []];
+
+    // Merge CMS-created pages that opted into menu placement. This happens at
+    // read time so editors can place new pages in the navbar without a code
+    // change and without overwriting the admin-managed navigation config.
+    try {
+        $pages = \DB::table('cms_content')
+            ->where('type', 'page')
+            ->where('status', 'published')
+            ->where('is_deleted', 0)
+            ->get(['slug', 'title', 'structured_data']);
+
+        $primary  = $config['primary_nav'] ?? [];
+        $topLevel = [];
+
+        foreach ($pages as $page) {
+            $sd = is_string($page->structured_data)
+                ? (json_decode($page->structured_data, true) ?: [])
+                : ((array) $page->structured_data);
+            $nav = $sd['_nav'] ?? null;
+            if (!is_array($nav) || empty($nav['show_in_menu'])) continue;
+
+            $order  = isset($nav['order']) ? (int) $nav['order'] : 0;
+            $parent = trim((string) ($nav['parent'] ?? ''));
+            $link   = ['label' => $page->title, 'url' => '/p/' . $page->slug];
+
+            $placed = false;
+            $isTop  = $parent === ''
+                || strcasecmp($parent, '__top__') === 0
+                || strcasecmp($parent, 'top level') === 0;
+
+            if (!$isTop) {
+                foreach ($primary as $i => $item) {
+                    if (!isset($item['label']) || strcasecmp($item['label'], $parent) !== 0) continue;
+
+                    // Only place into an EXISTING mega menu. Never coerce a plain
+                    // link/dropdown item into a mega menu, as that would distort
+                    // the admin-managed nav shape and rendering. If the matched
+                    // parent isn't a mega menu, fall through to a top-level link.
+                    $isMega = ($item['type'] ?? '') === 'mega' || !empty($item['mega_groups']);
+                    if (!$isMega) break;
+
+                    $groups = $primary[$i]['mega_groups'] ?? [];
+
+                    // Find or create a "More" group for editor-added pages.
+                    $mi = null;
+                    foreach ($groups as $gi => $g) {
+                        if (isset($g['heading']) && strcasecmp($g['heading'], 'More') === 0) { $mi = $gi; break; }
+                    }
+                    if ($mi === null) { $groups[] = ['heading' => 'More', 'links' => []]; $mi = count($groups) - 1; }
+
+                    $groups[$mi]['links'][] = $link + ['_order' => $order];
+                    $primary[$i]['mega_groups'] = $groups;
+                    $placed = true;
+                    break;
+                }
+            }
+
+            if (!$placed) {
+                $topLevel[] = $link + ['type' => 'link', '_order' => $order];
+            }
+        }
+
+        // Sort and clean the injected "More" group links.
+        foreach ($primary as $i => $item) {
+            if (empty($item['mega_groups'])) continue;
+            foreach ($item['mega_groups'] as $gi => $g) {
+                if (!isset($g['heading']) || strcasecmp($g['heading'], 'More') !== 0) continue;
+                $links = $g['links'];
+                usort($links, fn($a, $b) => ($a['_order'] ?? 0) <=> ($b['_order'] ?? 0));
+                $primary[$i]['mega_groups'][$gi]['links'] = array_map(function ($l) {
+                    unset($l['_order']);
+                    return $l;
+                }, $links);
+            }
+        }
+
+        // Append top-level pages, ordered.
+        usort($topLevel, fn($a, $b) => ($a['_order'] ?? 0) <=> ($b['_order'] ?? 0));
+        $topLevel = array_map(function ($t) { unset($t['_order']); return $t; }, $topLevel);
+        $config['primary_nav'] = array_merge($primary, $topLevel);
+    } catch (\Throwable $e) {
+        // On any failure, fall back to the base navigation config unchanged.
+    }
+
+    return response()->json($config);
 });
 
 Route::get('/healthz', function () {
@@ -469,6 +554,9 @@ Route::get('/pages/{slug}', function (string $slug) {
         $data = (array) $item;
         if (is_string($data['structured_data'])) {
             $data['structured_data'] = json_decode($data['structured_data'], true) ?? [];
+        }
+        if (isset($data['seo_meta']) && is_string($data['seo_meta'])) {
+            $data['seo_meta'] = json_decode($data['seo_meta'], true) ?? [];
         }
         return response()->json(['data' => $data]);
     } catch (\Throwable $e) {
