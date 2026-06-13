@@ -32,6 +32,7 @@ import ResearchPartnersCmsPage from "@/pages/research-partners-cms";
 import InternationalPartnershipsCmsPage from "@/pages/international-partnerships-cms";
 import ExchangeProgrammesCmsPage from "@/pages/exchange-programmes-cms";
 import RepositoryCmsPage from "@/pages/repository-cms";
+import JournalCmsPage from "@/pages/journal-cms";
 import StaffProfilesCmsPage from "@/pages/staff-profiles-cms";
 import CampusesCmsPage from "@/pages/campuses-cms";
 import OfficesCmsPage from "@/pages/offices-cms";
@@ -355,6 +356,15 @@ function AppRoutes() {
           {() => (
             <RequireRole roles={ADMIN_ROLES}>
               <RepositoryCmsPage />
+            </RequireRole>
+          )}
+        </Route>
+
+        {/* Journal (PDF/document library) */}
+        <Route path="/journal">
+          {() => (
+            <RequireRole roles={ADMIN_ROLES}>
+              <JournalCmsPage />
             </RequireRole>
           )}
         </Route>

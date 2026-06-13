@@ -98,6 +98,7 @@ class SiteConfigSeeder extends Seeder
                     ['label' => 'Announcements',   'url' => '/announcements'],
                     ['label' => 'Archives',        'url' => '/archives'],
                     ['label' => 'Events Calendar', 'url' => '/events'],
+                    ['label' => 'Journal',         'url' => '/journal'],
                 ]],
                 ['label' => 'Media', 'url' => '/media', 'children' => [
                     ['label' => 'Media Overview',  'url' => '/media'],

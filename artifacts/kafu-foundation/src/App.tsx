@@ -25,6 +25,7 @@ import ProgrammeCompare from "@/pages/programme-compare";
 import StudentServices from "@/pages/student-services";
 import News from "@/pages/news";
 import NewsDetail from "@/pages/news-detail";
+import Journal from "@/pages/journal";
 import ArticleDetail from "@/pages/article-detail";
 import Events from "@/pages/events";
 import EventDetail from "@/pages/event-detail";
@@ -132,6 +133,7 @@ function Router() {
           <Route path="/admissions/fees" component={AdmissionsFees} />
           <Route path="/student-services" component={StudentServices} />
           <Route path="/news" component={News} />
+          <Route path="/journal" component={Journal} />
           <Route path="/news/:slug" component={NewsDetail} />
           <Route path="/articles/:slug" component={ArticleDetail} />
           <Route path="/events" component={Events} />

@@ -106,6 +106,34 @@ function mapCmsArticleDetail(CmsContent $item): array {
 }
 }
 
+if (!function_exists('mapJournal')) {
+function mapJournal(CmsContent $item): array {
+    $sd = $item->structured_data ?? [];
+    $date = $sd['publication_date']
+        ?? $item->published_at?->format('Y-m-d')
+        ?? $item->created_at->format('Y-m-d');
+    return [
+        'id'               => $item->id,
+        'slug'             => $item->slug,
+        'title'            => $item->title,
+        'description'      => $item->summary,
+        'summary'          => $item->summary,
+        'category'         => $item->category ?: null,
+        'issue_label'      => $sd['issue_label'] ?? null,
+        'cover_image'      => $item->featured_image ?: null,
+        'file_url'         => !empty($sd['file_url']) ? normalizeAttachmentUrl($sd['file_url']) : null,
+        'file_name'        => $sd['file_name'] ?? null,
+        'file_type'        => $sd['file_type'] ?? null,
+        'file_size_kb'     => $sd['file_size_kb'] ?? null,
+        'publication_date' => $date,
+        'date'             => $date,
+        'status'           => $item->status,
+        'created_at'       => $item->created_at,
+        'updated_at'       => $item->updated_at,
+    ];
+}
+}
+
 if (!function_exists('mapCmsEvent')) {
 function mapCmsEvent(CmsContent $item): array {
     $sd = $item->structured_data ?? [];
@@ -730,6 +758,45 @@ Route::get('/articles/{slug}', function (string $slug) {
         return response()->json(['data' => mapCmsArticleDetail($item)]);
     } catch (\Throwable $e) {
         return response()->json(['error' => 'Article not found'], 404);
+    }
+});
+
+// ─── Journal (PDF/document library) — public read ─────────────────────────────
+Route::get('/journal', function (Request $request) {
+    try {
+        $query = CmsContent::where('type', 'journal')
+            ->where('status', 'published')
+            ->where('is_deleted', false)
+            ->orderByDesc('published_at');
+
+        if ($request->query('category') && $request->query('category') !== 'All') {
+            $query->where('category', $request->query('category'));
+        }
+        if ($request->query('search')) {
+            $s = $request->query('search');
+            $query->where(fn($q) => $q->where('title', 'like', "%{$s}%")->orWhere('summary', 'like', "%{$s}%"));
+        }
+
+        $items = $query->get()->map(fn($item) => mapJournal($item))->toArray();
+        return response()->json(['data' => $items]);
+    } catch (\Throwable $e) {
+        return response()->json(['data' => []]);
+    }
+});
+
+Route::get('/journal/{slug}', function (string $slug) {
+    try {
+        $item = CmsContent::where('type', 'journal')
+            ->where('slug', $slug)
+            ->where('status', 'published')
+            ->where('is_deleted', false)
+            ->first();
+        if (!$item) {
+            return response()->json(['error' => 'Journal entry not found'], 404);
+        }
+        return response()->json(['data' => mapJournal($item)]);
+    } catch (\Throwable $e) {
+        return response()->json(['error' => 'Journal entry not found'], 404);
     }
 });
 
@@ -5704,6 +5771,183 @@ Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
             'gallery_album_slug' => $galleryAlbumSlug,
             'message'            => 'Article published' . ($galleryAlbumSlug ? " and gallery album '{$galleryAlbumSlug}' synced." : '.'),
         ]);
+    });
+});
+
+// ─── Journal (PDF/document library) admin CRUD ────────────────────────────────
+Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
+
+    // List journal entries (scoped strictly to type=journal)
+    Route::get('/journal', function (Request $request) {
+        $q = CmsContent::where('type', 'journal')
+            ->where('is_deleted', false)
+            ->orderByDesc('created_at');
+        if ($request->query('status')) {
+            $q->where('status', $request->query('status'));
+        }
+        if ($request->query('search')) {
+            $s = $request->query('search');
+            $q->where(fn($w) => $w->where('title', 'like', "%{$s}%")->orWhere('summary', 'like', "%{$s}%"));
+        }
+        return response()->json(['data' => $q->get()->map(fn($item) => mapJournal($item))]);
+    });
+
+    // File upload (PDF / document) for journal entries
+    Route::post('/journal/upload', function (Request $request) {
+        try {
+            $request->validate([
+                'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx|max:51200',
+            ]);
+            $file = $request->file('file');
+            $ext = strtolower($file->getClientOriginalExtension());
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeName = Str::slug($originalName) . '-' . substr((string) Str::uuid(), 0, 8) . '.' . $ext;
+            $path = $file->storeAs('journal', $safeName, 'public');
+            $url = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
+            return response()->json([
+                'url'       => $url,
+                'file_name' => $file->getClientOriginalName(),
+                'file_type' => strtoupper($ext),
+                'size_kb'   => round($file->getSize() / 1024, 1),
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['message' => collect($e->errors())->flatten()->first()], 422);
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    });
+
+    // Cover image upload for journal entries
+    Route::post('/journal/upload-cover', function (Request $request) {
+        try {
+            $request->validate([
+                'image' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
+            ]);
+            $file = $request->file('image');
+            $ext = strtolower($file->getClientOriginalExtension());
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $safeName = Str::slug($originalName) . '-' . substr((string) Str::uuid(), 0, 8) . '.' . $ext;
+            $path = $file->storeAs('journal-covers', $safeName, 'public');
+            $url = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
+            return response()->json(['url' => $url]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json(['message' => collect($e->errors())->flatten()->first()], 422);
+        } catch (\Throwable $e) {
+            return response()->json(['message' => $e->getMessage()], 500);
+        }
+    });
+
+    Route::get('/journal/{id}', function (int $id) {
+        $item = CmsContent::where('type', 'journal')->where('is_deleted', false)->findOrFail($id);
+        return response()->json(['data' => mapJournal($item)]);
+    });
+
+    Route::post('/journal', function (Request $request) {
+        $data = $request->validate([
+            'title'            => 'required|string|max:255',
+            'slug'             => 'required|string|unique:cms_content,slug',
+            'description'      => 'nullable|string',
+            'category'         => 'nullable|string|max:100',
+            'cover_image'      => 'nullable|string',
+            'issue_label'      => 'nullable|string|max:150',
+            'publication_date' => 'nullable|date',
+            'file_url'         => 'nullable|string',
+            'file_name'        => 'nullable|string',
+            'file_type'        => 'nullable|string|max:20',
+            'file_size_kb'     => 'nullable|numeric',
+            'status'           => 'nullable|string|in:draft,published',
+        ]);
+
+        $status = $data['status'] ?? 'draft';
+        $item = CmsContent::create([
+            'type'           => 'journal',
+            'title'          => $data['title'],
+            'slug'           => $data['slug'],
+            'summary'        => $data['description'] ?? null,
+            'category'       => $data['category'] ?? null,
+            'featured_image' => $data['cover_image'] ?? null,
+            'status'         => $status,
+            'author_id'      => auth()->id(),
+            'published_at'   => $status === 'published'
+                ? ($data['publication_date'] ?? now())
+                : null,
+            'structured_data' => [
+                'issue_label'      => $data['issue_label'] ?? null,
+                'publication_date' => $data['publication_date'] ?? null,
+                'file_url'         => $data['file_url'] ?? null,
+                'file_name'        => $data['file_name'] ?? null,
+                'file_type'        => $data['file_type'] ?? null,
+                'file_size_kb'     => $data['file_size_kb'] ?? null,
+            ],
+        ]);
+        return response()->json(['data' => mapJournal($item)], 201);
+    });
+
+    Route::put('/journal/{id}', function (Request $request, int $id) {
+        $item = CmsContent::where('type', 'journal')->where('is_deleted', false)->findOrFail($id);
+        $data = $request->validate([
+            'title'            => 'sometimes|string|max:255',
+            'slug'             => 'sometimes|string|unique:cms_content,slug,' . $item->id,
+            'description'      => 'nullable|string',
+            'category'         => 'nullable|string|max:100',
+            'cover_image'      => 'nullable|string',
+            'issue_label'      => 'nullable|string|max:150',
+            'publication_date' => 'nullable|date',
+            'file_url'         => 'nullable|string',
+            'file_name'        => 'nullable|string',
+            'file_type'        => 'nullable|string|max:20',
+            'file_size_kb'     => 'nullable|numeric',
+            'status'           => 'nullable|string|in:draft,published',
+        ]);
+
+        $sd = $item->structured_data ?? [];
+        foreach (['issue_label', 'publication_date', 'file_url', 'file_name', 'file_type', 'file_size_kb'] as $key) {
+            if (array_key_exists($key, $data)) {
+                $sd[$key] = $data[$key];
+            }
+        }
+
+        $update = ['structured_data' => $sd];
+        if (array_key_exists('title', $data))       $update['title'] = $data['title'];
+        if (array_key_exists('slug', $data))        $update['slug'] = $data['slug'];
+        if (array_key_exists('description', $data)) $update['summary'] = $data['description'];
+        if (array_key_exists('category', $data))    $update['category'] = $data['category'];
+        if (array_key_exists('cover_image', $data)) $update['featured_image'] = $data['cover_image'];
+
+        if (array_key_exists('status', $data)) {
+            $update['status'] = $data['status'];
+            if ($data['status'] === 'published') {
+                $update['published_at'] = $data['publication_date']
+                    ?? $sd['publication_date']
+                    ?? $item->published_at
+                    ?? now();
+            }
+        }
+
+        $item->update($update);
+        return response()->json(['data' => mapJournal($item->fresh())]);
+    });
+
+    Route::post('/journal/{id}/publish', function (Request $request, int $id) {
+        $item = CmsContent::where('type', 'journal')->where('is_deleted', false)->findOrFail($id);
+        $sd = $item->structured_data ?? [];
+        $item->update([
+            'status'       => 'published',
+            'published_at' => ($sd['publication_date'] ?? null) ?: ($item->published_at ?? now()),
+        ]);
+        return response()->json(['data' => mapJournal($item->fresh())]);
+    });
+
+    Route::post('/journal/{id}/unpublish', function (Request $request, int $id) {
+        $item = CmsContent::where('type', 'journal')->where('is_deleted', false)->findOrFail($id);
+        $item->update(['status' => 'draft']);
+        return response()->json(['data' => mapJournal($item->fresh())]);
+    });
+
+    Route::delete('/journal/{id}', function (int $id) {
+        $item = CmsContent::where('type', 'journal')->where('is_deleted', false)->findOrFail($id);
+        $item->update(['is_deleted' => true]);
+        return response()->json(['success' => true]);
     });
 });
 

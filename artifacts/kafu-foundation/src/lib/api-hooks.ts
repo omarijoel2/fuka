@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { fetchApi, type ArticleDetail } from "./api-types";
+import { fetchApi, type ArticleDetail, type JournalItem } from "./api-types";
 
 /**
  * Resolves a storage URL so it works in both dev (Vite proxy) and production.
@@ -180,6 +180,19 @@ export function useArticle(slug: string) {
     queryKey: ["article", slug],
     queryFn: () => fetchApi<ArticleDetail>(`/articles/${slug}`),
     enabled: !!slug,
+  });
+}
+
+export function useJournal(params?: { category?: string; search?: string }) {
+  return useQuery({
+    queryKey: ["journal", params],
+    queryFn: () => {
+      const p = new URLSearchParams();
+      if (params?.category && params.category !== "All") p.append("category", params.category);
+      if (params?.search) p.append("search", params.search);
+      const q = p.toString() ? `?${p.toString()}` : "";
+      return fetchApi<JournalItem[]>(`/journal${q}`);
+    },
   });
 }
 

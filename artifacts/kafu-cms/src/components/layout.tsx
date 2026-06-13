@@ -95,6 +95,12 @@ const navItems: NavItem[] = [
     ],
   },
   {
+    label: "Journal",
+    icon: <FileText className="w-4 h-4" />,
+    roles: ADMIN_ROLES,
+    href: "/journal",
+  },
+  {
     label: "Academic Profiles",
     icon: <UserCog className="w-4 h-4" />,
     roles: ADMIN_ROLES,

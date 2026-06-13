@@ -39,6 +39,24 @@ export interface NewsArticleDetail extends NewsArticle {
   blocks?: ArticleBlock[];
 }
 
+export interface JournalItem {
+  id: number;
+  slug: string;
+  title: string;
+  description: string | null;
+  summary: string | null;
+  category: string | null;
+  issue_label: string | null;
+  cover_image: string | null;
+  file_url: string | null;
+  file_name: string | null;
+  file_type: string | null;
+  file_size_kb: number | null;
+  publication_date: string;
+  date: string;
+  status: string;
+}
+
 export interface ArticleDetail {
   id: number;
   slug: string;
