@@ -1,21 +1,108 @@
 import React from "react";
 import { Link } from "wouter";
-import { useBranding, BRANDING_DEFAULTS } from "@/lib/api-hooks";
+import { useBranding, BRANDING_DEFAULTS, useNavConfig } from "@/lib/api-hooks";
+
+interface FooterItem {
+  label: string;
+  url: string;
+  external?: boolean;
+}
+interface FooterGroup {
+  group: string;
+  items: FooterItem[];
+}
+
+const FALLBACK_FOOTER_GROUPS: FooterGroup[] = [
+  {
+    group: "Quick Links",
+    items: [
+      { label: "About KAFU", url: "/about" },
+      { label: "Schools & Faculties", url: "/schools" },
+      { label: "Academic Programmes", url: "/programmes" },
+      { label: "Admissions", url: "/admissions" },
+      { label: "Apply Online", url: "/admissions/apply" },
+      { label: "Staff Directory", url: "/staff" },
+      { label: "Contact Us", url: "/contact" },
+    ],
+  },
+  {
+    group: "Opportunities",
+    items: [
+      { label: "All Opportunities", url: "/opportunities" },
+      { label: "Tenders", url: "/opportunities?category=tender" },
+      { label: "Vacancies", url: "/opportunities?category=vacancy" },
+      { label: "Internships", url: "/opportunities?category=internship" },
+      { label: "Scholarships", url: "/opportunities?category=scholarship" },
+      { label: "Calls for Applications", url: "/opportunities?category=call" },
+      { label: "Archives", url: "/archives" },
+    ],
+  },
+  {
+    group: "Research & Info",
+    items: [
+      { label: "Research Overview", url: "/research" },
+      { label: "Research Projects", url: "/research/projects" },
+      { label: "Publications", url: "/research/publications" },
+      { label: "Repository", url: "/repository" },
+      { label: "International", url: "/international" },
+      { label: "Strategic Plan", url: "/about/strategic-plan" },
+      { label: "Policies", url: "/about/policies" },
+    ],
+  },
+  {
+    group: "Portals",
+    items: [
+      { label: "Student Portal", url: "https://portal.kafu.ac.ke" },
+      { label: "E-Learning", url: "https://elearning.kafu.ac.ke" },
+      { label: "Staff Portal", url: "/staff" },
+      { label: "Library Portal", url: "https://library.kafu.ac.ke" },
+    ],
+  },
+  {
+    group: "Governance",
+    items: [
+      { label: "University Council", url: "/about/council" },
+      { label: "Management", url: "/about/management" },
+      { label: "Directorates", url: "/directorates" },
+      { label: "Service Charter", url: "/about/service-charter" },
+    ],
+  },
+];
+
+function isExternal(url: string, explicit?: boolean): boolean {
+  if (explicit) return true;
+  return /^(https?:)?\/\//i.test(url) || url.startsWith("mailto:") || url.startsWith("tel:");
+}
+
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 export function Footer() {
   const { data: branding } = useBranding();
+  const { data: navConfig } = useNavConfig();
+
   const logoUrl     = branding?.logo_primary_url ?? BRANDING_DEFAULTS.logo_primary_url;
   const logoAlt     = branding?.logo_alt          ?? BRANDING_DEFAULTS.logo_alt;
   const tagline     = branding?.tagline           ?? BRANDING_DEFAULTS.tagline;
   const description = branding?.site_description  ?? BRANDING_DEFAULTS.site_description;
 
+  const footerGroups: FooterGroup[] =
+    navConfig?.footer_nav && navConfig.footer_nav.length > 0
+      ? (navConfig.footer_nav as FooterGroup[])
+      : FALLBACK_FOOTER_GROUPS;
+
   return (
     <footer className="bg-primary text-primary-foreground pt-16 pb-8">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 mb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
 
-          {/* Col 1 — Brand */}
-          <div className="lg:col-span-1">
+          {/* Brand */}
+          <div className="lg:col-span-3">
             <img
               src={logoUrl}
               alt={logoAlt}
@@ -50,112 +137,42 @@ export function Footer() {
             </div>
           </div>
 
-          {/* Col 2 — Quick Links */}
-          <div>
-            <h4 className="font-bold mb-4 text-white uppercase tracking-wider text-xs">Quick Links</h4>
-            <ul className="space-y-2 text-sm">
-              {[
-                { label: "About KAFU",           href: "/about",              testid: "footer-link-about" },
-                { label: "Schools & Faculties",  href: "/schools",            testid: "footer-link-schools" },
-                { label: "Academic Programmes",  href: "/programmes",         testid: "footer-link-programmes" },
-                { label: "Admissions",           href: "/admissions",         testid: "footer-link-admissions" },
-                { label: "Apply Online",         href: "/admissions/apply",   testid: "footer-link-apply" },
-                { label: "Staff Directory",      href: "/staff",              testid: "footer-link-staff-dir" },
-                { label: "Contact Us",           href: "/contact",            testid: "footer-link-contact" },
-              ].map(({ label, href, testid }) => (
-                <li key={href}>
-                  <Link href={href} className="text-primary-foreground/75 hover:text-accent transition-colors" data-testid={testid}>
-                    {label}
-                  </Link>
-                </li>
+          {/* Link columns (CMS-managed via Navigation manager → Footer tab) */}
+          <div className="lg:col-span-9">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8">
+              {footerGroups.map((group, gi) => (
+                <div key={`${group.group}-${gi}`} data-testid={`footer-group-${slugify(group.group) || gi}`}>
+                  <h4 className="font-bold mb-4 text-white uppercase tracking-wider text-xs">{group.group}</h4>
+                  <ul className="space-y-2 text-sm">
+                    {(group.items ?? []).map((item, ii) => {
+                      const testid = `footer-link-${slugify(group.group) || gi}-${slugify(item.label) || ii}`;
+                      return (
+                        <li key={`${item.url}-${ii}`}>
+                          {isExternal(item.url, item.external) ? (
+                            <a
+                              href={item.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-primary-foreground/75 hover:text-accent transition-colors"
+                              data-testid={testid}
+                            >
+                              {item.label}
+                            </a>
+                          ) : (
+                            <Link
+                              href={item.url}
+                              className="text-primary-foreground/75 hover:text-accent transition-colors"
+                              data-testid={testid}
+                            >
+                              {item.label}
+                            </Link>
+                          )}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
               ))}
-            </ul>
-          </div>
-
-          {/* Col 3 — Opportunities */}
-          <div>
-            <h4 className="font-bold mb-4 text-white uppercase tracking-wider text-xs">Opportunities</h4>
-            <ul className="space-y-2 text-sm">
-              {[
-                { label: "All Opportunities",      href: "/opportunities",                      testid: "footer-opp-all" },
-                { label: "Tenders",                href: "/opportunities?category=tender",      testid: "footer-opp-tenders" },
-                { label: "Vacancies",              href: "/opportunities?category=vacancy",     testid: "footer-opp-vacancies" },
-                { label: "Internships",            href: "/opportunities?category=internship",  testid: "footer-opp-internships" },
-                { label: "Scholarships",           href: "/opportunities?category=scholarship", testid: "footer-opp-scholarships" },
-                { label: "Calls for Applications", href: "/opportunities?category=call",        testid: "footer-opp-calls" },
-                { label: "Archives",               href: "/archives",                           testid: "footer-opp-archives" },
-              ].map(({ label, href, testid }) => (
-                <li key={href}>
-                  <Link href={href} className="text-primary-foreground/75 hover:text-accent transition-colors" data-testid={testid}>
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Col 4 — Research & Info */}
-          <div>
-            <h4 className="font-bold mb-4 text-white uppercase tracking-wider text-xs">Research & Info</h4>
-            <ul className="space-y-2 text-sm">
-              {[
-                { label: "Research Overview",      href: "/research",                    testid: "footer-res-overview" },
-                { label: "Research Projects",      href: "/research/projects",           testid: "footer-res-projects" },
-                { label: "Publications",           href: "/research/publications",       testid: "footer-res-pubs" },
-                { label: "Repository",             href: "/repository",                  testid: "footer-res-repo" },
-                { label: "International",          href: "/international",               testid: "footer-res-intl" },
-                { label: "Strategic Plan",         href: "/about/strategic-plan",        testid: "footer-res-sp" },
-                { label: "Policies",               href: "/about/policies",              testid: "footer-res-policies" },
-              ].map(({ label, href, testid }) => (
-                <li key={href}>
-                  <Link href={href} className="text-primary-foreground/75 hover:text-accent transition-colors" data-testid={testid}>
-                    {label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Col 5 — Portals */}
-          <div>
-            <h4 className="font-bold mb-4 text-white uppercase tracking-wider text-xs">Portals</h4>
-            <ul className="space-y-2 text-sm">
-              {[
-                { label: "Student Portal",    href: "https://portal.kafu.ac.ke",    testid: "footer-portal-student",   external: true },
-                { label: "E-Learning",        href: "https://elearning.kafu.ac.ke", testid: "footer-portal-elearning", external: true },
-                { label: "Staff Portal",      href: "/staff",                       testid: "footer-portal-staff",     external: false },
-                { label: "Library Portal",    href: "https://library.kafu.ac.ke",   testid: "footer-portal-library",   external: true },
-              ].map(({ label, href, testid, external }) => (
-                <li key={href}>
-                  {external ? (
-                    <a href={href} target="_blank" rel="noreferrer"
-                      className="text-primary-foreground/75 hover:text-accent transition-colors"
-                      data-testid={testid}>{label}</a>
-                  ) : (
-                    <Link href={href} className="text-primary-foreground/75 hover:text-accent transition-colors" data-testid={testid}>
-                      {label}
-                    </Link>
-                  )}
-                </li>
-              ))}
-            </ul>
-
-            <div className="mt-6 pt-5 border-t border-primary-foreground/15">
-              <h4 className="font-bold mb-3 text-white uppercase tracking-wider text-xs">Governance</h4>
-              <ul className="space-y-2 text-sm">
-                {[
-                  { label: "University Council", href: "/about/council",         testid: "footer-gov-council" },
-                  { label: "Management",         href: "/about/management",      testid: "footer-gov-mgmt" },
-                  { label: "Directorates",       href: "/directorates",          testid: "footer-gov-dir" },
-                  { label: "Service Charter",    href: "/about/service-charter", testid: "footer-gov-charter" },
-                ].map(({ label, href, testid }) => (
-                  <li key={href}>
-                    <Link href={href} className="text-primary-foreground/75 hover:text-accent transition-colors" data-testid={testid}>
-                      {label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
             </div>
           </div>
         </div>
