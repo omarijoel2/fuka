@@ -36,7 +36,7 @@ class OpportunitiesSeeder extends Seeder
                 'opportunity_category' => 'tender',
                 'opportunity_type'     => 'Tender',
                 'reference'            => 'KAFU/PROC/001/2026',
-                'deadline'             => '2026-04-30',
+                'deadline'             => '2026-07-31',
                 'deadline_time'        => '17:00',
                 'opportunity_status'   => 'open',
                 'requirements' => [
@@ -75,7 +75,7 @@ class OpportunitiesSeeder extends Seeder
                 'opportunity_category' => 'tender',
                 'opportunity_type'     => 'Tender',
                 'reference'            => 'KAFU/PROC/002/2026',
-                'deadline'             => '2026-04-08',
+                'deadline'             => '2026-06-22',
                 'deadline_time'        => '12:00',
                 'opportunity_status'   => 'closing-soon',
                 'requirements' => [
@@ -87,7 +87,7 @@ class OpportunitiesSeeder extends Seeder
                     'Bonded and insured against third-party liability',
                     'NSSF and NHIF compliance certificates',
                 ],
-                'submission_info' => 'Sealed bids in plain envelopes clearly marked "KAFU/PROC/002/2026 — Security Services" must be deposited in the Tender Box at the Procurement Office by 8 April 2026 at 12:00 noon. Late submissions will be disqualified.',
+                'submission_info' => 'Sealed bids in plain envelopes clearly marked "KAFU/PROC/002/2026 — Security Services" must be deposited in the Tender Box at the Procurement Office by 22 June 2026 at 12:00 noon. Late submissions will be disqualified.',
                 'contact' => [
                     'office'   => 'Procurement & Supply Chain Department',
                     'email'    => 'procurement@kafu.ac.ke',
@@ -113,7 +113,7 @@ class OpportunitiesSeeder extends Seeder
                 'opportunity_category' => 'tender',
                 'opportunity_type'     => 'Tender',
                 'reference'            => 'KAFU/PROC/003/2026',
-                'deadline'             => '2026-05-09',
+                'deadline'             => '2026-08-15',
                 'deadline_time'        => '17:00',
                 'opportunity_status'   => 'open',
                 'requirements' => [
@@ -124,7 +124,7 @@ class OpportunitiesSeeder extends Seeder
                     'Technical specifications of proposed equipment (must meet or exceed specs in tender document)',
                     'After-sales service and warranty commitment letter',
                 ],
-                'submission_info' => 'Completed tender documents to be deposited in the Tender Box at Procurement Office, Kaimosi Campus by 9 May 2026 at 17:00. Tenders must be sealed and marked "KAFU/PROC/003/2026 — ICT Equipment".',
+                'submission_info' => 'Completed tender documents to be deposited in the Tender Box at Procurement Office, Kaimosi Campus by 15 August 2026 at 17:00. Tenders must be sealed and marked "KAFU/PROC/003/2026 — ICT Equipment".',
                 'contact' => [
                     'office'   => 'ICT Department / Procurement',
                     'email'    => 'ict@kafu.ac.ke',
@@ -151,7 +151,7 @@ class OpportunitiesSeeder extends Seeder
                 'opportunity_category' => 'tender',
                 'opportunity_type'     => 'Tender',
                 'reference'            => 'KAFU/PROC/004/2026',
-                'deadline'             => '2026-05-30',
+                'deadline'             => '2026-09-05',
                 'deadline_time'        => '17:00',
                 'opportunity_status'   => 'open',
                 'requirements' => [
@@ -162,7 +162,7 @@ class OpportunitiesSeeder extends Seeder
                     'Certified copies of registration with NSSF, NHIF',
                     'Site visit attendance confirmation',
                 ],
-                'submission_info' => 'Sealed bids in plain envelopes marked "KAFU/PROC/004/2026 — Student Centre Phase 2" to be submitted to the Procurement Office by 30 May 2026 at 17:00. Site visit: 20 April 2026 at 10:00 AM, assemble at the Estates Office.',
+                'submission_info' => 'Sealed bids in plain envelopes marked "KAFU/PROC/004/2026 — Student Centre Phase 2" to be submitted to the Procurement Office by 5 September 2026 at 17:00. Site visit: 25 August 2026 at 10:00 AM, assemble at the Estates Office.',
                 'contact' => [
                     'office'   => 'Estates & Facilities Management',
                     'email'    => 'estates@kafu.ac.ke',
@@ -221,7 +221,7 @@ class OpportunitiesSeeder extends Seeder
                 'opportunity_category' => 'vacancy',
                 'opportunity_type'     => 'Job Vacancy',
                 'reference'            => 'KAFU/HR/001/2026',
-                'deadline'             => '2026-04-25',
+                'deadline'             => '2026-07-18',
                 'deadline_time'        => '17:00',
                 'opportunity_status'   => 'open',
                 'requirements' => [
@@ -232,7 +232,7 @@ class OpportunitiesSeeder extends Seeder
                     'Strong written and oral communication skills in English',
                     'Registration with relevant professional body (e.g. IEEE, ACM) is an advantage',
                 ],
-                'submission_info' => 'Applications including a cover letter, detailed CV, copies of academic and professional certificates, and names of three referees (with full contact details) should be sent to the Human Resources Office by email or hard copy by 25 April 2026. Only shortlisted candidates will be contacted.',
+                'submission_info' => 'Applications including a cover letter, detailed CV, copies of academic and professional certificates, and names of three referees (with full contact details) should be sent to the Human Resources Office by email or hard copy by 18 July 2026. Only shortlisted candidates will be contacted.',
                 'contact' => [
                     'office'   => 'Human Resources Division',
                     'email'    => 'hr@kafu.ac.ke',
@@ -258,7 +258,7 @@ class OpportunitiesSeeder extends Seeder
                 'opportunity_category' => 'vacancy',
                 'opportunity_type'     => 'Job Vacancy',
                 'reference'            => 'KAFU/HR/002/2026',
-                'deadline'             => '2026-04-08',
+                'deadline'             => '2026-06-25',
                 'deadline_time'        => '17:00',
                 'opportunity_status'   => 'closing-soon',
                 'requirements' => [
@@ -268,7 +268,7 @@ class OpportunitiesSeeder extends Seeder
                     'Teaching experience at diploma or degree level preferred',
                     'Good academic writing and communication skills',
                 ],
-                'submission_info' => 'Send applications to hr@kafu.ac.ke with subject "KAFU/HR/002/2026 — Lecturer Nursing" by 8 April 2026 at 17:00.',
+                'submission_info' => 'Send applications to hr@kafu.ac.ke with subject "KAFU/HR/002/2026 — Lecturer Nursing" by 25 June 2026 at 17:00.',
                 'contact' => [
                     'office'   => 'Human Resources Division',
                     'email'    => 'hr@kafu.ac.ke',
@@ -294,7 +294,7 @@ class OpportunitiesSeeder extends Seeder
                 'opportunity_category' => 'vacancy',
                 'opportunity_type'     => 'Job Vacancy',
                 'reference'            => 'KAFU/HR/003/2026',
-                'deadline'             => '2026-04-28',
+                'deadline'             => '2026-07-10',
                 'deadline_time'        => '17:00',
                 'opportunity_status'   => 'open',
                 'requirements' => [
@@ -305,7 +305,7 @@ class OpportunitiesSeeder extends Seeder
                     'Knowledge of IPSAS and IFRS',
                     'High level of integrity and attention to detail',
                 ],
-                'submission_info' => 'Applications with CV, certificates, and three referees to hr@kafu.ac.ke, subject: "KAFU/HR/003/2026 — Finance Officer". Deadline: 28 April 2026.',
+                'submission_info' => 'Applications with CV, certificates, and three referees to hr@kafu.ac.ke, subject: "KAFU/HR/003/2026 — Finance Officer". Deadline: 10 July 2026.',
                 'contact' => [
                     'office'   => 'Human Resources Division',
                     'email'    => 'hr@kafu.ac.ke',
@@ -331,7 +331,7 @@ class OpportunitiesSeeder extends Seeder
                 'opportunity_category' => 'vacancy',
                 'opportunity_type'     => 'Job Vacancy',
                 'reference'            => 'KAFU/HR/004/2026',
-                'deadline'             => '2026-05-02',
+                'deadline'             => '2026-08-02',
                 'deadline_time'        => '17:00',
                 'opportunity_status'   => 'open',
                 'requirements' => [
@@ -341,7 +341,7 @@ class OpportunitiesSeeder extends Seeder
                     'Strong communication, organisational, and IT skills',
                     'High level of integrity and professionalism',
                 ],
-                'submission_info' => 'Applications to hr@kafu.ac.ke, subject: "KAFU/HR/004/2026 — Deputy Registrar (Academics)". Deadline: 2 May 2026.',
+                'submission_info' => 'Applications to hr@kafu.ac.ke, subject: "KAFU/HR/004/2026 — Deputy Registrar (Academics)". Deadline: 2 August 2026.',
                 'contact' => [
                     'office'   => 'Human Resources Division',
                     'email'    => 'hr@kafu.ac.ke',
@@ -398,7 +398,7 @@ class OpportunitiesSeeder extends Seeder
                 'opportunity_category' => 'internship',
                 'opportunity_type'     => 'Internship',
                 'reference'            => 'KAFU/INTERN/001/2026',
-                'deadline'             => '2026-04-15',
+                'deadline'             => '2026-07-15',
                 'deadline_time'        => '17:00',
                 'opportunity_status'   => 'open',
                 'requirements' => [
@@ -434,7 +434,7 @@ class OpportunitiesSeeder extends Seeder
                 'opportunity_category' => 'internship',
                 'opportunity_type'     => 'Internship',
                 'reference'            => 'KAFU/INTERN/002/2026',
-                'deadline'             => '2026-04-30',
+                'deadline'             => '2026-07-30',
                 'deadline_time'        => '17:00',
                 'opportunity_status'   => 'open',
                 'requirements' => [
@@ -443,7 +443,7 @@ class OpportunitiesSeeder extends Seeder
                     'Introductory letter from supervisor',
                     'Brief statement of research interest (300 words max)',
                 ],
-                'submission_info' => 'Email to dean.sos@kafu.ac.ke, subject "KAFU/INTERN/002/2026 — Research Assistantship". Deadline: 30 April 2026.',
+                'submission_info' => 'Email to dean.sos@kafu.ac.ke, subject "KAFU/INTERN/002/2026 — Research Assistantship". Deadline: 30 July 2026.',
                 'contact' => [
                     'office'   => 'School of Science (SOS)',
                     'email'    => 'dean.sos@kafu.ac.ke',
@@ -470,7 +470,7 @@ class OpportunitiesSeeder extends Seeder
                 'opportunity_category' => 'call',
                 'opportunity_type'     => 'Call for Applications',
                 'reference'            => 'KAFU/CALL/001/2026',
-                'deadline'             => '2026-04-30',
+                'deadline'             => '2026-07-31',
                 'deadline_time'        => '17:00',
                 'opportunity_status'   => 'open',
                 'requirements' => [
@@ -480,7 +480,7 @@ class OpportunitiesSeeder extends Seeder
                     'Ethics clearance letter where human or animal subjects are involved',
                     'Budget narrative and justification',
                 ],
-                'submission_info' => 'Submit completed proposals electronically to research@kafu.ac.ke and a hard copy to the Directorate of Research by 30 April 2026. Proposals must use the prescribed template available for download.',
+                'submission_info' => 'Submit completed proposals electronically to research@kafu.ac.ke and a hard copy to the Directorate of Research by 31 July 2026. Proposals must use the prescribed template available for download.',
                 'contact' => [
                     'office'   => 'Directorate of Research, Innovation & Outreach',
                     'email'    => 'research@kafu.ac.ke',
@@ -507,7 +507,7 @@ class OpportunitiesSeeder extends Seeder
                 'opportunity_category' => 'call',
                 'opportunity_type'     => 'Call for Applications',
                 'reference'            => 'KAFU/CALL/002/2026',
-                'deadline'             => '2026-05-31',
+                'deadline'             => '2026-08-31',
                 'deadline_time'        => '17:00',
                 'opportunity_status'   => 'open',
                 'requirements' => [
@@ -516,7 +516,7 @@ class OpportunitiesSeeder extends Seeder
                     'Contact details of a designated partnership coordinator',
                     'Proposed timeline and resource commitment',
                 ],
-                'submission_info' => 'Submit concept notes to partnerships@kafu.ac.ke with subject "KAFU/CALL/002/2026 — Partnership Proposal". Deadline: 31 May 2026.',
+                'submission_info' => 'Submit concept notes to partnerships@kafu.ac.ke with subject "KAFU/CALL/002/2026 — Partnership Proposal". Deadline: 31 August 2026.',
                 'contact' => [
                     'office'   => 'Office of the Vice-Chancellor — Partnerships',
                     'email'    => 'partnerships@kafu.ac.ke',
@@ -574,7 +574,7 @@ class OpportunitiesSeeder extends Seeder
                 'opportunity_category' => 'scholarship',
                 'opportunity_type'     => 'Scholarship',
                 'reference'            => 'KAFU/BURS/001/2026',
-                'deadline'             => '2026-05-31',
+                'deadline'             => '2026-07-31',
                 'deadline_time'        => '17:00',
                 'opportunity_status'   => 'open',
                 'requirements' => [
@@ -585,7 +585,7 @@ class OpportunitiesSeeder extends Seeder
                     'Minimum CGPA of 2.0 (or equivalent)',
                     'Statement of need (max 500 words)',
                 ],
-                'submission_info' => 'Applications to be submitted to the Student Affairs Office with all supporting documents by 31 May 2026. Forms available at the Student Affairs Office and for download below.',
+                'submission_info' => 'Applications to be submitted to the Student Affairs Office with all supporting documents by 31 July 2026. Forms available at the Student Affairs Office and for download below.',
                 'contact' => [
                     'office'   => 'Student Affairs Division',
                     'email'    => 'studentaffairs@kafu.ac.ke',
@@ -611,9 +611,9 @@ class OpportunitiesSeeder extends Seeder
                 'opportunity_category' => 'scholarship',
                 'opportunity_type'     => 'Scholarship',
                 'reference'            => 'KAFU/BURS/002/2026',
-                'deadline'             => '2026-04-30',
+                'deadline'             => '2026-06-26',
                 'deadline_time'        => '17:00',
-                'opportunity_status'   => 'open',
+                'opportunity_status'   => 'closing-soon',
                 'requirements' => [
                     'Registered KAFU student for 2026/2027 academic year',
                     'HELB loan application confirmation (where applicable)',
@@ -622,7 +622,7 @@ class OpportunitiesSeeder extends Seeder
                     'Financial needs declaration',
                     'Completed KAFU/BURS/002 form',
                 ],
-                'submission_info' => 'Applications to Student Affairs Office or by email to studentaffairs@kafu.ac.ke, subject "KAFU/BURS/002/2026 — Equity Bursary". Deadline: 30 April 2026.',
+                'submission_info' => 'Applications to Student Affairs Office or by email to studentaffairs@kafu.ac.ke, subject "KAFU/BURS/002/2026 — Equity Bursary". Deadline: 26 June 2026.',
                 'contact' => [
                     'office'   => 'Student Affairs Division',
                     'email'    => 'studentaffairs@kafu.ac.ke',

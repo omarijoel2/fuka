@@ -11,3 +11,4 @@
 - [Webmaster scan alert dedupe](webmaster-scan-alerts.md) — scan dedupe must escalate severity on the existing unresolved alert, not skip; one alert type spans multiple severity tiers.
 - [Staff profile routing](staff-profile-routing.md) — public profile URL is /images/uploads/:slug but API detail is /staff/{slug}; hook must fetch /staff/${slug}; department must be in cms_content column.
 - [Admissions/Academics & MP17 completeness](modules-already-built.md) — the "global benchmark" Admissions/Academics upgrade and MP17 CMS are ~85-100% already built; enrich, don't rebuild.
+- [Date-derived seed staleness](date-derived-seed-staleness.md) — opportunities auto-close on deadline-vs-now; fixed seed dates silently expire and empty the homepage; seed future dates.
