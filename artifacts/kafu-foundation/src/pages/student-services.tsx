@@ -1,4 +1,5 @@
-import { Users, Library, Activity, HeartHandshake, ShieldCheck, Laptop, LucideIcon, ExternalLink, Lock, Globe, BookOpen, Stethoscope, Briefcase, GraduationCap, CreditCard, FileText, Wifi, Phone } from "lucide-react";
+import { Users, Library, Activity, HeartHandshake, ShieldCheck, Laptop, LucideIcon, ExternalLink, Lock, Globe, BookOpen, Stethoscope, Briefcase, GraduationCap, CreditCard, FileText, Wifi, Phone, ChevronRight } from "lucide-react";
+import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { SeoHead } from "@/components/seo-head";
 import { useQuery } from "@tanstack/react-query";
@@ -7,7 +8,18 @@ interface Service {
   icon: string;
   title: string;
   description: string;
+  link?: string;
 }
+
+// Default destinations for the campus support service cards, keyed by title.
+// A service can override this via a `link` field supplied by the CMS.
+const DEFAULT_SERVICE_LINKS: Record<string, string> = {
+  "Games & Sports":       "/students/affairs",
+  "University Library":   "https://library.kafu.ac.ke",
+  "Accommodation":        "/students/affairs",
+  "Counselling Services": "/students/affairs",
+  "Student Government":   "/students/council",
+};
 
 interface StudentServicesData {
   hero_heading?: string;
@@ -135,14 +147,39 @@ export default function StudentServices() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
           {services.map((service, i) => {
             const Icon = ICON_MAP[service.icon] ?? Activity;
-            return (
-              <div key={i} className="bg-card p-7 border rounded-xl shadow-sm hover:shadow-md transition-shadow">
+            const link = service.link ?? DEFAULT_SERVICE_LINKS[service.title];
+            const isExternal = !!link && /^https?:\/\//.test(link);
+            const testId = `link-service-${service.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}`;
+            const cardClass = `bg-card p-7 border rounded-xl shadow-sm transition-all block ${link ? "hover:shadow-md hover:border-primary/30" : "hover:shadow-md"}`;
+            const inner = (
+              <>
                 <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center mb-5">
                   <Icon className="w-6 h-6" />
                 </div>
                 <h3 className="text-lg font-bold font-serif mb-2">{service.title}</h3>
                 <p className="text-muted-foreground text-sm">{service.description}</p>
-              </div>
+                {link && (
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary mt-4">
+                    Learn more {isExternal ? <ExternalLink className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
+                  </span>
+                )}
+              </>
+            );
+
+            if (!link) {
+              return <div key={i} className={cardClass}>{inner}</div>;
+            }
+            if (isExternal) {
+              return (
+                <a key={i} href={link} target="_blank" rel="noopener noreferrer" className={cardClass} data-testid={testId}>
+                  {inner}
+                </a>
+              );
+            }
+            return (
+              <Link key={i} href={link} className={cardClass} data-testid={testId}>
+                {inner}
+              </Link>
             );
           })}
 

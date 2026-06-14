@@ -65,7 +65,7 @@ class NewsEventsAnnouncementsSeeder extends Seeder
                 'title'          => 'KAFU VC Represents Education CS at Women Empowerment Initiative in Migori County',
                 'summary'        => 'Vice-Chancellor Prof. Peter Nyamuhanga Mwita represented Cabinet Secretary for Education at the Women in Leadership Empowerment Symposium held in Migori County. Addressing hundreds of women professionals and students, Prof. Mwita highlighted KAFU\'s commitment to gender equity in higher education and the university\'s growing scholarship programmes for female students from marginalised communities.',
                 'category'       => 'Leadership',
-                'featured_image' => '/images/uploads/image-93.jpeg',
+                'featured_image' => '/images/uploads/vc-cbe-training.jpg',
                 'tags'           => ['SESS', 'Education', 'CBE', 'Training'],
                 'featured'       => false,
                 'published_at'   => '2026-02-15 08:00:00',
