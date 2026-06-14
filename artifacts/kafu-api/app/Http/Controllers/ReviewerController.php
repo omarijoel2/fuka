@@ -89,7 +89,29 @@ class ReviewerController extends Controller
         StaffSecurityEvent::log('profile_approved', $submission->user_id, $submission->user->email,
             ['submission_id' => $id, 'reviewer_id' => $request->user()->id]);
 
-        return response()->json(['submission' => $submission->fresh()->load('user', 'comments.author'), 'message' => 'Profile approved.']);
+        // Auto-populate the CMS staff profile from the approved submission (linked by email).
+        // A sync failure must not block the approval, so it is isolated and logged.
+        $syncedProfile = null;
+        try {
+            $syncedProfile = \App\Services\StaffProfileSync::syncFromSubmission(
+                $submission->fresh()->load('user'),
+                $request->user()
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Staff profile CMS sync failed: ' . $e->getMessage(), [
+                'submission_id' => $id,
+            ]);
+        }
+
+        return response()->json([
+            'submission'     => $submission->fresh()->load('user', 'comments.author'),
+            'synced_profile' => $syncedProfile ? [
+                'id'   => $syncedProfile->id,
+                'slug' => $syncedProfile->slug,
+                'name' => $syncedProfile->title,
+            ] : null,
+            'message'        => 'Profile approved.',
+        ]);
     }
 
     public function requestRevision(Request $request, int $id)

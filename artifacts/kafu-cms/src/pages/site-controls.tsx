@@ -1,6 +1,16 @@
 import { useState, useEffect } from "react";
 import { apiGet, apiPut } from "../lib/api";
 
+interface UtilityLink {
+  label: string;
+  url: string;
+}
+
+interface NavConfig {
+  utility_nav?: UtilityLink[];
+  [key: string]: unknown;
+}
+
 interface SiteConfig {
   site_name?: string;
   site_tagline?: string;
@@ -22,16 +32,46 @@ interface SiteConfig {
 
 export default function SiteControlsPage() {
   const [cfg, setCfg] = useState<SiteConfig>({});
+  const [nav, setNav] = useState<NavConfig>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    apiGet("/site-config/site")
-      .then((d) => { setCfg(d || {}); setLoading(false); })
+    Promise.all([apiGet("/site-config/site"), apiGet("/site-config/navigation")])
+      .then(([site, navigation]) => {
+        setCfg(site || {});
+        setNav(navigation || {});
+        setLoading(false);
+      })
       .catch(() => { setError("Failed to load site config"); setLoading(false); });
   }, []);
+
+  const utilityLinks: UtilityLink[] = Array.isArray(nav.utility_nav) ? nav.utility_nav : [];
+
+  const updateUtilityLink = (index: number, field: keyof UtilityLink, value: string) => {
+    const next = utilityLinks.map((link, i) =>
+      i === index ? { ...link, [field]: value } : link
+    );
+    setNav({ ...nav, utility_nav: next });
+  };
+
+  const addUtilityLink = () => {
+    setNav({ ...nav, utility_nav: [...utilityLinks, { label: "", url: "" }] });
+  };
+
+  const removeUtilityLink = (index: number) => {
+    setNav({ ...nav, utility_nav: utilityLinks.filter((_, i) => i !== index) });
+  };
+
+  const moveUtilityLink = (index: number, dir: -1 | 1) => {
+    const target = index + dir;
+    if (target < 0 || target >= utilityLinks.length) return;
+    const next = [...utilityLinks];
+    [next[index], next[target]] = [next[target], next[index]];
+    setNav({ ...nav, utility_nav: next });
+  };
 
   const save = async () => {
     setSaving(true);
@@ -39,6 +79,7 @@ export default function SiteControlsPage() {
     setError("");
     try {
       await apiPut("/site-config/site", cfg);
+      await apiPut("/site-config/navigation", { utility_nav: utilityLinks });
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     } catch (e: any) {
@@ -213,6 +254,92 @@ export default function SiteControlsPage() {
             </span>
           )}
         </div>
+      </section>
+
+      {/* Top Banner Links */}
+      <section className="bg-white border border-gray-200 rounded-xl p-6 space-y-4">
+        <div className="flex items-center justify-between border-b border-gray-100 pb-3">
+          <div>
+            <h2 className="text-base font-semibold text-gray-800">Top Banner Links</h2>
+            <p className="text-xs text-gray-500 mt-0.5">
+              The utility links shown in the slim bar at the very top of every public page
+              (Student Portal, Staff Login, Library, etc.). Use full URLs for external systems
+              (e.g. https://kafu.ac.ke/staff) or a path like /contact for on-site pages.
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {utilityLinks.length === 0 && (
+            <p className="text-sm text-gray-400">No top banner links yet. Add one below.</p>
+          )}
+          {utilityLinks.map((link, i) => (
+            <div key={i} className="flex items-end gap-2" data-testid={`utility-link-row-${i}`}>
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-gray-500 mb-1">Label</label>
+                <input
+                  data-testid={`input-utility-label-${i}`}
+                  type="text"
+                  value={link.label || ""}
+                  onChange={(e) => updateUtilityLink(i, "label", e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
+                  placeholder="e.g. Staff Login"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="block text-xs font-medium text-gray-500 mb-1">URL</label>
+                <input
+                  data-testid={`input-utility-url-${i}`}
+                  type="text"
+                  value={link.url || ""}
+                  onChange={(e) => updateUtilityLink(i, "url", e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#228B22]"
+                  placeholder="https://kafu.ac.ke/staff or /contact"
+                />
+              </div>
+              <div className="flex items-center gap-1 pb-0.5">
+                <button
+                  data-testid={`btn-utility-up-${i}`}
+                  type="button"
+                  onClick={() => moveUtilityLink(i, -1)}
+                  disabled={i === 0}
+                  title="Move up"
+                  className="px-2 py-2 text-gray-500 hover:text-gray-800 disabled:opacity-30"
+                >
+                  Up
+                </button>
+                <button
+                  data-testid={`btn-utility-down-${i}`}
+                  type="button"
+                  onClick={() => moveUtilityLink(i, 1)}
+                  disabled={i === utilityLinks.length - 1}
+                  title="Move down"
+                  className="px-2 py-2 text-gray-500 hover:text-gray-800 disabled:opacity-30"
+                >
+                  Down
+                </button>
+                <button
+                  data-testid={`btn-utility-remove-${i}`}
+                  type="button"
+                  onClick={() => removeUtilityLink(i)}
+                  title="Remove link"
+                  className="px-2 py-2 text-red-500 hover:text-red-700"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <button
+          data-testid="btn-utility-add"
+          type="button"
+          onClick={addUtilityLink}
+          className="px-3 py-2 border border-dashed border-gray-300 text-sm text-gray-600 rounded-lg hover:border-[#228B22] hover:text-[#228B22]"
+        >
+          Add Link
+        </button>
       </section>
 
       {/* Social Links */}

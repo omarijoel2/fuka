@@ -143,7 +143,7 @@ class SiteConfigSeeder extends Seeder
                         ['heading' => 'Quick Links', 'links' => [
                             ['label' => 'Student Portal', 'url' => 'https://portal.kafu.ac.ke',    'external' => true],
                             ['label' => 'E-Learning',     'url' => 'https://elearning.kafu.ac.ke', 'external' => true],
-                            ['label' => 'Staff Login',    'url' => 'https://staff.kafu.ac.ke',     'external' => true],
+                            ['label' => 'Staff Login',    'url' => 'https://kafu.ac.ke/staff',     'external' => true],
                             ['label' => 'Downloads',      'url' => '/media/downloads'],
                             ['label' => 'International',   'url' => '/international'],
                             ['label' => 'Contact',        'url' => '/contact'],
@@ -155,7 +155,7 @@ class SiteConfigSeeder extends Seeder
             'utility_nav' => [
                 ['label' => 'Student Portal', 'url' => 'https://portal.kafu.ac.ke'],
                 ['label' => 'E-Learning',     'url' => 'https://elearning.kafu.ac.ke'],
-                ['label' => 'Staff Login',    'url' => 'https://staff.kafu.ac.ke'],
+                ['label' => 'Staff Login',    'url' => 'https://kafu.ac.ke/staff'],
                 ['label' => 'Library',        'url' => '/repository'],
                 ['label' => 'Downloads',      'url' => '/media/downloads'],
                 ['label' => 'Alumni',         'url' => '/alumni'],

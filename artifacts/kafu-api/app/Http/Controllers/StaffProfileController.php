@@ -206,9 +206,9 @@ class StaffProfileController extends Controller
 
     private function findCmsProfile(\App\Models\User $user): ?CmsContent
     {
-        return CmsContent::where('type', 'staff')
+        return CmsContent::where('type', 'staff_profile')
             ->where('is_deleted', 0)
-            ->whereRaw("json_extract(structured_data, '$.email') = ?", [$user->email])
+            ->whereRaw("lower(json_extract(structured_data, '$.email')) = ?", [strtolower((string) $user->email)])
             ->first();
     }
 
@@ -279,7 +279,7 @@ class StaffProfileController extends Controller
 
         $profile = [
             'personal' => [
-                'title'        => $sd['title_prefix'] ?? ($user->title ?? ''),
+                'title'        => $sd['title_prefix'] ?? ($sd['prefix'] ?? ($user->title ?? '')),
                 'name'         => $cms->title ?? ($user->name ?? ''),
                 'job_title'    => $sd['designation'] ?? ($sd['rank'] ?? ($user->job_title ?? '')),
                 'department'   => $cms->department ?? ($user->department ?? ''),
