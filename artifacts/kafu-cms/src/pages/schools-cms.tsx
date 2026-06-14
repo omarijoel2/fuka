@@ -1,5 +1,7 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "@/lib/api";
+import PhotoUploadField from "@/components/photo-upload-field";
+import { PhotoBrowserModal } from "@/components/photo-browser-modal";
 import {
   Plus, Pencil, Trash2, X, GraduationCap, Loader2,
   BookOpen, Users, FlaskConical,
@@ -68,6 +70,7 @@ function SchoolModal({ school, onClose, onSaved }: {
   const [tab, setTab] = useState<Tab>("basic");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [showBrowser, setShowBrowser] = useState(false);
   const [staffOptions, setStaffOptions] = useState<StaffOption[]>([]);
   const [staffSearch, setStaffSearch] = useState("");
 
@@ -237,6 +240,35 @@ function SchoolModal({ school, onClose, onSaved }: {
                   Legacy dean text on file: <span className="font-medium">{form.dean}</span>. Select a staff profile above to replace it.
                 </p>
               )}
+
+              <div className="pt-2 border-t border-gray-100 space-y-2">
+                <p className="text-sm font-medium text-gray-700">Dean photo</p>
+                <p className="text-xs text-gray-400">
+                  Used when the linked staff profile has no photo, or when the dean is set manually. This photo also feeds the staff profile / portal.
+                </p>
+                <PhotoUploadField
+                  value={form.dean_photo ?? ""}
+                  onChange={url => set("dean_photo", url)}
+                  personName={selectedDean?.name ?? form.dean ?? ""}
+                  endpoint="/governance-photo"
+                />
+                <button type="button" onClick={() => setShowBrowser(true)}
+                  data-testid="school-dean-browse-library"
+                  className="text-xs text-[#1A5C38] underline hover:no-underline">
+                  Browse media library
+                </button>
+                {form.dean_photo && (
+                  <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl border border-gray-100">
+                    <img src={form.dean_photo} alt="Dean photo preview"
+                      className="w-20 h-20 rounded-full object-cover border-4 border-white shadow"
+                      onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                    <div>
+                      <p className="font-semibold text-gray-900">{selectedDean?.name || form.dean || "Dean name"}</p>
+                      <p className="text-sm text-gray-500">{selectedDean?.designation || form.dean_title || "Title"}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
@@ -285,6 +317,13 @@ function SchoolModal({ school, onClose, onSaved }: {
         </form>
       </div>
     </div>
+    {showBrowser && (
+      <PhotoBrowserModal
+        onSelect={url => { set("dean_photo", url); setShowBrowser(false); }}
+        onClose={() => setShowBrowser(false)}
+        title="Select Dean's Photo"
+      />
+    )}
     </>
   );
 }

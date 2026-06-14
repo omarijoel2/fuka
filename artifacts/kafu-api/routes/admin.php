@@ -2349,10 +2349,11 @@ Route::prefix('admin')->group(function () {
         Route::post('/', function (Request $request) {
             $deanSlug = $request->input('dean_staff_slug', '');
             $sd = json_encode([
-                // Legacy dean text is only kept when no staff profile is linked.
+                // Legacy dean name/title is only kept when no staff profile is linked;
+                // dean_photo is always persisted (feeds staff profile / fallback display).
                 'dean'             => $deanSlug ? $request->input('dean', '') : '',
                 'dean_title'       => $deanSlug ? $request->input('dean_title', '') : '',
-                'dean_photo'       => $deanSlug ? $request->input('dean_photo', '') : '',
+                'dean_photo'       => $request->input('dean_photo', ''),
                 'dean_staff_slug'  => $deanSlug,
                 'vision'           => $request->input('vision', ''),
                 'mission'          => $request->input('mission', ''),
@@ -2382,11 +2383,11 @@ Route::prefix('admin')->group(function () {
             $sdOld = is_string($item->structured_data) ? json_decode($item->structured_data, true) : ($item->structured_data ?? []);
             $deanSlug = $request->input('dean_staff_slug', $sdOld['dean_staff_slug'] ?? '');
             $sd = json_encode([
-                // When a staff profile is linked, dean fields are resolved from it,
-                // so legacy text is cleared to keep "Position Vacant" authoritative.
+                // Legacy dean name/title cleared when vacant to keep "Position Vacant"
+                // authoritative; dean_photo always persisted (feeds staff profile / fallback).
                 'dean'             => $deanSlug ? $request->input('dean', $sdOld['dean'] ?? '') : '',
                 'dean_title'       => $deanSlug ? $request->input('dean_title', $sdOld['dean_title'] ?? '') : '',
-                'dean_photo'       => $deanSlug ? $request->input('dean_photo', $sdOld['dean_photo'] ?? '') : '',
+                'dean_photo'       => $request->input('dean_photo', $sdOld['dean_photo'] ?? ''),
                 'dean_staff_slug'  => $deanSlug,
                 'vision'           => $request->input('vision', $sdOld['vision'] ?? ''),
                 'mission'          => $request->input('mission', $sdOld['mission'] ?? ''),
