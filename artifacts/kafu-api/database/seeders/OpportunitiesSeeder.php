@@ -14,6 +14,26 @@ class OpportunitiesSeeder extends Seeder
             if (CmsContent::where('slug', $data['slug'])->exists()) {
                 return;
             }
+            // Keep the sample opportunities evergreen: if a non-closed opportunity's
+            // hardcoded deadline has already passed (e.g. the seeder runs long after
+            // these fixtures were written), shift it into the near future so the
+            // homepage and listing always show live opportunities. The offset is
+            // derived from the slug so the result stays deterministic across runs.
+            $sd = $data['structured_data'] ?? [];
+            $status = $sd['opportunity_status'] ?? 'open';
+            if (in_array($status, ['open', 'closing-soon'], true) && !empty($sd['deadline'])) {
+                try {
+                    if (Carbon::parse($sd['deadline'])->endOfDay()->isPast()) {
+                        $hash = crc32($data['slug']) & 0x7fffffff; // always non-negative across platforms
+                        $offset = $status === 'closing-soon'
+                            ? 3 + ($hash % 5)    // 3–7 days out
+                            : 14 + ($hash % 45); // 14–58 days out
+                        $data['structured_data']['deadline'] = Carbon::now()->addDays($offset)->format('Y-m-d');
+                    }
+                } catch (\Throwable $e) {
+                    // leave the hardcoded deadline untouched if it can't be parsed
+                }
+            }
             CmsContent::create(array_merge([
                 'type'       => 'opportunity',
                 'status'     => 'published',
