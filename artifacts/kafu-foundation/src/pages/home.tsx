@@ -420,6 +420,7 @@ export default function Home() {
   const [progSchool, setProgSchool] = React.useState("");
   const [whyIdx, setWhyIdx] = React.useState(0);
   const [whyPerView, setWhyPerView] = React.useState(3);
+  const [oppTab, setOppTab] = React.useState("all");
 
   React.useEffect(() => {
     const update = () => {
@@ -434,7 +435,6 @@ export default function Home() {
   const featuredNews = news?.filter((n) => n.featured).slice(0, 3) ?? [];
   const latestNews = news?.slice(0, 4) ?? [];
   const upcomingEvents = events?.slice(0, 4) ?? [];
-  const openOpportunities = opportunities?.slice(0, 4) ?? [];
 
   const filteredProgrammes = (programmes ?? [])
     .filter((p) => {
@@ -1241,7 +1241,7 @@ export default function Home() {
       {/* ─── OPPORTUNITIES ─── */}
       <section className="py-12 md:py-20 bg-background">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-8 md:mb-10 gap-4">
+          <div className="flex flex-col md:flex-row justify-between items-end mb-6 md:mb-8 gap-4">
             <div>
               <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary mb-3">Opportunities</h2>
               <p className="text-muted-foreground">Tenders, vacancies, scholarships, and official notices.</p>
@@ -1252,44 +1252,95 @@ export default function Home() {
               </Link>
             </Button>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {openOpportunities.length === 0 ? (
-              <div className="col-span-2 text-center py-10 text-muted-foreground">No open opportunities at this time.</div>
-            ) : (
-              openOpportunities.map((opp) => (
-                <div
-                  key={opp.id}
-                  className="group flex items-start gap-4 p-5 rounded-xl border bg-card hover:border-primary hover:shadow-md transition-all"
-                  data-testid={`card-opportunity-${opp.id}`}
-                >
-                  <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
-                    {opp.type === "Tender" ? (
-                      <FileText className="w-5 h-5" />
-                    ) : opp.type === "Job Vacancy" ? (
-                      <Briefcase className="w-5 h-5" />
-                    ) : (
-                      <Award className="w-5 h-5" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                      <span className="text-xs font-semibold text-accent uppercase tracking-wider">{opp.type}</span>
-                      <span className="text-xs text-muted-foreground">Closes: {opp.deadline ? new Date(opp.deadline).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—"}</span>
-                    </div>
-                    <h4 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                      {opp.title}
-                    </h4>
-                    {opp.reference && (
-                      <p className="text-xs text-muted-foreground mt-1">{opp.reference}</p>
-                    )}
-                  </div>
-                  <span className="shrink-0 inline-block px-2.5 py-0.5 text-xs rounded-full bg-green-50 text-green-700 border border-green-200 font-medium">
-                    Open
-                  </span>
+
+          {(() => {
+            const OPP_TABS = [
+              { key: "all", label: "All" },
+              { key: "tender", label: "Tenders" },
+              { key: "vacancy", label: "Vacancies" },
+              { key: "internship", label: "Internships" },
+              { key: "scholarship", label: "Scholarships" },
+              { key: "call", label: "Calls" },
+            ];
+            const activeOpps = (opportunities ?? []).filter((o) => o.status !== "closed");
+            const tabCount = (key: string) =>
+              key === "all" ? activeOpps.length : activeOpps.filter((o) => o.category === key).length;
+            const shownOpps = (oppTab === "all" ? activeOpps : activeOpps.filter((o) => o.category === oppTab)).slice(0, 4);
+
+            return (
+              <>
+                <div className="flex flex-wrap gap-2 mb-6" role="tablist" data-testid="opportunity-tabs">
+                  {OPP_TABS.map((t) => {
+                    const count = tabCount(t.key);
+                    const isActive = oppTab === t.key;
+                    return (
+                      <button
+                        key={t.key}
+                        role="tab"
+                        aria-selected={isActive}
+                        onClick={() => setOppTab(t.key)}
+                        data-testid={`opportunity-tab-${t.key}`}
+                        className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium border transition-all ${
+                          isActive
+                            ? "bg-primary text-white border-primary shadow-sm"
+                            : "bg-card border-border text-muted-foreground hover:border-primary/40 hover:text-foreground"
+                        }`}
+                      >
+                        {t.label}
+                        {count > 0 && (
+                          <span className={`ml-0.5 text-xs px-1.5 rounded-full ${isActive ? "bg-white/20" : "bg-muted"}`}>
+                            {count}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
-              ))
-            )}
-          </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {shownOpps.length === 0 ? (
+                    <div className="col-span-2 text-center py-10 text-muted-foreground" data-testid="opportunities-empty">
+                      No open opportunities in this category right now.
+                    </div>
+                  ) : (
+                    shownOpps.map((opp) => (
+                      <Link
+                        key={opp.id}
+                        href={`/opportunities/${opp.slug}`}
+                        className="group flex items-start gap-4 p-5 rounded-xl border bg-card hover:border-primary hover:shadow-md transition-all"
+                        data-testid={`card-opportunity-${opp.slug}`}
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
+                          {opp.type === "Tender" ? (
+                            <FileText className="w-5 h-5" />
+                          ) : opp.type === "Job Vacancy" ? (
+                            <Briefcase className="w-5 h-5" />
+                          ) : (
+                            <Award className="w-5 h-5" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                            <span className="text-xs font-semibold text-accent uppercase tracking-wider">{opp.type}</span>
+                            <span className="text-xs text-muted-foreground">Closes: {opp.deadline ? new Date(opp.deadline).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "—"}</span>
+                          </div>
+                          <h4 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                            {opp.title}
+                          </h4>
+                          {opp.reference && (
+                            <p className="text-xs text-muted-foreground mt-1">{opp.reference}</p>
+                          )}
+                        </div>
+                        <span className="shrink-0 inline-block px-2.5 py-0.5 text-xs rounded-full bg-green-50 text-green-700 border border-green-200 font-medium">
+                          {opp.status === "closing-soon" ? "Closing Soon" : "Open"}
+                        </span>
+                      </Link>
+                    ))
+                  )}
+                </div>
+              </>
+            );
+          })()}
         </div>
       </section>
 
