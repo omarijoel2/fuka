@@ -180,6 +180,7 @@ class SiteConfigSeeder extends Seeder
                         ['label' => 'Admissions',          'url' => '/admissions'],
                         ['label' => 'Apply Online',        'url' => '/admissions/apply'],
                         ['label' => 'Staff Directory',     'url' => '/staff'],
+                        ['label' => 'Anti-Bribery and Corruption', 'url' => '/about/anti-bribery-corruption'],
                         ['label' => 'Contact Us',          'url' => '/contact'],
                     ],
                 ],

@@ -60,6 +60,7 @@ import StrategicPlan from "@/pages/about-strategic-plan";
 import AboutPolicies from "@/pages/about-policies";
 import ServiceCharter from "@/pages/about-service-charter";
 import AboutComplaints from "@/pages/about-complaints";
+import AboutABCC from "@/pages/about-abcc";
 import AboutLegal from "@/pages/about-legal";
 import AboutCSR from "@/pages/about-csr";
 import StudentAffairs from "@/pages/student-affairs";
@@ -174,6 +175,7 @@ function Router() {
           <Route path="/about/policies" component={AboutPolicies} />
           <Route path="/about/service-charter" component={ServiceCharter} />
           <Route path="/about/complaints" component={AboutComplaints} />
+          <Route path="/about/anti-bribery-corruption" component={AboutABCC} />
           <Route path="/about/legal" component={AboutLegal} />
           <Route path="/about/csr" component={AboutCSR} />
           <Route path="/students/affairs" component={StudentAffairs} />
