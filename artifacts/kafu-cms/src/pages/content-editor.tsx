@@ -942,6 +942,53 @@ export default function ContentEditorPage({ id }: { id?: string }) {
             </div>
           )}
 
+          {/* MEDIA & EXTERNAL LINK — news */}
+          {form.type === "news" && (
+            <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">
+              <h3 className="text-sm font-bold text-foreground">Media & External Link</h3>
+              <p className="text-xs text-muted-foreground">Optionally embed a video and/or link out to a full story on another website. Both appear on this story's public page.</p>
+
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1" htmlFor="input-video-url">Video URL (YouTube or Vimeo)</label>
+                <input
+                  id="input-video-url"
+                  type="url"
+                  value={sdField(sd, "video_url")}
+                  onChange={(e) => setSd("video_url", e.target.value)}
+                  placeholder="https://youtu.be/..."
+                  className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  data-testid="input-video-url"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1" htmlFor="input-external-url">External "Read more" link</label>
+                <input
+                  id="input-external-url"
+                  type="url"
+                  value={sdField(sd, "external_url")}
+                  onChange={(e) => setSd("external_url", e.target.value)}
+                  placeholder="https://example.com/full-story"
+                  className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  data-testid="input-external-url"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1" htmlFor="input-external-label">Link button label (optional)</label>
+                <input
+                  id="input-external-label"
+                  type="text"
+                  value={sdField(sd, "external_label")}
+                  onChange={(e) => setSd("external_label", e.target.value)}
+                  placeholder="Read more"
+                  className="w-full px-3 py-2 rounded-lg border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  data-testid="input-external-label"
+                />
+              </div>
+            </div>
+          )}
+
           {/* ATTACHMENTS — news, announcement, event, opportunity */}
           {["news", "announcement", "event", "opportunity"].includes(form.type) && (
             <div className="bg-white rounded-xl border border-border shadow-sm p-5 space-y-4">

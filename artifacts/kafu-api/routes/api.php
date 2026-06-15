@@ -29,6 +29,7 @@ function mapHeroSlide(CmsContent $item): array {
 
 if (!function_exists('mapCmsNews')) {
 function mapCmsNews(CmsContent $item): array {
+    $sd = $item->structured_data ?? [];
     return [
         'id'       => $item->id,
         'slug'     => $item->slug,
@@ -42,6 +43,8 @@ function mapCmsNews(CmsContent $item): array {
         'tags'         => $item->tags ?? [],
         'featured'     => (bool)$item->featured,
         'content_type' => 'news',
+        'external_url' => $sd['external_url'] ?? null,
+        'video_url'    => $sd['video_url'] ?? null,
     ];
 }
 }
@@ -71,6 +74,9 @@ function mapCmsNewsDetail(CmsContent $item): array {
         $a['url'] = normalizeAttachmentUrl($a['url'] ?? '');
         return $a;
     }, $sd['attachments'] ?? []);
+    $base['external_url']   = $sd['external_url'] ?? null;
+    $base['external_label'] = $sd['external_label'] ?? null;
+    $base['video_url']      = $sd['video_url'] ?? null;
     return $base;
 }
 }
@@ -92,6 +98,8 @@ function mapCmsArticle(CmsContent $item): array {
         'featured'           => (bool)$item->featured,
         'content_type'       => 'article',
         'gallery_album_slug' => $sd['gallery_album_slug'] ?? null,
+        'external_url'       => $sd['external_url'] ?? null,
+        'video_url'          => $sd['video_url'] ?? null,
     ];
 }
 }
@@ -102,6 +110,9 @@ function mapCmsArticleDetail(CmsContent $item): array {
     $sd              = $item->structured_data ?? [];
     $base['blocks']  = $sd['blocks'] ?? [];
     $base['content'] = $item->body ?? '';
+    $base['external_url']   = $sd['external_url'] ?? null;
+    $base['external_label'] = $sd['external_label'] ?? null;
+    $base['video_url']      = $sd['video_url'] ?? null;
     return $base;
 }
 }

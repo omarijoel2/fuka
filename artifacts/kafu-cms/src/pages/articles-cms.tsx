@@ -32,7 +32,7 @@ interface Article {
   tags: string[];
   featured: boolean;
   status: string;
-  structured_data: { blocks?: ArticleBlock[]; gallery_album_slug?: string | null; gallery_album_id?: number | null };
+  structured_data: { blocks?: ArticleBlock[]; gallery_album_slug?: string | null; gallery_album_id?: number | null; external_url?: string | null; external_label?: string | null; video_url?: string | null };
   blocks: ArticleBlock[];
   published_at: string | null;
   created_at: string;
@@ -47,6 +47,9 @@ interface ArticleMeta {
   featured_image: string;
   tags: string;
   featured: boolean;
+  external_url: string;
+  external_label: string;
+  video_url: string;
 }
 
 /* ── Helpers ────────────────────────────────────────────────────────────────── */
@@ -550,12 +553,14 @@ export default function ArticlesCmsPage() {
   const [meta, setMeta]             = useState<ArticleMeta>({
     title: "", slug: "", summary: "", category: "General",
     featured_image: "", tags: "", featured: false,
+    external_url: "", external_label: "", video_url: "",
   });
   const [blocks, setBlocks]         = useState<ArticleBlock[]>([]);
   const [saving, setSaving]         = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [toast, setToast]           = useState<{ type: "ok" | "err"; msg: string } | null>(null);
   const [gallerySlug, setGallerySlug] = useState<string | null>(null);
+  const [loadedSd, setLoadedSd]       = useState<Record<string, unknown>>({});
 
   function showToast(type: "ok" | "err", msg: string) {
     setToast({ type, msg });
@@ -578,9 +583,10 @@ export default function ArticlesCmsPage() {
   /* ── Open editor ───────────────────────────────────────────────────────── */
   async function openNew() {
     setEditId(null);
-    setMeta({ title: "", slug: "", summary: "", category: "General", featured_image: "", tags: "", featured: false });
+    setMeta({ title: "", slug: "", summary: "", category: "General", featured_image: "", tags: "", featured: false, external_url: "", external_label: "", video_url: "" });
     setBlocks([newBlock("paragraph")]);
     setGallerySlug(null);
+    setLoadedSd({});
     setView("editor");
   }
 
@@ -594,9 +600,13 @@ export default function ArticlesCmsPage() {
       featured_image: a.featured_image ?? "",
       tags:           (a.tags ?? []).join(", "),
       featured:       a.featured ?? false,
+      external_url:   a.structured_data?.external_url ?? "",
+      external_label: a.structured_data?.external_label ?? "",
+      video_url:      a.structured_data?.video_url ?? "",
     });
     setBlocks(a.blocks?.length ? a.blocks : [newBlock("paragraph")]);
     setGallerySlug(a.structured_data?.gallery_album_slug ?? null);
+    setLoadedSd((a.structured_data ?? {}) as Record<string, unknown>);
     setView("editor");
   }
 
@@ -656,7 +666,13 @@ export default function ArticlesCmsPage() {
       featured_image:   meta.featured_image || undefined,
       tags,
       featured:         meta.featured,
-      structured_data:  { blocks },
+      structured_data:  {
+        ...loadedSd,
+        blocks,
+        external_url:   meta.external_url.trim() || null,
+        external_label: meta.external_label.trim() || null,
+        video_url:      meta.video_url.trim() || null,
+      },
       ...(status ? { status } : {}),
     };
   }
@@ -989,6 +1005,56 @@ export default function ArticlesCmsPage() {
             placeholder="research, innovation, 2026"
             data-testid="art-tags"
           />
+        </div>
+
+        <div className="pt-2 border-t space-y-4">
+          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Media & External Link</h3>
+          <p className="text-xs text-muted-foreground -mt-2">Optionally embed a video and/or link out to a full story on another website. Both appear on the article's public page.</p>
+
+          <div>
+            <label className="block text-xs font-medium text-muted-foreground mb-1" htmlFor="art-video-url">
+              Video URL (YouTube or Vimeo)
+            </label>
+            <input
+              id="art-video-url"
+              type="url"
+              className="w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background"
+              value={meta.video_url}
+              onChange={(e) => setMeta((prev) => ({ ...prev, video_url: e.target.value }))}
+              placeholder="https://youtu.be/..."
+              data-testid="art-video-url"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-muted-foreground mb-1" htmlFor="art-external-url">
+              External "Read more" link
+            </label>
+            <input
+              id="art-external-url"
+              type="url"
+              className="w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background"
+              value={meta.external_url}
+              onChange={(e) => setMeta((prev) => ({ ...prev, external_url: e.target.value }))}
+              placeholder="https://example.com/full-story"
+              data-testid="art-external-url"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-medium text-muted-foreground mb-1" htmlFor="art-external-label">
+              Link button label (optional)
+            </label>
+            <input
+              id="art-external-label"
+              type="text"
+              className="w-full text-sm border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary/30 bg-background"
+              value={meta.external_label}
+              onChange={(e) => setMeta((prev) => ({ ...prev, external_label: e.target.value }))}
+              placeholder="Read more"
+              data-testid="art-external-label"
+            />
+          </div>
         </div>
       </div>
 

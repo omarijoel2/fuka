@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
         $this->call(ContentPagesSeeder::class);   // Structured page content (policies, strategic plan, service charter, etc.)
         $this->call(ContentMediaSeeder::class);   // Press releases, publications, videos, brand assets
         $this->call(NewsEventsAnnouncementsSeeder::class);
+        $this->call(VcStoriesSeeder::class);      // VC-requested external story + one-year video (idempotent)
         $this->call(OpportunitiesSeeder::class);
 
         // ── Research & International ───────────────────────────────────────────

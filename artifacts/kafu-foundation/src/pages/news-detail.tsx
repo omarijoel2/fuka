@@ -1,11 +1,20 @@
 import { Link, useParams } from "wouter";
 import { useNewsDetail, useNews, resolveStorageUrl } from "@/lib/api-hooks";
 import { Button } from "@/components/ui/button";
-import { Calendar, User, Tag, ChevronRight, ArrowLeft, ArrowRight, Share2, Download } from "lucide-react";
+import { Calendar, User, Tag, ChevronRight, ArrowLeft, ArrowRight, Share2, Download, ExternalLink } from "lucide-react";
 import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function toVideoEmbed(url?: string | null): string | null {
+  if (!url) return null;
+  const yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]+)/);
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
+  const vimeo = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}`;
+  return null;
 }
 
 export default function NewsDetail() {
@@ -115,11 +124,44 @@ export default function NewsDetail() {
               {article.summary}
             </p>
 
+            {/* Embedded video */}
+            {(() => {
+              const embed = toVideoEmbed(article.video_url);
+              if (!embed) return null;
+              return (
+                <div className="relative aspect-video rounded-2xl overflow-hidden mb-8 bg-black" data-testid="news-video-embed">
+                  <iframe
+                    src={embed}
+                    title={article.title}
+                    className="absolute inset-0 w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              );
+            })()}
+
             {/* Body content */}
             <div
               className="prose prose-lg max-w-none text-foreground leading-relaxed space-y-4 [&_p]:text-muted-foreground [&_p]:leading-relaxed [&_ul]:list-disc [&_ul]:pl-6 [&_ol]:list-decimal [&_ol]:pl-6 [&_li]:text-muted-foreground [&_li]:mb-1 [&_strong]:text-foreground"
               dangerouslySetInnerHTML={{ __html: article.content }}
             />
+
+            {/* External read-more */}
+            {article.external_url && (
+              <div className="mt-8 rounded-xl border border-primary/20 bg-primary/5 p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-foreground">Continue reading on an external site</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 break-all">{article.external_url}</p>
+                </div>
+                <Button asChild className="gap-2 shrink-0" data-testid="btn-external-read-more">
+                  <a href={article.external_url} target="_blank" rel="noopener noreferrer">
+                    {article.external_label || "Read more"}
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                </Button>
+              </div>
+            )}
 
             {/* Attachments */}
             {(() => {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, useParams } from "wouter";
 import { Button } from "@/components/ui/button";
 import {
-  Calendar, User, Tag, ChevronRight, ArrowLeft, Share2, Images, ChevronDown, ChevronUp,
+  Calendar, User, Tag, ChevronRight, ArrowLeft, Share2, Images, ChevronDown, ChevronUp, ExternalLink,
 } from "lucide-react";
 import { SeoHead, SITE_URL, ORG_JSONLD } from "@/components/seo-head";
 import { resolveStorageUrl, useNews, useArticle } from "@/lib/api-hooks";
@@ -13,6 +13,15 @@ function formatDate(d: string) {
   return new Date(d).toLocaleDateString("en-GB", {
     day: "numeric", month: "long", year: "numeric",
   });
+}
+
+function toVideoEmbed(url?: string | null): string | null {
+  if (!url) return null;
+  const yt = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]+)/);
+  if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
+  const vimeo = url.match(/vimeo\.com\/(\d+)/);
+  if (vimeo) return `https://player.vimeo.com/video/${vimeo[1]}`;
+  return null;
 }
 
 function textLength(blocks: ArticleBlock[]): number {
@@ -251,6 +260,23 @@ export default function ArticleDetail() {
               </div>
             )}
 
+            {/* Embedded video */}
+            {(() => {
+              const embed = toVideoEmbed(article.video_url);
+              if (!embed) return null;
+              return (
+                <div className="relative aspect-video rounded-2xl overflow-hidden mb-8 bg-black" data-testid="article-video-embed">
+                  <iframe
+                    src={embed}
+                    title={article.title}
+                    className="absolute inset-0 w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              );
+            })()}
+
             {/* Summary lead */}
             {(article.excerpt || article.summary) && (
               <p className="text-lg text-muted-foreground leading-relaxed mb-8 border-l-4 border-primary pl-5 italic">
@@ -303,6 +329,22 @@ export default function ArticleDetail() {
                   dangerouslySetInnerHTML={{ __html: article.content }}
                 />
               )
+            )}
+
+            {/* External read-more */}
+            {article.external_url && (
+              <div className="mt-8 rounded-xl border border-primary/20 bg-primary/5 p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-foreground">Continue reading on an external site</p>
+                  <p className="text-xs text-muted-foreground mt-0.5 break-all">{article.external_url}</p>
+                </div>
+                <Button asChild className="gap-2 shrink-0" data-testid="btn-external-read-more">
+                  <a href={article.external_url} target="_blank" rel="noopener noreferrer">
+                    {article.external_label || "Read more"}
+                    <ExternalLink className="w-4 h-4" />
+                  </a>
+                </Button>
+              </div>
             )}
 
             {/* Gallery album link */}

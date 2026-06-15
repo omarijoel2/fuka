@@ -31,12 +31,15 @@ export interface NewsArticle {
   featured: boolean;
   content_type?: string;
   gallery_album_slug?: string | null;
+  external_url?: string | null;
+  video_url?: string | null;
 }
 
 export interface NewsArticleDetail extends NewsArticle {
   content: string;
   related: number[];
   blocks?: ArticleBlock[];
+  external_label?: string | null;
 }
 
 export interface JournalItem {
@@ -73,6 +76,9 @@ export interface ArticleDetail {
   content: string;
   gallery_album_slug?: string | null;
   content_type: string;
+  external_url?: string | null;
+  external_label?: string | null;
+  video_url?: string | null;
 }
 
 export interface ProgrammeCount {
