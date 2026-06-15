@@ -1,6 +1,7 @@
 - [CMS content migration pattern](cms-content-migration.md) — FALLBACK_ rename + useQuery inside component + icon-merge IIFE for pages with JSX/Lucide icons in data arrays.
 - [PHP artisan serve upload limits](php-artisan-serve-upload.md) — php artisan serve spawns a child php -S process without -d flags; must cd into public/ and call php -S directly.
 - [Dynamic navigation architecture](dynamic-nav.md) — CMS-managed nav via site_config navigation group; public GET /api/navigation; mergeWithCms() in navbar; departments mega-menu is always hardcoded.
+- [School code/slug coupling](school-code-slug-coupling.md) — code↔slug map; dean/programmes/nav use a separate school_code that doesn't auto-sync; cms_content.slug is globally unique and soft-deletes keep the slug.
 - [Staff portal -> CMS sync](staff-portal-cms-sync.md) — reviewer approval upserts CmsContent type='staff_profile' matched by EMAIL; portal text fields re-parsed into renderer's structured arrays.
 - [Opportunities auto-archiving](opportunities-archiving.md) — expired opportunities are auto-CLOSED (read-time + daily content:archive-expired command), NOT kept evergreen by shifting deadlines; user rejected date-shifting.
 - [CMS page-builder HTML sanitization](cms-page-html-sanitization.md) — page body/summary HTML is a stored-XSS sink; sanitize server-side (HTMLPurifier) AND client-side (DOMPurify).

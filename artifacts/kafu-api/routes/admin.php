@@ -2348,6 +2348,20 @@ Route::prefix('admin')->group(function () {
 
         Route::post('/', function (Request $request) {
             $deanSlug = $request->input('dean_staff_slug', '');
+            // Slug is globally unique across cms_content; resolve collisions so the
+            // save returns an actionable message instead of a generic server error.
+            $newSlug = strtolower($request->input('code', $request->input('slug', 'school-' . time())));
+            $conflict = CmsContent::where('slug', $newSlug)->first();
+            if ($conflict) {
+                if ($conflict->is_deleted) {
+                    // A previously removed item still holds this code — free it.
+                    $conflict->update(['slug' => $newSlug . '-deleted-' . $conflict->id]);
+                } else {
+                    return response()->json([
+                        'message' => "The code '" . strtoupper($newSlug) . "' is already used by another item ({$conflict->type}: {$conflict->title}). Choose a different code.",
+                    ], 422);
+                }
+            }
             $sd = json_encode([
                 // Legacy dean name/title is only kept when no staff profile is linked;
                 // dean_photo is always persisted (feeds staff profile / fallback display).
@@ -2364,7 +2378,7 @@ Route::prefix('admin')->group(function () {
             $item = CmsContent::create([
                 'type'            => 'school',
                 'title'           => $request->input('name', 'New School'),
-                'slug'            => strtolower($request->input('code', $request->input('slug', 'school-' . time()))),
+                'slug'            => $newSlug,
                 'summary'         => $request->input('description', ''),
                 'body'            => $request->input('description', ''),
                 'status'          => $request->input('status', 'draft'),
@@ -2382,6 +2396,22 @@ Route::prefix('admin')->group(function () {
             $item = CmsContent::where('type', 'school')->where('is_deleted', false)->findOrFail($id);
             $sdOld = is_string($item->structured_data) ? json_decode($item->structured_data, true) : ($item->structured_data ?? []);
             $deanSlug = $request->input('dean_staff_slug', $sdOld['dean_staff_slug'] ?? '');
+            // Slug is globally unique across cms_content; resolve collisions so renaming
+            // a school's code returns an actionable message instead of a server error.
+            $newSlug = strtolower($request->input('code', $request->input('slug', $item->slug)));
+            if ($newSlug !== $item->slug) {
+                $conflict = CmsContent::where('slug', $newSlug)->where('id', '!=', $item->id)->first();
+                if ($conflict) {
+                    if ($conflict->is_deleted) {
+                        // A previously removed item still holds this code — free it.
+                        $conflict->update(['slug' => $newSlug . '-deleted-' . $conflict->id]);
+                    } else {
+                        return response()->json([
+                            'message' => "The code '" . strtoupper($newSlug) . "' is already used by another item ({$conflict->type}: {$conflict->title}). Remove or rename it first.",
+                        ], 422);
+                    }
+                }
+            }
             $sd = json_encode([
                 // Legacy dean name/title cleared when vacant to keep "Position Vacant"
                 // authoritative; dean_photo always persisted (feeds staff profile / fallback).
@@ -2397,7 +2427,7 @@ Route::prefix('admin')->group(function () {
             ]);
             $item->update([
                 'title'           => $request->input('name', $item->title),
-                'slug'            => strtolower($request->input('code', $request->input('slug', $item->slug))),
+                'slug'            => $newSlug,
                 'summary'         => $request->input('description', $item->summary),
                 'body'            => $request->input('description', $item->body),
                 'status'          => $request->input('status', $item->status),
