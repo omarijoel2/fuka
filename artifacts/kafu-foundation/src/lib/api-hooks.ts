@@ -147,6 +147,32 @@ export function useHeroSlides() {
   });
 }
 
+export interface DigitalService {
+  icon: string;
+  label: string;
+  desc: string;
+  url: string;
+  external?: boolean;
+}
+
+export interface HomepageConfig {
+  digital_services?: DigitalService[];
+  [key: string]: unknown;
+}
+
+export function useHomepageConfig() {
+  return useQuery<HomepageConfig>({
+    queryKey: ["homepage-config"],
+    queryFn: async () => {
+      const res = await fetch("/api/site-config/homepage");
+      if (!res.ok) return {};
+      const json = await res.json();
+      return (json?.data ?? json ?? {}) as HomepageConfig;
+    },
+    staleTime: 10 * 60 * 1000,
+  });
+}
+
 export function useStats() {
   return useQuery({
     queryKey: ["stats"],

@@ -32,6 +32,14 @@ class SiteConfigSeeder extends Seeder
                 ['label' => 'Research',        'url' => '/research'],
                 ['label' => 'News & Events',   'url' => '/news'],
             ],
+            'digital_services' => [
+                ['icon' => 'monitor', 'label' => 'Student Portal',       'desc' => 'Registration, results, fee statements and more', 'url' => 'https://portal.kafu.ac.ke', 'external' => true],
+                ['icon' => 'book',    'label' => 'E-Learning',           'desc' => 'Online classes, course materials and assignments', 'url' => 'https://elearning.kafu.ac.ke', 'external' => true],
+                ['icon' => 'library', 'label' => 'Library',              'desc' => 'Digital resources, research databases and journals', 'url' => '#', 'external' => false],
+                ['icon' => 'mail',    'label' => 'Institutional Email',   'desc' => 'Official KAFU email for students and staff', 'url' => 'mailto:info@kafu.ac.ke', 'external' => false],
+                ['icon' => 'users',   'label' => 'Staff Portal',         'desc' => 'HR, payroll and administrative services for staff', 'url' => '#', 'external' => false],
+                ['icon' => 'file',    'label' => 'Document Downloads',    'desc' => 'Forms, joining instructions, fee structures', 'url' => '/admissions', 'external' => false],
+            ],
             'show_admissions_banner' => true,
             'admissions_banner_text' => 'Undergraduate & Postgraduate Applications Now Open for 2026/2027',
         ]);

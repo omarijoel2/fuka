@@ -2,18 +2,34 @@ import { useState, useEffect } from "react";
 import { apiGet, apiPut } from "../lib/api";
 import { Link } from "wouter";
 import {
-  Monitor, BarChart3, Link as LinkIcon, Megaphone,
+  Monitor, BarChart3, Link as LinkIcon, Megaphone, LayoutGrid,
   Plus, Trash2, ChevronRight, ArrowRight, CheckCircle, Loader2,
 } from "lucide-react";
 
 interface QuickLink { label: string; url: string }
 interface Stat { label: string; value: string }
+interface DigitalService { icon: string; label: string; desc: string; url: string; external?: boolean }
+
+const DIGITAL_SERVICE_ICON_OPTIONS = [
+  { value: "monitor", label: "Monitor / Portal" },
+  { value: "book", label: "Book / E-Learning" },
+  { value: "library", label: "Library" },
+  { value: "mail", label: "Email" },
+  { value: "users", label: "People / Staff" },
+  { value: "file", label: "Document" },
+  { value: "globe", label: "Globe / Web" },
+  { value: "graduation", label: "Graduation" },
+  { value: "calendar", label: "Calendar" },
+  { value: "award", label: "Award" },
+  { value: "briefcase", label: "Briefcase" },
+];
 
 interface HomepageConfig {
   show_admissions_banner?: boolean;
   admissions_banner_text?: string;
   quick_links?: QuickLink[];
   stats?: Stat[];
+  digital_services?: DigitalService[];
 }
 
 function SectionCard({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) {
@@ -69,6 +85,14 @@ export default function HomepageManagerPage() {
 
   const addStat = () => setCfg({ ...cfg, stats: [...(cfg.stats || []), { label: "", value: "" }] });
   const removeStat = (i: number) => setCfg({ ...cfg, stats: (cfg.stats || []).filter((_, idx) => idx !== i) });
+
+  const updateService = (i: number, field: keyof DigitalService, val: string | boolean) => {
+    const list = [...(cfg.digital_services || [])];
+    list[i] = { ...list[i], [field]: val };
+    setCfg({ ...cfg, digital_services: list });
+  };
+  const addService = () => setCfg({ ...cfg, digital_services: [...(cfg.digital_services || []), { icon: "monitor", label: "", desc: "", url: "", external: false }] });
+  const removeService = (i: number) => setCfg({ ...cfg, digital_services: (cfg.digital_services || []).filter((_, idx) => idx !== i) });
 
   const inputCls = "w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#1A5C38]/30 focus:border-[#1A5C38]";
 
@@ -188,6 +212,66 @@ export default function HomepageManagerPage() {
           <button onClick={addStat} data-testid="btn-add-stat"
             className="flex items-center gap-2 text-sm text-[#1A5C38] font-medium hover:underline">
             <Plus className="w-4 h-4" /> Add Stat
+          </button>
+        </div>
+      </SectionCard>
+
+      {/* Digital Services */}
+      <SectionCard title="Digital Services" icon={<LayoutGrid className="w-4 h-4" />}>
+        <div className="space-y-4">
+          <p className="text-xs text-gray-500">The grid of service tiles shown in the "Digital Services" section of the homepage — e.g. Student Portal, E-Learning, Library. Each tile has an icon, title, short description, and a link.</p>
+          <div className="space-y-4">
+            {(cfg.digital_services || []).map((svc, i) => (
+              <div key={i} className="border border-gray-200 rounded-xl p-4 space-y-3" data-testid={`service-card-${i}`}>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Tile {i + 1}</span>
+                  <button onClick={() => removeService(i)} data-testid={`btn-remove-service-${i}`}
+                    className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Icon</label>
+                    <select value={svc.icon || "monitor"} onChange={e => updateService(i, "icon", e.target.value)}
+                      className={inputCls} data-testid={`select-service-icon-${i}`}>
+                      {DIGITAL_SERVICE_ICON_OPTIONS.map(opt => (
+                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Title</label>
+                    <input type="text" value={svc.label} onChange={e => updateService(i, "label", e.target.value)}
+                      placeholder="e.g. Student Portal" className={inputCls} data-testid={`input-service-label-${i}`} />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Description</label>
+                  <input type="text" value={svc.desc} onChange={e => updateService(i, "desc", e.target.value)}
+                    placeholder="e.g. Registration, results, fee statements and more" className={inputCls} data-testid={`input-service-desc-${i}`} />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 items-end">
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">Link (URL or path)</label>
+                    <input type="text" value={svc.url} onChange={e => updateService(i, "url", e.target.value)}
+                      placeholder="e.g. https://portal.kafu.ac.ke or /admissions" className={inputCls} data-testid={`input-service-url-${i}`} />
+                  </div>
+                  <label className="flex items-center gap-2 cursor-pointer pb-2">
+                    <input type="checkbox" checked={!!svc.external} onChange={e => updateService(i, "external", e.target.checked)}
+                      className="w-4 h-4 rounded border-gray-300 text-[#1A5C38] focus:ring-[#1A5C38]/30" data-testid={`checkbox-service-external-${i}`} />
+                    <span className="text-sm text-gray-700">Open in new tab (external link)</span>
+                  </label>
+                </div>
+              </div>
+            ))}
+            {(cfg.digital_services || []).length === 0 && (
+              <p className="text-sm text-gray-400 bg-gray-50 rounded-xl px-4 py-3">No service tiles configured. The homepage will show the default set until you add tiles here.</p>
+            )}
+          </div>
+          <button onClick={addService} data-testid="btn-add-service"
+            className="flex items-center gap-2 text-sm text-[#1A5C38] font-medium hover:underline">
+            <Plus className="w-4 h-4" /> Add Service Tile
           </button>
         </div>
       </SectionCard>

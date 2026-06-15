@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
-import { useStats, useNews, useSchools, useEvents, useOpportunities, useProgrammes, useHeroSlides, type HeroSlide } from "@/lib/api-hooks";
+import { useStats, useNews, useSchools, useEvents, useOpportunities, useProgrammes, useHeroSlides, useHomepageConfig, type HeroSlide } from "@/lib/api-hooks";
 import { NoticeBoardSection } from "@/components/notice-board";
 import { IntakeBanner } from "@/components/intake-banner";
 import { SITE_URL, SeoHead, ORG_JSONLD } from "@/components/seo-head";
@@ -407,8 +407,23 @@ function IntakeConversionSection() {
   );
 }
 
+const DIGITAL_SERVICE_ICONS: Record<string, React.ReactNode> = {
+  monitor: <Monitor className="w-7 h-7" />,
+  book: <BookOpen className="w-7 h-7" />,
+  library: <Library className="w-7 h-7" />,
+  mail: <Mail className="w-7 h-7" />,
+  users: <Users className="w-7 h-7" />,
+  file: <FileText className="w-7 h-7" />,
+  globe: <Globe className="w-7 h-7" />,
+  graduation: <GraduationCap className="w-7 h-7" />,
+  calendar: <Calendar className="w-7 h-7" />,
+  award: <Award className="w-7 h-7" />,
+  briefcase: <Briefcase className="w-7 h-7" />,
+};
+
 export default function Home() {
   const { data: stats, isLoading: statsLoading } = useStats();
+  const { data: homeCfg } = useHomepageConfig();
   const { data: news, isLoading: newsLoading } = useNews();
   const { data: schools, isLoading: schoolsLoading } = useSchools();
   const { data: events, isLoading: eventsLoading } = useEvents();
@@ -553,7 +568,7 @@ export default function Home() {
     },
   ];
 
-  const digitalServices = [
+  const FALLBACK_digitalServices = [
     {
       icon: <Monitor className="w-7 h-7" />,
       label: "Student Portal",
@@ -603,6 +618,19 @@ export default function Home() {
       testid: "service-documents",
     },
   ];
+
+  const cmsServices = homeCfg?.digital_services;
+  const digitalServices =
+    Array.isArray(cmsServices) && cmsServices.length > 0
+      ? cmsServices.map((svc, i) => ({
+          icon: DIGITAL_SERVICE_ICONS[svc.icon] ?? <Monitor className="w-7 h-7" />,
+          label: svc.label,
+          desc: svc.desc,
+          href: svc.url || "#",
+          external: !!svc.external,
+          testid: `service-cms-${i}`,
+        }))
+      : FALLBACK_digitalServices;
 
   const levelLabels: Record<string, string> = {
     undergraduate: "Undergraduate",
