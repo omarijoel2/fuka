@@ -5691,11 +5691,11 @@ Route::get('/admissions/settings', function () {
     ]]);
 });
 
-// ── Admin: attachment document upload ─────────────────────────────────────────
+// ── Admin: content media upload (documents, images, audio, video) ─────────────
 Route::middleware(['auth:sanctum'])->post('/admin/content/upload-attachment', function (Request $request) {
     try {
         $request->validate([
-            'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,zip|max:20480',
+            'file' => 'required|file|mimes:pdf,doc,docx,xls,xlsx,ppt,pptx,zip,txt,csv,jpg,jpeg,png,webp,gif,svg,mp3,wav,ogg,m4a,aac,mp4,webm,mov,m4v|max:20480',
         ]);
         $file = $request->file('file');
         $ext = strtolower($file->getClientOriginalExtension());
@@ -5703,11 +5703,21 @@ Route::middleware(['auth:sanctum'])->post('/admin/content/upload-attachment', fu
         $safeName = Str::slug($originalName) . '-' . substr((string) Str::uuid(), 0, 8) . '.' . $ext;
         $path = $file->storeAs('content-attachments', $safeName, 'public');
         $url = \Illuminate\Support\Facades\Storage::disk('public')->url($path);
+
+        $imageExt = ['jpg', 'jpeg', 'png', 'webp', 'gif', 'svg'];
+        $audioExt = ['mp3', 'wav', 'ogg', 'm4a', 'aac'];
+        $videoExt = ['mp4', 'webm', 'mov', 'm4v'];
+        $kind = in_array($ext, $imageExt) ? 'image'
+            : (in_array($ext, $audioExt) ? 'audio'
+            : (in_array($ext, $videoExt) ? 'video' : 'document'));
+
         return response()->json([
-            'url'     => $url,
-            'title'   => $file->getClientOriginalName(),
-            'type'    => strtoupper($ext),
-            'size_kb' => round($file->getSize() / 1024, 1),
+            'url'      => $url,
+            'title'    => $file->getClientOriginalName(),
+            'type'     => strtoupper($ext),
+            'kind'     => $kind,
+            'mime'     => $file->getClientMimeType(),
+            'size_kb'  => round($file->getSize() / 1024, 1),
         ]);
     } catch (\Illuminate\Validation\ValidationException $e) {
         return response()->json(['message' => collect($e->errors())->flatten()->first()], 422);

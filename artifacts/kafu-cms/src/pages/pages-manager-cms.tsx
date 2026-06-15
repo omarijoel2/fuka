@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { apiGet, apiPut, apiPost, formatDate } from "@/lib/api";
 import { Edit2, X, Save, AlertCircle, FileText, ChevronRight, RefreshCw, Plus, Code2, ListChecks } from "lucide-react";
 import StructuredDataEditor from "@/components/structured-data-editor";
+import PageBlocksEditor, { type PageBlock } from "@/components/page-blocks-editor";
 
 interface NavPlacement {
   show_in_menu: boolean;
@@ -75,6 +76,7 @@ export default function PagesManagerCmsPage() {
   const [sdObj, setSdObj] = useState<Record<string, unknown>>({});
   const [sdView, setSdView] = useState<"form" | "json">("form");
   const [nav, setNav] = useState<NavPlacement>({ show_in_menu: false, parent: "", order: 0 });
+  const [blocks, setBlocks] = useState<PageBlock[]>([]);
   const [navParents, setNavParents] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
@@ -119,6 +121,7 @@ export default function PagesManagerCmsPage() {
       status: "draft", updated_at: "", structured_data: {}, seo_meta: {},
     });
     setNav({ show_in_menu: false, parent: TOP_LEVEL, order: 0 });
+    setBlocks([]);
     setJsonError("");
   }
 
@@ -128,6 +131,8 @@ export default function PagesManagerCmsPage() {
     if (isBuilderPage(page)) {
       setMode("builder");
       setNav(readNav(page.structured_data));
+      const sd = (page.structured_data ?? {}) as Record<string, unknown>;
+      setBlocks(Array.isArray(sd.blocks) ? (sd.blocks as PageBlock[]) : []);
     } else {
       setMode("structured");
       const sd = (page.structured_data ?? {}) as Record<string, unknown>;
@@ -220,7 +225,7 @@ export default function PagesManagerCmsPage() {
       parent: nav.parent ?? TOP_LEVEL,
       order: Number(nav.order) || 0,
     };
-    const sd = { ...(editing.structured_data ?? {}), _nav: navObj };
+    const sd = { ...(editing.structured_data ?? {}), _nav: navObj, blocks };
     const payload = {
       title,
       slug,
@@ -420,6 +425,17 @@ export default function PagesManagerCmsPage() {
                       className={`${TEXTAREA} font-mono text-xs`}
                       placeholder="<h2>Section heading</h2>&#10;<p>Write the page content here. Basic HTML is supported.</p>" />
                     <p className="text-xs text-gray-400 mt-1">Basic HTML such as headings, paragraphs, lists and links is supported.</p>
+                  </div>
+
+                  {/* Content blocks */}
+                  <div className="border border-gray-200 rounded-xl p-4 space-y-3">
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600">Content Blocks</p>
+                      <p className="text-xs text-gray-400 mt-0.5">
+                        Add rich media below the main content: text, images, video (upload or YouTube/Vimeo link), audio, downloadable documents and embeds.
+                      </p>
+                    </div>
+                    <PageBlocksEditor value={blocks} onChange={setBlocks} />
                   </div>
 
                   {/* SEO */}

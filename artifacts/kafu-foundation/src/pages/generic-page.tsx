@@ -3,12 +3,14 @@ import { useQuery } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
 import DOMPurify from "dompurify";
 import NotFound from "@/pages/not-found";
+import PageBlocks, { type PageBlock } from "@/components/page-blocks";
 
 interface PageData {
   title: string;
   summary: string | null;
   body: string | null;
   seo_meta?: { title?: string; description?: string; keywords?: string } | null;
+  structured_data?: { blocks?: PageBlock[] } | null;
   updated_at?: string | null;
 }
 
@@ -73,18 +75,23 @@ export default function GenericPage() {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
+      <div className="max-w-4xl mx-auto px-6 py-12 space-y-8">
         {data.body && data.body.trim().length > 0 ? (
           <div
             className="prose prose-lg max-w-none prose-headings:font-serif prose-headings:text-primary prose-a:text-primary"
             data-testid="page-body"
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(data.body) }}
           />
-        ) : (
+        ) : null}
+
+        <PageBlocks blocks={data.structured_data?.blocks ?? []} />
+
+        {(!data.body || data.body.trim().length === 0) &&
+          (data.structured_data?.blocks ?? []).length === 0 ? (
           <p className="text-gray-500" data-testid="page-empty">
             This page has no content yet.
           </p>
-        )}
+        ) : null}
       </div>
     </article>
   );

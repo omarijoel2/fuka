@@ -27,6 +27,40 @@ export async function apiUploadFile(path: string, file: File, fieldName = "photo
   }
   return res.json();
 }
+export interface UploadedAttachment {
+  url: string;
+  title: string;
+  type: string;
+  kind: "image" | "audio" | "video" | "document";
+  mime: string;
+  size_kb: number;
+}
+
+export async function apiUploadAttachment(file: File): Promise<UploadedAttachment> {
+  const token = localStorage.getItem("kafu_cms_token");
+  const formData = new FormData();
+  formData.append("file", file);
+  const res = await fetch(`${API_BASE}/content/upload-attachment`, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: formData,
+  });
+  if (res.status === 401) {
+    localStorage.removeItem("kafu_cms_token");
+    localStorage.removeItem("kafu_cms_user");
+    window.location.href = `${(import.meta.env.BASE_URL ?? "").replace(/\/$/, "")}/login`;
+    throw new Error("Session expired. Please log in again.");
+  }
+  if (!res.ok) {
+    const err = (await res.json().catch(() => ({}))) as Record<string, unknown>;
+    throw new Error((err?.message as string) || `Upload failed (${res.status})`);
+  }
+  return res.json();
+}
+
 const TOKEN_KEY = "kafu_cms_token";
 
 function getToken() {

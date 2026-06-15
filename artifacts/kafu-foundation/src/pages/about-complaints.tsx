@@ -4,6 +4,7 @@ import { Link } from "wouter";
 import { SeoHead } from "@/components/seo-head";
 import { PageHero } from "@/components/ui/page-hero";
 import { MessageSquare, CheckCircle, Phone, Mail, FileText, Users, Clock, ChevronRight, AlertCircle } from "lucide-react";
+import PageDownloads, { type PageDownload } from "@/components/page-downloads";
 
 const FALLBACK_PROCESS_STEPS = [
   {

@@ -1,5 +1,13 @@
 import React from "react";
 import { Plus, Trash2 } from "lucide-react";
+import MediaUploadField from "@/components/media-upload-field";
+
+const MEDIA_KEY_RE =
+  /(^|_)(url|file|files|document|documents|attachment|attachments|download|downloads|media|image|images|photo|photos|logo|icon|video|audio|pdf|doc|thumbnail|cover|href)$/i;
+
+function isMediaKey(key: string): boolean {
+  return MEDIA_KEY_RE.test(key);
+}
 
 const INPUT =
   "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30";
@@ -44,13 +52,39 @@ interface FieldProps {
   onRemove?: () => void;
   path: string;
   depth: number;
+  media?: boolean;
 }
 
-function ScalarField({ label, value, onChange, onRemove, path }: FieldProps) {
+function ScalarField({ label, value, onChange, onRemove, path, media }: FieldProps) {
   const isBool = typeof value === "boolean";
   const isNum = typeof value === "number";
   const str = value == null ? "" : String(value);
   const longText = !isBool && !isNum && (str.length > 60 || str.includes("\n"));
+  const isMediaField = media && !isBool && !isNum;
+
+  if (isMediaField) {
+    return (
+      <div className="flex items-start gap-2">
+        <div className="flex-1">
+          {label && (
+            <label className="block text-[11px] font-medium text-gray-500 mb-1">{label}</label>
+          )}
+          <MediaUploadField value={str} onChange={(url) => onChange(url)} testid={testid(path)} />
+        </div>
+        {onRemove && (
+          <button
+            type="button"
+            onClick={onRemove}
+            data-testid={`sd-remove-${testid(path)}`}
+            className="mt-6 text-gray-300 hover:text-red-500 transition-colors shrink-0"
+            aria-label="Remove"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-start gap-2">
@@ -113,7 +147,7 @@ function ScalarField({ label, value, onChange, onRemove, path }: FieldProps) {
   );
 }
 
-function ArrayField({ label, value, onChange, path, depth }: FieldProps) {
+function ArrayField({ label, value, onChange, path, depth, media }: FieldProps) {
   const arr = Array.isArray(value) ? value : [];
   const sample = arr.length > 0 ? arr[0] : "";
   const objectItems = arr.length > 0 && isPlainObject(arr[0]);
@@ -171,6 +205,7 @@ function ArrayField({ label, value, onChange, path, depth }: FieldProps) {
               onRemove={() => remove(i)}
               path={`${path}-${i}`}
               depth={depth + 1}
+              media={media}
             />
           )
         )}
@@ -230,6 +265,7 @@ function ObjectFields({
           onChange={(next) => onChange({ ...value, [key]: next })}
           path={`${path}-${key}`}
           depth={depth}
+          media={isMediaKey(key)}
         />
       ))}
     </div>
