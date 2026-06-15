@@ -330,6 +330,16 @@ export default function ProfileEditorPage() {
     }
   }
 
+  async function handleRevise() {
+    try {
+      await staffPost("/profile/revise");
+      await loadProfile();
+      showToast("success", "You can now update your profile. Your changes will be submitted for review.");
+    } catch (err: unknown) {
+      showToast("error", err instanceof Error ? err.message : "Failed to start an update.");
+    }
+  }
+
   async function uploadPhoto() {
     if (!photoFile) return;
     setUploadingPhoto(true);
@@ -445,6 +455,7 @@ export default function ProfileEditorPage() {
   const canEdit = !submission || ["draft", "revision_requested"].includes(submission.workflow_status);
   const canSubmit = canEdit && (submission?.completeness_score ?? 0) >= 40 && user?.has_consent;
   const isSubmitted = submission && !["draft", "revision_requested"].includes(submission.workflow_status);
+  const isApproved = submission && ["approved", "published"].includes(submission.workflow_status);
 
   const displayPhoto = photoPreview ?? uploadedPhotoUrl ?? user?.avatar_url ?? null;
 
@@ -505,7 +516,20 @@ export default function ProfileEditorPage() {
         </div>
       )}
 
-      {!canEdit && (
+      {!canEdit && isApproved && (
+        <div className="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <CheckCircle className="w-5 h-5 text-green-600" />
+            <p className="text-sm text-green-800 font-medium">Your profile is approved and live. To make changes, start an update — your edits will be submitted for review.</p>
+          </div>
+          <button onClick={handleRevise} data-testid="btn-revise"
+            className="flex items-center gap-1.5 text-xs font-semibold text-white bg-primary px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors shrink-0">
+            <RotateCcw className="w-3.5 h-3.5" /> Update My Profile
+          </button>
+        </div>
+      )}
+
+      {!canEdit && !isApproved && (
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <CheckCircle className="w-5 h-5 text-blue-500" />

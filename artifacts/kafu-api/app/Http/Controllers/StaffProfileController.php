@@ -48,10 +48,10 @@ class StaffProfileController extends Controller
             return response()->json(['message' => 'Invalid section.'], 422);
         }
 
-        $submission = $this->getOrCreateDraft($user);
+        $submission = $this->getEditableDraft($user);
 
         if (!in_array($submission->workflow_status, ['draft', 'revision_requested'])) {
-            return response()->json(['message' => 'Cannot edit a submitted profile. Withdraw first.'], 422);
+            return response()->json(['message' => 'Your profile is currently under review and cannot be edited until the review is complete.'], 422);
         }
 
         $profileData = $submission->profile_data ?? [];
@@ -139,6 +139,27 @@ class StaffProfileController extends Controller
         return response()->json(['submission' => $submission->fresh(), 'message' => 'Submission withdrawn.']);
     }
 
+    /**
+     * Start a new editable revision of an already-approved (or published) profile.
+     * Forks a fresh draft seeded from the latest submission so the staff member can
+     * update their profile and route the changes back through the review queue
+     * without disturbing the live, approved version.
+     */
+    public function revise(Request $request)
+    {
+        $user  = $request->user();
+        $draft = $this->getEditableDraft($user);
+
+        if (!in_array($draft->workflow_status, ['draft', 'revision_requested'])) {
+            return response()->json(['message' => 'Your profile is currently under review and cannot be edited yet.'], 422);
+        }
+
+        return response()->json([
+            'submission' => $draft->fresh()->load('comments.author'),
+            'message'    => 'You can now update your profile. Your changes will be submitted for review.',
+        ]);
+    }
+
     public function getSubmissions(Request $request)
     {
         $user = $request->user();
@@ -158,7 +179,7 @@ class StaffProfileController extends Controller
         $user = $request->user();
         $user->update(['avatar_url' => $url]);
 
-        $submission  = $this->getOrCreateDraft($user);
+        $submission  = $this->getEditableDraft($user);
         $profileData = $submission->profile_data ?? [];
         $profileData['uploads'] = array_merge($profileData['uploads'] ?? [], ['photo_url' => $url]);
         $submission->update(['profile_data' => $profileData]);
@@ -173,7 +194,7 @@ class StaffProfileController extends Controller
         $url  = Storage::disk('public')->url($path);
 
         $user        = $request->user();
-        $submission  = $this->getOrCreateDraft($user);
+        $submission  = $this->getEditableDraft($user);
         $profileData = $submission->profile_data ?? [];
         $profileData['uploads'] = array_merge($profileData['uploads'] ?? [], ['cv_url' => $url]);
         $submission->update(['profile_data' => $profileData]);
@@ -362,6 +383,38 @@ class StaffProfileController extends Controller
             'profile_data'       => $profileData,
             'section_completion' => $sectionCompletion,
             'completeness_score' => $overallScore,
+        ]);
+    }
+
+    /**
+     * Return an editable working copy of the user's profile. If the latest
+     * submission is in a terminal state (approved/published), fork a new draft
+     * version seeded from it so further edits go back through the review queue
+     * without touching the live profile. Mid-review submissions are returned
+     * as-is; callers enforce the not-editable guard.
+     */
+    private function getEditableDraft(\App\Models\User $user): ProfileSubmission
+    {
+        $latest = ProfileSubmission::where('user_id', $user->id)
+            ->orderByDesc('version_number')
+            ->first();
+
+        if (!$latest) {
+            return $this->getOrCreateDraft($user, $this->findCmsProfile($user));
+        }
+
+        if (in_array($latest->workflow_status, ['draft', 'revision_requested', 'submitted', 'under_review'])) {
+            return $latest;
+        }
+
+        // Terminal state (approved / published): start a fresh draft revision.
+        return ProfileSubmission::create([
+            'user_id'            => $user->id,
+            'workflow_status'    => 'draft',
+            'version_number'     => ((int) $latest->version_number) + 1,
+            'profile_data'       => $latest->profile_data ?? [],
+            'section_completion' => $latest->section_completion ?? [],
+            'completeness_score' => (int) $latest->completeness_score,
         ]);
     }
 

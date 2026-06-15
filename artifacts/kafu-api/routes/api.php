@@ -1915,6 +1915,7 @@ Route::prefix('staff')->middleware(['auth:sanctum'])->group(function () {
     Route::get('/profile',                    [\App\Http\Controllers\StaffProfileController::class, 'getProfile']);
     Route::put('/profile/section/{section}',  [\App\Http\Controllers\StaffProfileController::class, 'updateSection']);
     Route::post('/profile/submit',            [\App\Http\Controllers\StaffProfileController::class, 'submit']);
+    Route::post('/profile/revise',            [\App\Http\Controllers\StaffProfileController::class, 'revise']);
     Route::post('/profile/withdraw',          [\App\Http\Controllers\StaffProfileController::class, 'withdraw']);
     Route::get('/profile/submissions',        [\App\Http\Controllers\StaffProfileController::class, 'getSubmissions']);
     Route::post('/upload-photo',              [\App\Http\Controllers\StaffProfileController::class, 'uploadPhoto']);
