@@ -19,6 +19,28 @@ use Illuminate\Support\Str;
 |--------------------------------------------------------------------------
 */
 
+if (!function_exists('schoolSaveErrorMessage')) {
+    /**
+     * Build a sanitized, actionable message for a school save failure.
+     * Detects duplicate-code (unique constraint) errors and otherwise returns
+     * a generic message — never the raw SQL/exception text. Full detail is
+     * logged separately via report().
+     */
+    function schoolSaveErrorMessage(\Throwable $e, string $verb): string
+    {
+        if ($e instanceof \Illuminate\Database\QueryException) {
+            $sqlState = $e->getCode();
+            $driverCode = $e->errorInfo[1] ?? null;
+            // 23000 = integrity constraint violation; MySQL 1062 / SQLite 19 = unique.
+            if ($sqlState === '23000' || in_array($driverCode, [1062, 19], true)) {
+                return 'That school code is already in use by another item. Choose a different code.';
+            }
+            return "Could not {$verb} the school because of a database error. Please review the fields and try again.";
+        }
+        return "Could not {$verb} the school due to an unexpected error. Please try again, and contact ICT support if it persists.";
+    }
+}
+
 if (!function_exists('kafuSanitizeHtml')) {
     /**
      * Sanitize editor-authored HTML against an allowlist so that page body
@@ -2362,7 +2384,10 @@ Route::prefix('admin')->group(function () {
                     ], 422);
                 }
             }
-            $sd = json_encode([
+            // Pass arrays directly — the model's array casts encode once. Encoding
+            // here with json_encode() produced a double-encoded string in the json
+            // column (a real latent bug on MySQL); let the cast own serialization.
+            $sd = [
                 // Legacy dean name/title is only kept when no staff profile is linked;
                 // dean_photo is always persisted (feeds staff profile / fallback display).
                 'dean'             => $deanSlug ? $request->input('dean', '') : '',
@@ -2374,27 +2399,47 @@ Route::prefix('admin')->group(function () {
                 'colour'           => $request->input('colour', '#1B3A6B'),
                 'href'             => $request->input('href', ''),
                 'programmes_count' => $request->input('programmes_count', ['undergraduate' => 0, 'postgraduate' => 0, 'doctoral' => 0]),
-            ]);
-            $item = CmsContent::create([
-                'type'            => 'school',
-                'title'           => $request->input('name', 'New School'),
-                'slug'            => $newSlug,
-                'summary'         => $request->input('description', ''),
-                'body'            => $request->input('description', ''),
-                'status'          => $request->input('status', 'draft'),
-                'structured_data' => $sd,
-                'is_deleted'      => false,
-                'author_id'       => $request->user()->id,
-                'tags'            => '[]',
-                'seo_meta'        => '{}',
-                'published_at'    => now(),
-            ]);
+            ];
+            try {
+                $item = CmsContent::create([
+                    'type'            => 'school',
+                    'title'           => $request->input('name', 'New School'),
+                    'slug'            => $newSlug,
+                    'summary'         => $request->input('description', ''),
+                    'body'            => $request->input('description', ''),
+                    'status'          => $request->input('status', 'draft'),
+                    'structured_data' => $sd,
+                    'is_deleted'      => false,
+                    'author_id'       => $request->user()->id,
+                    'tags'            => [],
+                    'seo_meta'        => [],
+                    'published_at'    => now(),
+                ]);
+            } catch (\Throwable $e) {
+                // Log full detail server-side; return a sanitized, actionable message
+                // (no raw SQL/schema text) instead of the generic production mask.
+                report($e);
+                return response()->json([
+                    'message' => schoolSaveErrorMessage($e, 'create'),
+                ], 422);
+            }
             return response()->json(['data' => $item], 201);
         });
 
         Route::put('/{id}', function (Request $request, int $id) {
             $item = CmsContent::where('type', 'school')->where('is_deleted', false)->findOrFail($id);
-            $sdOld = is_string($item->structured_data) ? json_decode($item->structured_data, true) : ($item->structured_data ?? []);
+            // Robustly coerce existing structured_data to an array. Legacy rows may be
+            // double-encoded (a JSON string inside the json column), so unwrap until we
+            // get an array — otherwise `$sdOld['key']` access throws a 500 on MySQL.
+            $sdOld = $item->structured_data;
+            $depth = 0;
+            while (is_string($sdOld) && $depth < 5) {
+                $sdOld = json_decode($sdOld, true);
+                $depth++;
+            }
+            if (!is_array($sdOld)) {
+                $sdOld = [];
+            }
             $deanSlug = $request->input('dean_staff_slug', $sdOld['dean_staff_slug'] ?? '');
             // Slug is globally unique across cms_content; resolve collisions so renaming
             // a school's code returns an actionable message instead of a server error.
@@ -2412,7 +2457,9 @@ Route::prefix('admin')->group(function () {
                     }
                 }
             }
-            $sd = json_encode([
+            // Pass an array — the model's array cast encodes once. Encoding here with
+            // json_encode() double-encoded the json column (a real latent bug on MySQL).
+            $sd = [
                 // Legacy dean name/title cleared when vacant to keep "Position Vacant"
                 // authoritative; dean_photo always persisted (feeds staff profile / fallback).
                 'dean'             => $deanSlug ? $request->input('dean', $sdOld['dean'] ?? '') : '',
@@ -2424,15 +2471,24 @@ Route::prefix('admin')->group(function () {
                 'colour'           => $request->input('colour', $sdOld['colour'] ?? '#1B3A6B'),
                 'href'             => $request->input('href', $sdOld['href'] ?? ''),
                 'programmes_count' => $request->input('programmes_count', $sdOld['programmes_count'] ?? ['undergraduate' => 0, 'postgraduate' => 0, 'doctoral' => 0]),
-            ]);
-            $item->update([
-                'title'           => $request->input('name', $item->title),
-                'slug'            => $newSlug,
-                'summary'         => $request->input('description', $item->summary),
-                'body'            => $request->input('description', $item->body),
-                'status'          => $request->input('status', $item->status),
-                'structured_data' => $sd,
-            ]);
+            ];
+            try {
+                $item->update([
+                    'title'           => $request->input('name', $item->title),
+                    'slug'            => $newSlug,
+                    'summary'         => $request->input('description', $item->summary),
+                    'body'            => $request->input('description', $item->body),
+                    'status'          => $request->input('status', $item->status),
+                    'structured_data' => $sd,
+                ]);
+            } catch (\Throwable $e) {
+                // Log full detail server-side; return a sanitized, actionable message
+                // (no raw SQL/schema text) instead of the generic production mask.
+                report($e);
+                return response()->json([
+                    'message' => schoolSaveErrorMessage($e, 'save'),
+                ], 422);
+            }
             return response()->json(['data' => $item->fresh()]);
         });
 

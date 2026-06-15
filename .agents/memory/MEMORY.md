@@ -1,6 +1,7 @@
 - [CMS content migration pattern](cms-content-migration.md) — FALLBACK_ rename + useQuery inside component + icon-merge IIFE for pages with JSX/Lucide icons in data arrays.
 - [PHP artisan serve upload limits](php-artisan-serve-upload.md) — php artisan serve spawns a child php -S process without -d flags; must cd into public/ and call php -S directly.
 - [Dynamic navigation architecture](dynamic-nav.md) — CMS-managed nav via site_config navigation group; public GET /api/navigation; mergeWithCms() in navbar; departments mega-menu is always hardcoded.
+- [JSON column double-encoding trap](json-column-double-encoding.md) — array-cast cms_content fields must be assigned arrays, not json_encode strings; SQLite hides it, MySQL bites.
 - [CMS structured_data save preservation](cms-structured-data.md) — editors rebuilding structured_data on save must spread loaded structured_data first or server-set keys (gallery_album_slug/id) get wiped.
 - [School code/slug coupling](school-code-slug-coupling.md) — code↔slug map; dean/programmes/nav use a separate school_code that doesn't auto-sync; cms_content.slug is globally unique and soft-deletes keep the slug.
 - [Staff portal -> CMS sync](staff-portal-cms-sync.md) — reviewer approval upserts CmsContent type='staff_profile' matched by EMAIL; portal text fields re-parsed into renderer's structured arrays.

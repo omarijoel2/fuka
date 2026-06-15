@@ -1122,6 +1122,9 @@ Route::get('/schools', function () {
 
 Route::get('/schools/{code}', function (string $code) {
     $code = strtoupper($code);
+    // Normalize legacy/abbreviation codes to their canonical school code so old
+    // links (e.g. /schools/sohs) resolve instead of showing an empty page.
+    $code = \App\Support\SchoolCodeAlias::canonical($code);
 
     // Try CMS first — isolated try so DB errors fall through to static fallback
     try {
@@ -5279,6 +5282,9 @@ Route::get('/departments/{slug}', function (string $slug) {
 });
 
 Route::get('/schools/{code}/departments', function (string $code) {
+    // Normalize legacy/abbreviation codes (e.g. SOHS -> SHS) so child departments
+    // load on old links, matching the /schools/{code} detail route.
+    $code = \App\Support\SchoolCodeAlias::canonical($code);
     $depts = Department::where('school_code', strtoupper($code))
         ->where('is_active', true)
         ->orderBy('sort_order')
