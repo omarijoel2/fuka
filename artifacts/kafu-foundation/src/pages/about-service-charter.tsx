@@ -9,7 +9,7 @@ import { PageHero } from "@/components/ui/page-hero";
 interface MediaImage { url: string; caption?: string }
 interface MediaAudio { url: string; title?: string }
 interface MediaVideo { url: string; title?: string; poster?: string }
-interface CharterMedia { video?: MediaVideo[]; audio?: MediaAudio[]; images?: MediaImage[] }
+interface CharterMedia { video?: MediaVideo[]; audio?: MediaAudio[]; images?: MediaImage[]; charter_en?: MediaImage; charter_sw?: MediaImage }
 
 function toVideoEmbed(url: string): string | null {
   const yt = url.match(/(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([\w-]{11})/);
@@ -372,13 +372,13 @@ export default function ServiceCharter() {
               testid="en"
               label="Service Delivery Charter (English)"
               alt="KAFU Service Delivery Charter - English"
-              src="/images/uploads/service-delivery-charter-en.jpg"
+              src={media.charter_en?.url || "/images/uploads/service-delivery-charter-en.jpg"}
             />
             <CharterImageCard
               testid="sw"
               label="Service Delivery Charter (Kiswahili)"
               alt="KAFU Service Delivery Charter - Kiswahili"
-              src="/images/uploads/service-delivery-charter-sw.jpg"
+              src={media.charter_sw?.url || "/images/uploads/service-delivery-charter-sw.jpg"}
             />
             <CharterVideoCard media={media} />
             <CharterAudioCard media={media} />

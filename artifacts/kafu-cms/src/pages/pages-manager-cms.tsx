@@ -3,6 +3,7 @@ import { apiGet, apiPut, apiPost, formatDate } from "@/lib/api";
 import { Edit2, X, Save, AlertCircle, FileText, ChevronRight, RefreshCw, Plus, Code2, ListChecks } from "lucide-react";
 import StructuredDataEditor from "@/components/structured-data-editor";
 import PageBlocksEditor, { type PageBlock } from "@/components/page-blocks-editor";
+import MediaUploadField from "@/components/media-upload-field";
 
 interface NavPlacement {
   show_in_menu: boolean;
@@ -63,6 +64,52 @@ function readNav(sd: Record<string, unknown> | null): NavPlacement {
 function isBuilderPage(page: PageRecord): boolean {
   if (page.structured_data && "_nav" in page.structured_data) return true;
   return !!(page.body && page.body.trim().length > 0);
+}
+
+function CharterImagesEditor({
+  value,
+  onChange,
+}: {
+  value: Record<string, unknown>;
+  onChange: (v: Record<string, unknown>) => void;
+}) {
+  const media = (value.media ?? {}) as Record<string, { url?: string } | undefined>;
+  const enUrl = media.charter_en?.url ?? "";
+  const swUrl = media.charter_sw?.url ?? "";
+  function setUrl(key: "charter_en" | "charter_sw", url: string) {
+    const prev = (media[key] ?? {}) as Record<string, unknown>;
+    onChange({ ...value, media: { ...media, [key]: { ...prev, url } } });
+  }
+  return (
+    <div className="border border-gray-200 rounded-xl p-4 space-y-4 mb-4" data-testid="section-charter-images">
+      <div>
+        <p className="text-xs font-semibold text-gray-600">Service Delivery Charter Images</p>
+        <p className="text-xs text-gray-400 mt-0.5">
+          Upload or paste the English and Kiswahili charter images shown on the Service Charter page. Leave blank to use the built-in placeholder.
+        </p>
+      </div>
+      <div>
+        <label className="block text-[11px] font-medium text-gray-500 mb-1">Service Delivery Charter (English)</label>
+        <MediaUploadField
+          value={enUrl}
+          onChange={(u) => setUrl("charter_en", u)}
+          testid="charter-en"
+          accept=".jpg,.jpeg,.png,.webp"
+          placeholder="Upload or paste the English charter image…"
+        />
+      </div>
+      <div>
+        <label className="block text-[11px] font-medium text-gray-500 mb-1">Service Delivery Charter (Kiswahili)</label>
+        <MediaUploadField
+          value={swUrl}
+          onChange={(u) => setUrl("charter_sw", u)}
+          testid="charter-sw"
+          accept=".jpg,.jpeg,.png,.webp"
+          placeholder="Upload or paste the Kiswahili charter image…"
+        />
+      </div>
+    </div>
+  );
 }
 
 export default function PagesManagerCmsPage() {
@@ -529,7 +576,12 @@ export default function PagesManagerCmsPage() {
                   )}
 
                   {sdView === "form" ? (
-                    <StructuredDataEditor value={sdObj} onChange={setSdObj} />
+                    <>
+                      {editing?.slug === "about-service-charter" && (
+                        <CharterImagesEditor value={sdObj} onChange={setSdObj} />
+                      )}
+                      <StructuredDataEditor value={sdObj} onChange={setSdObj} />
+                    </>
                   ) : (
                     <>
                       <textarea
