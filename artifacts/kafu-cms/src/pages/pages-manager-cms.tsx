@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { apiGet, apiPut, apiPost, formatDate } from "@/lib/api";
-import { Edit2, X, Save, AlertCircle, FileText, ChevronRight, RefreshCw, Plus } from "lucide-react";
+import { Edit2, X, Save, AlertCircle, FileText, ChevronRight, RefreshCw, Plus, Code2, ListChecks } from "lucide-react";
+import StructuredDataEditor from "@/components/structured-data-editor";
 
 interface NavPlacement {
   show_in_menu: boolean;
@@ -71,6 +72,8 @@ export default function PagesManagerCmsPage() {
   const [creating, setCreating] = useState(false);
   const [jsonText, setJsonText] = useState("");
   const [jsonError, setJsonError] = useState("");
+  const [sdObj, setSdObj] = useState<Record<string, unknown>>({});
+  const [sdView, setSdView] = useState<"form" | "json">("form");
   const [nav, setNav] = useState<NavPlacement>({ show_in_menu: false, parent: "", order: 0 });
   const [navParents, setNavParents] = useState<string[]>([]);
   const [saving, setSaving] = useState(false);
@@ -127,9 +130,35 @@ export default function PagesManagerCmsPage() {
       setNav(readNav(page.structured_data));
     } else {
       setMode("structured");
-      setJsonText(JSON.stringify(page.structured_data ?? {}, null, 2));
+      const sd = (page.structured_data ?? {}) as Record<string, unknown>;
+      setSdObj(sd);
+      setJsonText(JSON.stringify(sd, null, 2));
+      setSdView("form");
     }
     setJsonError("");
+  }
+
+  function switchSdView(next: "form" | "json") {
+    if (next === sdView) return;
+    if (next === "json") {
+      setJsonText(JSON.stringify(sdObj ?? {}, null, 2));
+      setJsonError("");
+    } else {
+      try {
+        const parsed = JSON.parse(jsonText);
+        if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+          setSdObj(parsed as Record<string, unknown>);
+          setJsonError("");
+        } else {
+          showToast("error", "JSON must be an object to use the form editor.");
+          return;
+        }
+      } catch {
+        showToast("error", "Fix the JSON before switching to the form editor.");
+        return;
+      }
+    }
+    setSdView(next);
   }
 
   function closeModal() {
@@ -153,9 +182,13 @@ export default function PagesManagerCmsPage() {
 
   async function saveStructured() {
     if (!editing) return;
-    if (jsonError) { showToast("error", "Fix JSON errors before saving."); return; }
     let parsedSd: Record<string, unknown> = {};
-    try { parsedSd = JSON.parse(jsonText); } catch { showToast("error", "Invalid JSON."); return; }
+    if (sdView === "json") {
+      if (jsonError) { showToast("error", "Fix JSON errors before saving."); return; }
+      try { parsedSd = JSON.parse(jsonText); } catch { showToast("error", "Invalid JSON."); return; }
+    } else {
+      parsedSd = sdObj ?? {};
+    }
     setSaving(true);
     try {
       await apiPut(`/content/${editing.id}`, {
@@ -444,32 +477,62 @@ export default function PagesManagerCmsPage() {
                   </div>
                 </>
               ) : (
-                /* Structured data JSON editor */
+                /* Structured data editor — friendly form by default, JSON as escape hatch */
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-xs font-semibold text-gray-600">Structured Data (JSON)</label>
-                    {hint && (
-                      <span className="text-[10px] text-gray-400 flex items-center gap-1">
-                        <ChevronRight className="w-3 h-3" />
-                        Expected keys: <code className="bg-gray-100 px-1 rounded">{hint}</code>
-                      </span>
-                    )}
+                  <div className="flex items-center justify-between mb-2">
+                    <label className="text-xs font-semibold text-gray-600">Page Content</label>
+                    <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
+                      <button
+                        type="button"
+                        onClick={() => switchSdView("form")}
+                        data-testid="btn-sd-view-form"
+                        className={`flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-md transition-colors ${
+                          sdView === "form" ? "bg-white text-primary shadow-sm" : "text-gray-500 hover:text-gray-700"
+                        }`}
+                      >
+                        <ListChecks className="w-3.5 h-3.5" /> Form
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => switchSdView("json")}
+                        data-testid="btn-sd-view-json"
+                        className={`flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-md transition-colors ${
+                          sdView === "json" ? "bg-white text-primary shadow-sm" : "text-gray-500 hover:text-gray-700"
+                        }`}
+                      >
+                        <Code2 className="w-3.5 h-3.5" /> Advanced (JSON)
+                      </button>
+                    </div>
                   </div>
-                  <textarea
-                    rows={18}
-                    value={jsonText}
-                    onChange={e => handleJsonChange(e.target.value)}
-                    data-testid="textarea-structured-data"
-                    spellCheck={false}
-                    className={`${TEXTAREA} font-mono text-xs ${jsonError ? "border-red-400 focus:ring-red-300" : ""}`}
-                  />
-                  {jsonError && (
-                    <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3" /> {jsonError}
+
+                  {hint && (
+                    <p className="text-[10px] text-gray-400 flex items-center gap-1 mb-2">
+                      <ChevronRight className="w-3 h-3" />
+                      Sections: <code className="bg-gray-100 px-1 rounded">{hint}</code>
                     </p>
                   )}
-                  <p className="text-xs text-gray-400 mt-1">
-                    The website falls back to hardcoded defaults if any key is missing or removed. Save to publish changes immediately.
+
+                  {sdView === "form" ? (
+                    <StructuredDataEditor value={sdObj} onChange={setSdObj} />
+                  ) : (
+                    <>
+                      <textarea
+                        rows={18}
+                        value={jsonText}
+                        onChange={e => handleJsonChange(e.target.value)}
+                        data-testid="textarea-structured-data"
+                        spellCheck={false}
+                        className={`${TEXTAREA} font-mono text-xs ${jsonError ? "border-red-400 focus:ring-red-300" : ""}`}
+                      />
+                      {jsonError && (
+                        <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
+                          <AlertCircle className="w-3 h-3" /> {jsonError}
+                        </p>
+                      )}
+                    </>
+                  )}
+                  <p className="text-xs text-gray-400 mt-2">
+                    Edit each field directly in the form. Switch to Advanced (JSON) only if you need to add or restructure fields. The website falls back to its built-in defaults if a field is removed. Save to publish immediately.
                   </p>
                 </div>
               )}
