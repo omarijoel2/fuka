@@ -6,6 +6,43 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Models\CmsContent;
 
+if (!function_exists('resolveSchoolCode')) {
+/**
+ * Resolve a requested school code (which may be a legacy/alternate abbreviation
+ * such as "SOHS") to the canonical code of the matching school. Aliases are not
+ * hardcoded — each school carries its own `code_aliases` array in structured_data,
+ * editable in the CMS. Falls back to the requested code when nothing matches.
+ */
+function resolveSchoolCode(string $code): string {
+    $code = strtoupper(trim($code));
+    if ($code === '') return $code;
+    try {
+        $exact = CmsContent::where('type', 'school')
+            ->where('is_deleted', false)
+            ->whereRaw('UPPER(slug) = ?', [$code])
+            ->exists();
+        if ($exact) return $code;
+
+        $schools = CmsContent::where('type', 'school')
+            ->where('is_deleted', false)
+            ->get(['slug', 'structured_data']);
+        foreach ($schools as $sch) {
+            $sd = $sch->structured_data;
+            if (is_string($sd)) $sd = json_decode($sd, true);
+            $aliases = (is_array($sd) && isset($sd['code_aliases']) && is_array($sd['code_aliases']))
+                ? array_map(fn($a) => strtoupper((string) $a), $sd['code_aliases'])
+                : [];
+            if (in_array($code, $aliases, true)) {
+                return strtoupper($sch->slug);
+            }
+        }
+    } catch (\Throwable $e) {
+        // DB unavailable — return the requested code unchanged.
+    }
+    return $code;
+}
+}
+
 if (!function_exists('mapHeroSlide')) {
 function mapHeroSlide(CmsContent $item): array {
     $sd = $item->structured_data ?? [];
@@ -1121,10 +1158,9 @@ Route::get('/schools', function () {
 });
 
 Route::get('/schools/{code}', function (string $code) {
-    $code = strtoupper($code);
-    // Normalize legacy/abbreviation codes to their canonical school code so old
-    // links (e.g. /schools/sohs) resolve instead of showing an empty page.
-    $code = \App\Support\SchoolCodeAlias::canonical($code);
+    // Resolve legacy/abbreviation codes (e.g. /schools/sohs) to the canonical
+    // school code via each school's CMS-managed `code_aliases` — no hardcoded map.
+    $code = resolveSchoolCode($code);
 
     // Try CMS first — isolated try so DB errors fall through to static fallback
     try {
@@ -5282,9 +5318,9 @@ Route::get('/departments/{slug}', function (string $slug) {
 });
 
 Route::get('/schools/{code}/departments', function (string $code) {
-    // Normalize legacy/abbreviation codes (e.g. SOHS -> SHS) so child departments
-    // load on old links, matching the /schools/{code} detail route.
-    $code = \App\Support\SchoolCodeAlias::canonical($code);
+    // Resolve legacy/abbreviation codes via CMS-managed `code_aliases` so child
+    // departments load on old links, matching the /schools/{code} detail route.
+    $code = resolveSchoolCode($code);
     $depts = Department::where('school_code', strtoupper($code))
         ->where('is_active', true)
         ->orderBy('sort_order')

@@ -18,3 +18,10 @@ where it bites.
 cast encode once. Never `json_encode()` first. When READING legacy values that may be
 multi-encoded, unwrap in a loop (`while (is_string($x)) $x = json_decode($x, true)`)
 and coerce to `[]` before offset access. Applies to all cms_content CRUD routes.
+
+**Related — no hardcoded content:** the project forbids baking content/config into
+code. Legacy school-code aliases (SOHS->SHS etc.) live as a `code_aliases` array in
+each school's `structured_data` (CMS-editable, seeded by SchoolsOnlySeeder), resolved
+dynamically by `resolveSchoolCode()` in api.php — NOT a hardcoded PHP map class. When
+tempted to add a lookup/mapping table in code, store it as data on the relevant record
+instead.

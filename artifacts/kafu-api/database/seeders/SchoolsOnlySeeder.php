@@ -38,6 +38,7 @@ class SchoolsOnlySeeder extends Seeder
                 'postgrad_count'  => 7,
                 'doctoral_count'  => 2,
                 'href'           => null,
+                'code_aliases'   => ['SOE'],
             ],
             [
                 'code'           => 'SBE',
@@ -53,6 +54,7 @@ class SchoolsOnlySeeder extends Seeder
                 'postgrad_count'  => 2,
                 'doctoral_count'  => 1,
                 'href'           => null,
+                'code_aliases'   => ['SOBE'],
             ],
             [
                 'code'           => 'SCIT',
@@ -83,6 +85,7 @@ class SchoolsOnlySeeder extends Seeder
                 'postgrad_count'  => 4,
                 'doctoral_count'  => 0,
                 'href'           => null,
+                'code_aliases'   => ['SOSCI'],
             ],
             [
                 'code'           => 'SHS',
@@ -98,6 +101,7 @@ class SchoolsOnlySeeder extends Seeder
                 'postgrad_count'  => 0,
                 'doctoral_count'  => 0,
                 'href'           => null,
+                'code_aliases'   => ['SOHS'],
             ],
             // ── Directorates & Campuses ──────────────────────────────────────
             [
@@ -150,6 +154,7 @@ class SchoolsOnlySeeder extends Seeder
                     'postgraduate'  => $s['postgrad_count'],
                     'doctoral'      => $s['doctoral_count'],
                 ],
+                'code_aliases'     => $s['code_aliases'] ?? [],
             ];
 
             $existing = CmsContent::where('slug', $slug)->first();
