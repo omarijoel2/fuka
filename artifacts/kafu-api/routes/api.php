@@ -5343,10 +5343,10 @@ Route::get('/search', function (Request $request) {
     if ($type === 'all' || $type === 'news') {
         $rows = DB::table('cms_content')
             ->where('type', 'news')->where('status', 'published')->where('is_deleted', false)
-            ->where(function ($q2) use ($term) { $q2->where('title', 'LIKE', $term)->orWhere('excerpt', 'LIKE', $term); })
-            ->select('slug', 'title', 'excerpt', 'category', 'published_at')->limit(5)->get();
+            ->where(function ($q2) use ($term) { $q2->where('title', 'LIKE', $term)->orWhere('summary', 'LIKE', $term); })
+            ->select('slug', 'title', 'summary', 'category', 'published_at')->limit(5)->get();
         foreach ($rows as $r) {
-            $results[] = ['type' => 'news', 'url' => '/news/' . $r->slug, 'title' => $r->title, 'description' => $r->excerpt, 'category' => $r->category];
+            $results[] = ['type' => 'news', 'url' => '/news/' . $r->slug, 'title' => $r->title, 'description' => $r->summary, 'category' => $r->category];
         }
     }
 
@@ -5354,10 +5354,10 @@ Route::get('/search', function (Request $request) {
     if ($type === 'all' || $type === 'event') {
         $rows = DB::table('cms_content')
             ->where('type', 'event')->where('is_deleted', false)
-            ->where(function ($q2) use ($term) { $q2->where('title', 'LIKE', $term)->orWhere('excerpt', 'LIKE', $term); })
-            ->select('slug', 'title', 'excerpt', 'category')->limit(4)->get();
+            ->where(function ($q2) use ($term) { $q2->where('title', 'LIKE', $term)->orWhere('summary', 'LIKE', $term); })
+            ->select('slug', 'title', 'summary', 'category')->limit(4)->get();
         foreach ($rows as $r) {
-            $results[] = ['type' => 'event', 'url' => '/events/' . $r->slug, 'title' => $r->title, 'description' => $r->excerpt, 'category' => $r->category];
+            $results[] = ['type' => 'event', 'url' => '/events/' . $r->slug, 'title' => $r->title, 'description' => $r->summary, 'category' => $r->category];
         }
     }
 

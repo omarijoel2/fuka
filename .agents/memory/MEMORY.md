@@ -16,3 +16,4 @@
 - [Admissions/Academics & MP17 completeness](modules-already-built.md) — the "global benchmark" Admissions/Academics upgrade and MP17 CMS are ~85-100% already built; enrich, don't rebuild.
 - [Date-derived seed staleness](date-derived-seed-staleness.md) — opportunities auto-close on deadline-vs-now; fixed seed dates silently expire and empty the homepage; seed future dates.
 - [Staff profile re-edit after approval](staff-profile-revise.md) — approved/published ProfileSubmissions are terminal; re-editing forks a NEW draft (version+1) via getEditableDraft, never mutates the live record.
+- [cms_content has no excerpt column](cms-content-excerpt-column.md) — DB column is `summary`; API only aliases it to `excerpt` in responses; querying `excerpt` 500s on MySQL.
