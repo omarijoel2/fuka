@@ -41,11 +41,22 @@ return Application::configure(basePath: dirname(__DIR__))
                 } elseif ($e instanceof \Symfony\Component\HttpKernel\Exception\NotFoundHttpException) {
                     $status = 404;
                 }
+                $message = $e->getMessage();
+                if (app()->environment('production')) {
+                    $message = 'An error occurred. Please try again.';
+                    if ($e instanceof \Illuminate\Database\QueryException) {
+                        $raw = $e->getMessage();
+                        if (str_contains($raw, 'Base table or view not found')
+                            || str_contains($raw, 'no such table')
+                            || str_contains($raw, 'Unknown column')
+                            || str_contains($raw, 'no such column')) {
+                            $message = 'Database schema is out of date on this server. An administrator should run: php artisan migrate --force';
+                        }
+                    }
+                }
                 return response()->json([
                     'error'   => true,
-                    'message' => app()->environment('production')
-                        ? 'An error occurred. Please try again.'
-                        : $e->getMessage(),
+                    'message' => $message,
                     'code'    => $status,
                 ], $status);
             }
