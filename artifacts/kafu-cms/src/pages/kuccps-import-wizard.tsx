@@ -61,7 +61,7 @@ interface LetterTemplate {
 const FIELD_OPTIONS: Array<{ value: string; label: string; required?: boolean }> = [
   { value: "full_name",                label: "Full Name",                required: true },
   { value: "kcse_index_number",        label: "KCSE Index Number",        required: true },
-  { value: "kcse_year",                label: "KCSE Year",                required: true },
+  { value: "kcse_year",                label: "KCSE Year" },
   { value: "assigned_programme",       label: "Assigned Programme/Course",required: true },
   { value: "gender",                   label: "Gender" },
   { value: "national_id_number",       label: "National ID Number" },
@@ -95,12 +95,30 @@ const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   cancelled:                   { label: "Cancelled",          color: "#dc3545" },
 };
 
+async function parseResponse(r: Response) {
+  let data: any = null;
+  try {
+    data = await r.json();
+  } catch {
+    if (r.status === 413) throw new Error("File is too large for the server. Maximum upload size exceeded.");
+    throw new Error(`Server error (${r.status}). Please try again or contact ICT.`);
+  }
+  if (!r.ok) {
+    const firstFieldError =
+      data?.errors && typeof data.errors === "object"
+        ? (Object.values(data.errors).flat() as string[])[0]
+        : null;
+    throw new Error(firstFieldError ?? data?.message ?? `Request failed (${r.status})`);
+  }
+  return data;
+}
+
 function apiFetch(path: string, opts?: RequestInit) {
   const token = localStorage.getItem("kafu_cms_token");
   return fetch(`${API}${path}`, {
     ...opts,
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}`, ...(opts?.headers ?? {}) },
-  }).then((r) => r.json());
+  }).then(parseResponse);
 }
 
 function apiFetchForm(path: string, body: FormData) {
@@ -109,7 +127,7 @@ function apiFetchForm(path: string, body: FormData) {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
     body,
-  }).then((r) => r.json());
+  }).then(parseResponse);
 }
 
 // ═════════════════════════════════════════════════════════════════════════════
@@ -552,7 +570,18 @@ export default function KuccpsImportWizard() {
                         <select
                           data-testid={`mapping-select-${h.replace(/\s/g, "_")}`}
                           value={mapped}
-                          onChange={(e) => setMapping({ ...mapping, [h]: e.target.value })}
+                          onChange={(e) => {
+                            const field = e.target.value;
+                            const next = { ...mapping };
+                            if (field) {
+                              // A field can only be mapped to one column — clear it elsewhere
+                              for (const key of Object.keys(next)) {
+                                if (key !== h && next[key] === field) delete next[key];
+                              }
+                            }
+                            next[h] = field;
+                            setMapping(next);
+                          }}
                           style={{ ...selectStyle, borderColor: isRequired ? "#198754" : (mapped ? "#ccc" : "#e5e7eb"), fontSize: 12 }}
                         >
                           {FIELD_OPTIONS.map((o) => (

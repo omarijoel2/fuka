@@ -126,6 +126,38 @@ class KuccpsImportController extends Controller
         $request->validate([
             'mapping'               => 'required|array',
             'academic_year'         => 'required|string',
+        ]);
+
+        // Only known field keys (or empty = skip column) are accepted
+        $allowedFields = [
+            'full_name', 'kcse_index_number', 'kcse_year', 'assigned_programme',
+            'gender', 'national_id_number', 'birth_certificate_number', 'phone_number',
+            'email', 'kuccps_reference', 'county', 'secondary_school_name',
+            'mean_grade', 'cluster_points', 'placement_category', 'disability_status',
+        ];
+        $unknown = array_diff(array_filter(array_values($request->mapping)), $allowedFields);
+        if (!empty($unknown)) {
+            return response()->json([
+                'message' => 'Unknown mapping field(s): ' . implode(', ', $unknown),
+            ], 422);
+        }
+
+        // Mandatory fields must be mapped, and no field may be mapped to two columns
+        $mappedFields = array_filter(array_values($request->mapping));
+        $missing = array_diff(['full_name', 'kcse_index_number', 'assigned_programme'], $mappedFields);
+        if (!empty($missing)) {
+            return response()->json([
+                'message' => 'Required fields not mapped: ' . implode(', ', $missing),
+            ], 422);
+        }
+        $dupes = array_diff_assoc($mappedFields, array_unique($mappedFields));
+        if (!empty($dupes)) {
+            return response()->json([
+                'message' => 'Each field can only be mapped to one column. Duplicated: ' . implode(', ', array_unique($dupes)),
+            ], 422);
+        }
+
+        $request->validate([
             'intake_id'             => 'nullable|integer',
             'admission_letter_template_id' => 'nullable|integer',
             'reporting_date_text'   => 'nullable|string',

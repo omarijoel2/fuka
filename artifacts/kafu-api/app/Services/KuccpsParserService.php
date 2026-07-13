@@ -117,7 +117,6 @@ class KuccpsParserService
      */
     public function autoSuggestMappings(array $headers): array
     {
-        $suggestions = [];
         $rules = [
             'full_name'                => ['name', 'student name', 'applicant name', 'full names', 'full name', 'names', 'surname', 'student'],
             'kcse_index_number'        => ['index', 'index no', 'kcse index', 'exam index', 'index number', 'index_no', 'reg no', 'registration'],
@@ -137,16 +136,45 @@ class KuccpsParserService
             'disability_status'        => ['disability', 'pwd', 'special needs'],
         ];
 
+        // Score every header/field pair, then greedily assign best matches so
+        // that each field is suggested for at most one header and specific
+        // aliases (e.g. "programme name") always beat generic ones (e.g. "name").
+        $candidates = [];
         foreach ($headers as $header) {
-            $lower = strtolower(trim($header));
+            $lower = strtolower(trim((string) $header));
+            if ($lower === '') continue;
+
             foreach ($rules as $field => $aliases) {
+                $best = 0;
                 foreach ($aliases as $alias) {
-                    if ($lower === $alias || str_contains($lower, $alias) || similar_text($lower, $alias) / max(strlen($lower), strlen($alias)) > 0.85) {
-                        $suggestions[$header] = $field;
-                        break 2;
+                    $score = 0;
+                    if ($lower === $alias) {
+                        $score = 1000;
+                    } elseif (preg_match('/(^|[^a-z])' . preg_quote($alias, '/') . '($|[^a-z])/', $lower)) {
+                        // Alias appears as whole word(s); longer aliases are more specific
+                        $score = 500 + strlen($alias) * 10 - (strlen($lower) - strlen($alias));
+                    } else {
+                        $ratio = similar_text($lower, $alias) / max(strlen($lower), strlen($alias));
+                        if ($ratio > 0.85) {
+                            $score = (int) round(100 * $ratio);
+                        }
                     }
+                    if ($score > $best) $best = $score;
+                }
+                if ($best > 0) {
+                    $candidates[] = ['header' => $header, 'field' => $field, 'score' => $best];
                 }
             }
+        }
+
+        usort($candidates, fn($a, $b) => $b['score'] <=> $a['score']);
+
+        $suggestions = [];
+        $usedFields  = [];
+        foreach ($candidates as $c) {
+            if (isset($suggestions[$c['header']]) || isset($usedFields[$c['field']])) continue;
+            $suggestions[$c['header']] = $c['field'];
+            $usedFields[$c['field']]   = true;
         }
 
         return $suggestions;
