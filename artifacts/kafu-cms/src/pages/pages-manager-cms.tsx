@@ -181,6 +181,14 @@ export default function PagesManagerCmsPage() {
     setPickingTemplate(false);
   }
 
+  function applyExistingPage(source: PageRecord) {
+    const sd = (source.structured_data ?? {}) as Record<string, unknown>;
+    const srcBlocks = Array.isArray(sd.blocks) ? (sd.blocks as PageBlock[]) : [];
+    setEditing(p => (p ? { ...p, summary: source.summary ?? "", body: source.body ?? "" } : p));
+    setBlocks(srcBlocks.map((b, i) => ({ ...b, id: `blk-${Date.now()}-${i}` })));
+    setPickingTemplate(false);
+  }
+
   function openEdit(page: PageRecord) {
     setCreating(false);
     setEditing({ ...page });
@@ -449,6 +457,31 @@ export default function PagesManagerCmsPage() {
                     </button>
                   ))}
                 </div>
+                {pages.length > 0 && (
+                  <div className="mt-6 border-t border-gray-200 pt-5">
+                    <label htmlFor="copy-existing-page" className="block text-sm font-semibold text-gray-900 mb-1">
+                      Or copy an existing page
+                    </label>
+                    <p className="text-xs text-gray-500 mb-2">
+                      Starts the new page with the content of a page you have already built. The title, web address, and navbar placement stay blank.
+                    </p>
+                    <select
+                      id="copy-existing-page"
+                      defaultValue=""
+                      data-testid="select-copy-existing-page"
+                      onChange={e => {
+                        const src = pages.find(p => String(p.id) === e.target.value);
+                        if (src) applyExistingPage(src);
+                      }}
+                      className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+                    >
+                      <option value="" disabled>Select a page to copy…</option>
+                      {pages.map(p => (
+                        <option key={p.id} value={String(p.id)}>{p.title} ({p.slug})</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </div>
             ) : (
             <div className="flex-1 overflow-y-auto p-6 space-y-5">

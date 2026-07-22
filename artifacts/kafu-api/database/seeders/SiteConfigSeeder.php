@@ -420,5 +420,42 @@ class SiteConfigSeeder extends Seeder
                 ['n' => '06', 'title' => 'Receive & Accept Offer', 'body' => 'Successful applicants will receive an admission letter. Accept your offer, pay the required fees, and report on the designated joining date.'],
             ],
         ]);
+
+        // About page content — only seed if the group is empty so edited content is never overwritten
+        if (empty(SiteConfig::getGroup('about'))) {
+            SiteConfig::setGroup('about', [
+                'hero_heading'      => 'About KAFU',
+                'hero_description'  => 'Discover the history, mission, and vision of Kaimosi Friends University — a public-spirited institution at the heart of Western Kenya.',
+                'hero_image_url'    => '/images/uploads/aerial-1.jpg',
+                'campus_photo_url'  => '/images/uploads/aerial-2.jpg',
+                'history_heading'   => 'Our History',
+                'history_p1'        => "Kaimosi Friends University (KAFU) was formally awarded its University Charter on August 2, 2022. This landmark event, presided over by the Government of Kenya, marked the institution's elevation to a fully autonomous public university — one of the chartered public universities in Kenya operating under the Universities Act, 2012, guidelines issued by the Commission for University Education (CUE), its own University Charter, and Statutes.",
+                'history_p2'        => 'KAFU, formerly Kaimosi Friends University College (KAFUCO), was established in 2014 through Legal Notice Number 87 of May 22, 2015, as a Constituent College of Masinde Muliro University of Science and Technology (MMUST). KAFUCO itself was a successor institution to the educational infrastructure previously occupied by the Kaimosi Teachers Training College (KTTC), building upon the rich academic heritage of the larger Kaimosi Complex.',
+                'history_p3'        => 'The University is strategically located within the renowned Kaimosi Complex in Vihiga County, Western Kenya — just 500 metres off the Chavakali-Kapsabet Road — providing an ideal environment for teaching, learning, and research. KAFU is ISO 9001:2015 certified, demonstrating its commitment to delivering high-quality education and maintaining the security of its data and processes to international standards.',
+                'vision'            => 'To be a premier university in training, research, innovation and community service.',
+                'mission'           => 'To provide quality education and training, promote research and innovation for sustainable development.',
+                'quaker_heritage'   => 'KAFU draws from the rich Quaker tradition of Friends Church East Africa, which established the first school at Kaimosi in 1902. This heritage of service, integrity, and education without discrimination remains at the core of every programme, policy, and partnership the university pursues.',
+                'vc_name'           => 'Prof. Peter N. Mwita',
+                'vc_title'          => 'Vice Chancellor',
+                'vc_bio'            => 'Prof. Peter N. Mwita is a distinguished Kenyan academic leader, statistician, and institution builder with over three decades of experience in higher education, research management, and national development. He currently serves as the Vice Chancellor of Kaimosi Friends University (KAFU), where he is driving a transformative agenda focused on academic excellence, research expansion, governance strengthening, and community-centred growth.',
+                'vc_bio_full'       => implode("\n\n", [
+                    'Prof. Mwita holds a Ph.D. in Statistics from Technische Universitat Kaiserslautern (Germany), a Master of Applied Statistics from Macquarie University (Australia), and a BSc (Statistics Major) with First Class Honours from Kenyatta University. His academic career includes senior leadership roles such as Deputy Vice-Chancellor (Research, Innovation & Linkages) at Machakos University, Dean of the School of Mathematical Sciences at JKUAT, and Chairman of the Department of Statistics and Actuarial Sciences.',
+                    "A respected scholar, Prof. Mwita has published widely in statistics, supervised numerous postgraduate students, and led major research initiatives. He was instrumental in establishing the UNESCO Chair on Cloud Computing for Sustainable Development, strengthening Kenya's capacity in data-driven innovation and sustainability research. Nationally, as Chairman of the Kenya National Bureau of Statistics, he played a pivotal role in the restructuring of the Bureau.",
+                    'Prof. Mwita is also widely recognized as a mentor and builder of talent. He has guided generations of young scholars, researchers, and professionals, and has championed institutional initiatives that expand youth opportunities. These include the Luban Workshop, the Ajiry Centre, and the STEM Centre, all of which strengthen technical skills, digital competencies, and innovation capacity among Kenyan youth.',
+                    'At KAFU, Prof. Mwita is implementing a forward-looking vision anchored in quality teaching, robust research systems, fiscal discipline, and strong governance. He is actively building partnerships with national and county governments, industry, and development agencies to position the university as a centre of excellence in Kenya and a catalyst for regional socio-economic transformation.',
+                    "Prof. Mwita is known for his integrity, strategic clarity, calm leadership style, and unwavering dedication to academic and national progress. His career reflects a deep commitment to scholarship, mentorship, and the development of institutions that empower communities and shape Kenya's future.",
+                ]),
+                'vc_email'          => 'vc@kafu.ac.ke',
+                'vc_photo_url'      => '/images/uploads/Prof.-Mwita-council.jpg',
+                'core_values'       => ['Integrity and Professionalism', 'Quality and Excellence', 'Equity and Inclusivity', 'Innovation and Creativity', 'Teamwork and Collaboration'],
+                'sidebar_stats'     => [
+                    ['label' => 'Location', 'value' => 'Kaimosi Complex, Vihiga County, Western Kenya'],
+                    ['label' => 'Academic Breadth', 'value' => '5 Schools, 38+ Programmes'],
+                    ['label' => 'University Charter', 'value' => 'Awarded August 2, 2022'],
+                    ['label' => 'Programmes', 'value' => 'Certificate to PhD level'],
+                    ['label' => 'Quality Standard', 'value' => 'ISO 9001:2015 Certified'],
+                ],
+            ]);
+        }
     }
 }
