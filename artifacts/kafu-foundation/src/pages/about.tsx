@@ -3,6 +3,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { SeoHead } from "@/components/seo-head";
 import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 
 interface AboutData {
   hero_heading?: string;
@@ -19,6 +20,7 @@ interface AboutData {
   vc_name?: string;
   vc_title?: string;
   vc_bio?: string;
+  vc_bio_full?: string;
   vc_email?: string;
   vc_photo_url?: string;
   core_values?: string[];
@@ -40,6 +42,7 @@ const DEFAULTS: Required<AboutData> = {
   vc_name: "Prof. Peter N. Mwita",
   vc_title: "Vice Chancellor",
   vc_bio: "Prof. Peter N. Mwita is the Vice Chancellor of Kaimosi Friends University and the Secretary to the Council. A full Professor and esteemed academic leader with a distinguished career spanning over 29 years in academia and research, he previously served as Deputy Vice-Chancellor (Research, Innovation, and Linkages) at Machakos University. Under his leadership, KAFU continues to advance its mission of quality education, research, and community engagement.",
+  vc_bio_full: "",
   vc_email: "vc@kafu.ac.ke",
   vc_photo_url: "/images/uploads/Prof.-Mwita-council.jpg",
   core_values: ["Integrity and Professionalism", "Quality and Excellence", "Equity and Inclusivity", "Innovation and Creativity", "Teamwork and Collaboration"],
@@ -60,6 +63,8 @@ export default function About() {
   });
 
   const d = { ...DEFAULTS, ...(apiData?.data ?? {}) };
+  const [vcExpanded, setVcExpanded] = useState(false);
+  const vcFullParagraphs = (d.vc_bio_full ?? "").split(/\n+/).map(p => p.trim()).filter(Boolean);
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -135,7 +140,21 @@ export default function About() {
                 <div className="bg-primary text-primary-foreground p-8 flex flex-col justify-center">
                   <span className="text-xs font-semibold uppercase tracking-wider text-accent mb-3">{d.vc_title}</span>
                   <h3 className="text-2xl font-serif font-bold mb-3">{d.vc_name}</h3>
-                  <p className="text-primary-foreground/80 text-sm leading-relaxed mb-5">{d.vc_bio}</p>
+                  <p className="text-primary-foreground/80 text-sm leading-relaxed mb-3">{d.vc_bio}</p>
+                  {vcExpanded && vcFullParagraphs.map((p, i) => (
+                    <p key={i} className="text-primary-foreground/80 text-sm leading-relaxed mb-3">{p}</p>
+                  ))}
+                  {vcFullParagraphs.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setVcExpanded(v => !v)}
+                      aria-expanded={vcExpanded}
+                      data-testid="button-vc-read-more"
+                      className="self-start text-accent text-sm font-semibold hover:underline mb-5"
+                    >
+                      {vcExpanded ? "Show less" : "Read more"}
+                    </button>
+                  )}
                   <a href={`mailto:${d.vc_email}`} className="text-accent text-sm font-medium hover:underline">
                     {d.vc_email}
                   </a>

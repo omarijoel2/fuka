@@ -19,6 +19,7 @@ interface AboutConfig {
   vc_name?: string;
   vc_title?: string;
   vc_bio?: string;
+  vc_bio_full?: string;
   vc_email?: string;
   vc_photo_url?: string;
   core_values?: string[];
@@ -199,8 +200,11 @@ export default function AboutCmsPage() {
         <Field label="Photo URL" id="vc_photo_url">
           <input id="vc_photo_url" className={inputCls} value={config.vc_photo_url ?? ""} onChange={e => set("vc_photo_url", e.target.value)} data-testid="input-vc-photo-url" />
         </Field>
-        <Field label="Bio" id="vc_bio">
+        <Field label="Bio (short intro, always visible)" id="vc_bio">
           <textarea id="vc_bio" className={textareaCls} value={config.vc_bio ?? ""} onChange={e => set("vc_bio", e.target.value)} data-testid="input-vc-bio" />
+        </Field>
+        <Field label="Full Bio (shown when visitors click Read more; separate paragraphs with blank lines)" id="vc_bio_full">
+          <textarea id="vc_bio_full" className={textareaCls} rows={10} value={config.vc_bio_full ?? ""} onChange={e => set("vc_bio_full", e.target.value)} data-testid="input-vc-bio-full" />
         </Field>
       </section>
 
