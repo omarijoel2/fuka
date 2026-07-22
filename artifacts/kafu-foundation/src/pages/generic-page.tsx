@@ -64,7 +64,7 @@ export default function GenericPage() {
 
       <header className="bg-primary text-white">
         <div className="max-w-4xl mx-auto px-6 py-16">
-          <h1 className="font-serif text-3xl md:text-4xl font-bold" data-testid="page-title">
+          <h1 className="font-serif text-3xl md:text-4xl font-bold text-white" data-testid="page-title">
             {data.title}
           </h1>
           {data.summary ? (

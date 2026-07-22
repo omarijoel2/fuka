@@ -4,6 +4,7 @@ import { Edit2, X, Save, AlertCircle, FileText, ChevronRight, RefreshCw, Plus, C
 import StructuredDataEditor from "@/components/structured-data-editor";
 import PageBlocksEditor, { type PageBlock } from "@/components/page-blocks-editor";
 import MediaUploadField from "@/components/media-upload-field";
+import { PAGE_TEMPLATES, type PageTemplate } from "@/lib/page-templates";
 
 interface NavPlacement {
   show_in_menu: boolean;
@@ -118,6 +119,7 @@ export default function PagesManagerCmsPage() {
   const [editing, setEditing] = useState<PageRecord | null>(null);
   const [mode, setMode] = useState<"structured" | "builder">("structured");
   const [creating, setCreating] = useState(false);
+  const [pickingTemplate, setPickingTemplate] = useState(false);
   const [jsonText, setJsonText] = useState("");
   const [jsonError, setJsonError] = useState("");
   const [sdObj, setSdObj] = useState<Record<string, unknown>>({});
@@ -163,6 +165,7 @@ export default function PagesManagerCmsPage() {
   function openCreate() {
     setCreating(true);
     setMode("builder");
+    setPickingTemplate(true);
     setEditing({
       id: 0, slug: "", title: "", summary: "", body: "",
       status: "draft", updated_at: "", structured_data: {}, seo_meta: {},
@@ -170,6 +173,12 @@ export default function PagesManagerCmsPage() {
     setNav({ show_in_menu: false, parent: TOP_LEVEL, order: 0 });
     setBlocks([]);
     setJsonError("");
+  }
+
+  function applyTemplate(tpl: PageTemplate) {
+    setEditing(p => (p ? { ...p, summary: tpl.summary, body: tpl.body } : p));
+    setBlocks(tpl.blocks.map(b => ({ ...b, id: `${b.id ?? "blk"}-${Date.now()}` })) as PageBlock[]);
+    setPickingTemplate(false);
   }
 
   function openEdit(page: PageRecord) {
@@ -216,6 +225,7 @@ export default function PagesManagerCmsPage() {
   function closeModal() {
     setEditing(null);
     setCreating(false);
+    setPickingTemplate(false);
   }
 
   function handleJsonChange(val: string) {
@@ -417,7 +427,41 @@ export default function PagesManagerCmsPage() {
               </button>
             </div>
 
+            {creating && pickingTemplate ? (
+              <div className="flex-1 overflow-y-auto p-6">
+                <p className="text-sm text-gray-600 mb-4">
+                  Choose a starting template. It pre-fills the page with a professional layout — just replace the placeholder text with your content.
+                </p>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  {PAGE_TEMPLATES.map(tpl => (
+                    <button
+                      key={tpl.id}
+                      type="button"
+                      onClick={() => applyTemplate(tpl)}
+                      data-testid={`btn-template-${tpl.id}`}
+                      className="text-left border border-gray-200 rounded-xl p-4 hover:border-primary/50 hover:bg-primary/5 transition-colors group"
+                    >
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <FileText className="w-4 h-4 text-primary shrink-0" />
+                        <span className="text-sm font-semibold text-gray-900 group-hover:text-primary">{tpl.name}</span>
+                      </div>
+                      <p className="text-xs text-gray-500 leading-relaxed">{tpl.description}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
             <div className="flex-1 overflow-y-auto p-6 space-y-5">
+              {creating && (
+                <button
+                  type="button"
+                  onClick={() => setPickingTemplate(true)}
+                  data-testid="btn-back-to-templates"
+                  className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
+                >
+                  <ChevronRight className="w-3.5 h-3.5 rotate-180" /> Back to templates
+                </button>
+              )}
               {/* Title */}
               <div>
                 <label className="block text-xs font-semibold text-gray-600 mb-1.5">Page Title</label>
@@ -605,7 +649,9 @@ export default function PagesManagerCmsPage() {
                 </div>
               )}
             </div>
+            )}
 
+            {!(creating && pickingTemplate) && (
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200">
               <button onClick={closeModal} data-testid="btn-cancel-page-edit"
                 className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
@@ -620,6 +666,7 @@ export default function PagesManagerCmsPage() {
                 {saving ? "Saving…" : creating ? "Create & Publish" : "Save & Publish"}
               </button>
             </div>
+            )}
           </div>
         </div>
       )}
