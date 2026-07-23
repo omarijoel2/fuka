@@ -86,7 +86,7 @@ export default function About() {
         />
         <div className="absolute inset-0 bg-primary/70" />
         <div className="relative container mx-auto px-4 text-center z-10">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-4">{d.hero_heading}</h1>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-serif font-bold mb-4 text-white">{d.hero_heading}</h1>
           <p className="text-lg text-primary-foreground/80 max-w-2xl mx-auto">{d.hero_description}</p>
         </div>
       </div>
