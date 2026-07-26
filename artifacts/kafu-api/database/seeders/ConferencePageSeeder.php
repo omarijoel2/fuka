@@ -35,7 +35,7 @@ JSON, true);
             'status'          => $data['status'] ?? 'published',
             'structured_data' => $data['structured_data'],
             'seo_meta'        => $data['seo_meta'],
-            'published_date'  => now(),
+            'published_at'  => now(),
         ]);
 
         $this->command?->info('conference-2026 page created.');
