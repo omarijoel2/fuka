@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { apiGet, apiPut, apiPost, formatDate } from "@/lib/api";
-import { Edit2, X, Save, AlertCircle, FileText, ChevronRight, RefreshCw, Plus, Code2, ListChecks } from "lucide-react";
+import { apiGet, apiPut, apiPost, apiDelete, formatDate } from "@/lib/api";
+import { Edit2, X, Save, AlertCircle, FileText, ChevronRight, RefreshCw, Plus, Code2, ListChecks, EyeOff, Eye, Trash2 } from "lucide-react";
 import StructuredDataEditor from "@/components/structured-data-editor";
 import PageBlocksEditor, { type PageBlock } from "@/components/page-blocks-editor";
 import MediaUploadField from "@/components/media-upload-field";
@@ -314,6 +314,38 @@ export default function PagesManagerCmsPage() {
       load();
     } catch (e: unknown) {
       showToast("error", e instanceof Error ? e.message : "Save failed.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function togglePublish() {
+    if (!editing || creating) return;
+    const next = editing.status === "published" ? "unpublished" : "published";
+    setSaving(true);
+    try {
+      await apiPut(`/content/${editing.id}`, { status: next });
+      showToast("success", next === "published" ? "Page published." : "Page unpublished — it is now hidden from the public site.");
+      closeModal();
+      load();
+    } catch (e: unknown) {
+      showToast("error", e instanceof Error ? e.message : "Status change failed.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function deletePage() {
+    if (!editing || creating) return;
+    if (!window.confirm(`Delete "${editing.title}"? The page will be removed from the public site and this list.`)) return;
+    setSaving(true);
+    try {
+      await apiDelete(`/content/${editing.id}`);
+      showToast("success", "Page deleted.");
+      closeModal();
+      load();
+    } catch (e: unknown) {
+      showToast("error", e instanceof Error ? e.message : "Delete failed. Only admins and department editors can delete pages.");
     } finally {
       setSaving(false);
     }
@@ -686,6 +718,20 @@ export default function PagesManagerCmsPage() {
 
             {!(creating && pickingTemplate) && (
             <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-gray-200">
+              {!creating && editing.id > 0 && (
+                <>
+                  <button onClick={deletePage} disabled={saving} data-testid="btn-delete-page"
+                    className="flex items-center gap-1.5 px-3 py-2 text-sm text-red-600 border border-red-200 rounded-lg hover:bg-red-50 disabled:opacity-50 transition-colors mr-auto">
+                    <Trash2 className="w-4 h-4" /> Delete
+                  </button>
+                  <button onClick={togglePublish} disabled={saving} data-testid="btn-toggle-publish-page"
+                    className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 transition-colors">
+                    {editing.status === "published"
+                      ? <><EyeOff className="w-4 h-4" /> Unpublish</>
+                      : <><Eye className="w-4 h-4" /> Publish</>}
+                  </button>
+                </>
+              )}
               <button onClick={closeModal} data-testid="btn-cancel-page-edit"
                 className="px-4 py-2 text-sm text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
                 Cancel
