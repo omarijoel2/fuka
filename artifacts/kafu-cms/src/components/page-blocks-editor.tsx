@@ -74,7 +74,7 @@ export default function PageBlocksEditor({ value, onChange }: Props) {
       )}
 
       {blocks.map((block, idx) => {
-        const Meta = BLOCK_META[block.type];
+        const Meta = BLOCK_META[block.type] ?? { label: `${block.type} (advanced — edit via JSON view)`, icon: Code };
         const Icon = Meta.icon;
         return (
           <div key={block.id} className="border border-gray-200 rounded-xl p-3 bg-gray-50/40" data-testid={`block-${block.id}`}>
