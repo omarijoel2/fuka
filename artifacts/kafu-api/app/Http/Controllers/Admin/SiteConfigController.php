@@ -8,8 +8,23 @@ use Illuminate\Http\Request;
 
 class SiteConfigController extends Controller
 {
-    private const ALLOWED = ['homepage', 'navigation', 'site', 'seo', 'contact', 'branding', 'admissions_fees', 'admissions_content', 'permissions', 'staff_documents'];
+private const ALLOWED = [
+    'homepage',
+    'navigation',
+    'site',
+    'seo',
+    'contact',
+    'branding',
 
+    'about',
+    'student-services',
+
+    'admissions_fees',
+    'admissions_content',
+
+    'permissions',
+    'staff_documents'
+];
     public function getGroup(string $group)
     {
         if (!in_array($group, self::ALLOWED)) {
